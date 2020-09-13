@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,160 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="action_copy_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_copy_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_copy_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_copy_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_cut_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_cut_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_cut_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_cut_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_delete_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_delete_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_delete_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_delete_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_edit_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_edit_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_edit_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_edit_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_edit_snbt_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_edit_snbt_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_edit_snbt_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_edit_snbt_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_new_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_new_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_new_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_new_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_open_file_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_open_file_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_open_file_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_open_file_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_open_folder_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_open_folder_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_open_folder_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_open_folder_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_paste_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_paste_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_paste_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_paste_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_refresh_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_refresh_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_refresh_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_refresh_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_rename_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_rename_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_rename_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_rename_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_save_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_save_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_save_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_save_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_search_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_search_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_search_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_search_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="byte_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\byte_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="byte_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\byte_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="byte_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\byte_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="byte_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\byte_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="compound_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\compound_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="compound_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\compound_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="double_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\double_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="double_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\double_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="float_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\float_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="float_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\float_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="int_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\int_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="int_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\int_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="int_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\int_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="int_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\int_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="list_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\list_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="list_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\list_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="long_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\long_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="long_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\long_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="long_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\long_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="long_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\long_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="short_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\short_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="short_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\short_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="string_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\string_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="string_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\string_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

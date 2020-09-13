@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +67,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SNBT\SnbtMaker.cs" />
+    <Compile Include="SNBT\SnbtParser.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -78,6 +81,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -92,6 +96,162 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
+      <Project>{4488498d-976d-4da3-bf72-109531af0488}</Project>
+      <Name>fNbt</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\byte_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\byte_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\compound_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\compound_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\double_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\double_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\float_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\float_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\int_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\int_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\int_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\int_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\list_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\list_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\long_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\long_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\long_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\long_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\short_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\short_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\string_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\string_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\byte_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\byte_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_new_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_new_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_file_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_file_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_folder_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_folder_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_paste_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_paste_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_refresh_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_refresh_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_rename_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_rename_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_copy_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_copy_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_cut_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_cut_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_delete_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_delete_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_search_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_search_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
