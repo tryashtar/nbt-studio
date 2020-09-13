@@ -16,16 +16,20 @@ namespace NbtExplorer2
     {
         public NbtTreeView()
         {
+            // linking data to visibility
             CanExpandGetter = NbtCanExpand;
             ChildrenGetter = NbtGetChildren;
 
-            this.HeaderStyle = ColumnHeaderStyle.None;
+            // boilerplate to display icons next to tags
             LargeImageList = new ImageList() { ImageSize = new Size(16, 16) };
             SmallImageList = new ImageList() { ImageSize = new Size(16, 16) };
             PopulateImageList(LargeImageList);
             PopulateImageList(SmallImageList);
+
+            this.HeaderStyle = ColumnHeaderStyle.None;
             AllColumns.Add(new OLVColumn()
             {
+                // linking data to visibility
                 AspectGetter = NbtGetText,
                 ImageGetter = NbtGetImage,
                 FillsFreeSpace = true
@@ -33,17 +37,89 @@ namespace NbtExplorer2
             RebuildColumns();
         }
 
+        // double-click to expand/collapse
+        // (automatically does nothing for tags that can't expand/collapse)
         protected override bool ProcessLButtonDoubleClick(OlvListViewHitTestInfo hti)
         {
-            if (IsExpanded(hti.RowObject))
-                Collapse(hti.RowObject);
-            else
-                Expand(hti.RowObject);
+            ToggleExpansion(hti.RowObject);
             return base.ProcessLButtonDoubleClick(hti);
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // space to toggle collapsed/expanded
+            if (keyData == Keys.Space)
+            {
+                ToggleExpansion(SelectedObject);
+                return true;
+            }
+            // control-space to expand all
+            if (keyData == (Keys.Space | Keys.Control))
+            {
+                if (IsExpanded(SelectedObject))
+                    Collapse(SelectedObject);
+                else
+                    ExpandAll(SelectedObject);
+                return true;
+            }
+            // control-up to select parent
+            if (keyData == (Keys.Up | Keys.Control))
+            {
+                SelectObject(GetParent(SelectedObject));
+                FocusedItem = SelectedItem; // fix navigation being weird
+                return true;
+            }
+            // control-down to select lowest sibling
+            if (keyData == (Keys.Down | Keys.Control))
+            {
+                var parent = GetParent(SelectedObject);
+                if (parent == null)
+                    return true;
+                var siblings = GetChildren(parent).Cast<object>();
+                var last = siblings.Last();
+                if (SelectedObject == last)
+                    return ProcessCmdKey(ref msg, Keys.Down); // treat as normal down (does not work)
+                else
+                {
+                    SelectObject(last);
+                    FocusedItem = SelectedItem; // fix navigation being weird
+                    return true;
+                }
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        // collapse children when collapsing
+        protected override void OnCollapsed(TreeBranchCollapsedEventArgs e)
+        {
+            CollapseAll(e.Model);
+            base.OnCollapsed(e);
+        }
+
+        private void ExpandAll(object model)
+        {
+            // reverse order optimization
+            foreach (var child in GetChildren(model))
+            {
+                Expand(child);
+            }
+            Expand(model);
+        }
+
+        private void CollapseAll(object model)
+        {
+            Collapse(model);
+            foreach (var child in GetChildren(model))
+            {
+                Collapse(child);
+            }
+        }
+
+        // ObjectListView images work by returning strings that are cached in the ImageList
+        // set them up to contain the tag type icons
         private void PopulateImageList(ImageList list)
         {
+            list.Images.Add("file", Properties.Resources.file_image);
             foreach (NbtTagType type in Enum.GetValues(typeof(NbtTagType)))
             {
                 var key = type.ToString();
@@ -51,6 +127,15 @@ namespace NbtExplorer2
                 if (value != null)
                     list.Images.Add(key, value);
             }
+        }
+
+        private object NbtGetImage(object obj)
+        {
+            if (obj is NbtTag tag)
+                return tag.TagType.ToString();
+            if (obj is NbtFile)
+                return "file";
+            return null;
         }
 
         private bool NbtCanExpand(object obj)
@@ -91,13 +176,6 @@ namespace NbtExplorer2
             if (name == null)
                 return value;
             return $"{name}: {value}";
-        }
-
-        private object NbtGetImage(object obj)
-        {
-            if (obj is NbtTag tag)
-                return tag.TagType.ToString();
-            return null;
         }
     }
 }

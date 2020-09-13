@@ -67,6 +67,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SNBT\SnbtMaker.cs" />
     <Compile Include="SNBT\SnbtParser.cs" />
     <Compile Include="Util.cs" />
@@ -75,14 +80,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -252,6 +252,84 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\action_search_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_compound_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_compound_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_double_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_double_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_float_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_float_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_list_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_list_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_short_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_short_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_string_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_string_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\file_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\file_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

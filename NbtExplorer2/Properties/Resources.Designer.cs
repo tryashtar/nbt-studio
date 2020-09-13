@@ -323,9 +323,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon byte_array_icon {
+        internal static System.Drawing.Icon file_icon {
             get {
-                object obj = ResourceManager.GetObject("byte_array_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("file_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -333,9 +333,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap byte_array_image {
+        internal static System.Drawing.Bitmap file_image {
             get {
-                object obj = ResourceManager.GetObject("byte_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("file_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -343,9 +343,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon byte_icon {
+        internal static System.Drawing.Icon tag_byte_array_icon {
             get {
-                object obj = ResourceManager.GetObject("byte_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_byte_array_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -353,9 +353,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap byte_image {
+        internal static System.Drawing.Bitmap tag_byte_array_image {
             get {
-                object obj = ResourceManager.GetObject("byte_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_byte_array_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -363,9 +363,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon compound_icon {
+        internal static System.Drawing.Icon tag_byte_icon {
             get {
-                object obj = ResourceManager.GetObject("compound_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_byte_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -373,9 +373,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap compound_image {
+        internal static System.Drawing.Bitmap tag_byte_image {
             get {
-                object obj = ResourceManager.GetObject("compound_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_byte_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -383,9 +383,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon double_icon {
+        internal static System.Drawing.Icon tag_compound_icon {
             get {
-                object obj = ResourceManager.GetObject("double_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_compound_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -393,9 +393,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap double_image {
+        internal static System.Drawing.Bitmap tag_compound_image {
             get {
-                object obj = ResourceManager.GetObject("double_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_compound_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -403,9 +403,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon float_icon {
+        internal static System.Drawing.Icon tag_double_icon {
             get {
-                object obj = ResourceManager.GetObject("float_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_double_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -413,9 +413,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap float_image {
+        internal static System.Drawing.Bitmap tag_double_image {
             get {
-                object obj = ResourceManager.GetObject("float_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_double_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -423,9 +423,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon int_array_icon {
+        internal static System.Drawing.Icon tag_float_icon {
             get {
-                object obj = ResourceManager.GetObject("int_array_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_float_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -433,9 +433,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap int_array_image {
+        internal static System.Drawing.Bitmap tag_float_image {
             get {
-                object obj = ResourceManager.GetObject("int_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_float_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -443,9 +443,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon int_icon {
+        internal static System.Drawing.Icon tag_int_array_icon {
             get {
-                object obj = ResourceManager.GetObject("int_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_int_array_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -453,9 +453,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap int_image {
+        internal static System.Drawing.Bitmap tag_int_array_image {
             get {
-                object obj = ResourceManager.GetObject("int_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_int_array_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -463,9 +463,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon list_icon {
+        internal static System.Drawing.Icon tag_int_icon {
             get {
-                object obj = ResourceManager.GetObject("list_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_int_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -473,9 +473,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap list_image {
+        internal static System.Drawing.Bitmap tag_int_image {
             get {
-                object obj = ResourceManager.GetObject("list_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_int_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -483,9 +483,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon long_array_icon {
+        internal static System.Drawing.Icon tag_list_icon {
             get {
-                object obj = ResourceManager.GetObject("long_array_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_list_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -493,9 +493,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap long_array_image {
+        internal static System.Drawing.Bitmap tag_list_image {
             get {
-                object obj = ResourceManager.GetObject("long_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_list_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -503,9 +503,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon long_icon {
+        internal static System.Drawing.Icon tag_long_array_icon {
             get {
-                object obj = ResourceManager.GetObject("long_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_long_array_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -513,9 +513,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap long_image {
+        internal static System.Drawing.Bitmap tag_long_array_image {
             get {
-                object obj = ResourceManager.GetObject("long_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_long_array_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -523,9 +523,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon short_icon {
+        internal static System.Drawing.Icon tag_long_icon {
             get {
-                object obj = ResourceManager.GetObject("short_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_long_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -533,9 +533,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap short_image {
+        internal static System.Drawing.Bitmap tag_long_image {
             get {
-                object obj = ResourceManager.GetObject("short_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_long_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -543,9 +543,9 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon string_icon {
+        internal static System.Drawing.Icon tag_short_icon {
             get {
-                object obj = ResourceManager.GetObject("string_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_short_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -553,9 +553,29 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap string_image {
+        internal static System.Drawing.Bitmap tag_short_image {
             get {
-                object obj = ResourceManager.GetObject("string_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tag_short_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon tag_string_icon {
+            get {
+                object obj = ResourceManager.GetObject("tag_string_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap tag_string_image {
+            get {
+                object obj = ResourceManager.GetObject("tag_string_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

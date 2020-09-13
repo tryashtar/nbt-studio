@@ -61,29 +61,29 @@ namespace NbtExplorer2
             switch (type)
             {
                 case NbtTagType.Byte:
-                    return Properties.Resources.byte_image;
+                    return Properties.Resources.tag_byte_image;
                 case NbtTagType.Short:
-                    return Properties.Resources.short_image;
+                    return Properties.Resources.tag_short_image;
                 case NbtTagType.Int:
-                    return Properties.Resources.int_image;
+                    return Properties.Resources.tag_int_image;
                 case NbtTagType.Long:
-                    return Properties.Resources.long_image;
+                    return Properties.Resources.tag_long_image;
                 case NbtTagType.Float:
-                    return Properties.Resources.float_image;
+                    return Properties.Resources.tag_float_image;
                 case NbtTagType.Double:
-                    return Properties.Resources.double_image;
+                    return Properties.Resources.tag_double_image;
                 case NbtTagType.ByteArray:
-                    return Properties.Resources.byte_array_image;
+                    return Properties.Resources.tag_byte_array_image;
                 case NbtTagType.String:
-                    return Properties.Resources.string_image;
+                    return Properties.Resources.tag_string_image;
                 case NbtTagType.List:
-                    return Properties.Resources.list_image;
+                    return Properties.Resources.tag_list_image;
                 case NbtTagType.Compound:
-                    return Properties.Resources.compound_image;
+                    return Properties.Resources.tag_compound_image;
                 case NbtTagType.IntArray:
-                    return Properties.Resources.int_array_image;
+                    return Properties.Resources.tag_int_array_image;
                 case NbtTagType.LongArray:
-                    return Properties.Resources.long_array_image;
+                    return Properties.Resources.tag_long_array_image;
                 default:
                     return null;
             }
@@ -94,29 +94,29 @@ namespace NbtExplorer2
             switch (type)
             {
                 case NbtTagType.Byte:
-                    return Properties.Resources.byte_icon;
+                    return Properties.Resources.tag_byte_icon;
                 case NbtTagType.Short:
-                    return Properties.Resources.short_icon;
+                    return Properties.Resources.tag_short_icon;
                 case NbtTagType.Int:
-                    return Properties.Resources.int_icon;
+                    return Properties.Resources.tag_int_icon;
                 case NbtTagType.Long:
-                    return Properties.Resources.long_icon;
+                    return Properties.Resources.tag_long_icon;
                 case NbtTagType.Float:
-                    return Properties.Resources.float_icon;
+                    return Properties.Resources.tag_float_icon;
                 case NbtTagType.Double:
-                    return Properties.Resources.double_icon;
+                    return Properties.Resources.tag_double_icon;
                 case NbtTagType.ByteArray:
-                    return Properties.Resources.byte_array_icon;
+                    return Properties.Resources.tag_byte_array_icon;
                 case NbtTagType.String:
-                    return Properties.Resources.string_icon;
+                    return Properties.Resources.tag_string_icon;
                 case NbtTagType.List:
-                    return Properties.Resources.list_icon;
+                    return Properties.Resources.tag_list_icon;
                 case NbtTagType.Compound:
-                    return Properties.Resources.compound_icon;
+                    return Properties.Resources.tag_compound_icon;
                 case NbtTagType.IntArray:
-                    return Properties.Resources.int_array_icon;
+                    return Properties.Resources.tag_int_array_icon;
                 case NbtTagType.LongArray:
-                    return Properties.Resources.long_array_icon;
+                    return Properties.Resources.tag_long_array_icon;
                 default:
                     return null;
             }

@@ -86,7 +86,9 @@ namespace NbtExplorer2
         private void ToolDelete_Click(object sender, EventArgs e)
         {
             Controller.DeleteNbt(NbtTree.SelectedObjects);
-            NbtTree.RefreshSelectedObjects();
+            NbtTree.RemoveObjects(NbtTree.SelectedObjects);
+            // to do: keep selection size if possible, moving down by default but up if down is unavailable
+            // do not allow selections to leak into lower siblings
         }
     }
 }
