@@ -9,11 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace NbtExplorer2
+namespace NbtExplorer2.UI
 {
     public partial class MainForm : Form
     {
         private bool HasUnsavedChanges = false;
+        private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
 
         public MainForm()
         {
@@ -21,7 +22,8 @@ namespace NbtExplorer2
             InitializeComponent();
 
             // stuff excluded from the designer for cleaner/less duplicated code
-            foreach (var item in CreateTagButtons())
+            CreateTagButtons = MakeCreateTagButtons();
+            foreach (var item in CreateTagButtons.Values)
             {
                 Tools.Items.Insert(Tools.Items.IndexOf(Separator4), item);
             }
@@ -29,16 +31,31 @@ namespace NbtExplorer2
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-
+            NbtTree_SelectedIndexChanged(this, EventArgs.Empty);
         }
 
         private void AddTag(NbtTagType type)
         {
-
+            NbtTag tag = null;
+            if (NbtTree.SelectedObject is NbtTag selected)
+                tag = selected;
+            else if (NbtTree.SelectedObject is NbtFile file)
+                tag = file.RootTag;
+            if (tag != null)
+            {
+                var form = new CreateTagWindow(type, tag);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    NbtTree.RefreshSelectedObjects();
+                    NbtTree.Expand(NbtTree.SelectedObject);
+                    HasUnsavedChanges = true;
+                }
+            }
         }
 
-        private IEnumerable<ToolStripButton> CreateTagButtons()
+        private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
         {
+            var buttons = new Dictionary<NbtTagType, ToolStripButton>();
             foreach (var type in Util.NormalTagTypes())
             {
                 var button = new ToolStripButton(
@@ -46,13 +63,17 @@ namespace NbtExplorer2
                     image: Util.TagTypeImage(type),
                     onClick: (s, e) => AddTag(type));
                 button.DisplayStyle = ToolStripItemDisplayStyle.Image;
-                yield return button;
+                buttons.Add(type, button);
             }
+            return buttons;
         }
 
         private void ToolNew_Click(object sender, EventArgs e)
         {
-
+            if (!ConfirmIfUnsaved("Create a new file anyway?"))
+                return;
+            NbtTree.SetObjects(new[] { new NbtFile() });
+            HasUnsavedChanges = false;
         }
 
         private void ToolOpenFile_Click(object sender, EventArgs e)
@@ -74,6 +95,7 @@ namespace NbtExplorer2
         private void OpenFiles(IEnumerable<string> paths)
         {
             NbtTree.SetObjects(Controller.OpenFiles(paths));
+            HasUnsavedChanges = false;
         }
 
         private bool ConfirmIfUnsaved(string message)
@@ -87,8 +109,20 @@ namespace NbtExplorer2
         {
             Controller.DeleteNbt(NbtTree.SelectedObjects);
             NbtTree.RemoveObjects(NbtTree.SelectedObjects);
-            // to do: keep selection size if possible, moving down by default but up if down is unavailable
-            // do not allow selections to leak into lower siblings
+            HasUnsavedChanges = true;
+        }
+
+        private void NbtTree_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            foreach (var item in CreateTagButtons)
+            {
+                if (NbtTree.SelectedObject is NbtFile)
+                    item.Value.Enabled = true;
+                else if (NbtTree.SelectedObject is NbtTag tag)
+                    item.Value.Enabled = Util.CanAdd(tag, item.Key);
+                else
+                    item.Value.Enabled = false;
+            }
         }
     }
 }

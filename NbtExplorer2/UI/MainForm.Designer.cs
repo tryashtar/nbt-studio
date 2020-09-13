@@ -1,4 +1,4 @@
-﻿namespace NbtExplorer2
+﻿namespace NbtExplorer2.UI
 {
     partial class MainForm
     {
@@ -52,7 +52,7 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.NbtTree = new NbtExplorer2.NbtTreeView();
+            this.NbtTree = new NbtExplorer2.UI.NbtTreeView();
             this.Tools.SuspendLayout();
             this.MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NbtTree)).BeginInit();
@@ -265,6 +265,7 @@
             // 
             this.NbtTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.NbtTree.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NbtTree.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.NbtTree.HideSelection = false;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);
             this.NbtTree.Name = "NbtTree";
@@ -275,6 +276,7 @@
             this.NbtTree.UseCompatibleStateImageBehavior = false;
             this.NbtTree.View = System.Windows.Forms.View.Details;
             this.NbtTree.VirtualMode = true;
+            this.NbtTree.SelectedIndexChanged += new System.EventHandler(this.NbtTree_SelectedIndexChanged);
             // 
             // MainForm
             // 

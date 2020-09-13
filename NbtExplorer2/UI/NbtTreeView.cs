@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using NbtExplorer2.SNBT;
+using System.IO;
 
-namespace NbtExplorer2
+namespace NbtExplorer2.UI
 {
     public class NbtTreeView : TreeListView
     {
@@ -101,17 +102,19 @@ namespace NbtExplorer2
             // reverse order optimization
             foreach (var child in GetChildren(model))
             {
-                Expand(child);
+                ExpandAll(child);
             }
-            Expand(model);
+            if (!IsExpanded(model))
+                Expand(model);
         }
 
         private void CollapseAll(object model)
         {
-            Collapse(model);
+            if (IsExpanded(model))
+                Collapse(model);
             foreach (var child in GetChildren(model))
             {
-                Collapse(child);
+                CollapseAll(child);
             }
         }
 
@@ -140,8 +143,8 @@ namespace NbtExplorer2
 
         private bool NbtCanExpand(object obj)
         {
-            if (obj is NbtFile)
-                return true;
+            if (obj is NbtFile file)
+                return file.RootTag.Count > 0;
             if (obj is NbtCompound compound)
                 return compound.Count > 0;
             if (obj is NbtList list)
@@ -164,16 +167,17 @@ namespace NbtExplorer2
         {
             string name = null;
             string value = null;
-            int? count = Util.ChildrenCount(obj);
-            if (count != null)
-                value = $"[{ Util.Pluralize(count.Value, "entry", "entries")}]";
-            if (obj is NbtTag tag)
+            if (obj is NbtFile file)
+            {
+                name = Path.GetFileName(file.FileName);
+                value = Util.PreviewNbtValue(file);
+            }
+            else if (obj is NbtTag tag)
             {
                 name = tag.Name;
-                if (value == null)
-                    value = tag.ToSnbt(multiline: false, delimit: false);
+                value = Util.PreviewNbtValue(tag);
             }
-            if (name == null)
+            if (name == null) // possible if the tag is in a list
                 return value;
             return $"{name}: {value}";
         }
