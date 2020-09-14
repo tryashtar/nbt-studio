@@ -52,6 +52,7 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NbtTree2 = new NbtExplorer2.UI.NbtTreeView2();
             this.NbtTree = new NbtExplorer2.UI.NbtTreeView();
             this.Tools.SuspendLayout();
             this.MenuStrip.SuspendLayout();
@@ -264,17 +265,34 @@
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
             // 
+            // NbtTree2
+            // 
+            this.NbtTree2.BackColor = System.Drawing.SystemColors.Window;
+            this.NbtTree2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.NbtTree2.DefaultToolTipProvider = null;
+            this.NbtTree2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NbtTree2.DragDropMarkColor = System.Drawing.Color.Black;
+            this.NbtTree2.Font = new System.Drawing.Font("Arial", 9F);
+            this.NbtTree2.LineColor = System.Drawing.SystemColors.ControlDark;
+            this.NbtTree2.Location = new System.Drawing.Point(0, 49);
+            this.NbtTree2.Model = null;
+            this.NbtTree2.Name = "NbtTree2";
+            this.NbtTree2.SelectedNode = null;
+            this.NbtTree2.Size = new System.Drawing.Size(800, 335);
+            this.NbtTree2.TabIndex = 3;
+            this.NbtTree2.Text = "nbtTreeView21";
+            // 
             // NbtTree
             // 
-            this.NbtTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NbtTree.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.NbtTree.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.NbtTree.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.NbtTree.HideSelection = false;
-            this.NbtTree.Location = new System.Drawing.Point(0, 49);
+            this.NbtTree.Location = new System.Drawing.Point(0, 384);
             this.NbtTree.Name = "NbtTree";
             this.NbtTree.OwnerDraw = true;
             this.NbtTree.ShowGroups = false;
-            this.NbtTree.Size = new System.Drawing.Size(800, 401);
+            this.NbtTree.Size = new System.Drawing.Size(800, 66);
             this.NbtTree.TabIndex = 0;
             this.NbtTree.UseCompatibleStateImageBehavior = false;
             this.NbtTree.UseExplorerTheme = true;
@@ -287,6 +305,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.NbtTree2);
             this.Controls.Add(this.NbtTree);
             this.Controls.Add(this.Tools);
             this.Controls.Add(this.MenuStrip);
@@ -330,6 +349,7 @@
         private System.Windows.Forms.ToolStripSeparator Separator4;
         private System.Windows.Forms.ToolStripButton ToolFind;
         private System.Windows.Forms.ToolStripButton ToolNew;
+        private NbtTreeView2 NbtTree2;
     }
 }
 

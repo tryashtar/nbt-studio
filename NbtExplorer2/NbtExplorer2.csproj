@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="ListViewPrinter, Version=2.7.1.31255, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ObjectListView.2.7.1.5\lib\ListViewPrinter.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\NbtTreeModel.cs" />
     <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,6 +85,9 @@
     </Compile>
     <Compile Include="SNBT\SnbtMaker.cs" />
     <Compile Include="SNBT\SnbtParser.cs" />
+    <Compile Include="UI\NbtTreeView2.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>

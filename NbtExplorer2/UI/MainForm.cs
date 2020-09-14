@@ -149,6 +149,7 @@ namespace NbtExplorer2.UI
             {
                 NbtTree.Expand(item);
             }
+            NbtTree2.Model = new NbtTreeModel(Controller.OpenFiles(paths));
             HasUnsavedChanges = false;
         }
 
