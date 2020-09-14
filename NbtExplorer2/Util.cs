@@ -65,33 +65,57 @@ namespace NbtExplorer2
             }
         }
 
-        // value is parsed to the proper type and inserted into the tag
-        // value is treated as size for arrays
-        public static NbtTag CreateTag(NbtTagType type, string name, string value)
+        public static void SetValue(NbtTag tag, object value)
         {
-            var tag = CreateTag(type, name);
-            if (tag is NbtByte tag_byte)
-                tag_byte.Value = (byte)sbyte.Parse(value);
-            else if (tag is NbtShort tag_short)
-                tag_short.Value = short.Parse(value);
-            else if (tag is NbtInt tag_int)
-                tag_int.Value = int.Parse(value);
-            else if (tag is NbtFloat tag_float)
-                tag_float.Value = float.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-            else if (tag is NbtDouble tag_double)
-                tag_double.Value = double.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-            else if (tag is NbtString tag_string)
-                tag_string.Value = value;
-            else if (tag is NbtByteArray tag_byte_array)
-                tag_byte_array.Value = new byte[ParseNonNegativeInt(value)];
-            else if (tag is NbtIntArray tag_int_array)
-                tag_int_array.Value = new int[ParseNonNegativeInt(value)];
-            else if (tag is NbtLongArray tag_long_array)
-                tag_long_array.Value = new long[ParseNonNegativeInt(value)];
-            return tag;
+            if (tag is NbtByte tag_byte && value is byte b)
+                tag_byte.Value = b;
+            else if (tag is NbtShort tag_short && value is short s)
+                tag_short.Value = s;
+            else if (tag is NbtInt tag_int && value is int i)
+                tag_int.Value = i;
+            else if (tag is NbtFloat tag_float && value is float f)
+                tag_float.Value = f;
+            else if (tag is NbtDouble tag_double && value is double d)
+                tag_double.Value = d;
+            else if (tag is NbtString tag_string && value is string str)
+                tag_string.Value = str;
         }
 
-        private static int ParseNonNegativeInt(string value)
+        public static object ParseValue(string value, NbtTagType type)
+        {
+            switch (type)
+            {
+                case NbtTagType.Byte:
+                    return (byte)sbyte.Parse(value);
+                case NbtTagType.Short:
+                    return short.Parse(value);
+                case NbtTagType.Int:
+                    return int.Parse(value);
+                case NbtTagType.Long:
+                    return long.Parse(value);
+                case NbtTagType.Float:
+                    return float.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                case NbtTagType.Double:
+                    return double.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                case NbtTagType.String:
+                    return value;
+                default:
+                    return null;
+            }
+        }
+
+        // clears any existing data in the tag's array
+        public static void SetSize(NbtTag tag, int size)
+        {
+            if (tag is NbtByteArray tag_byte_array)
+                tag_byte_array.Value = new byte[size];
+            else if (tag is NbtIntArray tag_int_array)
+                tag_int_array.Value = new int[size];
+            else if (tag is NbtLongArray tag_long_array)
+                tag_long_array.Value = new long[size];
+        }
+
+        public static int ParseNonNegativeInt(string value)
         {
             int val = int.Parse(value);
             if (val < 0)
@@ -99,11 +123,14 @@ namespace NbtExplorer2
             return val;
         }
 
-        public static NbtTag CreateTag(NbtTagType type, string name)
+        public static string DoubleToString(double d)
         {
-            var tag = CreateTag(type);
-            tag.Name = name;
-            return tag;
+            return d.ToString("0." + new string('#', 339));
+        }
+
+        public static string FloatToString(float f)
+        {
+            return f.ToString("0." + new string('#', 339));
         }
 
         public static NbtTag CreateTag(NbtTagType type)
@@ -152,9 +179,9 @@ namespace NbtExplorer2
                 case NbtTagType.Long:
                     return Tuple.Create(long.MinValue.ToString(), long.MaxValue.ToString());
                 case NbtTagType.Float:
-                    return Tuple.Create(float.MinValue.ToString(), float.MaxValue.ToString());
+                    return Tuple.Create(FloatToString(float.MinValue), FloatToString(float.MaxValue));
                 case NbtTagType.Double:
-                    return Tuple.Create(double.MinValue.ToString(), double.MaxValue.ToString());
+                    return Tuple.Create(DoubleToString(double.MinValue), DoubleToString(double.MaxValue));
                 default:
                     throw new ArgumentException($"{type} isn't numeric, has no min and max");
             }
@@ -167,6 +194,14 @@ namespace NbtExplorer2
             if (tag is NbtList list)
                 return list.Count == 0 || list.ListType == type;
             return false;
+        }
+
+        public static void Add(NbtTag parent, NbtTag child)
+        {
+            if (parent is NbtCompound compound)
+                compound.Add(child);
+            if (parent is NbtList list)
+                list.Add(child);
         }
 
         public static string PreviewNbtValue(NbtTag tag)

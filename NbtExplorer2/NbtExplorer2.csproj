@@ -56,11 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
-    <Compile Include="UI\CreateTagWindow.cs">
+    <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\CreateTagWindow.Designer.cs">
-      <DependentUpon>CreateTagWindow.cs</DependentUpon>
+    <Compile Include="UI\EditTagWindow.Designer.cs">
+      <DependentUpon>EditTagWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
@@ -81,8 +81,8 @@
     <Compile Include="SNBT\SnbtMaker.cs" />
     <Compile Include="SNBT\SnbtParser.cs" />
     <Compile Include="Util.cs" />
-    <EmbeddedResource Include="UI\CreateTagWindow.resx">
-      <DependentUpon>CreateTagWindow.cs</DependentUpon>
+    <EmbeddedResource Include="UI\EditTagWindow.resx">
+      <DependentUpon>EditTagWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

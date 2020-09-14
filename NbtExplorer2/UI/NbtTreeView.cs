@@ -79,7 +79,7 @@ namespace NbtExplorer2.UI
                 var siblings = GetChildren(parent).Cast<object>();
                 var last = siblings.Last();
                 if (SelectedObject == last)
-                    return ProcessCmdKey(ref msg, Keys.Down); // treat as normal down (does not work)
+                    return base.ProcessCmdKey(ref msg, Keys.Down); // treat as normal down (does not work)
                 else
                 {
                     SelectObject(last);

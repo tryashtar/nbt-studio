@@ -1,6 +1,6 @@
 ﻿namespace NbtExplorer2.UI
 {
-    partial class CreateTagWindow
+    partial class EditTagWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -144,7 +144,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create Tag";
-            this.Load += new System.EventHandler(this.CreateTagWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

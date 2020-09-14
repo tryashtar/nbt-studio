@@ -176,6 +176,7 @@
             this.ToolRename.Name = "ToolRename";
             this.ToolRename.Size = new System.Drawing.Size(23, 22);
             this.ToolRename.Text = "Rename";
+            this.ToolRename.Click += new System.EventHandler(this.ToolRename_Click);
             // 
             // ToolEdit
             // 
@@ -185,6 +186,7 @@
             this.ToolEdit.Name = "ToolEdit";
             this.ToolEdit.Size = new System.Drawing.Size(23, 22);
             this.ToolEdit.Text = "Edit";
+            this.ToolEdit.Click += new System.EventHandler(this.ToolEdit_Click);
             // 
             // ToolEditSnbt
             // 
@@ -269,11 +271,11 @@
             this.NbtTree.HideSelection = false;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);
             this.NbtTree.Name = "NbtTree";
-            this.NbtTree.OwnerDraw = true;
             this.NbtTree.ShowGroups = false;
             this.NbtTree.Size = new System.Drawing.Size(800, 401);
             this.NbtTree.TabIndex = 0;
             this.NbtTree.UseCompatibleStateImageBehavior = false;
+            this.NbtTree.UseExplorerTheme = true;
             this.NbtTree.View = System.Windows.Forms.View.Details;
             this.NbtTree.VirtualMode = true;
             this.NbtTree.SelectedIndexChanged += new System.EventHandler(this.NbtTree_SelectedIndexChanged);

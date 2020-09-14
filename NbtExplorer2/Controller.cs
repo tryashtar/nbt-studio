@@ -29,5 +29,14 @@ namespace NbtExplorer2
                 }
             }
         }
+
+        public static NbtTag GetTag(object obj)
+        {
+            if (obj is NbtFile file)
+                return file.RootTag;
+            if (obj is NbtTag tag)
+                return tag;
+            return null;
+        }
     }
 }

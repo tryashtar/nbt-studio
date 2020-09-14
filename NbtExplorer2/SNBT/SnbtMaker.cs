@@ -58,7 +58,7 @@ namespace NbtExplorer2.SNBT
             else if (tag.Value == float.NaN)
                 result = "NaN";
             else
-                result = tag.Value.ToString("0." + new string('#', 339));
+                result = Util.FloatToString(tag.Value);
             return result + (suffix ? "f" : "");
         }
         public static string ToSnbt(this NbtDouble tag, bool suffix)
@@ -71,7 +71,7 @@ namespace NbtExplorer2.SNBT
             else if (tag.Value == double.NaN)
                 result = "NaN";
             else
-                result = tag.Value.ToString("0." + new string('#', 339));
+                result = Util.DoubleToString(tag.Value);
             return result + (suffix ? "d" : "");
         }
         public static string ToSnbt(this NbtString tag, bool quotes = true)

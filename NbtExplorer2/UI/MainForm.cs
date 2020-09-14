@@ -43,13 +43,36 @@ namespace NbtExplorer2.UI
                 tag = file.RootTag;
             if (tag != null)
             {
-                var form = new CreateTagWindow(type, tag);
-                if (form.ShowDialog() == DialogResult.OK)
+                if (EditTagWindow.CreateTag(type, tag))
                 {
-                    NbtTree.RefreshSelectedObjects();
+                    NbtTree.RefreshObjects(NbtTree.SelectedObjects); // don't do NbtTree.RefreshSelectedObjects(), it doesn't work properly
                     NbtTree.Expand(NbtTree.SelectedObject);
                     HasUnsavedChanges = true;
                 }
+            }
+        }
+
+        private void ToolEdit_Click(object sender, EventArgs e)
+        {
+            var tag = Controller.GetTag(NbtTree.SelectedObject);
+            if (tag == null)
+                return;
+            if (EditTagWindow.ModifyTag(tag, EditPurpose.EditValue))
+            {
+                NbtTree.RefreshSelectedObjects();
+                HasUnsavedChanges = true;
+            }
+        }
+
+        private void ToolRename_Click(object sender, EventArgs e)
+        {
+            var tag = Controller.GetTag(NbtTree.SelectedObject);
+            if (tag == null)
+                return;
+            if (EditTagWindow.ModifyTag(tag, EditPurpose.Rename))
+            {
+                NbtTree.RefreshSelectedObjects();
+                HasUnsavedChanges = true;
             }
         }
 
@@ -95,6 +118,10 @@ namespace NbtExplorer2.UI
         private void OpenFiles(IEnumerable<string> paths)
         {
             NbtTree.SetObjects(Controller.OpenFiles(paths));
+            foreach (var item in NbtTree.Roots)
+            {
+                NbtTree.Expand(item);
+            }
             HasUnsavedChanges = false;
         }
 
