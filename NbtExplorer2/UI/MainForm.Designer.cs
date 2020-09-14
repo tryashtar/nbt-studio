@@ -112,6 +112,7 @@
             this.ToolOpenFolder.Name = "ToolOpenFolder";
             this.ToolOpenFolder.Size = new System.Drawing.Size(23, 22);
             this.ToolOpenFolder.Text = "Open Folder";
+            this.ToolOpenFolder.Click += new System.EventHandler(this.ToolOpenFolder_Click);
             // 
             // ToolSave
             // 
@@ -271,6 +272,7 @@
             this.NbtTree.HideSelection = false;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);
             this.NbtTree.Name = "NbtTree";
+            this.NbtTree.OwnerDraw = true;
             this.NbtTree.ShowGroups = false;
             this.NbtTree.Size = new System.Drawing.Size(800, 401);
             this.NbtTree.TabIndex = 0;

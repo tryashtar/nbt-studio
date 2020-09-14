@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
+    <Compile Include="NbtFolder.cs" />
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -339,6 +340,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\file_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

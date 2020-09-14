@@ -224,6 +224,7 @@ namespace NbtExplorer2
         }
 
         public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag);
+        public static string PreviewNbtValue(NbtFolder folder) => $"[{Util.Pluralize(folder.Files.Count, "file")}]";
 
         public static string TagTypeName(NbtTagType type)
         {

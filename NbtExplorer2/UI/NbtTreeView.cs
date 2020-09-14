@@ -123,6 +123,7 @@ namespace NbtExplorer2.UI
         private void PopulateImageList(ImageList list)
         {
             list.Images.Add("file", Properties.Resources.file_image);
+            list.Images.Add("folder", Properties.Resources.folder_image);
             foreach (NbtTagType type in Enum.GetValues(typeof(NbtTagType)))
             {
                 var key = type.ToString();
@@ -138,6 +139,8 @@ namespace NbtExplorer2.UI
                 return tag.TagType.ToString();
             if (obj is NbtFile)
                 return "file";
+            if (obj is NbtFolder)
+                return "folder";
             return null;
         }
 
@@ -145,6 +148,8 @@ namespace NbtExplorer2.UI
         {
             if (obj is NbtFile file)
                 return file.RootTag.Count > 0;
+            if (obj is NbtFolder folder)
+                return folder.Subfolders.Any() || folder.Files.Any();
             if (obj is NbtCompound compound)
                 return compound.Count > 0;
             if (obj is NbtList list)
@@ -156,6 +161,8 @@ namespace NbtExplorer2.UI
         {
             if (obj is NbtFile file)
                 return file.RootTag.Tags;
+            if (obj is NbtFolder folder)
+                return folder.Subfolders.Concat<object>(folder.Files);
             if (obj is NbtCompound compound)
                 return compound.Tags;
             if (obj is NbtList list)
@@ -171,6 +178,11 @@ namespace NbtExplorer2.UI
             {
                 name = Path.GetFileName(file.FileName);
                 value = Util.PreviewNbtValue(file);
+            }
+            else if (obj is NbtFolder folder)
+            {
+                name = Path.GetFileName(folder.FileName);
+                value = Util.PreviewNbtValue(folder);
             }
             else if (obj is NbtTag tag)
             {

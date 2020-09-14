@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,6 +114,32 @@ namespace NbtExplorer2.UI
                 if (dialog.ShowDialog() == DialogResult.OK)
                     OpenFiles(dialog.FileNames);
             }
+        }
+
+        private void ToolOpenFolder_Click(object sender, EventArgs e)
+        {
+            if (!ConfirmIfUnsaved("Open a new folder anyway?"))
+                return;
+            using (var dialog = new OpenFileDialog
+            {
+                RestoreDirectory = true,
+                Multiselect = false,
+                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt",
+            })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                    OpenFolder(Path.GetDirectoryName(dialog.FileName));
+            }
+        }
+
+        private void OpenFolder(string path)
+        {
+            NbtTree.SetObjects(new[] { new NbtFolder(path, true) });
+            foreach (var item in NbtTree.Roots)
+            {
+                NbtTree.Expand(item);
+            }
+            HasUnsavedChanges = false;
         }
 
         private void OpenFiles(IEnumerable<string> paths)
