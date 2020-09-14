@@ -35,14 +35,14 @@ namespace NbtExplorer2.UI
             SizeLabel.Visible = SettingSize;
             SizeBox.Visible = SettingSize;
 
-            this.Icon = Util.TagTypeIcon(tag.TagType);
+            this.Icon = INbt.TagTypeIcon(tag.TagType);
             if (purpose == EditPurpose.Create)
-                this.Text = $"Create {Util.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Create {INbt.TagTypeName(tag.TagType)} Tag";
             else if (purpose == EditPurpose.EditValue || purpose == EditPurpose.Rename)
             {
-                this.Text = $"Edit {Util.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Edit {INbt.TagTypeName(tag.TagType)} Tag";
                 NameBox.Text = tag.Name;
-                ValueBox.Text = tag.ToSnbt(false, false);
+                ValueBox.Text = INbt.PreviewNbtValue(tag);
             }
 
             if (SettingName && purpose != EditPurpose.EditValue)
@@ -60,10 +60,10 @@ namespace NbtExplorer2.UI
         public static bool CreateTag(NbtTagType type, NbtTag parent)
         {
             bool has_name = parent is NbtCompound;
-            bool has_value = Util.IsValueType(type);
-            bool has_size = Util.IsSizeType(type);
+            bool has_value = INbt.IsValueType(type);
+            bool has_size = INbt.IsArrayType(type);
 
-            var tag = Util.CreateTag(type);
+            var tag = INbt.CreateTag(type);
 
             if (has_name || has_value || has_size)
             {
@@ -74,7 +74,7 @@ namespace NbtExplorer2.UI
             {
                 // no customization required, just add it directly
                 // example: adding a compound to a list
-                Util.Add(parent, tag);
+                INbt.Add(parent, tag);
                 return true;
             }
         }
@@ -85,7 +85,7 @@ namespace NbtExplorer2.UI
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
             bool has_name = parent is NbtCompound;
-            bool has_value = Util.IsValueType(existing.TagType);
+            bool has_value = INbt.IsValueType(existing.TagType);
 
             if (has_name || has_value)
             {
@@ -101,7 +101,7 @@ namespace NbtExplorer2.UI
             {
                 DialogResult = DialogResult.OK;
                 if (Purpose == EditPurpose.Create)
-                    Util.Add(TagParent, WorkingTag);
+                    INbt.Add(TagParent, WorkingTag);
                 Close();
             }
         }
@@ -155,17 +155,17 @@ namespace NbtExplorer2.UI
             {
                 try
                 {
-                    parsed_value = Util.ParseValue(str_value, WorkingTag.TagType);
+                    parsed_value = INbt.ParseValue(str_value, WorkingTag.TagType);
                 }
                 catch (FormatException)
                 {
-                    MessageBox.Show($"The value is formatted incorrectly for a {Util.TagTypeName(WorkingTag.TagType).ToLower()}");
+                    MessageBox.Show($"The value is formatted incorrectly for a {INbt.TagTypeName(WorkingTag.TagType).ToLower()}");
                     return false;
                 }
                 catch (OverflowException)
                 {
-                    var minmax = Util.MinMaxFor(WorkingTag.TagType);
-                    MessageBox.Show($"The value for {Util.TagTypeName(WorkingTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}");
+                    var minmax = INbt.MinMaxFor(WorkingTag.TagType);
+                    MessageBox.Show($"The value for {INbt.TagTypeName(WorkingTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}");
                     return false;
                 }
                 catch { return false; }
@@ -173,9 +173,9 @@ namespace NbtExplorer2.UI
             if (SettingName)
                 WorkingTag.Name = name;
             if (SettingSize && int_size.HasValue)
-                Util.SetSize(WorkingTag, int_size.Value);
+                INbt.SetSize(WorkingTag, int_size.Value);
             if (SettingValue && parsed_value != null)
-                Util.SetValue(WorkingTag, parsed_value);
+                INbt.SetValue(WorkingTag, parsed_value);
             return true;
         }
 

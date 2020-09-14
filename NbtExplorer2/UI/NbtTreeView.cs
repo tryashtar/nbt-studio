@@ -127,7 +127,7 @@ namespace NbtExplorer2.UI
             foreach (NbtTagType type in Enum.GetValues(typeof(NbtTagType)))
             {
                 var key = type.ToString();
-                var value = Util.TagTypeImage(type);
+                var value = INbt.TagTypeImage(type);
                 if (value != null)
                     list.Images.Add(key, value);
             }
@@ -177,17 +177,17 @@ namespace NbtExplorer2.UI
             if (obj is NbtFile file)
             {
                 name = Path.GetFileName(file.FileName);
-                value = Util.PreviewNbtValue(file);
+                value = INbt.PreviewNbtValue(file);
             }
             else if (obj is NbtFolder folder)
             {
                 name = Path.GetFileName(folder.FileName);
-                value = Util.PreviewNbtValue(folder);
+                value = INbt.PreviewNbtValue(folder);
             }
             else if (obj is NbtTag tag)
             {
                 name = tag.Name;
-                value = Util.PreviewNbtValue(tag);
+                value = INbt.PreviewNbtValue(tag);
             }
             if (name == null) // possible if the tag is in a list
                 return value;

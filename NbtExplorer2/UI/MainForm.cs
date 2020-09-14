@@ -14,6 +14,8 @@ namespace NbtExplorer2.UI
 {
     public partial class MainForm : Form
     {
+        private NbtTreeModel ViewModel;
+
         private bool HasUnsavedChanges = false;
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
 
@@ -37,25 +39,20 @@ namespace NbtExplorer2.UI
 
         private void AddTag(NbtTagType type)
         {
-            NbtTag tag = null;
-            if (NbtTree.SelectedObject is NbtTag selected)
-                tag = selected;
-            else if (NbtTree.SelectedObject is NbtFile file)
-                tag = file.RootTag;
-            if (tag != null)
+            var tag = INbt.GetNbt(NbtTree.SelectedObject);
+            if (tag == null)
+                return;
+            if (EditTagWindow.CreateTag(type, tag))
             {
-                if (EditTagWindow.CreateTag(type, tag))
-                {
-                    NbtTree.RefreshObjects(NbtTree.SelectedObjects); // don't do NbtTree.RefreshSelectedObjects(), it doesn't work properly
-                    NbtTree.Expand(NbtTree.SelectedObject);
-                    HasUnsavedChanges = true;
-                }
+                NbtTree.RefreshObjects(NbtTree.SelectedObjects); // don't do NbtTree.RefreshSelectedObjects(), it doesn't work properly
+                NbtTree.Expand(NbtTree.SelectedObject);
+                HasUnsavedChanges = true;
             }
         }
 
         private void ToolEdit_Click(object sender, EventArgs e)
         {
-            var tag = Controller.GetTag(NbtTree.SelectedObject);
+            var tag = INbt.GetNbt(NbtTree.SelectedObject);
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.EditValue))
@@ -67,7 +64,7 @@ namespace NbtExplorer2.UI
 
         private void ToolRename_Click(object sender, EventArgs e)
         {
-            var tag = Controller.GetTag(NbtTree.SelectedObject);
+            var tag = INbt.GetNbt(NbtTree.SelectedObject);
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.Rename))
@@ -80,11 +77,11 @@ namespace NbtExplorer2.UI
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
         {
             var buttons = new Dictionary<NbtTagType, ToolStripButton>();
-            foreach (var type in Util.NormalTagTypes())
+            foreach (var type in INbt.NormalTagTypes())
             {
                 var button = new ToolStripButton(
-                    text: $"Add {Util.TagTypeName(type)} Tag",
-                    image: Util.TagTypeImage(type),
+                    text: $"Add {INbt.TagTypeName(type)} Tag",
+                    image: INbt.TagTypeImage(type),
                     onClick: (s, e) => AddTag(type));
                 button.DisplayStyle = ToolStripItemDisplayStyle.Image;
                 buttons.Add(type, button);
@@ -144,12 +141,13 @@ namespace NbtExplorer2.UI
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            NbtTree.SetObjects(Controller.OpenFiles(paths));
-            foreach (var item in NbtTree.Roots)
-            {
-                NbtTree.Expand(item);
-            }
-            NbtTree2.Model = new NbtTreeModel(Controller.OpenFiles(paths));
+            //NbtTree.SetObjects(Controller.OpenFiles(paths));
+            //foreach (var item in NbtTree.Roots)
+            //{
+            //    NbtTree.Expand(item);
+            //}
+            ViewModel = new NbtTreeModel(Controller.OpenFiles(paths));
+            NbtTree2.Model = ViewModel;
             HasUnsavedChanges = false;
         }
 
@@ -162,21 +160,16 @@ namespace NbtExplorer2.UI
 
         private void ToolDelete_Click(object sender, EventArgs e)
         {
-            Controller.DeleteNbt(NbtTree.SelectedObjects);
-            NbtTree.RemoveObjects(NbtTree.SelectedObjects);
+            ViewModel.Remove(NbtTree2.SelectedObject);
             HasUnsavedChanges = true;
         }
 
         private void NbtTree_SelectedIndexChanged(object sender, EventArgs e)
         {
+            var tag = INbt.GetNbt(NbtTree2.SelectedObject);
             foreach (var item in CreateTagButtons)
             {
-                if (NbtTree.SelectedObject is NbtFile)
-                    item.Value.Enabled = true;
-                else if (NbtTree.SelectedObject is NbtTag tag)
-                    item.Value.Enabled = Util.CanAdd(tag, item.Key);
-                else
-                    item.Value.Enabled = false;
+                item.Value.Enabled = INbt.CanAdd(tag, item.Key);
             }
         }
     }

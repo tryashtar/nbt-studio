@@ -16,18 +16,36 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
-        public readonly IEnumerable<NbtFile> Files;
-        public NbtTreeModel(IEnumerable<NbtFile> files)
+        public readonly IEnumerable<object> Roots;
+        private readonly Dictionary<object, object> ParentDict = new Dictionary<object, object>();
+        public NbtTreeModel(IEnumerable<object> roots)
         {
-            Files = files;
+            Roots = roots;
+        }
+
+        public void Remove(object obj)
+        {
+            INbt.Delete(obj);
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetPath(ParentDict[obj]), new[] { obj }));
+        }
+
+        private TreePath GetPath(object item)
+        {
+            Stack<object> stack = new Stack<object>();
+            while (!Roots.Contains(item))
+            {
+                stack.Push(item);
+                item = ParentDict[item];
+            }
+            return new TreePath(stack.ToArray());
         }
 
         public IEnumerable GetChildren(TreePath treePath)
         {
             if (treePath.IsEmpty())
-                return Files;
+                return Roots;
             else
-                return GetChildren(treePath.LastNode);
+                return GetChildren(treePath.LastNode, true);
         }
 
         public bool IsLeaf(TreePath treePath)
@@ -35,22 +53,22 @@ namespace NbtExplorer2.UI
             return !HasChildren(treePath.LastNode);
         }
 
-        private IEnumerable<object> GetChildren(object obj)
+        private IEnumerable<object> GetChildren(object obj, bool remember_parent)
         {
-            if (obj is NbtFolder folder)
-                return folder.Subfolders.Concat<object>(folder.Files);
-            if (obj is NbtFile file)
-                return file.RootTag.Tags;
-            if (obj is NbtCompound compound)
-                return compound.Tags;
-            if (obj is NbtList list)
-                return list;
-            return null;
+            var children = INbt.GetChildren(obj);
+            if (children != null && remember_parent)
+            {
+                foreach (var child in children)
+                {
+                    ParentDict[child] = obj;
+                }
+            }
+            return children;
         }
 
         private bool HasChildren(object obj)
         {
-            var children = GetChildren(obj);
+            var children = GetChildren(obj, false);
             return children != null && children.Any();
         }
     }

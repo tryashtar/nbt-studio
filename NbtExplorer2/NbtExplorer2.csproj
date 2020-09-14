@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
+    <Compile Include="INbt.cs" />
     <Compile Include="NbtFolder.cs" />
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>

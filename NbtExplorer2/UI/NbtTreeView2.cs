@@ -16,15 +16,20 @@ namespace NbtExplorer2.UI
         public NbtTreeView2()
         {
             NodeControls.Add(new NbtIcon());
-            NodeControls.Add(new NbtText());
+            NodeControls.Add(new NbtText(':'));
             this.RowHeight = 20;
+            this.SelectionMode = TreeSelectionMode.Multi;
         }
+
+        public object SelectedObject => SelectedNode?.Tag;
+        public IEnumerable<object> SelectedObjects => SelectedNodes?.Select(x => x.Tag);
     }
 
     public class NbtIcon : NodeControl
     {
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
+            NbtText.DrawSelection(context);
             var image = GetIcon(node);
             if (image != null)
             {
@@ -47,18 +52,18 @@ namespace NbtExplorer2.UI
         private Image GetIcon(TreeNodeAdv node)
         {
             var obj = node.Tag;
-            if (obj is NbtFile)
-                return Properties.Resources.file_image;
-            if (obj is NbtFolder)
-                return Properties.Resources.folder_image;
-            if (obj is NbtTag tag)
-                return Util.TagTypeImage(tag.TagType);
-            return null;
+            return INbt.Image(obj);
         }
     }
 
     public class NbtText : NodeControl
     {
+        char? BoldBefore;
+        public NbtText(char? bold_before)
+        {
+            BoldBefore = bold_before;
+        }
+
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
             var text = GetText(node);
@@ -66,26 +71,48 @@ namespace NbtExplorer2.UI
             {
                 var size = MeasureSize(node, context);
                 Point point = new Point(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
-                context.Graphics.DrawString(text, context.Font, new SolidBrush(Parent.ForeColor), point);
+                DrawSelection(context);
+                var halves = GetTextHalves(text);
+                var boldfont = new Font(context.Font, FontStyle.Bold);
+                context.Graphics.DrawString(halves[0], boldfont, new SolidBrush(Parent.ForeColor), point);
+                point.X += TextRenderer.MeasureText(halves[0], boldfont).Width;
+                context.Graphics.DrawString(halves[1], context.Font, new SolidBrush(Parent.ForeColor), point);
             }
+        }
+
+        public static void DrawSelection(DrawContext context)
+        {
+            if (context.DrawSelection == DrawSelectionMode.Active)
+                context.Graphics.FillRectangle(Brushes.LightBlue, context.Bounds);
         }
 
         public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
         {
             var text = GetText(node);
-            return text == null ? Size.Empty : TextRenderer.MeasureText(text, context.Font);
+            if (text == null)
+                return Size.Empty;
+            var halves = GetTextHalves(text);
+            var boldfont = new Font(context.Font, FontStyle.Bold);
+            Size s1 = TextRenderer.MeasureText(halves[0], boldfont);
+            Size s2 = TextRenderer.MeasureText(halves[1], context.Font);
+            return new Size(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
         private string GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
-            if (obj is NbtFile file)
-                return Util.PreviewNbtValue(file);
-            if (obj is NbtFolder folder)
-                return Util.PreviewNbtValue(folder);
-            if (obj is NbtTag tag)
-                return Util.PreviewNbtValue(tag);
-            return null;
+            return INbt.PreviewNameAndValue(obj);
+        }
+
+        private string[] GetTextHalves(string text)
+        {
+            if (BoldBefore.HasValue && text.Contains(BoldBefore.Value))
+            {
+                var split = text.Split(BoldBefore.Value);
+                split[0] += BoldBefore.Value;
+                return split;
+            }
+            return new[] { "", text };
         }
     }
 }
