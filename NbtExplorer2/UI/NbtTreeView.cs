@@ -40,12 +40,7 @@ namespace NbtExplorer2.UI
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Clicks == 2)
-            {
                 base.OnMouseDoubleClick(e); // toggle expansion
-                var node = GetNodeAt(e.Location);
-                if (node?.Tag is NbtTag tag && INbt.IsValueType(tag.TagType))
-                    EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-            }
             base.OnMouseDown(e);
         }
 

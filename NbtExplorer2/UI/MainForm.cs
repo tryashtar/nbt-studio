@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Aga.Controls.Tree;
 
 namespace NbtExplorer2.UI
 {
@@ -16,7 +17,6 @@ namespace NbtExplorer2.UI
     {
         private NbtTreeModel ViewModel;
 
-        private bool HasUnsavedChanges = false;
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
 
         public MainForm()
@@ -28,7 +28,7 @@ namespace NbtExplorer2.UI
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
             {
-                Tools.Items.Insert(Tools.Items.IndexOf(Separator4), item);
+                Tools.Items.Insert(Tools.Items.IndexOf(ToolSeparator4), item);
             }
         }
 
@@ -42,12 +42,9 @@ namespace NbtExplorer2.UI
             var parent = INbt.GetNbt(NbtTree.SelectedObject);
             if (parent == null)
                 return;
-            var tag = EditTagWindow.CreateTag(type, parent);
+            var tag = EditTagWindow.CreateTag(type, parent, Control.ModifierKeys == Keys.Shift);
             if (tag != null)
-            {
                 ViewModel.Add(tag, NbtTree.SelectedObject); // NOT parent, because the selected object could be an NbtFile, while parent would be its compound
-                HasUnsavedChanges = true;
-            }
         }
 
         private void ToolEdit_Click(object sender, EventArgs e)
@@ -56,7 +53,7 @@ namespace NbtExplorer2.UI
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.EditValue))
-                HasUnsavedChanges = true;
+                ViewModel.NoticeChanges(tag);
         }
 
         private void ToolRename_Click(object sender, EventArgs e)
@@ -65,7 +62,7 @@ namespace NbtExplorer2.UI
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.Rename))
-                HasUnsavedChanges = true;
+                ViewModel.NoticeChanges(tag);
         }
 
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
@@ -88,7 +85,6 @@ namespace NbtExplorer2.UI
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
             ViewModel = new NbtTreeModel(new[] { new NbtFile() }, NbtTree);
-            HasUnsavedChanges = false;
         }
 
         private void ToolOpenFile_Click(object sender, EventArgs e)
@@ -126,18 +122,16 @@ namespace NbtExplorer2.UI
         private void OpenFolder(string path)
         {
             ViewModel = new NbtTreeModel(new[] { new NbtFolder(path, true) }, NbtTree);
-            HasUnsavedChanges = false;
         }
 
         private void OpenFiles(IEnumerable<string> paths)
         {
             ViewModel = new NbtTreeModel(Controller.OpenFiles(paths), NbtTree);
-            HasUnsavedChanges = false;
         }
 
         private bool ConfirmIfUnsaved(string message)
         {
-            if (!HasUnsavedChanges)
+            if (ViewModel == null || !ViewModel.HasUnsavedChanges)
                 return true;
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo) == DialogResult.Yes;
         }
@@ -146,7 +140,6 @@ namespace NbtExplorer2.UI
         {
             if (NbtTree.SelectedObject != null)
                 ViewModel.RemoveAll(NbtTree.SelectedObjects);
-            HasUnsavedChanges = true;
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
@@ -156,6 +149,47 @@ namespace NbtExplorer2.UI
             {
                 item.Value.Enabled = INbt.CanAdd(tag, item.Key);
             }
+        }
+
+        private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
+        {
+            if (e.Node?.Tag is NbtTag tag && INbt.IsValueType(tag.TagType))
+                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+        }
+
+        private void ToolSave_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ToolRefresh_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MenuSaveAs_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ToolCut_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ToolCopy_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ToolPaste_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ToolEditSnbt_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

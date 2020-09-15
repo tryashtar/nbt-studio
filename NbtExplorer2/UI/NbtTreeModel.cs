@@ -16,6 +16,7 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
+        public bool HasUnsavedChanges { get; private set; } = false;
         public readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
@@ -34,6 +35,7 @@ namespace NbtExplorer2.UI
         {
             INbt.Delete(obj);
             NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetParentPath(obj), new[] { obj }));
+            HasUnsavedChanges = true;
         }
 
         public void RemoveAll(IEnumerable<object> objects)
@@ -49,6 +51,14 @@ namespace NbtExplorer2.UI
             INbt.Add(tag, parent);
             NodesInserted?.Invoke(this, new TreeModelEventArgs(GetPath(parent), new[] { INbt.IndexOf(parent, tag) }, new[] { tag }));
             View.FindNodeByTag(parent).Expand();
+            //View.EnsureVisible(View.FindNodeByTag(tag));
+            HasUnsavedChanges = true;
+        }
+
+        public void NoticeChanges(object obj)
+        {
+            // currently, changes seem to be reflected without needing to raise NodesChanged
+            HasUnsavedChanges = true;
         }
 
         private TreePath GetPath(object item)

@@ -55,7 +55,19 @@ namespace NbtExplorer2.UI
             }
         }
 
-        public static NbtTag CreateTag(NbtTagType type, NbtTag parent)
+        private static string GetAutomaticName(NbtTag tag, NbtCompound parent)
+        {
+            string basename = INbt.TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
+            for (int i = 0; i < 999999; i++)
+            {
+                string name = basename + i.ToString();
+                if (!parent.Contains(name))
+                    return name;
+            }
+            throw new InvalidOperationException("This compound really contains 999999 similarly named tags?!");
+        }
+
+        public static NbtTag CreateTag(NbtTagType type, NbtTag parent, bool bypass_window = false)
         {
             bool has_name = parent is NbtCompound;
             bool has_value = INbt.IsValueType(type);
@@ -63,7 +75,13 @@ namespace NbtExplorer2.UI
 
             var tag = INbt.CreateTag(type);
 
-            if (has_name || has_value || has_size)
+            if (bypass_window)
+            {
+                if (has_name)
+                    tag.Name = GetAutomaticName(tag, (NbtCompound)parent);
+                return tag;
+            }
+            else if (has_name || has_value || has_size)
             {
                 var window = new EditTagWindow(tag, parent, has_name, has_value, has_size, EditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? tag : null;
