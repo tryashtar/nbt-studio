@@ -16,13 +16,43 @@ namespace NbtExplorer2.UI
         public NbtTreeView()
         {
             NodeControls.Add(new NbtIcon());
-            NodeControls.Add(new NbtText(':'));
+            NodeControls.Add(new NbtText());
             this.RowHeight = 20;
             this.SelectionMode = TreeSelectionMode.Multi;
         }
 
         public object SelectedObject => SelectedNode?.Tag;
         public IEnumerable<object> SelectedObjects => SelectedNodes?.Select(x => x.Tag);
+
+        private void ToggleExpansion(TreeNodeAdv node, bool all = false)
+        {
+            if (node.IsExpanded)
+                node.Collapse();
+            else
+            {
+                if (all)
+                    node.ExpandAll();
+                else
+                    node.Expand();
+            }
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            if (e.Clicks == 2)
+            {
+                base.OnMouseDoubleClick(e); // toggle expansion
+                var node = GetNodeAt(e.Location);
+                if (node?.Tag is NbtTag tag && INbt.IsValueType(tag.TagType))
+                    EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            }
+            base.OnMouseDown(e);
+        }
+
+        // this only fires when the mouse is released after two clicks, which feels laggy
+        // so just disable the native behavior and reimplement it with OnMouseDown
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        { }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -31,19 +61,13 @@ namespace NbtExplorer2.UI
                 // space to toggle collapsed/expanded
                 if (keyData == Keys.Space)
                 {
-                    if (SelectedNode.IsExpanded)
-                        SelectedNode.Collapse();
-                    else
-                        SelectedNode.Expand();
+                    ToggleExpansion(SelectedNode);
                     return true;
                 }
                 // control-space to expand all
                 if (keyData == (Keys.Space | Keys.Control))
                 {
-                    if (SelectedNode.IsExpanded)
-                        SelectedNode.Collapse();
-                    else
-                        SelectedNode.ExpandAll();
+                    ToggleExpansion(SelectedNode, true);
                     return true;
                 }
                 // control-up to select parent
@@ -93,25 +117,21 @@ namespace NbtExplorer2.UI
 
     public class NbtText : NodeControl
     {
-        char? BoldBefore;
-        public NbtText(char? bold_before)
-        {
-            BoldBefore = bold_before;
-        }
-
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
-            var text = GetText(node);
-            if (text != null)
+            var halves = GetText(node);
+            if (halves != null)
             {
                 var size = MeasureSize(node, context);
                 Point point = new Point(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
                 DrawSelection(context);
-                var halves = GetTextHalves(text);
                 var boldfont = new Font(context.Font, FontStyle.Bold);
-                context.Graphics.DrawString(halves[0], boldfont, new SolidBrush(Parent.ForeColor), point);
-                point.X += TextRenderer.MeasureText(halves[0], boldfont).Width;
-                context.Graphics.DrawString(halves[1], context.Font, new SolidBrush(Parent.ForeColor), point);
+                if (halves.Item1 != null)
+                {
+                    context.Graphics.DrawString(halves.Item1, boldfont, new SolidBrush(Parent.ForeColor), point);
+                    point.X += TextRenderer.MeasureText(halves.Item1, boldfont).Width;
+                }
+                context.Graphics.DrawString(halves.Item2, context.Font, new SolidBrush(Parent.ForeColor), point);
             }
         }
 
@@ -123,31 +143,19 @@ namespace NbtExplorer2.UI
 
         public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
         {
-            var text = GetText(node);
-            if (text == null)
+            var halves = GetText(node);
+            if (halves == null)
                 return Size.Empty;
-            var halves = GetTextHalves(text);
             var boldfont = new Font(context.Font, FontStyle.Bold);
-            Size s1 = TextRenderer.MeasureText(halves[0], boldfont);
-            Size s2 = TextRenderer.MeasureText(halves[1], context.Font);
+            Size s1 = halves.Item1 == null ? Size.Empty : TextRenderer.MeasureText(halves.Item1, boldfont);
+            Size s2 = TextRenderer.MeasureText(halves.Item2, context.Font);
             return new Size(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
-        private string GetText(TreeNodeAdv node)
+        private Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
             return INbt.PreviewNameAndValue(obj);
-        }
-
-        private string[] GetTextHalves(string text)
-        {
-            if (BoldBefore.HasValue && text.Contains(BoldBefore.Value))
-            {
-                var split = text.Split(BoldBefore.Value);
-                split[0] += BoldBefore.Value;
-                return split;
-            }
-            return new[] { "", text };
         }
     }
 }

@@ -241,13 +241,17 @@ namespace NbtExplorer2
             }
         }
 
-        public static string PreviewNameAndValue(object obj)
+        public static Tuple<string, string> PreviewNameAndValue(object obj)
         {
             string name = PreviewName(obj);
             string value = PreviewValue(obj);
             if (name == null)
-                return value;
-            return $"{name}: {value}";
+            {
+                if (value == null)
+                    return null;
+                return Tuple.Create((string)null, value);
+            }
+            return Tuple.Create(name + ": ", value);
         }
 
         public static string PreviewName(object obj)
