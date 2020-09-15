@@ -30,6 +30,7 @@ namespace NbtExplorer2.UI
                 item.Expand();
             }
         }
+        public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
         public void Remove(object obj)
         {

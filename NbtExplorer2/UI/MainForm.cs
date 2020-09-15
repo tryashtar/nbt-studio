@@ -84,7 +84,7 @@ namespace NbtExplorer2.UI
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
-            ViewModel = new NbtTreeModel(new[] { new NbtFile() }, NbtTree);
+            ViewModel = new NbtTreeModel(new NbtFile(), NbtTree);
         }
 
         private void ToolOpenFile_Click(object sender, EventArgs e)
@@ -126,7 +126,13 @@ namespace NbtExplorer2.UI
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            ViewModel = new NbtTreeModel(Controller.OpenFiles(paths), NbtTree);
+            var files = paths.Select(x => NbtFile.TryCreate(x));
+            var bad = files.Where(x => x == null);
+            var good = files.Where(x => x != null);
+            if (bad.Any())
+                MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load failure");
+            if (good.Any())
+                ViewModel = new NbtTreeModel(good, NbtTree);
         }
 
         private bool ConfirmIfUnsaved(string message)
@@ -159,7 +165,7 @@ namespace NbtExplorer2.UI
 
         private void ToolSave_Click(object sender, EventArgs e)
         {
-
+            
         }
 
         private void ToolRefresh_Click(object sender, EventArgs e)

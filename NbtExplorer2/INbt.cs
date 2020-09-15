@@ -257,9 +257,9 @@ namespace NbtExplorer2
         public static string PreviewName(object obj)
         {
             if (obj is NbtFile file)
-                return Path.GetFileName(file.FileName);
+                return Path.GetFileName(file.Path);
             if (obj is NbtFolder folder)
-                return Path.GetFileName(folder.FileName);
+                return Path.GetFileName(folder.Path);
             if (obj is NbtTag tag)
                 return tag.Name;
             return null;

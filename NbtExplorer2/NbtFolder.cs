@@ -10,7 +10,7 @@ namespace NbtExplorer2
 {
     public class NbtFolder
     {
-        public readonly string FileName;
+        public readonly string Path;
         public IReadOnlyCollection<NbtFolder> Subfolders => _Subfolders.AsReadOnly();
         public IReadOnlyCollection<NbtFile> Files => _Files.AsReadOnly();
         private readonly List<NbtFolder> _Subfolders = new List<NbtFolder>();
@@ -18,10 +18,12 @@ namespace NbtExplorer2
 
         public NbtFolder(string path, bool recursive)
         {
-            FileName = path;
+            Path = path;
             foreach (var item in Directory.GetFiles(path))
             {
-                _Files.Add(new NbtFile(item));
+                var file = NbtFile.TryCreate(item);
+                if (file != null)
+                    _Files.Add(file);
             }
             if (recursive)
             {
