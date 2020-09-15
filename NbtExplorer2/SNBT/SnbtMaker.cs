@@ -101,7 +101,7 @@ namespace NbtExplorer2.SNBT
             if (!multiline)
                 return ListToString("", x => x.ToSnbt(false), tag, false);
             var sb = new StringBuilder();
-            AddSnbt(tag, sb, "    ", 0, false);
+            AddSnbtList(tag, sb, "    ", 0, false);
             return sb.ToString();
         }
 
@@ -109,7 +109,7 @@ namespace NbtExplorer2.SNBT
         {
             var sb = new StringBuilder();
             if (multiline)
-                AddSnbt(tag, sb, "    ", 0, false);
+                AddSnbtCompound(tag, sb, "    ", 0, false);
             else
             {
                 sb.Append("{");
@@ -184,10 +184,10 @@ namespace NbtExplorer2.SNBT
         // used for aligning indents for multiline compounds and lists
         private static void AddSnbt(NbtTag tag, StringBuilder sb, string indentString, int indentLevel, bool includeName)
         {
-            if (tag.TagType == NbtTagType.Compound)
-                AddSnbt((NbtCompound)tag, sb, indentString, indentLevel, includeName);
-            else if (tag.TagType == NbtTagType.List)
-                AddSnbt((NbtList)tag, sb, indentString, indentLevel, includeName);
+            if (tag is NbtCompound compound)
+                AddSnbtCompound(compound, sb, indentString, indentLevel, includeName);
+            else if (tag is NbtList list)
+                AddSnbtList(list, sb, indentString, indentLevel, includeName);
             else
             {
                 AddIndents(sb, indentString, indentLevel);
@@ -197,7 +197,7 @@ namespace NbtExplorer2.SNBT
             }
         }
 
-        private static void AddSnbt(NbtCompound tag, StringBuilder sb, string indentString, int indentLevel, bool includeName)
+        private static void AddSnbtCompound(NbtCompound tag, StringBuilder sb, string indentString, int indentLevel, bool includeName)
         {
             AddIndents(sb, indentString, indentLevel);
             if (includeName)
@@ -219,7 +219,7 @@ namespace NbtExplorer2.SNBT
             sb.Append('}');
         }
 
-        private static void AddSnbt(NbtList tag, StringBuilder sb, string indentString, int indentLevel, bool includeName)
+        private static void AddSnbtList(NbtList tag, StringBuilder sb, string indentString, int indentLevel, bool includeName)
         {
             AddIndents(sb, indentString, indentLevel);
             if (includeName)

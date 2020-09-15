@@ -200,12 +200,25 @@ namespace NbtExplorer2
             return null;
         }
 
-        public static void Add(NbtTag parent, NbtTag child)
+        public static void Add(NbtTag child, object parent)
         {
-            if (parent is NbtCompound compound)
+            if (parent is NbtFile file)
+                file.RootTag.Add(child);
+            else if (parent is NbtCompound compound)
                 compound.Add(child);
-            if (parent is NbtList list)
+            else if (parent is NbtList list)
                 list.Add(child);
+        }
+
+        public static int IndexOf(object parent, NbtTag child)
+        {
+            if (parent is NbtFile file)
+                return file.RootTag.Tags.ToList().IndexOf(child);
+            else if (parent is NbtCompound compound)
+                return compound.Tags.ToList().IndexOf(child);
+            else if (parent is NbtList list)
+                return list.IndexOf(child);
+            return -1;
         }
 
         public static void Delete(object obj)

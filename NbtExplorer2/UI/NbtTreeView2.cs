@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace NbtExplorer2.UI
 {
-    public class NbtTreeView2 : TreeViewAdv
+    public class NbtTreeView : TreeViewAdv
     {
-        public NbtTreeView2()
+        public NbtTreeView()
         {
             NodeControls.Add(new NbtIcon());
             NodeControls.Add(new NbtText(':'));
@@ -23,6 +23,41 @@ namespace NbtExplorer2.UI
 
         public object SelectedObject => SelectedNode?.Tag;
         public IEnumerable<object> SelectedObjects => SelectedNodes?.Select(x => x.Tag);
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (SelectedNode != null)
+            {
+                // space to toggle collapsed/expanded
+                if (keyData == Keys.Space)
+                {
+                    if (SelectedNode.IsExpanded)
+                        SelectedNode.Collapse();
+                    else
+                        SelectedNode.Expand();
+                    return true;
+                }
+                // control-space to expand all
+                if (keyData == (Keys.Space | Keys.Control))
+                {
+                    if (SelectedNode.IsExpanded)
+                        SelectedNode.Collapse();
+                    else
+                        SelectedNode.ExpandAll();
+                    return true;
+                }
+                // control-up to select parent
+                if (keyData == (Keys.Up | Keys.Control))
+                {
+                    if (SelectedNode.Parent.Parent != null) // this seems weird but is correct
+                    {
+                        SelectedNode = SelectedNode.Parent;
+                        return true;
+                    }
+                }
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
 
     public class NbtIcon : NodeControl

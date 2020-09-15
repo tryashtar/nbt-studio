@@ -8,7 +8,6 @@ namespace NbtExplorer2.UI
 {
     public partial class EditTagWindow : Form
     {
-        private readonly EditPurpose Purpose;
         private readonly NbtTag WorkingTag;
         private readonly NbtTag TagParent;
         private readonly bool SettingName;
@@ -19,7 +18,6 @@ namespace NbtExplorer2.UI
         {
             InitializeComponent();
 
-            Purpose = purpose;
             WorkingTag = tag;
             TagParent = parent;
 
@@ -57,7 +55,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        public static bool CreateTag(NbtTagType type, NbtTag parent)
+        public static NbtTag CreateTag(NbtTagType type, NbtTag parent)
         {
             bool has_name = parent is NbtCompound;
             bool has_value = INbt.IsValueType(type);
@@ -68,15 +66,10 @@ namespace NbtExplorer2.UI
             if (has_name || has_value || has_size)
             {
                 var window = new EditTagWindow(tag, parent, has_name, has_value, has_size, EditPurpose.Create);
-                return window.ShowDialog() == DialogResult.OK; // window adds the tag by itself
+                return window.ShowDialog() == DialogResult.OK ? tag : null;
             }
             else
-            {
-                // no customization required, just add it directly
-                // example: adding a compound to a list
-                INbt.Add(parent, tag);
-                return true;
-            }
+                return tag; // no customization required, example: adding a compound to a list
         }
 
         public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
@@ -100,8 +93,6 @@ namespace NbtExplorer2.UI
             if (TryModify())
             {
                 DialogResult = DialogResult.OK;
-                if (Purpose == EditPurpose.Create)
-                    INbt.Add(TagParent, WorkingTag);
                 Close();
             }
         }

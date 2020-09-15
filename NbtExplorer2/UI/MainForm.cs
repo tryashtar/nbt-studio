@@ -34,18 +34,18 @@ namespace NbtExplorer2.UI
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            NbtTree_SelectedIndexChanged(this, EventArgs.Empty);
+            NbtTree_SelectionChanged(this, EventArgs.Empty);
         }
 
         private void AddTag(NbtTagType type)
         {
-            var tag = INbt.GetNbt(NbtTree.SelectedObject);
-            if (tag == null)
+            var parent = INbt.GetNbt(NbtTree.SelectedObject);
+            if (parent == null)
                 return;
-            if (EditTagWindow.CreateTag(type, tag))
+            var tag = EditTagWindow.CreateTag(type, parent);
+            if (tag != null)
             {
-                NbtTree.RefreshObjects(NbtTree.SelectedObjects); // don't do NbtTree.RefreshSelectedObjects(), it doesn't work properly
-                NbtTree.Expand(NbtTree.SelectedObject);
+                ViewModel.Add(tag, NbtTree.SelectedObject); // NOT parent, because the selected object could be an NbtFile, while parent would be its compound
                 HasUnsavedChanges = true;
             }
         }
@@ -56,10 +56,7 @@ namespace NbtExplorer2.UI
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.EditValue))
-            {
-                NbtTree.RefreshSelectedObjects();
                 HasUnsavedChanges = true;
-            }
         }
 
         private void ToolRename_Click(object sender, EventArgs e)
@@ -68,10 +65,7 @@ namespace NbtExplorer2.UI
             if (tag == null)
                 return;
             if (EditTagWindow.ModifyTag(tag, EditPurpose.Rename))
-            {
-                NbtTree.RefreshSelectedObjects();
                 HasUnsavedChanges = true;
-            }
         }
 
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
@@ -93,7 +87,7 @@ namespace NbtExplorer2.UI
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
-            NbtTree.SetObjects(new[] { new NbtFile() });
+            ViewModel = new NbtTreeModel(new[] { new NbtFile() }, NbtTree);
             HasUnsavedChanges = false;
         }
 
@@ -131,23 +125,13 @@ namespace NbtExplorer2.UI
 
         private void OpenFolder(string path)
         {
-            NbtTree.SetObjects(new[] { new NbtFolder(path, true) });
-            foreach (var item in NbtTree.Roots)
-            {
-                NbtTree.Expand(item);
-            }
+            ViewModel = new NbtTreeModel(new[] { new NbtFolder(path, true) }, NbtTree);
             HasUnsavedChanges = false;
         }
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            //NbtTree.SetObjects(Controller.OpenFiles(paths));
-            //foreach (var item in NbtTree.Roots)
-            //{
-            //    NbtTree.Expand(item);
-            //}
-            ViewModel = new NbtTreeModel(Controller.OpenFiles(paths));
-            NbtTree2.Model = ViewModel;
+            ViewModel = new NbtTreeModel(Controller.OpenFiles(paths), NbtTree);
             HasUnsavedChanges = false;
         }
 
@@ -160,13 +144,14 @@ namespace NbtExplorer2.UI
 
         private void ToolDelete_Click(object sender, EventArgs e)
         {
-            ViewModel.Remove(NbtTree2.SelectedObject);
+            if (NbtTree.SelectedObject != null)
+                ViewModel.RemoveAll(NbtTree.SelectedObjects);
             HasUnsavedChanges = true;
         }
 
-        private void NbtTree_SelectedIndexChanged(object sender, EventArgs e)
+        private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
-            var tag = INbt.GetNbt(NbtTree2.SelectedObject);
+            var tag = INbt.GetNbt(NbtTree.SelectedObject);
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = INbt.CanAdd(tag, item.Key);

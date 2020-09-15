@@ -36,15 +36,6 @@
     <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
       <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
     </Reference>
-    <Reference Include="ListViewPrinter, Version=2.7.1.31255, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ObjectListView.2.7.1.5\lib\ListViewPrinter.dll</HintPath>
-    </Reference>
-    <Reference Include="ObjectListView, Version=2.7.1.31255, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
-      <HintPath>..\packages\ObjectListView.2.7.1.5\lib\ObjectListView.dll</HintPath>
-    </Reference>
-    <Reference Include="SparkleLibrary, Version=2.7.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ObjectListView.2.7.1.5\lib\SparkleLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -74,9 +65,6 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\NbtTreeModel.cs" />
-    <Compile Include="UI\NbtTreeView.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -86,7 +74,7 @@
     </Compile>
     <Compile Include="SNBT\SnbtMaker.cs" />
     <Compile Include="SNBT\SnbtParser.cs" />
-    <Compile Include="UI\NbtTreeView2.cs">
+    <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util.cs" />

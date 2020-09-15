@@ -17,27 +17,48 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
         public readonly IEnumerable<object> Roots;
-        private readonly Dictionary<object, object> ParentDict = new Dictionary<object, object>();
-        public NbtTreeModel(IEnumerable<object> roots)
+        private readonly NbtTreeView View;
+        public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
             Roots = roots;
+            View = view;
+            View.Model = this;
+            // expand all top-level objects
+            foreach (var item in View.Root.Children)
+            {
+                item.Expand();
+            }
         }
 
         public void Remove(object obj)
         {
             INbt.Delete(obj);
-            NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetPath(ParentDict[obj]), new[] { obj }));
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetParentPath(obj), new[] { obj }));
+        }
+
+        public void RemoveAll(IEnumerable<object> objects)
+        {
+            foreach (var item in objects.ToList())
+            {
+                Remove(item);
+            }
+        }
+
+        public void Add(NbtTag tag, object parent)
+        {
+            INbt.Add(tag, parent);
+            NodesInserted?.Invoke(this, new TreeModelEventArgs(GetPath(parent), new[] { INbt.IndexOf(parent, tag) }, new[] { tag }));
+            View.FindNodeByTag(parent).Expand();
         }
 
         private TreePath GetPath(object item)
         {
-            Stack<object> stack = new Stack<object>();
-            while (!Roots.Contains(item))
-            {
-                stack.Push(item);
-                item = ParentDict[item];
-            }
-            return new TreePath(stack.ToArray());
+            return View.GetPath(View.FindNodeByTag(item));
+        }
+
+        private TreePath GetParentPath(object item)
+        {
+            return View.GetPath(View.FindNodeByTag(item).Parent);
         }
 
         public IEnumerable GetChildren(TreePath treePath)
@@ -45,7 +66,7 @@ namespace NbtExplorer2.UI
             if (treePath.IsEmpty())
                 return Roots;
             else
-                return GetChildren(treePath.LastNode, true);
+                return GetChildren(treePath.LastNode);
         }
 
         public bool IsLeaf(TreePath treePath)
@@ -53,22 +74,15 @@ namespace NbtExplorer2.UI
             return !HasChildren(treePath.LastNode);
         }
 
-        private IEnumerable<object> GetChildren(object obj, bool remember_parent)
+        private IEnumerable<object> GetChildren(object obj)
         {
             var children = INbt.GetChildren(obj);
-            if (children != null && remember_parent)
-            {
-                foreach (var child in children)
-                {
-                    ParentDict[child] = obj;
-                }
-            }
             return children;
         }
 
         private bool HasChildren(object obj)
         {
-            var children = GetChildren(obj, false);
+            var children = GetChildren(obj);
             return children != null && children.Any();
         }
     }
