@@ -55,10 +55,12 @@ namespace NbtExplorer2.UI
             }
         }
 
-        private static string GetAutomaticName(NbtTag tag, NbtCompound parent)
+        public static string GetAutomaticName(NbtTag tag, NbtCompound parent)
         {
-            string basename = INbt.TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
-            for (int i = 0; i < 999999; i++)
+            if (tag.Name != null && !parent.Contains(tag.Name))
+                return tag.Name;
+            string basename = tag.Name ?? INbt.TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
+            for (int i = 1; i < 999999; i++)
             {
                 string name = basename + i.ToString();
                 if (!parent.Contains(name))

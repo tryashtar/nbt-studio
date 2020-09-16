@@ -434,6 +434,7 @@
             // 
             // NbtTree
             // 
+            this.NbtTree.AllowDrop = true;
             this.NbtTree.BackColor = System.Drawing.SystemColors.Window;
             this.NbtTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.NbtTree.DefaultToolTipProvider = null;
@@ -450,8 +451,11 @@
             this.NbtTree.Size = new System.Drawing.Size(800, 401);
             this.NbtTree.TabIndex = 3;
             this.NbtTree.Text = "NBT Tree";
+            this.NbtTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.NbtTree_ItemDrag);
             this.NbtTree.NodeMouseDoubleClick += new System.EventHandler<Aga.Controls.Tree.TreeNodeAdvMouseEventArgs>(this.NbtTree_NodeMouseDoubleClick);
             this.NbtTree.SelectionChanged += new System.EventHandler(this.NbtTree_SelectionChanged);
+            this.NbtTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragDrop);
+            this.NbtTree.DragOver += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragOver);
             // 
             // MainForm
             // 

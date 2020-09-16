@@ -44,7 +44,7 @@ namespace NbtExplorer2.UI
                 return;
             var tag = EditTagWindow.CreateTag(type, parent, Control.ModifierKeys == Keys.Shift);
             if (tag != null)
-                ViewModel.Add(tag, NbtTree.SelectedObject); // NOT parent, because the selected object could be an NbtFile, while parent would be its compound
+                ViewModel.Add(NbtTree.SelectedObject, tag); // NOT parent, because the selected object could be an NbtFile, while parent would be its compound
         }
 
         private void ToolEdit_Click(object sender, EventArgs e)
@@ -165,7 +165,7 @@ namespace NbtExplorer2.UI
 
         private void ToolSave_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void ToolRefresh_Click(object sender, EventArgs e)
@@ -196,6 +196,27 @@ namespace NbtExplorer2.UI
         private void ToolEditSnbt_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            DoDragDrop(NbtTree.SelectedNodes.ToArray(), DragDropEffects.Move);
+        }
+
+        private void NbtTree_DragOver(object sender, DragEventArgs e)
+        {
+            var objects = NbtTree.ObjectsFromDrag(e);
+            if (objects != null
+                && NbtTree.DropPosition.Node != null
+                && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
+                e.Effect = e.AllowedEffect;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void NbtTree_DragDrop(object sender, DragEventArgs e)
+        {
+            ViewModel.Move(NbtTree.ObjectsFromDrag(e), NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
         }
     }
 }

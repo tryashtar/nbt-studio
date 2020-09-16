@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace NbtExplorer2
 {
+    // represents a loadable and saveable NBT file
+    // uses fNbt.NbtFile to do the work reading/writing binary data to disk, but can also read/write SNBT without using one
     public class NbtFile
     {
         public string Path { get; private set; }
@@ -41,13 +43,21 @@ namespace NbtExplorer2
         {
             try
             {
-                var text = File.ReadAllText(path);
-                var tag = SnbtParser.Parse(text);
-                if (!(tag is NbtCompound compound))
-                    return null;
-                compound.Name = "";
-                var file = new fNbt.NbtFile(compound);
-                return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(path, !text.Contains("\n")));
+                using (var stream = File.OpenRead(path))
+                using (var reader = new StreamReader(stream, Encoding.UTF8))
+                {
+                    char[] firstchar = new char[1];
+                    reader.ReadBlock(firstchar, 0, 1);
+                    if (firstchar[0] != '{') // optimization to not load in huge files
+                        return null;
+                    var text = firstchar[0] + reader.ReadToEnd();
+                    var tag = SnbtParser.Parse(text);
+                    if (!(tag is NbtCompound compound))
+                        return null;
+                    compound.Name = "";
+                    var file = new fNbt.NbtFile(compound);
+                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(path, !text.Contains("\n")));
+                }
             }
             catch
             {

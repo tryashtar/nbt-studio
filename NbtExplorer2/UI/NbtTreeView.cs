@@ -49,6 +49,38 @@ namespace NbtExplorer2.UI
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         { }
 
+
+        private TreeNodeAdv LastDragDestination;
+        private DateTime LastDragDestinationTime;
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            // expand nodes we hover over while drag and dropping
+            if (DropPosition.Node != LastDragDestination)
+            {
+                LastDragDestination = DropPosition.Node;
+                LastDragDestinationTime = DateTime.Now;
+            }
+            else if (DropPosition.Node != null && DropPosition.Position == NodePosition.Inside)
+            {
+                TimeSpan hover_time = DateTime.Now.Subtract(LastDragDestinationTime);
+                if (hover_time.TotalSeconds > 0.5)
+                {
+                    // don't expand the node we're dragging itself
+                    var objects = ObjectsFromDrag(drgevent);
+                    if (objects != null && !objects.Contains(DropPosition.Node.Tag))
+                        DropPosition.Node.Expand();
+                }
+            }
+            base.OnDragOver(drgevent);
+        }
+
+        public IEnumerable<object> ObjectsFromDrag(DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
+                return null;
+            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => x.Tag);
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (SelectedNode != null)
@@ -83,7 +115,7 @@ namespace NbtExplorer2.UI
     {
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
-            NbtText.DrawSelection(context);
+            NbtText.DrawSelection(node, context);
             var image = GetIcon(node);
             if (image != null)
             {
@@ -119,7 +151,7 @@ namespace NbtExplorer2.UI
             {
                 var size = MeasureSize(node, context);
                 Point point = new Point(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
-                DrawSelection(context);
+                DrawSelection(node, context);
                 var boldfont = new Font(context.Font, FontStyle.Bold);
                 if (halves.Item1 != null)
                 {
@@ -130,7 +162,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        public static void DrawSelection(DrawContext context)
+        public static void DrawSelection(TreeNodeAdv node, DrawContext context)
         {
             if (context.DrawSelection == DrawSelectionMode.Active)
                 context.Graphics.FillRectangle(Brushes.LightBlue, context.Bounds);

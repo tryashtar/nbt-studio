@@ -1,5 +1,7 @@
-﻿using fNbt;
+﻿using Aga.Controls.Tree;
+using fNbt;
 using NbtExplorer2.SNBT;
+using NbtExplorer2.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -200,7 +202,7 @@ namespace NbtExplorer2
             return null;
         }
 
-        public static void Add(NbtTag child, object parent)
+        public static void Add(object parent, NbtTag child)
         {
             if (parent is NbtFile file)
                 file.RootTag.Add(child);
@@ -210,10 +212,20 @@ namespace NbtExplorer2
                 list.Add(child);
         }
 
+        public static void Insert(object parent, int index, NbtTag child)
+        {
+            if (parent is NbtFile file)
+                file.RootTag.Insert(index, child);
+            else if (parent is NbtCompound compound)
+                compound.Insert(index, child);
+            else if (parent is NbtList list)
+                list.Insert(index, child);
+        }
+
         public static int IndexOf(object parent, NbtTag child)
         {
             if (parent is NbtFile file)
-                return file.RootTag.Tags.ToList().IndexOf(child);
+                return file.RootTag.IndexOf(child);
             else if (parent is NbtCompound compound)
                 return compound.Tags.ToList().IndexOf(child);
             else if (parent is NbtList list)
@@ -307,6 +319,60 @@ namespace NbtExplorer2
             if (type == NbtTagType.LongArray)
                 return "Long Array";
             return type.ToString();
+        }
+
+        public static bool CanDropAll(IEnumerable<object> items, object destination, int index)
+        {
+            return items.All(x => CanDrop(x, destination, index));
+        }
+
+        public static bool CanDrop(object item, object destination, int index)
+        {
+            return Drop(item, destination, index, just_check: true);
+        }
+
+        public static bool DropAll(IEnumerable<object> items, object destination, int index)
+        {
+            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
+            return items.Reverse().All(x => Drop(x, destination, index));
+        }
+
+        public static bool Drop(object item, object destination, int index, bool just_check = false)
+        {
+            if (destination is NbtFolder)
+            {
+                if (item is NbtFile file)
+                {
+                    if (!just_check)
+                        Console.WriteLine("Move file into folder");
+                    return true;
+                }
+                if (item is NbtFolder folder)
+                {
+                    if (!just_check)
+                        Console.WriteLine("Move folder into other folder");
+                    return true;
+                }
+                return false;
+            }
+            var tag_item = GetNbt(item);
+            var tag_dest = GetNbt(destination);
+            if (tag_item == null || tag_dest == null)
+                return false;
+            if (!CanAdd(tag_dest, tag_item.TagType))
+                return false;
+            if (!just_check)
+            {
+                if (tag_item.Parent == tag_dest && IndexOf(tag_dest, tag_item) < index)
+                    index--;
+                Delete(tag_item);
+                if (tag_dest is NbtCompound compound)
+                    tag_item.Name = EditTagWindow.GetAutomaticName(tag_item, compound);
+                else if (tag_dest is NbtList)
+                    tag_item.Name = null;
+                Insert(tag_dest, index, tag_item);
+            }
+            return true;
         }
 
         public static Image Image(object obj)
