@@ -164,8 +164,12 @@ namespace NbtExplorer2.UI
 
         public static void DrawSelection(TreeNodeAdv node, DrawContext context)
         {
+            // selected nodes are not "active" while dragging
+            // hovered nodes are "active" while dragging
             if (context.DrawSelection == DrawSelectionMode.Active)
                 context.Graphics.FillRectangle(Brushes.LightBlue, context.Bounds);
+            else if (node.IsSelected)
+                context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);
         }
 
         public override Size MeasureSize(TreeNodeAdv node, DrawContext context)

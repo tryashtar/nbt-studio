@@ -10,17 +10,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aga.Controls.Tree;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace NbtExplorer2.UI
 {
     public partial class MainForm : Form
     {
         private NbtTreeModel ViewModel;
-
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
+        private readonly string[] ClickedFiles;
 
-        public MainForm()
+        public MainForm(string[] args)
         {
+            ClickedFiles = args;
+
             // stuff from the designer
             InitializeComponent();
 
@@ -35,6 +38,8 @@ namespace NbtExplorer2.UI
         private void MainForm_Load(object sender, EventArgs e)
         {
             NbtTree_SelectionChanged(this, EventArgs.Empty);
+            if (ClickedFiles != null && ClickedFiles.Any())
+                OpenFiles(ClickedFiles);
         }
 
         private void AddTag(NbtTagType type)
@@ -93,6 +98,7 @@ namespace NbtExplorer2.UI
                 return;
             using (var dialog = new OpenFileDialog
             {
+                Title = "Select NBT files",
                 RestoreDirectory = true,
                 Multiselect = true,
                 Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt",
@@ -107,14 +113,15 @@ namespace NbtExplorer2.UI
         {
             if (!ConfirmIfUnsaved("Open a new folder anyway?"))
                 return;
-            using (var dialog = new OpenFileDialog
+            using (var dialog = new CommonOpenFileDialog
             {
+                Title = "Select a folder that contains NBT files",
                 RestoreDirectory = true,
                 Multiselect = false,
-                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt",
+                IsFolderPicker = true
             })
             {
-                if (dialog.ShowDialog() == DialogResult.OK)
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     OpenFolder(Path.GetDirectoryName(dialog.FileName));
             }
         }
@@ -205,18 +212,35 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_DragOver(object sender, DragEventArgs e)
         {
-            var objects = NbtTree.ObjectsFromDrag(e);
-            if (objects != null
-                && NbtTree.DropPosition.Node != null
-                && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
-                e.Effect = e.AllowedEffect;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
             else
-                e.Effect = DragDropEffects.None;
+            {
+                var objects = NbtTree.ObjectsFromDrag(e);
+                if (objects != null
+                    && NbtTree.DropPosition.Node != null
+                    && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
+                    e.Effect = e.AllowedEffect;
+                else
+                    e.Effect = DragDropEffects.None;
+            }
         }
 
         private void NbtTree_DragDrop(object sender, DragEventArgs e)
         {
-            ViewModel.Move(NbtTree.ObjectsFromDrag(e), NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (!ConfirmIfUnsaved("Open a new file anyway?"))
+                    return;
+                OpenFiles(files);
+            }
+            else
+            {
+                var objects = NbtTree.ObjectsFromDrag(e);
+                if (objects != null)
+                    ViewModel.Move(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
+            }
         }
     }
 }
