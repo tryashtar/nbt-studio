@@ -34,6 +34,17 @@ namespace NbtExplorer2.UI
 
         public void Remove(object obj)
         {
+            var node = View.FindNodeByTag(obj);
+            if (node != null && node.IsSelected)
+            {
+                node.IsSelected = false;
+                if (node.NextNode != null)
+                    node.NextNode.IsSelected = true;
+                else if (node.PreviousNode != null)
+                    node.PreviousNode.IsSelected = true;
+                else if (node.Parent != null)
+                    node.Parent.IsSelected = true;
+            }
             INbt.Delete(obj);
             NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetParentPath(obj), new[] { obj }));
             HasUnsavedChanges = true;

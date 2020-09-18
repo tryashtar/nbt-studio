@@ -304,7 +304,7 @@ namespace NbtExplorer2
                 return $"[{Util.Pluralize(int_array.Value.Length, "int")}]";
             else if (tag is NbtLongArray long_array)
                 return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
-            return tag.ToSnbt(multiline: false, delimit: false);
+            return tag.ToSnbt(expanded: false, delimit: false);
         }
 
         public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag);
@@ -323,6 +323,9 @@ namespace NbtExplorer2
 
         public static bool CanDropAll(IEnumerable<object> items, object destination, int index)
         {
+            // check if you're trying to add items of different types to a list
+            if (destination is NbtList list && items.OfType<NbtTag>().Select(x => x.TagType).Distinct().Skip(1).Any())
+                return false;
             return items.All(x => CanDrop(x, destination, index));
         }
 

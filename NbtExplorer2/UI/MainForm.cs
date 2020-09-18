@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aga.Controls.Tree;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using NbtExplorer2.SNBT;
 
 namespace NbtExplorer2.UI
 {
@@ -187,17 +188,37 @@ namespace NbtExplorer2.UI
 
         private void ToolCut_Click(object sender, EventArgs e)
         {
-
+            if (NbtTree.SelectedObject != null)
+            {
+                Copy(NbtTree.SelectedObjects);
+                ViewModel.RemoveAll(NbtTree.SelectedObjects);
+            }
         }
 
         private void ToolCopy_Click(object sender, EventArgs e)
         {
+            if (NbtTree.SelectedObject != null)
+                Copy(NbtTree.SelectedObjects);
+        }
 
+        private void Copy(IEnumerable<object> objects)
+        {
+            Clipboard.SetText(String.Join("\n", objects.OfType<NbtTag>().Select(x => x.ToSnbt(include_name: true))));
+        }
+
+        private void Paste(object destination)
+        {
+            var snbts = Clipboard.GetText().Split('\n');
+            foreach (var nbt in snbts)
+            {
+                if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                    ViewModel.Add(destination, tag);
+            }
         }
 
         private void ToolPaste_Click(object sender, EventArgs e)
         {
-
+            Paste(NbtTree.SelectedObject);
         }
 
         private void ToolEditSnbt_Click(object sender, EventArgs e)

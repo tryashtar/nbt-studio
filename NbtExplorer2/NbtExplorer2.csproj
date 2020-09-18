@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClipboardData.cs" />
     <Compile Include="ExportSettings.cs" />
     <Compile Include="INbt.cs" />
     <Compile Include="NbtFile.cs" />

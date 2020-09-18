@@ -23,17 +23,19 @@ namespace NbtExplorer2.SNBT
 
         private readonly StringReader Reader;
 
-        public static NbtTag Parse(string snbt)
+        public static NbtTag Parse(string snbt, bool named)
         {
             var parser = new SnbtParser(snbt);
-            return parser.Parse();
+            var value = named ? parser.ReadNamedValue() : parser.ReadValue();
+            parser.Finish();
+            return value;
         }
 
-        public static bool TryParse(string snbt, out NbtTag tag)
+        public static bool TryParse(string snbt, bool named, out NbtTag tag)
         {
             try
             {
-                tag = Parse(snbt);
+                tag = Parse(snbt, named);
                 return true;
             }
             catch (Exception)
@@ -49,45 +51,53 @@ namespace NbtExplorer2.SNBT
             Reader = new StringReader(snbt);
         }
 
-        private NbtTag Parse()
-        {
-            return ReadValue();
-        }
-
         private NbtTag ReadValue()
         {
             Reader.SkipWhitespace();
-            char next = (char)Reader.Peek();
-            if (next == '{')
+            char next = Reader.Peek();
+            if (next == Snbt.COMPOUND_OPEN)
                 return ReadCompound();
-            if (next == '[')
+            if (next == Snbt.LIST_OPEN)
                 return ReadListLike();
             return ReadTypedValue();
         }
 
+        private NbtTag ReadNamedValue()
+        {
+            string key = ReadKey();
+            Expect(Snbt.NAME_VALUE_SEPARATOR);
+            NbtTag value = ReadValue();
+            value.Name = key;
+            return value;
+        }
+
+        private void Finish()
+        {
+            Reader.SkipWhitespace();
+            if (Reader.CanRead())
+                throw new FormatException($"Trailing data found after position {Reader.Cursor}");
+        }
+
         private NbtCompound ReadCompound()
         {
-            Expect('{');
+            Expect(Snbt.COMPOUND_OPEN);
             Reader.SkipWhitespace();
             var compound = new NbtCompound();
-            while (Reader.CanRead() && Reader.Peek() != '}')
+            while (Reader.CanRead() && Reader.Peek() != Snbt.COMPOUND_CLOSE)
             {
-                string key = ReadKey();
-                Expect(':');
-                NbtTag value = ReadValue();
-                value.Name = key;
+                var value = ReadNamedValue();
                 compound.Add(value);
                 if (!ReadSeparator())
                     break;
             }
-            Expect('}');
+            Expect(Snbt.COMPOUND_CLOSE);
             return compound;
         }
 
         private bool ReadSeparator()
         {
             Reader.SkipWhitespace();
-            if (Reader.CanRead() && Reader.Peek() == ',')
+            if (Reader.CanRead() && Reader.Peek() == Snbt.VALUE_SEPARATOR)
             {
                 Reader.Read();
                 Reader.SkipWhitespace();
@@ -106,32 +116,32 @@ namespace NbtExplorer2.SNBT
 
         private NbtTag ReadListLike()
         {
-            if (Reader.CanRead(3) && !StringReader.IsQuote(Reader.Peek(1)) && Reader.Peek(2) == ';')
+            if (Reader.CanRead(3) && !StringReader.IsQuote(Reader.Peek(1)) && Reader.Peek(2) == Snbt.ARRAY_DELIMITER)
                 return ReadArray();
             return ReadList();
         }
 
         private NbtTag ReadArray()
         {
-            Expect('[');
+            Expect(Snbt.LIST_OPEN);
             char type = Reader.Read();
             Reader.Read(); // skip semicolon
             Reader.SkipWhitespace();
             if (!Reader.CanRead())
                 throw new FormatException($"Expected array to end, but reached end of data");
-            if (type == 'B')
+            if (type == Snbt.BYTE_ARRAY_PREFIX)
                 return ReadArray(NbtTagType.Byte);
-            if (type == 'L')
+            if (type == Snbt.LONG_ARRAY_PREFIX)
                 return ReadArray(NbtTagType.Long);
-            if (type == 'I')
+            if (type == Snbt.INT_ARRAY_PREFIX)
                 return ReadArray(NbtTagType.Int);
-            throw new FormatException($"{type} is not a valid array type (B, L, or I)");
+            throw new FormatException($"{type} is not a valid array type ({Snbt.BYTE_ARRAY_PREFIX}, {Snbt.LONG_ARRAY_PREFIX}, or {Snbt.INT_ARRAY_PREFIX})");
         }
 
         private NbtTag ReadArray(NbtTagType arraytype)
         {
             var list = new ArrayList();
-            while (Reader.Peek() != ']')
+            while (Reader.Peek() != Snbt.LIST_CLOSE)
             {
                 var tag = ReadValue();
                 if (arraytype == NbtTagType.Byte)
@@ -143,7 +153,7 @@ namespace NbtExplorer2.SNBT
                 if (!ReadSeparator())
                     break;
             }
-            Expect(']');
+            Expect(Snbt.LIST_CLOSE);
             if (arraytype == NbtTagType.Byte)
                 return new NbtByteArray(list.Cast<byte>().ToArray());
             else if (arraytype == NbtTagType.Long)
@@ -154,19 +164,19 @@ namespace NbtExplorer2.SNBT
 
         private NbtList ReadList()
         {
-            Expect('[');
+            Expect(Snbt.LIST_OPEN);
             Reader.SkipWhitespace();
             if (!Reader.CanRead())
                 throw new FormatException($"Expected list to end, but reached end of data");
             var list = new NbtList();
-            while (Reader.Peek() != ']')
+            while (Reader.Peek() != Snbt.LIST_CLOSE)
             {
                 var tag = ReadValue();
                 list.Add(tag);
                 if (!ReadSeparator())
                     break;
             }
-            Expect(']');
+            Expect(Snbt.LIST_CLOSE);
             return list;
         }
 
@@ -204,17 +214,17 @@ namespace NbtExplorer2.SNBT
                     return new NbtByte(1);
                 if (String.Equals(str, "false", StringComparison.OrdinalIgnoreCase))
                     return new NbtByte(0);
-                if (String.Equals(str, "Infinityf", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "Infinity" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
                     return new NbtFloat(float.PositiveInfinity);
-                if (String.Equals(str, "-Infinityf", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "-Infinity" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
                     return new NbtFloat(float.NegativeInfinity);
-                if (String.Equals(str, "NaNf", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "NaN" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
                     return new NbtFloat(float.NaN);
-                if (String.Equals(str, "Infinityd", StringComparison.OrdinalIgnoreCase) || String.Equals(str, "Infinity", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "Infinity" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "Infinity", StringComparison.OrdinalIgnoreCase))
                     return new NbtDouble(double.PositiveInfinity);
-                if (String.Equals(str, "-Infinityd", StringComparison.OrdinalIgnoreCase) || String.Equals(str, "-Infinity", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "-Infinity" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "-Infinity", StringComparison.OrdinalIgnoreCase))
                     return new NbtDouble(double.NegativeInfinity);
-                if (String.Equals(str, "NaNd", StringComparison.OrdinalIgnoreCase) || String.Equals(str, "NaN", StringComparison.OrdinalIgnoreCase))
+                if (String.Equals(str, "NaN" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "NaN", StringComparison.OrdinalIgnoreCase))
                     return new NbtDouble(double.NaN);
             }
             catch (FormatException)
@@ -237,7 +247,7 @@ namespace NbtExplorer2.SNBT
         private const char DOUBLE_QUOTE = '"';
         private const char SINGLE_QUOTE = '\'';
         private readonly string String;
-        private int Cursor;
+        public int Cursor { get; private set; }
 
         public StringReader(string str)
         {

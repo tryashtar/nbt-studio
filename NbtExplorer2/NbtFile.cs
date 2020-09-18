@@ -51,7 +51,7 @@ namespace NbtExplorer2
                     if (firstchar[0] != '{') // optimization to not load in huge files
                         return null;
                     var text = firstchar[0] + reader.ReadToEnd();
-                    var tag = SnbtParser.Parse(text);
+                    var tag = SnbtParser.Parse(text, named: false);
                     if (!(tag is NbtCompound compound))
                         return null;
                     compound.Name = "";
@@ -87,7 +87,7 @@ namespace NbtExplorer2
         public void Save()
         {
             if (ExportSettings.Snbt)
-                File.WriteAllText(Path, RootTag.ToSnbt(multiline: !ExportSettings.Minified));
+                File.WriteAllText(Path, RootTag.ToSnbt(expanded: !ExportSettings.Minified));
             else
             {
                 var file = new fNbt.NbtFile(Path);
