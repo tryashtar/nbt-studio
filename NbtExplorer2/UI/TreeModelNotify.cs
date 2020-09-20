@@ -67,9 +67,9 @@ namespace NbtExplorer2.UI
                 Tree = tree;
                 SourceObject = source;
             }
-            protected void Notify()
+            protected void Notify(bool parent = false)
             {
-                Tree.Notify(SourceObject);
+                Tree.Notify(SourceObject, parent);
             }
             protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
         }
@@ -96,7 +96,7 @@ namespace NbtExplorer2.UI
                     c.Remove(Tag);
                 else if (Tag.Parent is NbtList l)
                     l.Remove(Tag);
-                Notify();
+                Notify(parent: true);
             }
         }
 

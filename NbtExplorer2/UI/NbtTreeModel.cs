@@ -70,9 +70,23 @@ namespace NbtExplorer2.UI
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
-        private void Notify(object changed)
+        private void Notify(object changed, bool parent)
         {
+#if DEBUG
             Console.WriteLine($"changed: {changed.GetType()}");
+#endif
+            HasUnsavedChanges = true;
+            var path = parent ? GetParentPath(changed) : GetPath(changed);
+            var node = parent ? View.FindNodeByTag(changed).Parent : View.FindNodeByTag(changed);
+            var real_children = GetChildren(path).ToList();
+            var current_children = node.Children.Select(x => x.Tag).ToArray();
+            NodesChanged?.Invoke(this, new TreeModelEventArgs(path, real_children.ToArray()));
+            var remove = current_children.Except(real_children).ToArray();
+            var add = real_children.Except(current_children).ToArray();
+            if (remove.Any())
+                NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
+            if (add.Any())
+                NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
         }
 
         private TreePath GetPath(object item)
@@ -85,7 +99,8 @@ namespace NbtExplorer2.UI
             return View.GetPath(View.FindNodeByTag(item).Parent);
         }
 
-        public IEnumerable GetChildren(TreePath treePath)
+        IEnumerable  ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);
+        public IEnumerable<object> GetChildren(TreePath treePath)
         {
             if (treePath.IsEmpty())
                 return Roots;

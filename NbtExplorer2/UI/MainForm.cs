@@ -147,7 +147,7 @@ namespace NbtExplorer2.UI
 
         private void ToolDelete_Click(object sender, EventArgs e)
         {
-            foreach (var item in ViewModel.SelectedNbts)
+            foreach (var item in ViewModel.SelectedNbts.ToList())
             {
                 item.Remove();
             }

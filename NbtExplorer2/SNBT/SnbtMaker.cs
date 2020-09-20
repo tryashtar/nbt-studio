@@ -45,7 +45,7 @@ namespace NbtExplorer2.SNBT
                 return name + s.ToSnbt(delimit);
             if (tag is INbtInt i)
                 return name + i.ToSnbt();
-            if (tag is INbtInt l)
+            if (tag is INbtLong l)
                 return name + l.ToSnbt(delimit);
             if (tag is INbtFloat f)
                 return name + f.ToSnbt(delimit);

@@ -199,7 +199,7 @@ namespace NbtExplorer2
                 return compound.Tags;
             if (obj is NbtList list)
                 return list;
-            return null;
+            return Enumerable.Empty<object>();
         }
 
         public static void Add(object parent, NbtTag child)
