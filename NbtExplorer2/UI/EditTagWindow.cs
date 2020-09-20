@@ -97,12 +97,12 @@ namespace NbtExplorer2.UI
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
-            bool has_name = parent is NbtCompound;
+            bool has_name = parent is INbtCompound;
             bool has_value = INbt.IsValueType(existing.TagType);
 
             if (has_name || has_value)
             {
-                var window = new EditTagWindow(existing, parent.Adapt(), has_name, has_value, false, purpose);
+                var window = new EditTagWindow(existing, parent, has_name, has_value, false, purpose);
                 return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
             }
             return false;

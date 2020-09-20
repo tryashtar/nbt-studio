@@ -255,6 +255,7 @@ namespace NbtExplorer2.UI
                 }
             }
             public NbtTagType TagType => NbtTagType.Compound;
+            public int Count => Compound.Count;
 
             public void Add(NbtTag tag)
             {

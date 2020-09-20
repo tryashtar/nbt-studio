@@ -87,7 +87,7 @@ namespace NbtExplorer2
         public void Save()
         {
             if (ExportSettings.Snbt)
-                File.WriteAllText(Path, RootTag.ToSnbt(expanded: !ExportSettings.Minified));
+                File.WriteAllText(Path, RootTag.Adapt().ToSnbt(expanded: !ExportSettings.Minified));
             else
             {
                 var file = new fNbt.NbtFile(Path);

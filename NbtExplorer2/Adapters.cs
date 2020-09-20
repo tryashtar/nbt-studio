@@ -12,6 +12,16 @@ namespace NbtExplorer2
     {
         string Name { get; set; }
         NbtTagType TagType { get; }
+        INbtContainer Parent { get; }
+    }
+
+    public interface INbtContainer : INbtTag, IReadOnlyCollection<INbtTag>
+    {
+        void Add(NbtTag tag);
+        void AddRange(IEnumerable<NbtTag> tags);
+        void Clear();
+        bool Contains(NbtTag tag);
+        bool Remove(NbtTag tag);
     }
 
     public interface INbtByte : INbtTag
@@ -64,34 +74,24 @@ namespace NbtExplorer2
         long[] Value { get; set; }
     }
 
-    public interface INbtCompound : INbtTag
+    public interface INbtCompound : INbtContainer
     {
         IEnumerable<INbtTag> Tags { get; }
-        int Count { get; }
-        void Add(NbtTag tag);
-        void AddRange(IEnumerable<NbtTag> tags);
-        void Clear();
-        bool Contains(NbtTag tag);
         bool Contains(string name);
-        bool Remove(NbtTag tag);
         bool Remove(string name);
     }
 
-    public interface INbtList : INbtTag, IReadOnlyList<INbtTag>
+    public interface INbtList : INbtContainer, IReadOnlyList<INbtTag>
     {
         NbtTagType ListType { get; }
-        int Count { get; }
-        void Add(NbtTag tag);
-        void AddRange(IEnumerable<NbtTag> tags);
-        void Clear();
-        bool Contains(NbtTag tag);
-        bool Remove(NbtTag tag);
     }
 
     public static class Adapters
     {
         public static INbtTag Adapt(this NbtTag tag)
         {
+            if (tag == null)
+                return null;
             if (tag is NbtCompound compound)
                 return compound.AdaptCompound();
             if (tag is NbtList list)
@@ -109,6 +109,8 @@ namespace NbtExplorer2
 
         public string Name { get => Compound.Name; set => Compound.Name = value; }
         public NbtTagType TagType => NbtTagType.Compound;
+        public INbtContainer Parent => (INbtContainer)Compound.Parent.Adapt();
+
         public IEnumerable<INbtTag> Tags => Compound.Tags.Select(x => x.Adapt());
         public int Count => Compound.Count;
         public void Add(NbtTag tag) => Compound.Add(tag);
@@ -116,8 +118,13 @@ namespace NbtExplorer2
         public void Clear() => Compound.Clear();
         public bool Contains(NbtTag tag) => Compound.Contains(tag);
         public bool Contains(string name) => Compound.Contains(name);
+
+
         public bool Remove(NbtTag tag) => Compound.Remove(tag);
         public bool Remove(string name) => Compound.Remove(name);
+
+        public IEnumerator<INbtTag> GetEnumerator() => Compound.Tags.Select(x => x.Adapt()).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public class NbtListAdapter : INbtList
@@ -126,7 +133,9 @@ namespace NbtExplorer2
         public NbtListAdapter(NbtList list) { List = list; }
 
         public string Name { get => List.Name; set => List.Name = value; }
-        public NbtTagType TagType => NbtTagType.Compound;
+        public NbtTagType TagType => NbtTagType.List;
+        public INbtContainer Parent => (INbtContainer)List.Parent.Adapt();
+
         public NbtTagType ListType => List.ListType;
         public int Count => List.Count;
         public void Add(NbtTag tag) => List.Add(tag);

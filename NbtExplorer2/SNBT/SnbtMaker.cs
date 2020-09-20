@@ -218,9 +218,9 @@ namespace NbtExplorer2.SNBT
         // used for aligning indents for multiline compounds and lists
         private static void AddSnbt(INbtTag tag, StringBuilder sb, string indent_string, int indent_level, bool include_name)
         {
-            if (tag is NbtCompound compound)
+            if (tag is INbtCompound compound)
                 AddSnbtCompound(compound, sb, indent_string, indent_level, include_name);
-            else if (tag is NbtList list)
+            else if (tag is INbtList list)
                 AddSnbtList(list, sb, indent_string, indent_level, include_name);
             else
             {
