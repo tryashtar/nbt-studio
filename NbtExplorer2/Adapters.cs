@@ -92,14 +92,123 @@ namespace NbtExplorer2
         {
             if (tag == null)
                 return null;
+            if (tag is NbtByte b)
+                return b.AdaptByte();
+            if (tag is NbtShort s)
+                return s.AdaptShort();
+            if (tag is NbtInt i)
+                return i.AdaptInt();
+            if (tag is NbtLong l)
+                return l.AdaptLong();
+            if (tag is NbtFloat f)
+                return f.AdaptFloat();
+            if (tag is NbtDouble d)
+                return d.AdaptDouble();
+            if (tag is NbtString str)
+                return str.AdaptString();
+            if (tag is NbtByteArray ba)
+                return ba.AdaptByteArray();
+            if (tag is NbtIntArray ia)
+                return ia.AdaptIntArray();
+            if (tag is NbtLongArray la)
+                return la.AdaptLongArray();
             if (tag is NbtCompound compound)
                 return compound.AdaptCompound();
             if (tag is NbtList list)
                 return list.AdaptList();
             throw new ArgumentException($"Can't adapt {tag.GetType()}");
         }
+        public static INbtByte AdaptByte(this NbtByte tag) => new NbtByteAdapter(tag);
+        public static INbtShort AdaptShort(this NbtShort tag) => new NbtShortAdapter(tag);
+        public static INbtInt AdaptInt(this NbtInt tag) => new NbtIntAdapter(tag);
+        public static INbtLong AdaptLong(this NbtLong tag) => new NbtLongAdapter(tag);
+        public static INbtFloat AdaptFloat(this NbtFloat tag) => new NbtFloatAdapter(tag);
+        public static INbtDouble AdaptDouble(this NbtDouble tag) => new NbtDoubleAdapter(tag);
+        public static INbtString AdaptString(this NbtString tag) => new NbtStringAdapter(tag);
+        public static INbtByteArray AdaptByteArray(this NbtByteArray tag) => new NbtByteArrayAdapter(tag);
+        public static INbtIntArray AdaptIntArray(this NbtIntArray tag) => new NbtIntArrayAdapter(tag);
+        public static INbtLongArray AdaptLongArray(this NbtLongArray tag) => new NbtLongArrayAdapter(tag);
         public static INbtCompound AdaptCompound(this NbtCompound compound) => new NbtCompoundAdapter(compound);
         public static INbtList AdaptList(this NbtList list) => new NbtListAdapter(list);
+    }
+
+    public abstract class NbtTagAdapter : INbtTag
+    {
+        protected readonly NbtTag Tag;
+        public NbtTagAdapter(NbtTag tag) { Tag = tag; }
+        public string Name { get => Tag.Name; set => Tag.Name = value; }
+        public NbtTagType TagType => Tag.TagType;
+        public INbtContainer Parent => (INbtContainer)Tag.Parent;
+    }
+
+    public class NbtByteAdapter : NbtTagAdapter, INbtByte
+    {
+        private new NbtByte Tag => (NbtByte)base.Tag;
+        public NbtByteAdapter(NbtByte tag) : base(tag) { }
+        public byte Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtShortAdapter : NbtTagAdapter, INbtShort
+    {
+        private new NbtShort Tag => (NbtShort)base.Tag;
+        public NbtShortAdapter(NbtShort tag) : base(tag) { }
+        public short Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtIntAdapter : NbtTagAdapter, INbtInt
+    {
+        private new NbtInt Tag => (NbtInt)base.Tag;
+        public NbtIntAdapter(NbtInt tag) : base(tag) { }
+        public int Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtLongAdapter : NbtTagAdapter, INbtLong
+    {
+        private new NbtLong Tag => (NbtLong)base.Tag;
+        public NbtLongAdapter(NbtLong tag) : base(tag) { }
+        public long Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtFloatAdapter : NbtTagAdapter, INbtFloat
+    {
+        private new NbtFloat Tag => (NbtFloat)base.Tag;
+        public NbtFloatAdapter(NbtFloat tag) : base(tag) { }
+        public float Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtDoubleAdapter : NbtTagAdapter, INbtDouble
+    {
+        private new NbtDouble Tag => (NbtDouble)base.Tag;
+        public NbtDoubleAdapter(NbtDouble tag) : base(tag) { }
+        public double Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtStringAdapter : NbtTagAdapter, INbtString
+    {
+        private new NbtString Tag => (NbtString)base.Tag;
+        public NbtStringAdapter(NbtString tag) : base(tag) { }
+        public string Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtByteArrayAdapter : NbtTagAdapter, INbtByteArray
+    {
+        private new NbtByteArray Tag => (NbtByteArray)base.Tag;
+        public NbtByteArrayAdapter(NbtByteArray tag) : base(tag) { }
+        public byte[] Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtIntArrayAdapter : NbtTagAdapter, INbtIntArray
+    {
+        private new NbtIntArray Tag => (NbtIntArray)base.Tag;
+        public NbtIntArrayAdapter(NbtIntArray tag) : base(tag) { }
+        public int[] Value { get => Tag.Value; set => Tag.Value = value; }
+    }
+
+    public class NbtLongArrayAdapter : NbtTagAdapter, INbtLongArray
+    {
+        private new NbtLongArray Tag => (NbtLongArray)base.Tag;
+        public NbtLongArrayAdapter(NbtLongArray tag) : base(tag) { }
+        public long[] Value { get => Tag.Value; set => Tag.Value = value; }
     }
 
     public class NbtCompoundAdapter : INbtCompound
