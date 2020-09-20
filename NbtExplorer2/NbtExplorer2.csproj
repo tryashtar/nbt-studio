@@ -85,6 +85,7 @@
     <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\TreeModelNotify.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>

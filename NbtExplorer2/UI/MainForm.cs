@@ -45,7 +45,7 @@ namespace NbtExplorer2.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel.SelectedNbt;
+            var parent = ViewModel.SelectedNbt as INbtContainer;
             if (parent == null) return;
             var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
@@ -155,7 +155,7 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
-            var tag = ViewModel.SelectedNbt;
+            var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
             foreach (var item in CreateTagButtons)
             {
@@ -207,7 +207,7 @@ namespace NbtExplorer2.UI
             Clipboard.SetText(String.Join("\n", objects.Select(x => x.ToSnbt(include_name: true))));
         }
 
-        private void Paste(INbtTag destination)
+        private void Paste(INbtContainer destination)
         {
             var snbts = Clipboard.GetText().Split('\n');
             foreach (var nbt in snbts)
@@ -219,7 +219,7 @@ namespace NbtExplorer2.UI
 
         private void ToolPaste_Click(object sender, EventArgs e)
         {
-            var parent = ViewModel.SelectedNbt;
+            var parent = ViewModel.SelectedNbt as INbtContainer;
             if (parent != null)
                 Paste(parent);
         }
@@ -236,35 +236,35 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-            else
-            {
-                var objects = NbtTree.ObjectsFromDrag(e);
-                if (objects != null
-                    && NbtTree.DropPosition.Node != null
-                    && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
-                    e.Effect = e.AllowedEffect;
-                else
-                    e.Effect = DragDropEffects.None;
-            }
+            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            //    e.Effect = DragDropEffects.Copy;
+            //else
+            //{
+            //    var objects = NbtTree.ObjectsFromDrag(e);
+            //    if (objects != null
+            //        && NbtTree.DropPosition.Node != null
+            //        && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
+            //        e.Effect = e.AllowedEffect;
+            //    else
+            //        e.Effect = DragDropEffects.None;
+            //}
         }
 
         private void NbtTree_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                if (!ConfirmIfUnsaved("Open a new file anyway?"))
-                    return;
-                OpenFiles(files);
-            }
-            else
-            {
-                var objects = NbtTree.ObjectsFromDrag(e);
-                if (objects != null)
-                    ViewModel.Move(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
-            }
+            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            //{
+            //    var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            //    if (!ConfirmIfUnsaved("Open a new file anyway?"))
+            //        return;
+            //    OpenFiles(files);
+            //}
+            //else
+            //{
+            //    var objects = NbtTree.ObjectsFromDrag(e);
+            //    if (objects != null)
+            //        ViewModel.Move(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
+            //}
         }
     }
 }
