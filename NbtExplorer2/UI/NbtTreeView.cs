@@ -21,9 +21,6 @@ namespace NbtExplorer2.UI
             this.SelectionMode = TreeSelectionMode.Multi;
         }
 
-        public object SelectedObject => SelectedNode?.Tag;
-        public IEnumerable<object> SelectedObjects => SelectedNodes?.Select(x => x.Tag);
-
         private void ToggleExpansion(TreeNodeAdv node, bool all = false)
         {
             if (node.IsExpanded)

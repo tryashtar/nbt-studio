@@ -74,21 +74,21 @@ namespace NbtExplorer2
             return null;
         }
 
-        public static void SetValue(NbtTag tag, object value)
+        public static void SetValue(INbtTag tag, object value)
         {
-            if (tag is NbtByte tag_byte && value is byte b)
+            if (tag is INbtByte tag_byte && value is byte b)
                 tag_byte.Value = b;
-            else if (tag is NbtShort tag_short && value is short s)
+            else if (tag is INbtShort tag_short && value is short s)
                 tag_short.Value = s;
-            else if (tag is NbtInt tag_int && value is int i)
+            else if (tag is INbtInt tag_int && value is int i)
                 tag_int.Value = i;
-            else if (tag is NbtLong tag_long && value is long l)
+            else if (tag is INbtLong tag_long && value is long l)
                 tag_long.Value = l;
-            else if (tag is NbtFloat tag_float && value is float f)
+            else if (tag is INbtFloat tag_float && value is float f)
                 tag_float.Value = f;
-            else if (tag is NbtDouble tag_double && value is double d)
+            else if (tag is INbtDouble tag_double && value is double d)
                 tag_double.Value = d;
-            else if (tag is NbtString tag_string && value is string str)
+            else if (tag is INbtString tag_string && value is string str)
                 tag_string.Value = str;
         }
 
@@ -116,13 +116,13 @@ namespace NbtExplorer2
         }
 
         // clears any existing data in the tag's array
-        public static void SetSize(NbtTag tag, int size)
+        public static void SetSize(INbtTag tag, int size)
         {
-            if (tag is NbtByteArray tag_byte_array)
+            if (tag is INbtByteArray tag_byte_array)
                 tag_byte_array.Value = new byte[size];
-            else if (tag is NbtIntArray tag_int_array)
+            else if (tag is INbtIntArray tag_int_array)
                 tag_int_array.Value = new int[size];
-            else if (tag is NbtLongArray tag_long_array)
+            else if (tag is INbtLongArray tag_long_array)
                 tag_long_array.Value = new long[size];
         }
 
@@ -180,11 +180,11 @@ namespace NbtExplorer2
             }
         }
 
-        public static bool CanAdd(NbtTag tag, NbtTagType type)
+        public static bool CanAdd(INbtTag tag, NbtTagType type)
         {
-            if (tag is NbtCompound)
+            if (tag is INbtCompound)
                 return true;
-            if (tag is NbtList list)
+            if (tag is INbtList list)
                 return list.Count == 0 || list.ListType == type;
             return false;
         }
@@ -284,30 +284,30 @@ namespace NbtExplorer2
             if (obj is NbtFolder folder)
                 return PreviewNbtValue(folder);
             if (obj is NbtTag tag)
-                return PreviewNbtValue(tag);
+                return PreviewNbtValue(tag.Adapt());
             return null;
         }
 
-        public static string PreviewNbtValue(NbtTag tag)
+        public static string PreviewNbtValue(INbtTag tag)
         {
-            if (tag is NbtCompound compound)
+            if (tag is INbtCompound compound)
                 return $"[{Util.Pluralize(compound.Count, "entry", "entries")}]";
-            else if (tag is NbtList list)
+            else if (tag is INbtList list)
             {
                 if (list.Count == 0)
                     return $"[0 entries]";
                 return $"[{Util.Pluralize(list.Count, TagTypeName(list.ListType).ToLower())}]";
             }
-            else if (tag is NbtByteArray byte_array)
+            else if (tag is INbtByteArray byte_array)
                 return $"[{Util.Pluralize(byte_array.Value.Length, "byte")}]";
-            else if (tag is NbtIntArray int_array)
+            else if (tag is INbtIntArray int_array)
                 return $"[{Util.Pluralize(int_array.Value.Length, "int")}]";
-            else if (tag is NbtLongArray long_array)
+            else if (tag is INbtLongArray long_array)
                 return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
             return tag.ToSnbt(expanded: false, delimit: false);
         }
 
-        public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag);
+        public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag.Adapt());
         public static string PreviewNbtValue(NbtFolder folder) => $"[{Util.Pluralize(folder.Files.Count, "file")}]";
 
         public static string TagTypeName(NbtTagType type)
@@ -362,7 +362,7 @@ namespace NbtExplorer2
             var tag_dest = GetNbt(destination);
             if (tag_item == null || tag_dest == null)
                 return false;
-            if (!CanAdd(tag_dest, tag_item.TagType))
+            if (!CanAdd(tag_dest.Adapt(), tag_item.TagType))
                 return false;
             if (!just_check)
             {
@@ -370,7 +370,7 @@ namespace NbtExplorer2
                     index--;
                 Delete(tag_item);
                 if (tag_dest is NbtCompound compound)
-                    tag_item.Name = EditTagWindow.GetAutomaticName(tag_item, compound);
+                    tag_item.Name = EditTagWindow.GetAutomaticName(tag_item.Adapt(), compound.AdaptCompound());
                 else if (tag_dest is NbtList)
                     tag_item.Name = null;
                 Insert(tag_dest, index, tag_item);

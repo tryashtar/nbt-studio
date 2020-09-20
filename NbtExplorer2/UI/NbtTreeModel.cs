@@ -17,8 +17,46 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
         public bool HasUnsavedChanges { get; private set; } = false;
-        public readonly IEnumerable<object> Roots;
+        private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
+
+        public INotifyNode SelectedObject
+        {
+            get
+            {
+                if (View.SelectedNode == null)
+                    return null;
+                return ToNotifyNode(View.SelectedNode.Tag);
+            }
+        }
+        public IEnumerable<INotifyNode> SelectedObjects
+        {
+            get
+            {
+                if (View.SelectedNodes == null)
+                    return Enumerable.Empty<INotifyNode>();
+                return View.SelectedNodes.Select(x => ToNotifyNode(x.Tag));
+            }
+        }
+        public NotifyNbtTag SelectedNbt
+        {
+            get
+            {
+                if (View.SelectedNode == null)
+                    return null;
+                return (NotifyNbtTag)ToNotifyNode(View.SelectedNode.Tag, as_nbt: true);
+            }
+        }
+        public IEnumerable<NotifyNbtTag> SelectedNbts
+        {
+            get
+            {
+                if (View.SelectedNodes == null)
+                    Enumerable.Empty<NotifyNbtTag>();
+                return View.SelectedNodes.Select(x => (NotifyNbtTag)ToNotifyNode(x.Tag, as_nbt: true)).Where(x => x != null);
+            }
+        }
+
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
             Roots = roots;
@@ -31,6 +69,18 @@ namespace NbtExplorer2.UI
             }
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
+
+        private INotifyNode ToNotifyNode(object obj, bool as_nbt = false)
+        {
+            if (obj is NbtTag tag)
+                return new NotifyNbtTag(this, tag);
+            if (obj is NbtFile file)
+            {
+                if (as_nbt)
+                    return new NotifyNbtTag(this, file.RootTag);
+            }
+            throw new ArgumentException($"Can't create a model node from {obj.GetType()}");
+        }
 
         public void Remove(object obj)
         {
@@ -149,6 +199,97 @@ namespace NbtExplorer2.UI
         {
             var children = GetChildren(obj);
             return children != null && children.Any();
+        }
+
+        public interface INotifyNode
+        { }
+
+        public abstract class NotifyNode : INotifyNode
+        {
+            private NbtTreeModel Tree;
+            protected NotifyNode(NbtTreeModel tree)
+            {
+                Tree = tree;
+            }
+            protected void Notify()
+            {
+                //Tree.Notify();
+            }
+        }
+
+        public class NotifyNbtTag : NotifyNode, INbtTag
+        {
+            private readonly NbtTag Tag;
+            public NotifyNbtTag(NbtTreeModel tree, NbtTag tag) : base(tree)
+            {
+                Tag = tag;
+            }
+
+            public string Name
+            {
+                get => Tag.Name;
+                set
+                {
+                    Tag.Name = value;
+                    Notify();
+                }
+            }
+            public NbtTagType TagType => Tag.TagType;
+        }
+
+        public class NotifyNbtCompound : NotifyNode, INbtCompound
+        {
+            private readonly NbtCompound Compound;
+            public NotifyNbtCompound(NbtTreeModel tree, NbtCompound tag) : base(tree)
+            {
+                Compound = tag;
+            }
+
+            public string Name
+            {
+                get => Compound.Name;
+                set
+                {
+                    Compound.Name = value;
+                    Notify();
+                }
+            }
+            public NbtTagType TagType => NbtTagType.Compound;
+
+            public void Add(NbtTag tag)
+            {
+                Compound.Add(tag);
+                Notify();
+            }
+            public void AddRange(IEnumerable<NbtTag> tags)
+            {
+                Compound.AddRange(tags); Notify();
+            }
+            public void Clear()
+            {
+                Compound.Clear();
+                Notify();
+            }
+            public bool Contains(NbtTag tag) => Compound.Contains(tag);
+            public bool Contains(string name) => Compound.Contains(name);
+            public bool Remove(NbtTag tag)
+            {
+                if (Compound.Remove(tag))
+                {
+                    Notify();
+                    return true;
+                }
+                return false;
+            }
+            public bool Remove(string name)
+            {
+                if (Compound.Remove(name))
+                {
+                    Notify();
+                    return true;
+                }
+                return false;
+            }
         }
     }
 }

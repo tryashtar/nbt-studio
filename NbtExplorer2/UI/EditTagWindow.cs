@@ -8,13 +8,13 @@ namespace NbtExplorer2.UI
 {
     public partial class EditTagWindow : Form
     {
-        private readonly NbtTag WorkingTag;
-        private readonly NbtTag TagParent;
+        private readonly INbtTag WorkingTag;
+        private readonly INbtTag TagParent;
         private readonly bool SettingName;
         private readonly bool SettingValue;
         private readonly bool SettingSize;
 
-        private EditTagWindow(NbtTag tag, NbtTag parent, bool set_name, bool set_value, bool set_size, EditPurpose purpose)
+        private EditTagWindow(INbtTag tag, INbtTag parent, bool set_name, bool set_value, bool set_size, EditPurpose purpose)
         {
             InitializeComponent();
 
@@ -55,7 +55,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        public static string GetAutomaticName(NbtTag tag, NbtCompound parent)
+        public static string GetAutomaticName(INbtTag tag, INbtCompound parent)
         {
             if (tag.Name != null && !parent.Contains(tag.Name))
                 return tag.Name;
@@ -69,9 +69,9 @@ namespace NbtExplorer2.UI
             throw new InvalidOperationException("This compound really contains 999999 similarly named tags?!");
         }
 
-        public static NbtTag CreateTag(NbtTagType type, NbtTag parent, bool bypass_window = false)
+        public static NbtTag CreateTag(NbtTagType type, INbtTag parent, bool bypass_window = false)
         {
-            bool has_name = parent is NbtCompound;
+            bool has_name = parent is INbtCompound;
             bool has_value = INbt.IsValueType(type);
             bool has_size = INbt.IsArrayType(type);
 
@@ -80,19 +80,19 @@ namespace NbtExplorer2.UI
             if (bypass_window)
             {
                 if (has_name)
-                    tag.Name = GetAutomaticName(tag, (NbtCompound)parent);
+                    tag.Name = GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
                 return tag;
             }
             else if (has_name || has_value || has_size)
             {
-                var window = new EditTagWindow(tag, parent, has_name, has_value, has_size, EditPurpose.Create);
+                var window = new EditTagWindow(tag.Adapt(), parent, has_name, has_value, has_size, EditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? tag : null;
             }
             else
                 return tag; // no customization required, example: adding a compound to a list
         }
 
-        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(INbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
@@ -102,7 +102,7 @@ namespace NbtExplorer2.UI
 
             if (has_name || has_value)
             {
-                var window = new EditTagWindow(existing, parent, has_name, has_value, false, purpose);
+                var window = new EditTagWindow(existing, parent.Adapt(), has_name, has_value, false, purpose);
                 return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
             }
             return false;
@@ -133,7 +133,7 @@ namespace NbtExplorer2.UI
                     MessageBox.Show("The name cannot be empty");
                     return false;
                 }
-                if (TagParent is NbtCompound compound && name != WorkingTag.Name && compound.Contains(name))
+                if (TagParent is INbtCompound compound && name != WorkingTag.Name && compound.Contains(name))
                 {
                     MessageBox.Show($"Duplicate name; this compound already contains a tag named \"{name}\"");
                     return false;

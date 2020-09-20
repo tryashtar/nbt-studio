@@ -55,11 +55,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClipboardData.cs" />
     <Compile Include="ExportSettings.cs" />
     <Compile Include="INbt.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
+    <Compile Include="Adapters.cs" />
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
