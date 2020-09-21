@@ -158,7 +158,7 @@ namespace NbtExplorer2.UI
             var tag = ViewModel?.SelectedNbt as INbtContainer;
             foreach (var item in CreateTagButtons)
             {
-                item.Value.Enabled = tag != null && tag.CanAdd(item.Key);
+                item.Value.Enabled = tag == null ? false : tag.CanAdd(item.Key);
             }
         }
 
@@ -212,7 +212,7 @@ namespace NbtExplorer2.UI
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
-                    destination.Add(tag);
+                    INbt.TransformAdd(tag.Adapt(), destination);
             }
         }
 
@@ -277,9 +277,9 @@ namespace NbtExplorer2.UI
         {
             var insert = INbt.GetInsertionLocation(target, position);
             // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
-            foreach (var item in tags.Reverse().ToList())
+            foreach (var tag in tags.Reverse().ToList())
             {
-                item.InsertInto(insert.Item1, insert.Item2);
+                INbt.TransformInsert(tag, insert.Item1, insert.Item2);
             }
         }
     }

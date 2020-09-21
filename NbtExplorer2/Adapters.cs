@@ -17,6 +17,7 @@ namespace NbtExplorer2
         void Remove();
         void AddTo(INbtContainer container);
         void InsertInto(INbtContainer container, int index);
+        bool IsInside(INbtContainer container);
     }
 
     public interface INbtContainer : INbtTag, IReadOnlyCollection<INbtTag>
@@ -175,6 +176,7 @@ namespace NbtExplorer2
                 Remove();
             container.Insert(index, Tag);
         }
+        public bool IsInside(INbtContainer container) => container.Contains(Tag);
     }
 
     public class NbtByteAdapter : NbtTagAdapter, INbtByte

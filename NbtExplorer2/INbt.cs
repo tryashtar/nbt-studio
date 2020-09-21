@@ -278,6 +278,20 @@ namespace NbtExplorer2
             }
         }
 
+        public static void TransformInsert(INbtTag tag, INbtContainer destination, int index)
+        {
+            if (tag.IsInside(destination) && index > tag.Index)
+                index--;
+            tag.Remove();
+            if (destination is INbtCompound compound)
+                tag.Name = EditTagWindow.GetAutomaticName(tag, compound);
+            else if (destination is INbtList)
+                tag.Name = null;
+            tag.InsertInto(destination, index);
+        }
+
+        public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformInsert(tag, destination, destination.Count);
+
         public static bool CanAddAll(IEnumerable<INbtTag> tags, INbtContainer destination)
         {
             // check if you're trying to add items of different types to a list

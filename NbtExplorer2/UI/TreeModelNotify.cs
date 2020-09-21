@@ -128,6 +128,7 @@ namespace NbtExplorer2.UI
                 container.Insert(index, Tag);
                 NotifyParent();
             }
+            public bool IsInside(INbtContainer container) => container.Contains(Tag);
         }
 
         public class NotifyNbtByte : NotifyNbtTag, INbtByte
