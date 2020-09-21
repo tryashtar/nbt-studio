@@ -155,11 +155,10 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag == null) return;
+            var tag = ViewModel?.SelectedNbt as INbtContainer;
             foreach (var item in CreateTagButtons)
             {
-                item.Value.Enabled = INbt.CanAdd(tag, item.Key);
+                item.Value.Enabled = tag != null && tag.CanAdd(item.Key);
             }
         }
 
@@ -189,7 +188,7 @@ namespace NbtExplorer2.UI
             if (ViewModel.SelectedNbt != null)
             {
                 Copy(ViewModel.SelectedNbts);
-                foreach (var item in ViewModel.SelectedNbts)
+                foreach (var item in ViewModel.SelectedNbts.ToList())
                 {
                     item.Remove();
                 }
@@ -236,35 +235,52 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_DragOver(object sender, DragEventArgs e)
         {
-            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            //    e.Effect = DragDropEffects.Copy;
-            //else
-            //{
-            //    var objects = NbtTree.ObjectsFromDrag(e);
-            //    if (objects != null
-            //        && NbtTree.DropPosition.Node != null
-            //        && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
-            //        e.Effect = e.AllowedEffect;
-            //    else
-            //        e.Effect = DragDropEffects.None;
-            //}
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+            else
+            {
+                var tags = ViewModel.NbtsFromDrag(e);
+                if (tags.Any()
+                    && ViewModel.DropTag != null
+                    && CanMoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition))
+                    e.Effect = e.AllowedEffect;
+                else
+                    e.Effect = DragDropEffects.None;
+            }
         }
 
         private void NbtTree_DragDrop(object sender, DragEventArgs e)
         {
-            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            //{
-            //    var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            //    if (!ConfirmIfUnsaved("Open a new file anyway?"))
-            //        return;
-            //    OpenFiles(files);
-            //}
-            //else
-            //{
-            //    var objects = NbtTree.ObjectsFromDrag(e);
-            //    if (objects != null)
-            //        ViewModel.Move(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
-            //}
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (!ConfirmIfUnsaved("Open a new file anyway?"))
+                    return;
+                OpenFiles(files);
+            }
+            else
+            {
+                var tags = ViewModel.NbtsFromDrag(e);
+                if (tags.Any())
+                    MoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition);
+            }
+        }
+
+        private bool CanMoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        {
+            var insert = INbt.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return false;
+            return INbt.CanAddAll(tags, insert.Item1);
+        }
+
+        private void MoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        {
+            var insert = INbt.GetInsertionLocation(target, position);
+            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
+            foreach (var item in tags.Reverse().ToList())
+            {
+                item.InsertInto(insert.Item1, insert.Item2);
+            }
         }
     }
 }

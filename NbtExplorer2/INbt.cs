@@ -180,15 +180,6 @@ namespace NbtExplorer2
             }
         }
 
-        public static bool CanAdd(INbtTag tag, NbtTagType type)
-        {
-            if (tag is INbtCompound)
-                return true;
-            if (tag is INbtList list)
-                return list.Count == 0 || list.ListType == type;
-            return false;
-        }
-
         public static IEnumerable<object> GetChildren(object obj)
         {
             if (obj is NbtFolder folder)
@@ -200,57 +191,6 @@ namespace NbtExplorer2
             if (obj is NbtList list)
                 return list;
             return Enumerable.Empty<object>();
-        }
-
-        public static void Add(object parent, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                file.RootTag.Add(child);
-            else if (parent is NbtCompound compound)
-                compound.Add(child);
-            else if (parent is NbtList list)
-                list.Add(child);
-        }
-
-        public static void Insert(object parent, int index, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                file.RootTag.Insert(index, child);
-            else if (parent is NbtCompound compound)
-                compound.Insert(index, child);
-            else if (parent is NbtList list)
-                list.Insert(index, child);
-        }
-
-        public static int IndexOf(object parent, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                return file.RootTag.IndexOf(child);
-            else if (parent is NbtCompound compound)
-                return compound.Tags.ToList().IndexOf(child);
-            else if (parent is NbtList list)
-                return list.IndexOf(child);
-            return -1;
-        }
-
-        public static void Delete(object obj)
-        {
-            if (obj is NbtTag tag)
-            {
-                var parent = tag.Parent;
-                if (parent is NbtCompound compound)
-                    compound.Remove(tag);
-                else if (parent is NbtList list)
-                    list.Remove(tag);
-            }
-        }
-
-        public static void DeleteAll(IEnumerable objects)
-        {
-            foreach (var obj in objects)
-            {
-                Delete(obj);
-            }
         }
 
         public static Tuple<string, string> PreviewNameAndValue(object obj)
@@ -321,61 +261,29 @@ namespace NbtExplorer2
             return type.ToString();
         }
 
-        public static bool CanDropAll(IEnumerable<object> items, object destination, int index)
+        public static Tuple<INbtContainer, int> GetInsertionLocation(INbtTag target, NodePosition position)
+        {
+            if (position == NodePosition.Inside)
+            {
+                var container = (INbtContainer)target;
+                return Tuple.Create(container, container.Count);
+            }
+            else
+            {
+                var parent = target.Parent;
+                int index = target.Index;
+                if (position == NodePosition.After)
+                    index++;
+                return Tuple.Create(parent, index);
+            }
+        }
+
+        public static bool CanAddAll(IEnumerable<INbtTag> tags, INbtContainer destination)
         {
             // check if you're trying to add items of different types to a list
-            if (destination is NbtList list && items.OfType<NbtTag>().Select(x => x.TagType).Distinct().Skip(1).Any())
+            if (destination is INbtList list && tags.Select(x => x.TagType).Distinct().Skip(1).Any())
                 return false;
-            return items.All(x => CanDrop(x, destination, index));
-        }
-
-        public static bool CanDrop(object item, object destination, int index)
-        {
-            return Drop(item, destination, index, just_check: true);
-        }
-
-        public static bool DropAll(IEnumerable<object> items, object destination, int index)
-        {
-            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
-            return items.Reverse().All(x => Drop(x, destination, index));
-        }
-
-        public static bool Drop(object item, object destination, int index, bool just_check = false)
-        {
-            if (destination is NbtFolder)
-            {
-                if (item is NbtFile file)
-                {
-                    if (!just_check)
-                        Console.WriteLine("Move file into folder");
-                    return true;
-                }
-                if (item is NbtFolder folder)
-                {
-                    if (!just_check)
-                        Console.WriteLine("Move folder into other folder");
-                    return true;
-                }
-                return false;
-            }
-            var tag_item = GetNbt(item);
-            var tag_dest = GetNbt(destination);
-            if (tag_item == null || tag_dest == null)
-                return false;
-            if (!CanAdd(tag_dest.Adapt(), tag_item.TagType))
-                return false;
-            if (!just_check)
-            {
-                if (tag_item.Parent == tag_dest && IndexOf(tag_dest, tag_item) < index)
-                    index--;
-                Delete(tag_item);
-                if (tag_dest is NbtCompound compound)
-                    tag_item.Name = EditTagWindow.GetAutomaticName(tag_item.Adapt(), compound.AdaptCompound());
-                else if (tag_dest is NbtList)
-                    tag_item.Name = null;
-                Insert(tag_dest, index, tag_item);
-            }
-            return true;
+            return tags.All(x => destination.CanAdd(x.TagType));
         }
 
         public static Image Image(object obj)

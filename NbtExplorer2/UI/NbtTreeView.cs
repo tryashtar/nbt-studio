@@ -63,19 +63,19 @@ namespace NbtExplorer2.UI
                 if (hover_time.TotalSeconds > 0.5)
                 {
                     // don't expand the node we're dragging itself
-                    var objects = ObjectsFromDrag(drgevent);
-                    if (objects != null && !objects.Contains(DropPosition.Node.Tag))
+                    var nodes = NodesFromDrag(drgevent);
+                    if (nodes != null && !nodes.Contains(DropPosition.Node))
                         DropPosition.Node.Expand();
                 }
             }
             base.OnDragOver(drgevent);
         }
 
-        public IEnumerable<object> ObjectsFromDrag(DragEventArgs e)
+        private IEnumerable<object> NodesFromDrag(DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return null;
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => x.Tag);
+            return (TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

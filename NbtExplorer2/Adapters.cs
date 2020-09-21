@@ -13,12 +13,18 @@ namespace NbtExplorer2
         string Name { get; set; }
         NbtTagType TagType { get; }
         INbtContainer Parent { get; }
+        int Index { get; }
+        void Remove();
+        void AddTo(INbtContainer container);
+        void InsertInto(INbtContainer container, int index);
     }
 
     public interface INbtContainer : INbtTag, IReadOnlyCollection<INbtTag>
     {
+        bool CanAdd(NbtTagType type);
         void Add(NbtTag tag);
         void AddRange(IEnumerable<NbtTag> tags);
+        void Insert(int index, NbtTag tag);
         void Clear();
         bool Contains(NbtTag tag);
         bool Remove(NbtTag tag);
@@ -138,7 +144,37 @@ namespace NbtExplorer2
         public NbtTagAdapter(NbtTag tag) { Tag = tag; }
         public string Name { get => Tag.Name; set => Tag.Name = value; }
         public NbtTagType TagType => Tag.TagType;
-        public INbtContainer Parent => (INbtContainer)Tag.Parent;
+        public INbtContainer Parent => (INbtContainer)Tag.Parent.Adapt();
+        public int Index
+        {
+            get
+            {
+                if (Tag.Parent is NbtCompound c)
+                    return c.IndexOf(Tag);
+                else if (Tag.Parent is NbtList l)
+                    return l.IndexOf(Tag);
+                return -1;
+            }
+        }
+        public void Remove()
+        {
+            if (Tag.Parent is NbtCompound c)
+                c.Remove(Tag);
+            else if (Tag.Parent is NbtList l)
+                l.Remove(Tag);
+        }
+        public void AddTo(INbtContainer container)
+        {
+            if (Tag.Parent != null)
+                Remove();
+            container.Add(Tag);
+        }
+        public void InsertInto(INbtContainer container, int index)
+        {
+            if (Tag.Parent != null)
+                Remove();
+            container.Insert(index, Tag);
+        }
     }
 
     public class NbtByteAdapter : NbtTagAdapter, INbtByte
@@ -211,18 +247,16 @@ namespace NbtExplorer2
         public long[] Value { get => Tag.Value; set => Tag.Value = value; }
     }
 
-    public class NbtCompoundAdapter : INbtCompound
+    public class NbtCompoundAdapter : NbtTagAdapter, INbtCompound
     {
-        private readonly NbtCompound Compound;
-        public NbtCompoundAdapter(NbtCompound compound) { Compound = compound; }
-
-        public string Name { get => Compound.Name; set => Compound.Name = value; }
-        public NbtTagType TagType => NbtTagType.Compound;
-        public INbtContainer Parent => (INbtContainer)Compound.Parent.Adapt();
+        private NbtCompound Compound => (NbtCompound)base.Tag;
+        public NbtCompoundAdapter(NbtCompound compound) : base(compound) { }
 
         public IEnumerable<INbtTag> Tags => Compound.Tags.Select(x => x.Adapt());
         public int Count => Compound.Count;
+        public bool CanAdd(NbtTagType type) => true;
         public void Add(NbtTag tag) => Compound.Add(tag);
+        public void Insert(int index, NbtTag tag) => Compound.Insert(index, tag);
         public void AddRange(IEnumerable<NbtTag> tags) => Compound.AddRange(tags);
         public void Clear() => Compound.Clear();
         public bool Contains(NbtTag tag) => Compound.Contains(tag);
@@ -236,18 +270,16 @@ namespace NbtExplorer2
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class NbtListAdapter : INbtList
+    public class NbtListAdapter : NbtTagAdapter, INbtList
     {
-        private readonly NbtList List;
-        public NbtListAdapter(NbtList list) { List = list; }
-
-        public string Name { get => List.Name; set => List.Name = value; }
-        public NbtTagType TagType => NbtTagType.List;
-        public INbtContainer Parent => (INbtContainer)List.Parent.Adapt();
+        private NbtList List => (NbtList)base.Tag;
+        public NbtListAdapter(NbtList list) : base(list) { }
 
         public NbtTagType ListType => List.ListType;
         public int Count => List.Count;
+        public bool CanAdd(NbtTagType type) => List.Count == 0 || List.ListType == type;
         public void Add(NbtTag tag) => List.Add(tag);
+        public void Insert(int index, NbtTag tag) => List.Insert(index, tag);
         public void AddRange(IEnumerable<NbtTag> tags) => List.AddRange(tags);
         public void Clear() => List.Clear();
         public bool Contains(NbtTag tag) => List.Contains(tag);
