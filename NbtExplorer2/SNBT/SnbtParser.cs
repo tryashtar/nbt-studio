@@ -312,10 +312,15 @@ namespace NbtExplorer2.SNBT
                         result.Append(c);
                         escaped = false;
                     }
+                    else if (c == 'n')
+                    {
+                        result.Append('\n');
+                        escaped = false;
+                    }
                     else
                     {
                         Cursor--;
-                        throw new FormatException($"Tried to escape {c} at position {Cursor}, which is not {ESCAPE} or {end}");
+                        throw new FormatException($"Tried to escape {c} at position {Cursor}, which is not allowed");
                     }
                 }
                 else if (c == ESCAPE)

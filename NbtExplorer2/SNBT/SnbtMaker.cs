@@ -197,7 +197,10 @@ namespace NbtExplorer2.SNBT
                     if (c == preferred_quote)
                         builder.Append(STRING_ESCAPE);
                 }
-                builder.Append(c);
+                if (c == '\n')
+                    builder.Append("\\n");
+                else
+                    builder.Append(c);
             }
             if (preferred_quote == PLACEHOLDER_QUOTE)
                 preferred_quote = STRING_PRIMARY_QUOTE;

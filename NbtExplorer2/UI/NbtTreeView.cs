@@ -183,7 +183,14 @@ namespace NbtExplorer2.UI
         private Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
-            return INbt.PreviewNameAndValue(obj);
+            var text = INbt.PreviewNameAndValue(obj);
+            return Tuple.Create(Flatten(text.Item1), Flatten(text.Item2));
+        }
+
+        private string Flatten(string text)
+        {
+            if (text == null) return null;
+            return text.Replace("\n", "⏎").Replace("\r", "⏎");
         }
     }
 }
