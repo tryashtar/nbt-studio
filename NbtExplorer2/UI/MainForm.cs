@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -170,7 +170,9 @@ namespace NbtExplorer2.UI
 
         private void ToolSave_Click(object sender, EventArgs e)
         {
-
+            // temporary test
+            var file = (NbtFile)NbtTree.SelectedNode.Tag;
+            file.SaveAs(Path.Combine(Path.GetDirectoryName(file.Path), "test.nbt"), file.ExportSettings);
         }
 
         private void ToolRefresh_Click(object sender, EventArgs e)

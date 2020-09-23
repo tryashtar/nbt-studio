@@ -35,8 +35,9 @@ namespace NbtExplorer2
         public static NbtFile TryCreate(string path)
         {
             return TryCreateFromSnbt(path)
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect)
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, true);
+                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false) // bedrock files
+                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8) // bedrock level.dat files
+                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true); // java files
         }
 
         public static NbtFile TryCreateFromSnbt(string path)
@@ -65,18 +66,22 @@ namespace NbtExplorer2
             }
         }
 
-        public static NbtFile TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true)
+        public static NbtFile TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, int header_size = 0)
         {
             try
             {
                 var file = new fNbt.NbtFile();
                 file.BigEndian = big_endian;
-                file.LoadFromFile(path, compression, x => true);
-
+                var header = new byte[header_size];
+                using (var reader = File.OpenRead(path))
+                {
+                    reader.Read(header, 0, header_size);
+                    file.LoadFromStream(reader, compression);
+                }
                 if (file.RootTag == null)
                     return null;
 
-                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(path, file.FileCompression, big_endian));
+                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(path, file.FileCompression, big_endian, header));
             }
             catch
             {
@@ -90,9 +95,14 @@ namespace NbtExplorer2
                 File.WriteAllText(Path, RootTag.Adapt().ToSnbt(expanded: !ExportSettings.Minified));
             else
             {
-                var file = new fNbt.NbtFile(Path);
-                file.BigEndian = !ExportSettings.BigEndian;
-                file.SaveToFile(Path, ExportSettings.Compression);
+                var file = new fNbt.NbtFile();
+                file.BigEndian = ExportSettings.BigEndian;
+                file.RootTag = RootTag;
+                using (var writer = File.OpenWrite(Path))
+                {
+                    writer.Write(ExportSettings.Header, 0, ExportSettings.Header.Length);
+                    file.SaveToStream(writer, ExportSettings.Compression);
+                }
             }
         }
 
