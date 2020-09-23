@@ -280,5 +280,11 @@
   <ItemGroup>
     <None Include="Resources\folder_image.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_image.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

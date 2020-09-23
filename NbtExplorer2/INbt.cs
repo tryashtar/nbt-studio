@@ -1,4 +1,4 @@
-﻿using Aga.Controls.Tree;
+using Aga.Controls.Tree;
 using fNbt;
 using NbtExplorer2.SNBT;
 using NbtExplorer2.UI;
@@ -259,6 +259,81 @@ namespace NbtExplorer2
             if (type == NbtTagType.LongArray)
                 return "Long Array";
             return type.ToString();
+        }
+
+        public class TagNameSorter : IComparer<INbtTag>
+        {
+            public int Compare(INbtTag x, INbtTag y)
+            {
+                return x.Name.CompareTo(y.Name);
+            }
+        }
+
+        public class TagTypeSorter : IComparer<INbtTag>
+        {
+            private static readonly Dictionary<NbtTagType, int> TypeOrder = new Dictionary<NbtTagType, int>
+            {
+                {NbtTagType.Compound, 1},
+                {NbtTagType.List, 2},
+                {NbtTagType.Byte, 3},
+                {NbtTagType.Short, 4},
+                {NbtTagType.Int, 5},
+                {NbtTagType.Long, 6},
+                {NbtTagType.Float, 7},
+                {NbtTagType.Double, 8},
+                {NbtTagType.String, 9},
+                {NbtTagType.ByteArray, 9},
+                {NbtTagType.IntArray, 10},
+                {NbtTagType.LongArray, 11},
+            };
+            public int Compare(INbtTag x, INbtTag y)
+            {
+                int compare = TypePriority(x.TagType).CompareTo(TypePriority(y.TagType));
+                if (compare != 0)
+                    return compare;
+                return x.Name.CompareTo(y.Name);
+            }
+            private int TypePriority(NbtTagType type)
+            {
+                if (TypeOrder.TryGetValue(type, out int result))
+                    return result;
+                return int.MaxValue;
+            }
+        }
+
+        public static void Sort(INbtCompound compound, IComparer<INbtTag> sorter, bool recursive)
+        {
+            var tags = compound.Tags.OrderBy(x => x, sorter).ToList();
+            compound.Clear();
+            foreach (var tag in tags)
+            {
+                if (recursive)
+                {
+                    if (tag is INbtCompound sub)
+                        Sort(sub, sorter, true);
+                    else if (tag is INbtList list)
+                        SortChildren(list, sorter);
+                }
+                tag.AddTo(compound);
+            }
+        }
+
+        private static void SortChildren(INbtList list, IComparer<INbtTag> sorter)
+        {
+            if (list.ListType == NbtTagType.Compound)
+            {
+                foreach (INbtCompound item in list)
+                {
+                    Sort(item, sorter, true);
+                }
+            }
+            else if (list.ListType == NbtTagType.List)
+            {
+                foreach (INbtList item in list)
+                {
+                    SortChildren(item, sorter);
+                }
+            }
         }
 
         public static Tuple<INbtContainer, int> GetInsertionLocation(INbtTag target, NodePosition position)

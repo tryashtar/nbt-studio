@@ -1,4 +1,4 @@
-using fNbt;
+﻿using fNbt;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,7 +45,7 @@ namespace NbtExplorer2.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel.SelectedNbt as INbtContainer;
+            var parent = ViewModel?.SelectedNbt as INbtContainer;
             if (parent == null) return;
             var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
@@ -54,14 +54,14 @@ namespace NbtExplorer2.UI
 
         private void ToolEdit_Click(object sender, EventArgs e)
         {
-            var tag = ViewModel.SelectedNbt;
+            var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
             EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
         private void ToolRename_Click(object sender, EventArgs e)
         {
-            var tag = ViewModel.SelectedNbt;
+            var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
         }
@@ -155,17 +155,27 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
-            var tag = ViewModel?.SelectedNbt as INbtContainer;
+            var tag = ViewModel?.SelectedNbt;
+            var container = tag as INbtContainer;
             foreach (var item in CreateTagButtons)
             {
-                item.Value.Enabled = tag == null ? false : tag.CanAdd(item.Key);
+                item.Value.Enabled = container != null && container.CanAdd(item.Key);
             }
+            ToolSort.Enabled = tag is INbtCompound;
+            ToolCut.Enabled = tag != null;
+            ToolCopy.Enabled = tag != null;
+            ToolPaste.Enabled = container != null;
+            ToolDelete.Enabled = tag != null;
+            ToolRename.Enabled = tag != null;
+            ToolEdit.Enabled = tag != null;
+            ToolEditSnbt.Enabled = tag != null;
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            //if (e.Node?.Tag is NbtTag tag && INbt.IsValueType(tag.TagType))
-            //    EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            var tag = ViewModel?.SelectedNbt;
+            if (tag != null && INbt.IsValueType(tag.TagType))
+                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
         private void ToolSave_Click(object sender, EventArgs e)
@@ -187,7 +197,7 @@ namespace NbtExplorer2.UI
 
         private void ToolCut_Click(object sender, EventArgs e)
         {
-            if (ViewModel.SelectedNbt != null)
+            if (ViewModel?.SelectedNbt != null)
             {
                 Copy(ViewModel.SelectedNbts);
                 foreach (var item in ViewModel.SelectedNbts.ToList())
@@ -199,7 +209,7 @@ namespace NbtExplorer2.UI
 
         private void ToolCopy_Click(object sender, EventArgs e)
         {
-            if (ViewModel.SelectedNbt != null)
+            if (ViewModel?.SelectedNbt != null)
                 Copy(ViewModel.SelectedNbts);
         }
 
@@ -283,6 +293,13 @@ namespace NbtExplorer2.UI
             {
                 INbt.TransformInsert(tag, insert.Item1, insert.Item2);
             }
+        }
+
+        private void ToolSort_Click(object sender, EventArgs e)
+        {
+            var tag = ViewModel?.SelectedNbt as INbtCompound;
+            if (tag == null) return;
+            INbt.Sort(tag, new INbt.TagTypeSorter(), true);
         }
     }
 }

@@ -34,6 +34,7 @@
             this.ToolOpenFolder = new System.Windows.Forms.ToolStripButton();
             this.ToolSave = new System.Windows.Forms.ToolStripButton();
             this.ToolRefresh = new System.Windows.Forms.ToolStripButton();
+            this.ToolSort = new System.Windows.Forms.ToolStripButton();
             this.ToolSeperator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ToolCut = new System.Windows.Forms.ToolStripButton();
             this.ToolCopy = new System.Windows.Forms.ToolStripButton();
@@ -81,6 +82,7 @@
             this.ToolOpenFolder,
             this.ToolSave,
             this.ToolRefresh,
+            this.ToolSort,
             this.ToolSeperator1,
             this.ToolCut,
             this.ToolCopy,
@@ -143,6 +145,15 @@
             this.ToolRefresh.Size = new System.Drawing.Size(23, 22);
             this.ToolRefresh.Text = "Refresh";
             this.ToolRefresh.Click += new System.EventHandler(this.ToolRefresh_Click);
+            // 
+            // ToolSort
+            // 
+            this.ToolSort.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.ToolSort.Image = global::NbtExplorer2.Properties.Resources.action_sort_image;
+            this.ToolSort.Name = "ToolSort";
+            this.ToolSort.Size = new System.Drawing.Size(23, 22);
+            this.ToolSort.Text = "Sort";
+            this.ToolSort.Click += new System.EventHandler(this.ToolSort_Click);
             // 
             // ToolSeperator1
             // 
@@ -521,6 +532,7 @@
         private System.Windows.Forms.ToolStripMenuItem MenuEditValue;
         private System.Windows.Forms.ToolStripMenuItem MenuEditSnbt;
         private System.Windows.Forms.ToolStripMenuItem MenuDelete;
+        private System.Windows.Forms.ToolStripButton ToolSort;
     }
 }
 
