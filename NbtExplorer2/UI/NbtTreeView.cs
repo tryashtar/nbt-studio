@@ -4,6 +4,7 @@ using fNbt;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -134,8 +135,18 @@ namespace NbtExplorer2.UI
 
         private Image GetIcon(TreeNodeAdv node)
         {
-            var obj = node.Tag;
-            return INbt.Image(obj);
+            return GetImage(node.Tag);
+        }
+
+        private static Image GetImage(object obj)
+        {
+            if (obj is NbtFile)
+                return Properties.Resources.file_image;
+            if (obj is NbtFolder)
+                return Properties.Resources.folder_image;
+            if (obj is NbtTag tag)
+                return NbtUtil.TagTypeImage(tag.TagType);
+            return null;
         }
     }
 
@@ -183,8 +194,43 @@ namespace NbtExplorer2.UI
         private Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
-            var text = INbt.PreviewNameAndValue(obj);
+            var text = PreviewNameAndValue(obj);
             return Tuple.Create(Flatten(text.Item1), Flatten(text.Item2));
+        }
+
+        private static Tuple<string, string> PreviewNameAndValue(object obj)
+        {
+            string name = PreviewName(obj);
+            string value = PreviewValue(obj);
+            if (name == null)
+            {
+                if (value == null)
+                    return null;
+                return Tuple.Create((string)null, value);
+            }
+            return Tuple.Create(name + ": ", value);
+        }
+
+        private static string PreviewName(object obj)
+        {
+            if (obj is NbtFile file)
+                return Path.GetFileName(file.Path);
+            if (obj is NbtFolder folder)
+                return Path.GetFileName(folder.Path);
+            if (obj is NbtTag tag)
+                return tag.Name;
+            return null;
+        }
+
+        private static string PreviewValue(object obj)
+        {
+            if (obj is NbtFile file)
+                return NbtUtil.PreviewNbtValue(file.RootTag.Adapt());
+            if (obj is NbtFolder folder)
+                return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+            if (obj is NbtTag tag)
+                return NbtUtil.PreviewNbtValue(tag.Adapt());
+            return null;
         }
 
         private string Flatten(string text)

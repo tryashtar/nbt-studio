@@ -33,14 +33,14 @@ namespace NbtExplorer2.UI
             SizeLabel.Visible = SettingSize;
             SizeBox.Visible = SettingSize;
 
-            this.Icon = INbt.TagTypeIcon(tag.TagType);
+            this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
             if (purpose == EditPurpose.Create)
-                this.Text = $"Create {INbt.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Create {NbtUtil.TagTypeName(tag.TagType)} Tag";
             else if (purpose == EditPurpose.EditValue || purpose == EditPurpose.Rename)
             {
-                this.Text = $"Edit {INbt.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Edit {NbtUtil.TagTypeName(tag.TagType)} Tag";
                 NameBox.Text = tag.Name;
-                ValueBox.Text = INbt.PreviewNbtValue(tag);
+                ValueBox.Text = NbtUtil.PreviewNbtValue(tag);
             }
 
             if (SettingName && purpose != EditPurpose.EditValue)
@@ -58,15 +58,15 @@ namespace NbtExplorer2.UI
         public static NbtTag CreateTag(NbtTagType type, INbtTag parent, bool bypass_window = false)
         {
             bool has_name = parent is INbtCompound;
-            bool has_value = INbt.IsValueType(type);
-            bool has_size = INbt.IsArrayType(type);
+            bool has_value = NbtUtil.IsValueType(type);
+            bool has_size = NbtUtil.IsArrayType(type);
 
-            var tag = INbt.CreateTag(type);
+            var tag = NbtUtil.CreateTag(type);
 
             if (bypass_window)
             {
                 if (has_name)
-                    tag.Name = INbt.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
+                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
                 return tag;
             }
             else if (has_name || has_value || has_size)
@@ -84,7 +84,7 @@ namespace NbtExplorer2.UI
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
             bool has_name = parent is INbtCompound;
-            bool has_value = INbt.IsValueType(existing.TagType);
+            bool has_value = NbtUtil.IsValueType(existing.TagType);
 
             if (has_name || has_value)
             {
@@ -152,17 +152,17 @@ namespace NbtExplorer2.UI
             {
                 try
                 {
-                    parsed_value = INbt.ParseValue(str_value, WorkingTag.TagType);
+                    parsed_value = NbtUtil.ParseValue(str_value, WorkingTag.TagType);
                 }
                 catch (FormatException)
                 {
-                    MessageBox.Show($"The value is formatted incorrectly for a {INbt.TagTypeName(WorkingTag.TagType).ToLower()}");
+                    MessageBox.Show($"The value is formatted incorrectly for a {NbtUtil.TagTypeName(WorkingTag.TagType).ToLower()}");
                     return false;
                 }
                 catch (OverflowException)
                 {
-                    var minmax = INbt.MinMaxFor(WorkingTag.TagType);
-                    MessageBox.Show($"The value for {INbt.TagTypeName(WorkingTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}");
+                    var minmax = NbtUtil.MinMaxFor(WorkingTag.TagType);
+                    MessageBox.Show($"The value for {NbtUtil.TagTypeName(WorkingTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}");
                     return false;
                 }
                 catch { return false; }
@@ -170,9 +170,9 @@ namespace NbtExplorer2.UI
             if (SettingName)
                 WorkingTag.Name = name;
             if (SettingSize && int_size.HasValue)
-                INbt.SetSize(WorkingTag, int_size.Value);
+                NbtUtil.SetSize(WorkingTag, int_size.Value);
             if (SettingValue && parsed_value != null)
-                INbt.SetValue(WorkingTag, parsed_value);
+                NbtUtil.SetValue(WorkingTag, parsed_value);
             return true;
         }
 

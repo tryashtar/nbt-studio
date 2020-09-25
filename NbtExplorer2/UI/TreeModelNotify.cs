@@ -19,6 +19,11 @@ namespace NbtExplorer2.UI
             throw new ArgumentException($"Can't notify wrap {obj.GetType()}");
         }
 
+        private static NotifyNbtFile NotifyWrapFile(NbtTreeModel tree, NbtFile file)
+        {
+            return new NotifyNbtFile(file, tree, file);
+        }
+
         private static INotifyNbt NotifyWrapNbt(NbtTreeModel tree, object original, NbtTag tag)
         {
             if (tag == null)

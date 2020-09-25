@@ -45,7 +45,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrapNbt(this, View.SelectedNode.Tag, INbt.GetNbt(View.SelectedNode.Tag));
+                return NotifyWrapNbt(this, View.SelectedNode.Tag, NbtUtil.GetNbt(View.SelectedNode.Tag));
             }
         }
         public IEnumerable<INotifyNbt> SelectedNbts
@@ -54,7 +54,14 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNodes == null)
                     Enumerable.Empty<INotifyNbt>();
-                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, NbtUtil.GetNbt(x.Tag))).Where(x => x != null);
+            }
+        }
+        public IEnumerable<NotifyNbtFile> OpenedFiles
+        {
+            get
+            {
+                return Roots.OfType<NbtFile>().Select(x => NotifyWrapFile(this, x));
             }
         }
 
@@ -75,7 +82,7 @@ namespace NbtExplorer2.UI
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return Enumerable.Empty<INotifyNbt>();
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, NbtUtil.GetNbt(x.Tag))).Where(x => x != null);
         }
         public INbtTag DropTag
         {
@@ -83,7 +90,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.DropPosition.Node == null)
                     return null;
-                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, INbt.GetNbt(View.DropPosition.Node.Tag));
+                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, NbtUtil.GetNbt(View.DropPosition.Node.Tag));
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
@@ -154,8 +161,15 @@ namespace NbtExplorer2.UI
 
         private IEnumerable<object> GetChildren(object obj)
         {
-            var children = INbt.GetChildren(obj);
-            return children;
+            if (obj is NbtFolder folder)
+                return folder.Subfolders.Concat<object>(folder.Files);
+            if (obj is NbtFile file)
+                return file.RootTag.Tags;
+            if (obj is NbtCompound compound)
+                return compound.Tags;
+            if (obj is NbtList list)
+                return list;
+            return Enumerable.Empty<object>();
         }
 
         private bool HasChildren(object obj)

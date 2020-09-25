@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExportSettings.cs" />
-    <Compile Include="INbt.cs" />
+    <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />

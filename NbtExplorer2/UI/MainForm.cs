@@ -154,7 +154,7 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt as INbtCompound;
             if (tag == null) return;
-            INbt.Sort(tag, new INbt.TagTypeSorter(), true);
+            NbtUtil.Sort(tag, new NbtUtil.TagTypeSorter(), true);
         }
 
         private void Cut()
@@ -222,11 +222,11 @@ namespace NbtExplorer2.UI
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
         {
             var buttons = new Dictionary<NbtTagType, ToolStripButton>();
-            foreach (var type in INbt.NormalTagTypes())
+            foreach (var type in NbtUtil.NormalTagTypes())
             {
                 var button = new ToolStripButton(
-                    text: $"Add {INbt.TagTypeName(type)} Tag",
-                    image: INbt.TagTypeImage(type),
+                    text: $"Add {NbtUtil.TagTypeName(type)} Tag",
+                    image: NbtUtil.TagTypeImage(type),
                     onClick: (s, e) => AddTag(type));
                 button.DisplayStyle = ToolStripItemDisplayStyle.Image;
                 buttons.Add(type, button);
@@ -278,7 +278,7 @@ namespace NbtExplorer2.UI
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var tag = ViewModel?.SelectedNbt;
-            if (tag != null && INbt.IsValueType(tag.TagType))
+            if (tag != null && NbtUtil.IsValueType(tag.TagType))
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
@@ -293,7 +293,7 @@ namespace NbtExplorer2.UI
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
-                    INbt.TransformAdd(tag.Adapt(), destination);
+                    NbtUtil.TransformAdd(tag.Adapt(), destination);
             }
         }
 
@@ -337,19 +337,19 @@ namespace NbtExplorer2.UI
 
         private bool CanMoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
         {
-            var insert = INbt.GetInsertionLocation(target, position);
+            var insert = NbtUtil.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return false;
-            return INbt.CanAddAll(tags, insert.Item1);
+            return NbtUtil.CanAddAll(tags, insert.Item1);
         }
 
         private void MoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
         {
-            var insert = INbt.GetInsertionLocation(target, position);
+            var insert = NbtUtil.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return;
             // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
             foreach (var tag in tags.Reverse().ToList())
             {
-                INbt.TransformInsert(tag, insert.Item1, insert.Item2);
+                NbtUtil.TransformInsert(tag, insert.Item1, insert.Item2);
             }
         }
     }

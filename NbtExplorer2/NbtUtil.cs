@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace NbtExplorer2
 {
     // provides psuedo-interfaces to NBT tags as methods
-    public static class INbt
+    public static class NbtUtil
     {
         // everything except End and Unknown
         public static IEnumerable<NbtTagType> NormalTagTypes()
@@ -180,54 +180,6 @@ namespace NbtExplorer2
             }
         }
 
-        public static IEnumerable<object> GetChildren(object obj)
-        {
-            if (obj is NbtFolder folder)
-                return folder.Subfolders.Concat<object>(folder.Files);
-            if (obj is NbtFile file)
-                return file.RootTag.Tags;
-            if (obj is NbtCompound compound)
-                return compound.Tags;
-            if (obj is NbtList list)
-                return list;
-            return Enumerable.Empty<object>();
-        }
-
-        public static Tuple<string, string> PreviewNameAndValue(object obj)
-        {
-            string name = PreviewName(obj);
-            string value = PreviewValue(obj);
-            if (name == null)
-            {
-                if (value == null)
-                    return null;
-                return Tuple.Create((string)null, value);
-            }
-            return Tuple.Create(name + ": ", value);
-        }
-
-        public static string PreviewName(object obj)
-        {
-            if (obj is NbtFile file)
-                return Path.GetFileName(file.Path);
-            if (obj is NbtFolder folder)
-                return Path.GetFileName(folder.Path);
-            if (obj is NbtTag tag)
-                return tag.Name;
-            return null;
-        }
-
-        public static string PreviewValue(object obj)
-        {
-            if (obj is NbtFile file)
-                return PreviewNbtValue(file);
-            if (obj is NbtFolder folder)
-                return PreviewNbtValue(folder);
-            if (obj is NbtTag tag)
-                return PreviewNbtValue(tag.Adapt());
-            return null;
-        }
-
         public static string PreviewNbtValue(INbtTag tag)
         {
             if (tag is INbtCompound compound)
@@ -246,9 +198,6 @@ namespace NbtExplorer2
                 return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
             return tag.ToSnbt(expanded: false, delimit: false);
         }
-
-        public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag.Adapt());
-        public static string PreviewNbtValue(NbtFolder folder) => $"[{Util.Pluralize(folder.Files.Count, "file")}]";
 
         public static string TagTypeName(NbtTagType type)
         {
@@ -371,7 +320,7 @@ namespace NbtExplorer2
         {
             if (tag.Name != null && !parent.Contains(tag.Name))
                 return tag.Name;
-            string basename = tag.Name ?? INbt.TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
+            string basename = tag.Name ?? TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
             for (int i = 1; i < 999999; i++)
             {
                 string name = basename + i.ToString();
@@ -408,17 +357,6 @@ namespace NbtExplorer2
                 parent = parent.Parent;
             }
             return ancestors;
-        }
-
-        public static Image Image(object obj)
-        {
-            if (obj is NbtFile)
-                return Properties.Resources.file_image;
-            if (obj is NbtFolder)
-                return Properties.Resources.folder_image;
-            if (obj is NbtTag tag)
-                return TagTypeImage(tag.TagType);
-            return null;
         }
 
         public static Image TagTypeImage(NbtTagType type)
