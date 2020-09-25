@@ -67,6 +67,12 @@
     <Compile Include="UI\EditTagWindow.Designer.cs">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ExportWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ExportWindow.Designer.cs">
+      <DependentUpon>ExportWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,6 +96,9 @@
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ExportWindow.resx">
+      <DependentUpon>ExportWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

@@ -176,7 +176,7 @@ namespace NbtExplorer2.UI
             return true;
         }
 
-        private void OkButton_Click(object sender, EventArgs e)
+        private void ButtonOk_Click(object sender, EventArgs e)
         {
             Confirm();
         }

@@ -32,8 +32,8 @@
             this.SizeLabel = new System.Windows.Forms.Label();
             this.NameLabel = new System.Windows.Forms.Label();
             this.NameBox = new System.Windows.Forms.TextBox();
-            this.CancellingButton = new System.Windows.Forms.Button();
-            this.OkButton = new System.Windows.Forms.Button();
+            this.ButtonCancel = new System.Windows.Forms.Button();
+            this.ButtonOk = new System.Windows.Forms.Button();
             this.ValueLabel = new System.Windows.Forms.Label();
             this.ValueBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
@@ -78,29 +78,29 @@
             this.NameBox.Size = new System.Drawing.Size(209, 21);
             this.NameBox.TabIndex = 0;
             // 
-            // CancellingButton
+            // ButtonCancel
             // 
-            this.CancellingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CancellingButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancellingButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.CancellingButton.Location = new System.Drawing.Point(123, 65);
-            this.CancellingButton.Name = "CancellingButton";
-            this.CancellingButton.Size = new System.Drawing.Size(75, 23);
-            this.CancellingButton.TabIndex = 2;
-            this.CancellingButton.Text = "Cancel";
-            this.CancellingButton.UseVisualStyleBackColor = true;
+            this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.ButtonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ButtonCancel.Location = new System.Drawing.Point(123, 65);
+            this.ButtonCancel.Name = "ButtonCancel";
+            this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
+            this.ButtonCancel.TabIndex = 2;
+            this.ButtonCancel.Text = "Cancel";
+            this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
-            // OkButton
+            // ButtonOk
             // 
-            this.OkButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.OkButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.OkButton.Location = new System.Drawing.Point(204, 65);
-            this.OkButton.Name = "OkButton";
-            this.OkButton.Size = new System.Drawing.Size(75, 23);
-            this.OkButton.TabIndex = 3;
-            this.OkButton.Text = "OK";
-            this.OkButton.UseVisualStyleBackColor = true;
-            this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
+            this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ButtonOk.Location = new System.Drawing.Point(204, 65);
+            this.ButtonOk.Name = "ButtonOk";
+            this.ButtonOk.Size = new System.Drawing.Size(75, 23);
+            this.ButtonOk.TabIndex = 3;
+            this.ButtonOk.Text = "OK";
+            this.ButtonOk.UseVisualStyleBackColor = true;
+            this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
             // 
             // ValueLabel
             // 
@@ -122,17 +122,17 @@
             this.ValueBox.Size = new System.Drawing.Size(209, 21);
             this.ValueBox.TabIndex = 1;
             // 
-            // CreateTagWindow
+            // EditTagWindow
             // 
-            this.AcceptButton = this.OkButton;
+            this.AcceptButton = this.ButtonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.CancellingButton;
+            this.CancelButton = this.ButtonCancel;
             this.ClientSize = new System.Drawing.Size(291, 100);
             this.Controls.Add(this.ValueBox);
             this.Controls.Add(this.ValueLabel);
-            this.Controls.Add(this.CancellingButton);
-            this.Controls.Add(this.OkButton);
+            this.Controls.Add(this.ButtonCancel);
+            this.Controls.Add(this.ButtonOk);
             this.Controls.Add(this.SizeBox);
             this.Controls.Add(this.SizeLabel);
             this.Controls.Add(this.NameLabel);
@@ -140,7 +140,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "CreateTagWindow";
+            this.Name = "EditTagWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create Tag";
@@ -155,8 +155,8 @@
         private System.Windows.Forms.Label SizeLabel;
         private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.TextBox NameBox;
-        private System.Windows.Forms.Button CancellingButton;
-        private System.Windows.Forms.Button OkButton;
+        private System.Windows.Forms.Button ButtonCancel;
+        private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.Label ValueLabel;
         private System.Windows.Forms.TextBox ValueBox;
     }

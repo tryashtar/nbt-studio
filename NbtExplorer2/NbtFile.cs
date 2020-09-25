@@ -11,7 +11,7 @@ namespace NbtExplorer2
 {
     // represents a loadable and saveable NBT file
     // uses fNbt.NbtFile to do the work reading/writing binary data to disk, but can also read/write SNBT without using one
-    public class NbtFile
+    public class NbtFile : INbtFile
     {
         public string Path { get; private set; }
         public NbtCompound RootTag { get; private set; }
@@ -27,7 +27,7 @@ namespace NbtExplorer2
 
         public NbtFile()
         {
-            RootTag = new NbtCompound();
+            RootTag = new NbtCompound("");
             Path = null;
             ExportSettings = null;
         }
@@ -57,7 +57,7 @@ namespace NbtExplorer2
                         return null;
                     compound.Name = "";
                     var file = new fNbt.NbtFile(compound);
-                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(path, !text.Contains("\n")));
+                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n")));
                 }
             }
             catch
@@ -81,7 +81,7 @@ namespace NbtExplorer2
                 if (file.RootTag == null)
                     return null;
 
-                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(path, file.FileCompression, big_endian, header));
+                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, header));
             }
             catch
             {
@@ -91,7 +91,7 @@ namespace NbtExplorer2
 
         public void Save()
         {
-            ExportSettings.Export(RootTag);
+            ExportSettings.Export(Path, RootTag);
         }
 
         public void SaveAs(string path, ExportSettings settings)
@@ -100,5 +100,14 @@ namespace NbtExplorer2
             ExportSettings = settings;
             Save();
         }
+    }
+
+    public interface INbtFile
+    {
+        string Path { get; }
+        ExportSettings ExportSettings { get; }
+        bool CanSave { get; }
+        void Save();
+        void SaveAs(string path, ExportSettings settings);
     }
 }

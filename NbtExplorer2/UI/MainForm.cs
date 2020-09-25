@@ -17,7 +17,20 @@ namespace NbtExplorer2.UI
 {
     public partial class MainForm : Form
     {
-        private NbtTreeModel ViewModel;
+        private NbtTreeModel _ViewModel;
+        private NbtTreeModel ViewModel
+        {
+            get => _ViewModel;
+            set
+            {
+                if (_ViewModel != null)
+                    _ViewModel.Changed -= ViewModel_Changed;
+                _ViewModel = value;
+                _ViewModel.Changed += ViewModel_Changed;
+                ViewModel_Changed(this, EventArgs.Empty);
+            }
+        }
+
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
         private readonly string[] ClickedFiles;
 
@@ -92,6 +105,7 @@ namespace NbtExplorer2.UI
         private void MainForm_Load(object sender, EventArgs e)
         {
             NbtTree_SelectionChanged(this, EventArgs.Empty);
+            ViewModel_Changed(this, EventArgs.Empty);
             if (ClickedFiles != null && ClickedFiles.Any())
                 OpenFiles(ClickedFiles);
         }
@@ -139,13 +153,47 @@ namespace NbtExplorer2.UI
 
         private void Save()
         {
-            // temporary test
-            var file = (NbtFile)NbtTree.SelectedNode.Tag;
-            file.SaveAs(Path.Combine(Path.GetDirectoryName(file.Path), "test.nbt"), file.ExportSettings);
+            if (ViewModel == null) return;
+            foreach (var file in ViewModel.OpenedFiles)
+            {
+                if (file.CanSave)
+                    file.Save();
+                else
+                    SaveAs(file);
+            }
         }
 
         private void SaveAs()
-        { }
+        {
+            if (ViewModel == null) return;
+            foreach (var file in ViewModel.OpenedFiles)
+            {
+                SaveAs(file);
+            }
+        }
+
+        private void SaveAs(INbtFile file)
+        {
+            using (var dialog = new SaveFileDialog
+            {
+                Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
+                RestoreDirectory = true,
+                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt"
+            })
+            {
+                if (file.Path != null)
+                {
+                    dialog.InitialDirectory = Path.GetDirectoryName(file.Path);
+                    dialog.FileName = Path.GetFileName(file.Path);
+                }
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    var export = new ExportWindow(file.ExportSettings);
+                    if (export.ShowDialog() == DialogResult.OK)
+                        file.SaveAs(dialog.FileName, export.GetSettings());
+                }
+            }
+        }
 
         private void DoRefresh()
         { }
@@ -236,7 +284,7 @@ namespace NbtExplorer2.UI
 
         private void OpenFolder(string path)
         {
-            ViewModel = new NbtTreeModel(new[] { new NbtFolder(path, true) }, NbtTree);
+            ViewModel = new NbtTreeModel(new NbtFolder(path, true), NbtTree);
         }
 
         private void OpenFiles(IEnumerable<string> paths)
@@ -273,6 +321,13 @@ namespace NbtExplorer2.UI
             ActionRename.Enabled = tag != null;
             ActionEdit.Enabled = tag != null;
             ActionEditSnbt.Enabled = tag != null;
+        }
+
+        private void ViewModel_Changed(object sender, EventArgs e)
+        {
+            ActionSave.Enabled = ViewModel?.HasUnsavedChanges ?? false;
+            ActionSaveAs.Enabled = ViewModel != null;
+            ActionRefresh.Enabled = ViewModel != null;
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)

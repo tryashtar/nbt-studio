@@ -16,8 +16,10 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreeModelEventArgs> NodesInserted;
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
         public event EventHandler<TreePathEventArgs> StructureChanged;
+        public event EventHandler Changed;
 
-        public bool HasUnsavedChanges { get; private set; } = false;
+        private bool _HasUnsavedChanges = false;
+        public bool HasUnsavedChanges { get => _HasUnsavedChanges; private set { _HasUnsavedChanges = value; Changed?.Invoke(this, EventArgs.Empty); } }
         private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
 
@@ -61,7 +63,24 @@ namespace NbtExplorer2.UI
         {
             get
             {
-                return Roots.OfType<NbtFile>().Select(x => NotifyWrapFile(this, x));
+                var queue = new Queue<TreeNodeAdv>();
+                foreach (var item in View.Root.Children)
+                {
+                    queue.Enqueue(item);
+                }
+                while (queue.Any())
+                {
+                    var item = queue.Dequeue();
+                    if (item.Tag is NbtFile file)
+                        yield return NotifyWrapFile(this, file);
+                    else if (item.Tag is NbtFolder)
+                    {
+                        foreach (var sub in item.Children)
+                        {
+                            queue.Enqueue(sub);
+                        }
+                    }
+                }
             }
         }
 

@@ -63,7 +63,7 @@ namespace NbtExplorer2.UI
 
         public abstract class NotifyNode : INotifyNode
         {
-            private readonly NbtTreeModel Tree;
+            protected readonly NbtTreeModel Tree;
             private readonly object SourceObject;
             protected NotifyNode(NbtTreeModel tree, object source)
             {
@@ -81,13 +81,22 @@ namespace NbtExplorer2.UI
             protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
         }
 
-        public class NotifyNbtFile : NotifyNode
+        public class NotifyNbtFile : NotifyNode, INbtFile
         {
             private readonly NbtFile File;
             public NotifyNbtFile(NbtFile file, NbtTreeModel tree, object original) : base(tree, original)
             {
                 File = file;
             }
+            private void NotifySaved()
+            {
+                Tree.HasUnsavedChanges = false;
+            }
+            public string Path => File.Path;
+            public ExportSettings ExportSettings => File.ExportSettings;
+            public bool CanSave => File.CanSave;
+            public void Save() { File.Save(); NotifySaved(); }
+            public void SaveAs(string path, ExportSettings settings) { File.SaveAs(path, settings); Notify(); NotifySaved(); }
         }
 
         public abstract class NotifyNbtTag : NotifyNode, INotifyNbt
