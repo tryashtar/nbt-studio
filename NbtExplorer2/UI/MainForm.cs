@@ -288,6 +288,7 @@ namespace NbtExplorer2.UI
         private void MoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
         {
             var insert = INbt.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return;
             // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
             foreach (var tag in tags.Reverse().ToList())
             {

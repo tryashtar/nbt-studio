@@ -1,4 +1,4 @@
-using Aga.Controls.Tree;
+﻿using Aga.Controls.Tree;
 using fNbt;
 using NbtExplorer2.SNBT;
 using NbtExplorer2.UI;
@@ -340,8 +340,8 @@ namespace NbtExplorer2
         {
             if (position == NodePosition.Inside)
             {
-                var container = (INbtContainer)target;
-                return Tuple.Create(container, container.Count);
+                var container = target as INbtContainer;
+                return Tuple.Create(container, container?.Count ?? 0);
             }
             else
             {
@@ -372,7 +372,26 @@ namespace NbtExplorer2
             // check if you're trying to add items of different types to a list
             if (destination is INbtList list && tags.Select(x => x.TagType).Distinct().Skip(1).Any())
                 return false;
+            // check if you're trying to add an item to its own descendent
+            var ancestors = Ancestors(destination);
+            foreach (var ancestor in ancestors)
+            {
+                if (tags.Any(x => x.IsInside(ancestor)))
+                    return false;
+            }
             return tags.All(x => destination.CanAdd(x.TagType));
+        }
+
+        public static List<INbtContainer> Ancestors(INbtTag tag)
+        {
+            var ancestors = new List<INbtContainer>();
+            var parent = tag.Parent;
+            while (parent != null)
+            {
+                ancestors.Add(parent);
+                parent = parent.Parent;
+            }
+            return ancestors;
         }
 
         public static Image Image(object obj)
