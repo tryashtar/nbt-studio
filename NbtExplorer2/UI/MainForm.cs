@@ -45,30 +45,25 @@ namespace NbtExplorer2.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = INbt.GetNbt(NbtTree.SelectedObject);
-            if (parent == null)
-                return;
-            var tag = EditTagWindow.CreateTag(type, parent, Control.ModifierKeys == Keys.Shift);
+            var parent = ViewModel?.SelectedNbt as INbtContainer;
+            if (parent == null) return;
+            var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
-                ViewModel.Add(NbtTree.SelectedObject, tag); // NOT parent, because the selected object could be an NbtFile, while parent would be its compound
+                parent.Add(tag);
         }
 
         private void ToolEdit_Click(object sender, EventArgs e)
         {
-            var tag = INbt.GetNbt(NbtTree.SelectedObject);
-            if (tag == null)
-                return;
-            if (EditTagWindow.ModifyTag(tag, EditPurpose.EditValue))
-                ViewModel.NoticeChanges(tag);
+            var tag = ViewModel?.SelectedNbt;
+            if (tag == null) return;
+            EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
         private void ToolRename_Click(object sender, EventArgs e)
         {
-            var tag = INbt.GetNbt(NbtTree.SelectedObject);
-            if (tag == null)
-                return;
-            if (EditTagWindow.ModifyTag(tag, EditPurpose.Rename))
-                ViewModel.NoticeChanges(tag);
+            var tag = ViewModel?.SelectedNbt;
+            if (tag == null) return;
+            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
         }
 
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
@@ -152,28 +147,42 @@ namespace NbtExplorer2.UI
 
         private void ToolDelete_Click(object sender, EventArgs e)
         {
-            if (NbtTree.SelectedObject != null)
-                ViewModel.RemoveAll(NbtTree.SelectedObjects);
+            foreach (var item in ViewModel.SelectedNbts.ToList())
+            {
+                item.Remove();
+            }
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
-            var tag = INbt.GetNbt(NbtTree.SelectedObject);
+            var tag = ViewModel?.SelectedNbt;
+            var container = tag as INbtContainer;
             foreach (var item in CreateTagButtons)
             {
-                item.Value.Enabled = INbt.CanAdd(tag, item.Key);
+                item.Value.Enabled = container != null && container.CanAdd(item.Key);
             }
+            ToolSort.Enabled = tag is INbtCompound;
+            ToolCut.Enabled = tag != null;
+            ToolCopy.Enabled = tag != null;
+            ToolPaste.Enabled = container != null;
+            ToolDelete.Enabled = tag != null;
+            ToolRename.Enabled = tag != null;
+            ToolEdit.Enabled = tag != null;
+            ToolEditSnbt.Enabled = tag != null;
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            if (e.Node?.Tag is NbtTag tag && INbt.IsValueType(tag.TagType))
+            var tag = ViewModel?.SelectedNbt;
+            if (tag != null && INbt.IsValueType(tag.TagType))
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
         private void ToolSave_Click(object sender, EventArgs e)
         {
-
+            // temporary test
+            var file = (NbtFile)NbtTree.SelectedNode.Tag;
+            file.SaveAs(Path.Combine(Path.GetDirectoryName(file.Path), "test.nbt"), file.ExportSettings);
         }
 
         private void ToolRefresh_Click(object sender, EventArgs e)
@@ -188,37 +197,42 @@ namespace NbtExplorer2.UI
 
         private void ToolCut_Click(object sender, EventArgs e)
         {
-            if (NbtTree.SelectedObject != null)
+            if (ViewModel?.SelectedNbt != null)
             {
-                Copy(NbtTree.SelectedObjects);
-                ViewModel.RemoveAll(NbtTree.SelectedObjects);
+                Copy(ViewModel.SelectedNbts);
+                foreach (var item in ViewModel.SelectedNbts.ToList())
+                {
+                    item.Remove();
+                }
             }
         }
 
         private void ToolCopy_Click(object sender, EventArgs e)
         {
-            if (NbtTree.SelectedObject != null)
-                Copy(NbtTree.SelectedObjects);
+            if (ViewModel?.SelectedNbt != null)
+                Copy(ViewModel.SelectedNbts);
         }
 
-        private void Copy(IEnumerable<object> objects)
+        private void Copy(IEnumerable<INbtTag> objects)
         {
-            Clipboard.SetText(String.Join("\n", objects.OfType<NbtTag>().Select(x => x.ToSnbt(include_name: true))));
+            Clipboard.SetText(String.Join("\n", objects.Select(x => x.ToSnbt(include_name: true))));
         }
 
-        private void Paste(object destination)
+        private void Paste(INbtContainer destination)
         {
             var snbts = Clipboard.GetText().Split('\n');
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
-                    ViewModel.Add(destination, tag);
+                    INbt.TransformAdd(tag.Adapt(), destination);
             }
         }
 
         private void ToolPaste_Click(object sender, EventArgs e)
         {
-            Paste(NbtTree.SelectedObject);
+            var parent = ViewModel.SelectedNbt as INbtContainer;
+            if (parent != null)
+                Paste(parent);
         }
 
         private void ToolEditSnbt_Click(object sender, EventArgs e)
@@ -237,10 +251,10 @@ namespace NbtExplorer2.UI
                 e.Effect = DragDropEffects.Copy;
             else
             {
-                var objects = NbtTree.ObjectsFromDrag(e);
-                if (objects != null
-                    && NbtTree.DropPosition.Node != null
-                    && ViewModel.CanMove(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position))
+                var tags = ViewModel.NbtsFromDrag(e);
+                if (tags.Any()
+                    && ViewModel.DropTag != null
+                    && CanMoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition))
                     e.Effect = e.AllowedEffect;
                 else
                     e.Effect = DragDropEffects.None;
@@ -258,10 +272,35 @@ namespace NbtExplorer2.UI
             }
             else
             {
-                var objects = NbtTree.ObjectsFromDrag(e);
-                if (objects != null)
-                    ViewModel.Move(objects, NbtTree.DropPosition.Node.Tag, NbtTree.DropPosition.Position);
+                var tags = ViewModel.NbtsFromDrag(e);
+                if (tags.Any())
+                    MoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition);
             }
+        }
+
+        private bool CanMoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        {
+            var insert = INbt.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return false;
+            return INbt.CanAddAll(tags, insert.Item1);
+        }
+
+        private void MoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        {
+            var insert = INbt.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return;
+            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
+            foreach (var tag in tags.Reverse().ToList())
+            {
+                INbt.TransformInsert(tag, insert.Item1, insert.Item2);
+            }
+        }
+
+        private void ToolSort_Click(object sender, EventArgs e)
+        {
+            var tag = ViewModel?.SelectedNbt as INbtCompound;
+            if (tag == null) return;
+            INbt.Sort(tag, new INbt.TagTypeSorter(), true);
         }
     }
 }

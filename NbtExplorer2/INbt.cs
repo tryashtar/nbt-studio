@@ -74,21 +74,21 @@ namespace NbtExplorer2
             return null;
         }
 
-        public static void SetValue(NbtTag tag, object value)
+        public static void SetValue(INbtTag tag, object value)
         {
-            if (tag is NbtByte tag_byte && value is byte b)
+            if (tag is INbtByte tag_byte && value is byte b)
                 tag_byte.Value = b;
-            else if (tag is NbtShort tag_short && value is short s)
+            else if (tag is INbtShort tag_short && value is short s)
                 tag_short.Value = s;
-            else if (tag is NbtInt tag_int && value is int i)
+            else if (tag is INbtInt tag_int && value is int i)
                 tag_int.Value = i;
-            else if (tag is NbtLong tag_long && value is long l)
+            else if (tag is INbtLong tag_long && value is long l)
                 tag_long.Value = l;
-            else if (tag is NbtFloat tag_float && value is float f)
+            else if (tag is INbtFloat tag_float && value is float f)
                 tag_float.Value = f;
-            else if (tag is NbtDouble tag_double && value is double d)
+            else if (tag is INbtDouble tag_double && value is double d)
                 tag_double.Value = d;
-            else if (tag is NbtString tag_string && value is string str)
+            else if (tag is INbtString tag_string && value is string str)
                 tag_string.Value = str;
         }
 
@@ -116,13 +116,13 @@ namespace NbtExplorer2
         }
 
         // clears any existing data in the tag's array
-        public static void SetSize(NbtTag tag, int size)
+        public static void SetSize(INbtTag tag, int size)
         {
-            if (tag is NbtByteArray tag_byte_array)
+            if (tag is INbtByteArray tag_byte_array)
                 tag_byte_array.Value = new byte[size];
-            else if (tag is NbtIntArray tag_int_array)
+            else if (tag is INbtIntArray tag_int_array)
                 tag_int_array.Value = new int[size];
-            else if (tag is NbtLongArray tag_long_array)
+            else if (tag is INbtLongArray tag_long_array)
                 tag_long_array.Value = new long[size];
         }
 
@@ -180,15 +180,6 @@ namespace NbtExplorer2
             }
         }
 
-        public static bool CanAdd(NbtTag tag, NbtTagType type)
-        {
-            if (tag is NbtCompound)
-                return true;
-            if (tag is NbtList list)
-                return list.Count == 0 || list.ListType == type;
-            return false;
-        }
-
         public static IEnumerable<object> GetChildren(object obj)
         {
             if (obj is NbtFolder folder)
@@ -199,58 +190,7 @@ namespace NbtExplorer2
                 return compound.Tags;
             if (obj is NbtList list)
                 return list;
-            return null;
-        }
-
-        public static void Add(object parent, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                file.RootTag.Add(child);
-            else if (parent is NbtCompound compound)
-                compound.Add(child);
-            else if (parent is NbtList list)
-                list.Add(child);
-        }
-
-        public static void Insert(object parent, int index, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                file.RootTag.Insert(index, child);
-            else if (parent is NbtCompound compound)
-                compound.Insert(index, child);
-            else if (parent is NbtList list)
-                list.Insert(index, child);
-        }
-
-        public static int IndexOf(object parent, NbtTag child)
-        {
-            if (parent is NbtFile file)
-                return file.RootTag.IndexOf(child);
-            else if (parent is NbtCompound compound)
-                return compound.Tags.ToList().IndexOf(child);
-            else if (parent is NbtList list)
-                return list.IndexOf(child);
-            return -1;
-        }
-
-        public static void Delete(object obj)
-        {
-            if (obj is NbtTag tag)
-            {
-                var parent = tag.Parent;
-                if (parent is NbtCompound compound)
-                    compound.Remove(tag);
-                else if (parent is NbtList list)
-                    list.Remove(tag);
-            }
-        }
-
-        public static void DeleteAll(IEnumerable objects)
-        {
-            foreach (var obj in objects)
-            {
-                Delete(obj);
-            }
+            return Enumerable.Empty<object>();
         }
 
         public static Tuple<string, string> PreviewNameAndValue(object obj)
@@ -284,30 +224,30 @@ namespace NbtExplorer2
             if (obj is NbtFolder folder)
                 return PreviewNbtValue(folder);
             if (obj is NbtTag tag)
-                return PreviewNbtValue(tag);
+                return PreviewNbtValue(tag.Adapt());
             return null;
         }
 
-        public static string PreviewNbtValue(NbtTag tag)
+        public static string PreviewNbtValue(INbtTag tag)
         {
-            if (tag is NbtCompound compound)
+            if (tag is INbtCompound compound)
                 return $"[{Util.Pluralize(compound.Count, "entry", "entries")}]";
-            else if (tag is NbtList list)
+            else if (tag is INbtList list)
             {
                 if (list.Count == 0)
                     return $"[0 entries]";
                 return $"[{Util.Pluralize(list.Count, TagTypeName(list.ListType).ToLower())}]";
             }
-            else if (tag is NbtByteArray byte_array)
+            else if (tag is INbtByteArray byte_array)
                 return $"[{Util.Pluralize(byte_array.Value.Length, "byte")}]";
-            else if (tag is NbtIntArray int_array)
+            else if (tag is INbtIntArray int_array)
                 return $"[{Util.Pluralize(int_array.Value.Length, "int")}]";
-            else if (tag is NbtLongArray long_array)
+            else if (tag is INbtLongArray long_array)
                 return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
             return tag.ToSnbt(expanded: false, delimit: false);
         }
 
-        public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag);
+        public static string PreviewNbtValue(NbtFile file) => PreviewNbtValue(file.RootTag.Adapt());
         public static string PreviewNbtValue(NbtFolder folder) => $"[{Util.Pluralize(folder.Files.Count, "file")}]";
 
         public static string TagTypeName(NbtTagType type)
@@ -321,61 +261,137 @@ namespace NbtExplorer2
             return type.ToString();
         }
 
-        public static bool CanDropAll(IEnumerable<object> items, object destination, int index)
+        public class TagNameSorter : IComparer<INbtTag>
+        {
+            public int Compare(INbtTag x, INbtTag y)
+            {
+                return x.Name.CompareTo(y.Name);
+            }
+        }
+
+        public class TagTypeSorter : IComparer<INbtTag>
+        {
+            private static readonly Dictionary<NbtTagType, int> TypeOrder = new Dictionary<NbtTagType, int>
+            {
+                {NbtTagType.Compound, 1},
+                {NbtTagType.List, 2},
+                {NbtTagType.Byte, 3},
+                {NbtTagType.Short, 4},
+                {NbtTagType.Int, 5},
+                {NbtTagType.Long, 6},
+                {NbtTagType.Float, 7},
+                {NbtTagType.Double, 8},
+                {NbtTagType.String, 9},
+                {NbtTagType.ByteArray, 9},
+                {NbtTagType.IntArray, 10},
+                {NbtTagType.LongArray, 11},
+            };
+            public int Compare(INbtTag x, INbtTag y)
+            {
+                int compare = TypePriority(x.TagType).CompareTo(TypePriority(y.TagType));
+                if (compare != 0)
+                    return compare;
+                return x.Name.CompareTo(y.Name);
+            }
+            private int TypePriority(NbtTagType type)
+            {
+                if (TypeOrder.TryGetValue(type, out int result))
+                    return result;
+                return int.MaxValue;
+            }
+        }
+
+        public static void Sort(INbtCompound compound, IComparer<INbtTag> sorter, bool recursive)
+        {
+            var tags = compound.Tags.OrderBy(x => x, sorter).ToList();
+            compound.Clear();
+            foreach (var tag in tags)
+            {
+                if (recursive)
+                {
+                    if (tag is INbtCompound sub)
+                        Sort(sub, sorter, true);
+                    else if (tag is INbtList list)
+                        SortChildren(list, sorter);
+                }
+                tag.AddTo(compound);
+            }
+        }
+
+        private static void SortChildren(INbtList list, IComparer<INbtTag> sorter)
+        {
+            if (list.ListType == NbtTagType.Compound)
+            {
+                foreach (INbtCompound item in list)
+                {
+                    Sort(item, sorter, true);
+                }
+            }
+            else if (list.ListType == NbtTagType.List)
+            {
+                foreach (INbtList item in list)
+                {
+                    SortChildren(item, sorter);
+                }
+            }
+        }
+
+        public static Tuple<INbtContainer, int> GetInsertionLocation(INbtTag target, NodePosition position)
+        {
+            if (position == NodePosition.Inside)
+            {
+                var container = target as INbtContainer;
+                return Tuple.Create(container, container?.Count ?? 0);
+            }
+            else
+            {
+                var parent = target.Parent;
+                int index = target.Index;
+                if (position == NodePosition.After)
+                    index++;
+                return Tuple.Create(parent, index);
+            }
+        }
+
+        public static void TransformInsert(INbtTag tag, INbtContainer destination, int index)
+        {
+            if (tag.IsInside(destination) && index > tag.Index)
+                index--;
+            tag.Remove();
+            if (destination is INbtCompound compound)
+                tag.Name = EditTagWindow.GetAutomaticName(tag, compound);
+            else if (destination is INbtList)
+                tag.Name = null;
+            tag.InsertInto(destination, index);
+        }
+
+        public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformInsert(tag, destination, destination.Count);
+
+        public static bool CanAddAll(IEnumerable<INbtTag> tags, INbtContainer destination)
         {
             // check if you're trying to add items of different types to a list
-            if (destination is NbtList list && items.OfType<NbtTag>().Select(x => x.TagType).Distinct().Skip(1).Any())
+            if (destination is INbtList list && tags.Select(x => x.TagType).Distinct().Skip(1).Any())
                 return false;
-            return items.All(x => CanDrop(x, destination, index));
-        }
-
-        public static bool CanDrop(object item, object destination, int index)
-        {
-            return Drop(item, destination, index, just_check: true);
-        }
-
-        public static bool DropAll(IEnumerable<object> items, object destination, int index)
-        {
-            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
-            return items.Reverse().All(x => Drop(x, destination, index));
-        }
-
-        public static bool Drop(object item, object destination, int index, bool just_check = false)
-        {
-            if (destination is NbtFolder)
+            // check if you're trying to add an item to its own descendent
+            var ancestors = Ancestors(destination);
+            foreach (var ancestor in ancestors)
             {
-                if (item is NbtFile file)
-                {
-                    if (!just_check)
-                        Console.WriteLine("Move file into folder");
-                    return true;
-                }
-                if (item is NbtFolder folder)
-                {
-                    if (!just_check)
-                        Console.WriteLine("Move folder into other folder");
-                    return true;
-                }
-                return false;
+                if (tags.Any(x => x.IsInside(ancestor)))
+                    return false;
             }
-            var tag_item = GetNbt(item);
-            var tag_dest = GetNbt(destination);
-            if (tag_item == null || tag_dest == null)
-                return false;
-            if (!CanAdd(tag_dest, tag_item.TagType))
-                return false;
-            if (!just_check)
+            return tags.All(x => destination.CanAdd(x.TagType));
+        }
+
+        public static List<INbtContainer> Ancestors(INbtTag tag)
+        {
+            var ancestors = new List<INbtContainer>();
+            var parent = tag.Parent;
+            while (parent != null)
             {
-                if (tag_item.Parent == tag_dest && IndexOf(tag_dest, tag_item) < index)
-                    index--;
-                Delete(tag_item);
-                if (tag_dest is NbtCompound compound)
-                    tag_item.Name = EditTagWindow.GetAutomaticName(tag_item, compound);
-                else if (tag_dest is NbtList)
-                    tag_item.Name = null;
-                Insert(tag_dest, index, tag_item);
+                ancestors.Add(parent);
+                parent = parent.Parent;
             }
-            return true;
+            return ancestors;
         }
 
         public static Image Image(object obj)

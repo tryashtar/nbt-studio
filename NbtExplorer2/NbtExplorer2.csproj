@@ -55,11 +55,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClipboardData.cs" />
     <Compile Include="ExportSettings.cs" />
     <Compile Include="INbt.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
+    <Compile Include="Adapters.cs" />
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +85,7 @@
     <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\TreeModelNotify.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
@@ -278,6 +279,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -21,9 +21,6 @@ namespace NbtExplorer2.UI
             this.SelectionMode = TreeSelectionMode.Multi;
         }
 
-        public object SelectedObject => SelectedNode?.Tag;
-        public IEnumerable<object> SelectedObjects => SelectedNodes?.Select(x => x.Tag);
-
         private void ToggleExpansion(TreeNodeAdv node, bool all = false)
         {
             if (node.IsExpanded)
@@ -66,19 +63,19 @@ namespace NbtExplorer2.UI
                 if (hover_time.TotalSeconds > 0.5)
                 {
                     // don't expand the node we're dragging itself
-                    var objects = ObjectsFromDrag(drgevent);
-                    if (objects != null && !objects.Contains(DropPosition.Node.Tag))
+                    var nodes = NodesFromDrag(drgevent);
+                    if (nodes != null && !nodes.Contains(DropPosition.Node))
                         DropPosition.Node.Expand();
                 }
             }
             base.OnDragOver(drgevent);
         }
 
-        public IEnumerable<object> ObjectsFromDrag(DragEventArgs e)
+        private IEnumerable<object> NodesFromDrag(DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return null;
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => x.Tag);
+            return (TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -186,7 +183,14 @@ namespace NbtExplorer2.UI
         private Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
-            return INbt.PreviewNameAndValue(obj);
+            var text = INbt.PreviewNameAndValue(obj);
+            return Tuple.Create(Flatten(text.Item1), Flatten(text.Item2));
+        }
+
+        private string Flatten(string text)
+        {
+            if (text == null) return null;
+            return text.Replace("\n", "⏎").Replace("\r", "⏎");
         }
     }
 }

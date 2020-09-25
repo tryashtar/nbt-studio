@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NbtExplorer2.UI
 {
-    public class NbtTreeModel : ITreeModel
+    public partial class NbtTreeModel : ITreeModel
     {
         public event EventHandler<TreeModelEventArgs> NodesChanged;
         public event EventHandler<TreeModelEventArgs> NodesInserted;
@@ -17,8 +18,46 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
         public bool HasUnsavedChanges { get; private set; } = false;
-        public readonly IEnumerable<object> Roots;
+        private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
+
+        public INotifyNode SelectedObject
+        {
+            get
+            {
+                if (View.SelectedNode == null)
+                    return null;
+                return NotifyWrap(this, View.SelectedNode.Tag);
+            }
+        }
+        public IEnumerable<INotifyNode> SelectedObjects
+        {
+            get
+            {
+                if (View.SelectedNodes == null)
+                    return Enumerable.Empty<INotifyNode>();
+                return View.SelectedNodes.Select(x => NotifyWrap(this, x.Tag));
+            }
+        }
+        public INotifyNbt SelectedNbt
+        {
+            get
+            {
+                if (View.SelectedNode == null)
+                    return null;
+                return NotifyWrapNbt(this, View.SelectedNode.Tag, INbt.GetNbt(View.SelectedNode.Tag));
+            }
+        }
+        public IEnumerable<INotifyNbt> SelectedNbts
+        {
+            get
+            {
+                if (View.SelectedNodes == null)
+                    Enumerable.Empty<INotifyNbt>();
+                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+            }
+        }
+
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
             Roots = roots;
@@ -32,101 +71,74 @@ namespace NbtExplorer2.UI
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
-        public void Remove(object obj)
+        public IEnumerable<INotifyNbt> NbtsFromDrag(DragEventArgs e)
         {
-            var node = View.FindNodeByTag(obj);
-            if (node != null && node.IsSelected)
+            if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
+                return Enumerable.Empty<INotifyNbt>();
+            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+        }
+        public INbtTag DropTag
+        {
+            get
             {
-                node.IsSelected = false;
-                if (node.NextNode != null)
-                    node.NextNode.IsSelected = true;
-                else if (node.PreviousNode != null)
-                    node.PreviousNode.IsSelected = true;
-                else if (node.Parent != null)
-                    node.Parent.IsSelected = true;
+                if (View.DropPosition.Node == null)
+                    return null;
+                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, INbt.GetNbt(View.DropPosition.Node.Tag));
             }
-            INbt.Delete(obj);
-            NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetParentPath(obj), new[] { obj }));
+        }
+        public NodePosition DropPosition => View.DropPosition.Position;
+
+        // an object changed, refresh the nodes through ITreeModel's API to ensure it matches the true object
+        private void Notify(object changed)
+        {
+#if DEBUG
+            Console.WriteLine($"changed: {changed.GetType()}");
+#endif
+            var node = FindNodeByObject(changed);
+            if (node == null) return;
+            var path = View.GetPath(node);
             HasUnsavedChanges = true;
-        }
 
-        public void RemoveAll(IEnumerable<object> objects)
-        {
-            foreach (var item in objects.ToList())
+            var real_children = GetChildren(path).ToList();
+            var current_children = node == null ? new TreeNodeAdv[0] : node.Children.Select(x => x.Tag).ToArray();
+            var remove = current_children.Except(real_children).ToArray();
+            var add = real_children.Except(current_children).ToArray();
+
+            NodesChanged?.Invoke(this, new TreeModelEventArgs(path, real_children.ToArray()));
+            if (remove.Any())
+                NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
+            if (add.Any())
             {
-                Remove(item);
+                node.Expand();
+                NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
             }
         }
 
-        public void Add(object parent, NbtTag tag)
+        private TreeNodeAdv FindNodeByObject(object obj)
         {
-            INbt.Add(parent, tag);
-            NodesInserted?.Invoke(this, new TreeModelEventArgs(GetPath(parent), new[] { INbt.IndexOf(parent, tag) }, new[] { tag }));
-            View.FindNodeByTag(parent).Expand();
-            //View.EnsureVisible(View.FindNodeByTag(tag));
-            HasUnsavedChanges = true;
-        }
-
-        private Tuple<object, int> GetInsertionLocation(object target, NodePosition position)
-        {
-            var node = View.FindNodeByTag(target);
-            if (node == null)
-                throw new ArgumentException("Couldn't find target object");
-            if (position == NodePosition.Inside)
-                return Tuple.Create(target, node.Children.Count);
-            else
+            var quick = View.FindNodeByTag(obj);
+            if (quick != null)
+                return quick;
+            // breadth-first search, scan tree for the object
+            var queue = new Queue<TreeNodeAdv>();
+            queue.Enqueue(View.Root);
+            while (queue.Any())
             {
-                int index = node.Parent.Children.IndexOf(node);
-                if (position == NodePosition.After)
-                    index++;
-                return Tuple.Create(node.Parent.Tag, index);
+                var item = queue.Dequeue();
+                // notifiers can't tell whether they were added to a file that's being treated as a compound
+                // so here we disambiguate them
+                if (item.Tag is NbtFile file && file.RootTag == obj)
+                    return item;
+                foreach (var sub in item.Children)
+                {
+                    queue.Enqueue(sub);
+                }
             }
+            return null;
         }
 
-        public bool CanMove(IEnumerable<object> items, object target, NodePosition placement)
-        {
-            var insertion = GetInsertionLocation(target, placement);
-            var path = GetPath(insertion.Item1).FullPath;
-            foreach (var item in items)
-            {
-                // can't become the child of your own descendent
-                if (path.Contains(item))
-                    return false;
-            }
-            return INbt.CanDropAll(items, insertion.Item1, insertion.Item2);
-        }
-
-        public void Move(IEnumerable<object> items, object target, NodePosition placement)
-        {
-            var insertion = GetInsertionLocation(target, placement);
-            var path = GetPath(insertion.Item1);
-            INbt.DropAll(items, insertion.Item1, insertion.Item2);
-            foreach (var item in items)
-            {
-                NodesRemoved?.Invoke(this, new TreeModelEventArgs(GetParentPath(item), new[] { item }));
-                // only works for tags right now
-                NodesInserted?.Invoke(this, new TreeModelEventArgs(path, new[] { INbt.IndexOf(insertion.Item1, (NbtTag)item) }, new[] { item }));
-            }
-            HasUnsavedChanges = true;
-        }
-
-        public void NoticeChanges(object obj)
-        {
-            // currently, changes seem to be reflected without needing to raise NodesChanged
-            HasUnsavedChanges = true;
-        }
-
-        private TreePath GetPath(object item)
-        {
-            return View.GetPath(View.FindNodeByTag(item));
-        }
-
-        private TreePath GetParentPath(object item)
-        {
-            return View.GetPath(View.FindNodeByTag(item).Parent);
-        }
-
-        public IEnumerable GetChildren(TreePath treePath)
+        IEnumerable ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);
+        public IEnumerable<object> GetChildren(TreePath treePath)
         {
             if (treePath.IsEmpty())
                 return Roots;
