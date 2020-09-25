@@ -92,7 +92,8 @@ namespace NbtExplorer2.UI
         private void Notify(object changed)
         {
 #if DEBUG
-            Console.WriteLine($"changed: {changed.GetType()}");
+            if (changed != null)
+                Console.WriteLine($"changed: {changed.GetType()}");
 #endif
             var node = FindNodeByObject(changed);
             if (node == null) return;

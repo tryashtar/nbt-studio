@@ -177,7 +177,7 @@ namespace NbtExplorer2.UI
 
         private void Paste()
         {
-            var parent = ViewModel.SelectedNbt as INbtContainer;
+            var parent = ViewModel?.SelectedNbt as INbtContainer;
             if (parent != null)
                 Paste(parent);
         }

@@ -355,6 +355,8 @@ namespace NbtExplorer2
 
         public static void TransformInsert(INbtTag tag, INbtContainer destination, int index)
         {
+            if (!destination.CanAdd(tag.TagType))
+                return;
             if (tag.IsInside(destination) && index > tag.Index)
                 index--;
             tag.Remove();
