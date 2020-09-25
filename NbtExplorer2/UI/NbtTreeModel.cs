@@ -108,7 +108,10 @@ namespace NbtExplorer2.UI
             if (remove.Any())
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
             if (add.Any())
+            {
+                node.Expand();
                 NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
+            }
         }
 
         private TreeNodeAdv FindNodeByObject(object obj)
