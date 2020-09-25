@@ -359,10 +359,24 @@ namespace NbtExplorer2
                 index--;
             tag.Remove();
             if (destination is INbtCompound compound)
-                tag.Name = EditTagWindow.GetAutomaticName(tag, compound);
+                tag.Name = GetAutomaticName(tag, compound);
             else if (destination is INbtList)
                 tag.Name = null;
             tag.InsertInto(destination, index);
+        }
+
+        public static string GetAutomaticName(INbtTag tag, INbtCompound parent)
+        {
+            if (tag.Name != null && !parent.Contains(tag.Name))
+                return tag.Name;
+            string basename = tag.Name ?? INbt.TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
+            for (int i = 1; i < 999999; i++)
+            {
+                string name = basename + i.ToString();
+                if (!parent.Contains(name))
+                    return name;
+            }
+            throw new InvalidOperationException("This compound really contains 999999 similarly named tags?!");
         }
 
         public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformInsert(tag, destination, destination.Count);

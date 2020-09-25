@@ -21,6 +21,21 @@ namespace NbtExplorer2.UI
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
         private readonly string[] ClickedFiles;
 
+        private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", Properties.Resources.action_new_image, Keys.Control | Keys.N);
+        private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", Properties.Resources.action_open_file_image, Keys.Control | Keys.O);
+        private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", Properties.Resources.action_open_folder_image, Keys.Control | Keys.Shift | Keys.O);
+        private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", Properties.Resources.action_save_image, Keys.Control | Keys.S);
+        private readonly ToolStripMenuItem ActionSaveAs = DualMenuItem.Single("Save &As", Properties.Resources.action_save_image, Keys.Control | Keys.Shift | Keys.S);
+        private readonly DualMenuItem ActionRefresh = new DualMenuItem("&Refresh", "Refresh", Properties.Resources.action_refresh_image, Keys.F5);
+        private readonly ToolStripButton ActionSort = DualMenuItem.Single("Sort", Properties.Resources.action_sort_image);
+        private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", Properties.Resources.action_cut_image, Keys.Control | Keys.X);
+        private readonly DualMenuItem ActionCopy = new DualMenuItem("&Copy", "Copy", Properties.Resources.action_copy_image, Keys.Control | Keys.C);
+        private readonly DualMenuItem ActionPaste = new DualMenuItem("&Paste", "Paste", Properties.Resources.action_paste_image, Keys.Control | Keys.V);
+        private readonly DualMenuItem ActionRename = new DualMenuItem("&Rename", "Rename", Properties.Resources.action_rename_image, Keys.F2);
+        private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", Properties.Resources.action_edit_image, Keys.Control | Keys.E);
+        private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
+        private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
+        private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -29,11 +44,49 @@ namespace NbtExplorer2.UI
             InitializeComponent();
 
             // stuff excluded from the designer for cleaner/less duplicated code
+            ActionNew.Click += (s, e) => New();
+            ActionOpenFile.Click += (s, e) => OpenFile();
+            ActionOpenFolder.Click += (s, e) => OpenFolder();
+            ActionSave.Click += (s, e) => Save();
+            ActionSaveAs.Click += (s, e) => SaveAs();
+            ActionRefresh.Click += (s, e) => DoRefresh();
+            ActionSort.Click += (s, e) => Sort();
+            ActionCut.Click += (s, e) => Cut();
+            ActionCopy.Click += (s, e) => Copy();
+            ActionPaste.Click += (s, e) => Paste();
+            ActionRename.Click += (s, e) => Rename();
+            ActionEdit.Click += (s, e) => Edit();
+            ActionEditSnbt.Click += (s, e) => EditSnbt();
+            ActionDelete.Click += (s, e) => Delete();
+            ActionFind.Click += (s, e) => Find();
+
+            ActionNew.AddTo(Tools, MenuFile);
+            ActionOpenFile.AddTo(Tools, MenuFile);
+            ActionOpenFolder.AddTo(Tools, MenuFile);
+            MenuFile.DropDownItems.Add(new ToolStripSeparator());
+            ActionSave.AddTo(Tools, MenuFile);
+            MenuFile.DropDownItems.Add(ActionSaveAs);
+            ActionRefresh.AddTo(Tools, MenuFile);
+            Tools.Items.Add(ActionSort);
+            Tools.Items.Add(new ToolStripSeparator());
+            ActionCut.AddTo(Tools, MenuEdit);
+            ActionCopy.AddTo(Tools, MenuEdit);
+            ActionPaste.AddTo(Tools, MenuEdit);
+            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
+            Tools.Items.Add(new ToolStripSeparator());
+            ActionRename.AddTo(Tools, MenuEdit);
+            ActionEdit.AddTo(Tools, MenuEdit);
+            ActionEditSnbt.AddTo(Tools, MenuEdit);
+            ActionDelete.AddTo(Tools, MenuEdit);
+
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
             {
-                Tools.Items.Insert(Tools.Items.IndexOf(ToolSeparator4), item);
+                Tools.Items.Add(item);
             }
+
+            Tools.Items.Add(new ToolStripSeparator());
+            ActionFind.AddTo(Tools, MenuSearch);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -43,52 +96,14 @@ namespace NbtExplorer2.UI
                 OpenFiles(ClickedFiles);
         }
 
-        private void AddTag(NbtTagType type)
-        {
-            var parent = ViewModel?.SelectedNbt as INbtContainer;
-            if (parent == null) return;
-            var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
-            if (tag != null)
-                parent.Add(tag);
-        }
-
-        private void ToolEdit_Click(object sender, EventArgs e)
-        {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-        }
-
-        private void ToolRename_Click(object sender, EventArgs e)
-        {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
-        }
-
-        private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
-        {
-            var buttons = new Dictionary<NbtTagType, ToolStripButton>();
-            foreach (var type in INbt.NormalTagTypes())
-            {
-                var button = new ToolStripButton(
-                    text: $"Add {INbt.TagTypeName(type)} Tag",
-                    image: INbt.TagTypeImage(type),
-                    onClick: (s, e) => AddTag(type));
-                button.DisplayStyle = ToolStripItemDisplayStyle.Image;
-                buttons.Add(type, button);
-            }
-            return buttons;
-        }
-
-        private void ToolNew_Click(object sender, EventArgs e)
+        private void New()
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
             ViewModel = new NbtTreeModel(new NbtFile(), NbtTree);
         }
 
-        private void ToolOpenFile_Click(object sender, EventArgs e)
+        private void OpenFile()
         {
             if (!ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
@@ -105,7 +120,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        private void ToolOpenFolder_Click(object sender, EventArgs e)
+        private void OpenFolder()
         {
             if (!ConfirmIfUnsaved("Open a new folder anyway?"))
                 return;
@@ -120,6 +135,103 @@ namespace NbtExplorer2.UI
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     OpenFolder(Path.GetDirectoryName(dialog.FileName));
             }
+        }
+
+        private void Save()
+        {
+            // temporary test
+            var file = (NbtFile)NbtTree.SelectedNode.Tag;
+            file.SaveAs(Path.Combine(Path.GetDirectoryName(file.Path), "test.nbt"), file.ExportSettings);
+        }
+
+        private void SaveAs()
+        { }
+
+        private void DoRefresh()
+        { }
+
+        private void Sort()
+        {
+            var tag = ViewModel?.SelectedNbt as INbtCompound;
+            if (tag == null) return;
+            INbt.Sort(tag, new INbt.TagTypeSorter(), true);
+        }
+
+        private void Cut()
+        {
+            if (ViewModel?.SelectedNbt != null)
+            {
+                Copy(ViewModel.SelectedNbts);
+                foreach (var item in ViewModel.SelectedNbts.ToList())
+                {
+                    item.Remove();
+                }
+            }
+        }
+
+        private void Copy()
+        {
+            if (ViewModel?.SelectedNbt != null)
+                Copy(ViewModel.SelectedNbts);
+        }
+
+        private void Paste()
+        {
+            var parent = ViewModel.SelectedNbt as INbtContainer;
+            if (parent != null)
+                Paste(parent);
+        }
+
+        private void Rename()
+        {
+            var tag = ViewModel?.SelectedNbt;
+            if (tag == null) return;
+            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
+        }
+
+        private void Edit()
+        {
+            var tag = ViewModel?.SelectedNbt;
+            if (tag == null) return;
+            EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+        }
+
+        private void EditSnbt()
+        { }
+
+        private void Delete()
+        {
+            foreach (var item in ViewModel.SelectedNbts.ToList())
+            {
+                item.Remove();
+            }
+        }
+
+        private void Find()
+        { }
+
+        private void AddTag(NbtTagType type)
+        {
+            var parent = ViewModel?.SelectedNbt as INbtContainer;
+            if (parent == null) return;
+            var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
+            if (tag != null)
+                parent.Add(tag);
+        }
+
+        private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
+        {
+            var buttons = new Dictionary<NbtTagType, ToolStripButton>();
+            foreach (var type in INbt.NormalTagTypes())
+            {
+                var button = new ToolStripButton(
+                    text: $"Add {INbt.TagTypeName(type)} Tag",
+                    image: INbt.TagTypeImage(type),
+                    onClick: (s, e) => AddTag(type));
+                button.DisplayStyle = ToolStripItemDisplayStyle.Image;
+                buttons.Add(type, button);
+            }
+            return buttons;
         }
 
         private void OpenFolder(string path)
@@ -145,14 +257,6 @@ namespace NbtExplorer2.UI
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo) == DialogResult.Yes;
         }
 
-        private void ToolDelete_Click(object sender, EventArgs e)
-        {
-            foreach (var item in ViewModel.SelectedNbts.ToList())
-            {
-                item.Remove();
-            }
-        }
-
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
             var tag = ViewModel?.SelectedNbt;
@@ -161,14 +265,14 @@ namespace NbtExplorer2.UI
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
             }
-            ToolSort.Enabled = tag is INbtCompound;
-            ToolCut.Enabled = tag != null;
-            ToolCopy.Enabled = tag != null;
-            ToolPaste.Enabled = container != null;
-            ToolDelete.Enabled = tag != null;
-            ToolRename.Enabled = tag != null;
-            ToolEdit.Enabled = tag != null;
-            ToolEditSnbt.Enabled = tag != null;
+            ActionSort.Enabled = tag is INbtCompound;
+            ActionCut.Enabled = tag != null;
+            ActionCopy.Enabled = tag != null;
+            ActionPaste.Enabled = container != null;
+            ActionDelete.Enabled = tag != null;
+            ActionRename.Enabled = tag != null;
+            ActionEdit.Enabled = tag != null;
+            ActionEditSnbt.Enabled = tag != null;
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
@@ -176,41 +280,6 @@ namespace NbtExplorer2.UI
             var tag = ViewModel?.SelectedNbt;
             if (tag != null && INbt.IsValueType(tag.TagType))
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-        }
-
-        private void ToolSave_Click(object sender, EventArgs e)
-        {
-            // temporary test
-            var file = (NbtFile)NbtTree.SelectedNode.Tag;
-            file.SaveAs(Path.Combine(Path.GetDirectoryName(file.Path), "test.nbt"), file.ExportSettings);
-        }
-
-        private void ToolRefresh_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void MenuSaveAs_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ToolCut_Click(object sender, EventArgs e)
-        {
-            if (ViewModel?.SelectedNbt != null)
-            {
-                Copy(ViewModel.SelectedNbts);
-                foreach (var item in ViewModel.SelectedNbts.ToList())
-                {
-                    item.Remove();
-                }
-            }
-        }
-
-        private void ToolCopy_Click(object sender, EventArgs e)
-        {
-            if (ViewModel?.SelectedNbt != null)
-                Copy(ViewModel.SelectedNbts);
         }
 
         private void Copy(IEnumerable<INbtTag> objects)
@@ -226,18 +295,6 @@ namespace NbtExplorer2.UI
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
                     INbt.TransformAdd(tag.Adapt(), destination);
             }
-        }
-
-        private void ToolPaste_Click(object sender, EventArgs e)
-        {
-            var parent = ViewModel.SelectedNbt as INbtContainer;
-            if (parent != null)
-                Paste(parent);
-        }
-
-        private void ToolEditSnbt_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -294,13 +351,6 @@ namespace NbtExplorer2.UI
             {
                 INbt.TransformInsert(tag, insert.Item1, insert.Item2);
             }
-        }
-
-        private void ToolSort_Click(object sender, EventArgs e)
-        {
-            var tag = ViewModel?.SelectedNbt as INbtCompound;
-            if (tag == null) return;
-            INbt.Sort(tag, new INbt.TagTypeSorter(), true);
         }
     }
 }

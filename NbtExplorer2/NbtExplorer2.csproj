@@ -60,6 +60,7 @@
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />
+    <Compile Include="UI\DualMenuItem.cs" />
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
