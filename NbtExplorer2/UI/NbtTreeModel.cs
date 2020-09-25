@@ -27,7 +27,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrap(this, View.SelectedNode.Tag, View.SelectedNode.Parent?.Tag);
+                return NotifyWrap(this, View.SelectedNode.Tag);
             }
         }
         public IEnumerable<INotifyNode> SelectedObjects
@@ -36,7 +36,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNodes == null)
                     return Enumerable.Empty<INotifyNode>();
-                return View.SelectedNodes.Select(x => NotifyWrap(this, x.Tag, x.Parent?.Tag));
+                return View.SelectedNodes.Select(x => NotifyWrap(this, x.Tag));
             }
         }
         public INotifyNbt SelectedNbt
@@ -45,7 +45,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrapNbt(this, View.SelectedNode.Tag, View.SelectedNode.Parent?.Tag, INbt.GetNbt(View.SelectedNode.Tag));
+                return NotifyWrapNbt(this, View.SelectedNode.Tag, INbt.GetNbt(View.SelectedNode.Tag));
             }
         }
         public IEnumerable<INotifyNbt> SelectedNbts
@@ -54,7 +54,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNodes == null)
                     Enumerable.Empty<INotifyNbt>();
-                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, x.Parent?.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
             }
         }
 
@@ -75,7 +75,7 @@ namespace NbtExplorer2.UI
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return Enumerable.Empty<INotifyNbt>();
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, x.Parent?.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
+            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, INbt.GetNbt(x.Tag))).Where(x => x != null);
         }
         public INbtTag DropTag
         {
@@ -83,7 +83,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.DropPosition.Node == null)
                     return null;
-                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, View.DropPosition.Node.Parent?.Tag, INbt.GetNbt(View.DropPosition.Node.Tag));
+                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, INbt.GetNbt(View.DropPosition.Node.Tag));
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
@@ -94,10 +94,10 @@ namespace NbtExplorer2.UI
 #if DEBUG
             Console.WriteLine($"changed: {changed.GetType()}");
 #endif
-            var path = GetPath(changed);
-            if (path == null) return;
+            var node = FindNodeByObject(changed);
+            if (node == null) return;
+            var path = View.GetPath(node);
             HasUnsavedChanges = true;
-            var node = View.FindNodeByTag(changed);
 
             var real_children = GetChildren(path).ToList();
             var current_children = node == null ? new TreeNodeAdv[0] : node.Children.Select(x => x.Tag).ToArray();
@@ -111,29 +111,24 @@ namespace NbtExplorer2.UI
                 NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
         }
 
-        private TreePath GetPath(object item)
+        private TreeNodeAdv FindNodeByObject(object obj)
         {
-            var node = View.FindNodeByTag(item);
-            if (node != null)
-                return View.GetPath(node);
-            return GetPathSlow(item);
-        }
-
-        private TreePath GetPathSlow(object item)
-        {
-#if DEBUG
-            Console.WriteLine($"Slowly looking for {item.GetType()}");
-#endif
-            var queue = new Queue<TreePath>();
-            queue.Enqueue(new TreePath());
+            var quick = View.FindNodeByTag(obj);
+            if (quick != null)
+                return quick;
+            // breadth-first search, scan tree for the object
+            var queue = new Queue<TreeNodeAdv>();
+            queue.Enqueue(View.Root);
             while (queue.Any())
             {
-                var current = queue.Dequeue();
-                if (current.LastNode == item)
-                    return current;
-                foreach (var child in GetChildren(current))
+                var item = queue.Dequeue();
+                // notifiers can't tell whether they were added to a file that's being treated as a compound
+                // so here we disambiguate them
+                if (item.Tag is NbtFile file && file.RootTag == obj)
+                    return item;
+                foreach (var sub in item.Children)
                 {
-                    queue.Enqueue(new TreePath(current, child));
+                    queue.Enqueue(sub);
                 }
             }
             return null;

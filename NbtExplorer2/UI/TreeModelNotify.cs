@@ -10,43 +10,43 @@ namespace NbtExplorer2.UI
 {
     public partial class NbtTreeModel
     {
-        private static INotifyNode NotifyWrap(NbtTreeModel tree, object obj, object parent)
+        private static INotifyNode NotifyWrap(NbtTreeModel tree, object obj)
         {
             if (obj is NbtTag tag)
-                return NotifyWrapNbt(tree, obj, parent, tag);
+                return NotifyWrapNbt(tree, obj, tag);
             if (obj is NbtFile file)
-                return new NotifyNbtFile(file, tree, obj, parent);
+                return new NotifyNbtFile(file, tree, obj);
             throw new ArgumentException($"Can't notify wrap {obj.GetType()}");
         }
 
-        private static INotifyNbt NotifyWrapNbt(NbtTreeModel tree, object original, object parent, NbtTag tag)
+        private static INotifyNbt NotifyWrapNbt(NbtTreeModel tree, object original, NbtTag tag)
         {
             if (tag == null)
                 return null;
             if (tag is NbtByte b)
-                return new NotifyNbtByte(b, tree, original, parent);
+                return new NotifyNbtByte(b, tree, original);
             if (tag is NbtShort s)
-                return new NotifyNbtShort(s, tree, original, parent);
+                return new NotifyNbtShort(s, tree, original);
             if (tag is NbtInt i)
-                return new NotifyNbtInt(i, tree, original, parent);
+                return new NotifyNbtInt(i, tree, original);
             if (tag is NbtLong l)
-                return new NotifyNbtLong(l, tree, original, parent);
+                return new NotifyNbtLong(l, tree, original);
             if (tag is NbtFloat f)
-                return new NotifyNbtFloat(f, tree, original, parent);
+                return new NotifyNbtFloat(f, tree, original);
             if (tag is NbtDouble d)
-                return new NotifyNbtDouble(d, tree, original, parent);
+                return new NotifyNbtDouble(d, tree, original);
             if (tag is NbtString str)
-                return new NotifyNbtString(str, tree, original, parent);
+                return new NotifyNbtString(str, tree, original);
             if (tag is NbtByteArray ba)
-                return new NotifyNbtByteArray(ba, tree, original, parent);
+                return new NotifyNbtByteArray(ba, tree, original);
             if (tag is NbtIntArray ia)
-                return new NotifyNbtIntArray(ia, tree, original, parent);
+                return new NotifyNbtIntArray(ia, tree, original);
             if (tag is NbtLongArray la)
-                return new NotifyNbtLongArray(la, tree, original, parent);
+                return new NotifyNbtLongArray(la, tree, original);
             if (tag is NbtCompound compound)
-                return new NotifyNbtCompound(compound, tree, original, parent);
+                return new NotifyNbtCompound(compound, tree, original);
             if (tag is NbtList list)
-                return new NotifyNbtList(list, tree, original, parent);
+                return new NotifyNbtList(list, tree, original);
             throw new ArgumentException($"Can't notify wrap {tag.GetType()}");
         }
 
@@ -60,29 +60,26 @@ namespace NbtExplorer2.UI
         {
             private readonly NbtTreeModel Tree;
             private readonly object SourceObject;
-            private readonly object ParentObject;
-            protected NotifyNode(NbtTreeModel tree, object source, object parent)
+            protected NotifyNode(NbtTreeModel tree, object source)
             {
                 Tree = tree;
                 SourceObject = source;
-                ParentObject = parent;
             }
             protected void Notify()
             {
                 Tree.Notify(SourceObject);
             }
-            protected void NotifyParent()
+            protected void Notify(object obj)
             {
-                if (ParentObject != null)
-                    Tree.Notify(ParentObject);
+                Tree.Notify(obj);
             }
-            protected INotifyNbt Wrap(NbtTag tag, NbtTag parent) => NotifyWrapNbt(Tree, tag, parent, tag);
+            protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
         }
 
         public class NotifyNbtFile : NotifyNode
         {
             private readonly NbtFile File;
-            public NotifyNbtFile(NbtFile file, NbtTreeModel tree, object original, object parent) : base(tree, original, parent)
+            public NotifyNbtFile(NbtFile file, NbtTreeModel tree, object original) : base(tree, original)
             {
                 File = file;
             }
@@ -91,10 +88,10 @@ namespace NbtExplorer2.UI
         public abstract class NotifyNbtTag : NotifyNode, INotifyNbt
         {
             protected readonly NbtTag Tag;
-            public NotifyNbtTag(NbtTag tag, NbtTreeModel tree, object original, object parent) : base(tree, original, parent) { Tag = tag; }
+            public NotifyNbtTag(NbtTag tag, NbtTreeModel tree, object original) : base(tree, original) { Tag = tag; }
             public string Name { get => Tag.Name; set { Tag.Name = value; Notify(); } }
             public NbtTagType TagType => Tag.TagType;
-            public INbtContainer Parent => (INbtContainer)Wrap(Tag.Parent, Tag.Parent?.Parent);
+            public INbtContainer Parent => (INbtContainer)Wrap(Tag.Parent);
             public int Index
             {
                 get
@@ -108,25 +105,26 @@ namespace NbtExplorer2.UI
             }
             public void Remove()
             {
-                if (Tag.Parent is NbtCompound c)
+                var parent = Tag.Parent;
+                if (parent is NbtCompound c)
                     c.Remove(Tag);
-                else if (Tag.Parent is NbtList l)
+                else if (parent is NbtList l)
                     l.Remove(Tag);
-                NotifyParent();
+                Notify(parent);
             }
             public void AddTo(INbtContainer container)
             {
                 if (Tag.Parent != null)
                     Remove();
                 container.Add(Tag);
-                NotifyParent();
+                Notify(container);
             }
             public void InsertInto(INbtContainer container, int index)
             {
                 if (Tag.Parent != null)
                     Remove();
                 container.Insert(index, Tag);
-                NotifyParent();
+                Notify(container);
             }
             public bool IsInside(INbtContainer container) => container.Contains(Tag);
         }
@@ -134,78 +132,78 @@ namespace NbtExplorer2.UI
         public class NotifyNbtByte : NotifyNbtTag, INbtByte
         {
             private new NbtByte Tag => (NbtByte)base.Tag;
-            public NotifyNbtByte(NbtByte tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtByte(NbtByte tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public byte Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtShort : NotifyNbtTag, INbtShort
         {
             private new NbtShort Tag => (NbtShort)base.Tag;
-            public NotifyNbtShort(NbtShort tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtShort(NbtShort tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public short Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtInt : NotifyNbtTag, INbtInt
         {
             private new NbtInt Tag => (NbtInt)base.Tag;
-            public NotifyNbtInt(NbtInt tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtInt(NbtInt tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public int Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtLong : NotifyNbtTag, INbtLong
         {
             private new NbtLong Tag => (NbtLong)base.Tag;
-            public NotifyNbtLong(NbtLong tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtLong(NbtLong tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public long Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtFloat : NotifyNbtTag, INbtFloat
         {
             private new NbtFloat Tag => (NbtFloat)base.Tag;
-            public NotifyNbtFloat(NbtFloat tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtFloat(NbtFloat tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public float Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtDouble : NotifyNbtTag, INbtDouble
         {
             private new NbtDouble Tag => (NbtDouble)base.Tag;
-            public NotifyNbtDouble(NbtDouble tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtDouble(NbtDouble tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public double Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtString : NotifyNbtTag, INbtString
         {
             private new NbtString Tag => (NbtString)base.Tag;
-            public NotifyNbtString(NbtString tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtString(NbtString tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public string Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtByteArray : NotifyNbtTag, INbtByteArray
         {
             private new NbtByteArray Tag => (NbtByteArray)base.Tag;
-            public NotifyNbtByteArray(NbtByteArray tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtByteArray(NbtByteArray tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public byte[] Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtIntArray : NotifyNbtTag, INbtIntArray
         {
             private new NbtIntArray Tag => (NbtIntArray)base.Tag;
-            public NotifyNbtIntArray(NbtIntArray tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtIntArray(NbtIntArray tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public int[] Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtLongArray : NotifyNbtTag, INbtLongArray
         {
             private new NbtLongArray Tag => (NbtLongArray)base.Tag;
-            public NotifyNbtLongArray(NbtLongArray tag, NbtTreeModel tree, object original, object parent) : base(tag, tree, original, parent) { }
+            public NotifyNbtLongArray(NbtLongArray tag, NbtTreeModel tree, object original) : base(tag, tree, original) { }
             public long[] Value { get => Tag.Value; set { Tag.Value = value; Notify(); } }
         }
 
         public class NotifyNbtList : NotifyNbtTag, INbtList
         {
             private NbtList List => (NbtList)base.Tag;
-            public NotifyNbtList(NbtList list, NbtTreeModel tree, object original, object parent) : base(list, tree, original, parent) { }
-            public INbtTag this[int index] => Wrap(List[index], List);
+            public NotifyNbtList(NbtList list, NbtTreeModel tree, object original) : base(list, tree, original) { }
+            public INbtTag this[int index] => Wrap(List[index]);
             public int Count => List.Count;
             public NbtTagType ListType => List.ListType;
             public bool CanAdd(NbtTagType type) => List.Count == 0 || List.ListType == type;
@@ -215,16 +213,16 @@ namespace NbtExplorer2.UI
             public void Clear() { List.Clear(); Notify(); }
             public bool Contains(NbtTag tag) => List.Contains(tag);
             public bool Remove(NbtTag tag) { if (List.Remove(tag)) { Notify(); return true; } return false; }
-            public IEnumerator<INbtTag> GetEnumerator() => List.Select(x => Wrap(x, List)).GetEnumerator();
+            public IEnumerator<INbtTag> GetEnumerator() => List.Select(Wrap).GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         public class NotifyNbtCompound : NotifyNbtTag, INbtCompound
         {
             private NbtCompound Compound => (NbtCompound)base.Tag;
-            public NotifyNbtCompound(NbtCompound compound, NbtTreeModel tree, object original, object parent) : base(compound, tree, original, parent) { }
+            public NotifyNbtCompound(NbtCompound compound, NbtTreeModel tree, object original) : base(compound, tree, original) { }
             public int Count => Compound.Count;
-            public IEnumerable<INbtTag> Tags => Compound.Tags.Select(x => Wrap(x, Compound));
+            public IEnumerable<INbtTag> Tags => Compound.Tags.Select(Wrap);
             public bool CanAdd(NbtTagType type) => true;
             public void Add(NbtTag tag) { Compound.Add(tag); Notify(); }
             public void AddRange(IEnumerable<NbtTag> tags) { Compound.AddRange(tags); Notify(); }
