@@ -91,19 +91,7 @@ namespace NbtExplorer2
 
         public void Save()
         {
-            if (ExportSettings.Snbt)
-                File.WriteAllText(Path, RootTag.Adapt().ToSnbt(expanded: !ExportSettings.Minified));
-            else
-            {
-                var file = new fNbt.NbtFile();
-                file.BigEndian = ExportSettings.BigEndian;
-                file.RootTag = RootTag;
-                using (var writer = File.OpenWrite(Path))
-                {
-                    writer.Write(ExportSettings.Header, 0, ExportSettings.Header.Length);
-                    file.SaveToStream(writer, ExportSettings.Compression);
-                }
-            }
+            ExportSettings.Export(RootTag);
         }
 
         public void SaveAs(string path, ExportSettings settings)
