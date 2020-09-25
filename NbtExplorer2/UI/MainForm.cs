@@ -245,7 +245,11 @@ namespace NbtExplorer2.UI
         }
 
         private void EditSnbt()
-        { }
+        {
+            var tag = ViewModel?.SelectedNbt;
+            if (tag == null) return;
+            //EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
+        }
 
         private void Delete()
         {

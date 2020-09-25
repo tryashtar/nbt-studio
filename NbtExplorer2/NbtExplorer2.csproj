@@ -61,6 +61,12 @@
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />
     <Compile Include="UI\DualMenuItem.cs" />
+    <Compile Include="UI\EditSnbtWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditSnbtWindow.Designer.cs">
+      <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,6 +100,9 @@
     </Compile>
     <Compile Include="UI\TreeModelNotify.cs" />
     <Compile Include="Util.cs" />
+    <EmbeddedResource Include="UI\EditSnbtWindow.resx">
+      <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
     </EmbeddedResource>
