@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using NbtExplorer2.SNBT;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace NbtExplorer2.UI
@@ -10,6 +11,7 @@ namespace NbtExplorer2.UI
         private INbtTag WorkingTag;
         private readonly INbtContainer TagParent;
         private readonly bool SettingName;
+        public bool CheckWhileTyping = false;
 
         public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name)
         {
@@ -143,6 +145,35 @@ namespace NbtExplorer2.UI
                 MinifyCheck.Checked ^= true;
                 MinifyCheck.CheckedChanged += MinifyCheck_CheckedChanged;
             }
+        }
+
+        private void InputBox_TextChanged(object sender, EventArgs e)
+        {
+            if (!CheckWhileTyping)
+                return;
+            bool valid = true;
+            InputBox.BackColor = SystemColors.Window;
+            try
+            {
+                var tag = ParseTag();
+                var required = RequiredType();
+                if (required != null && tag.TagType != required)
+                    valid = false;
+            }
+            catch
+            {
+                valid = false;
+            }
+            if (!valid)
+                InputBox.BackColor = Blend(Color.Red, SystemColors.Window, 0.1);
+        }
+
+        private static Color Blend(Color color, Color backColor, double amount)
+        {
+            byte r = (byte)((color.R * amount) + backColor.R * (1 - amount));
+            byte g = (byte)((color.G * amount) + backColor.G * (1 - amount));
+            byte b = (byte)((color.B * amount) + backColor.B * (1 - amount));
+            return Color.FromArgb(r, g, b);
         }
     }
 }

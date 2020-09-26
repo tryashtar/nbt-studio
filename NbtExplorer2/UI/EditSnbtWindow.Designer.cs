@@ -52,6 +52,7 @@
             this.InputBox.Size = new System.Drawing.Size(624, 365);
             this.InputBox.TabIndex = 4;
             this.InputBox.WordWrap = false;
+            this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
             // 
             // ButtonCancel
             // 
