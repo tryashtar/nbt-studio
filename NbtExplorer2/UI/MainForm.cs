@@ -41,10 +41,12 @@ namespace NbtExplorer2.UI
         private readonly ToolStripMenuItem ActionSaveAs = DualMenuItem.Single("Save &As", Properties.Resources.action_save_image, Keys.Control | Keys.Shift | Keys.S);
         private readonly DualMenuItem ActionRefresh = new DualMenuItem("&Refresh", "Refresh", Properties.Resources.action_refresh_image, Keys.F5);
         private readonly ToolStripButton ActionSort = DualMenuItem.Single("Sort", Properties.Resources.action_sort_image);
+        private readonly ToolStripMenuItem ActionUndo = DualMenuItem.Single("&Undo", Properties.Resources.action_undo_image, Keys.Control | Keys.Z);
+        private readonly ToolStripMenuItem ActionRedo = DualMenuItem.Single("&Redo", Properties.Resources.action_redo_image, Keys.Control | Keys.Shift | Keys.Z);
         private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", Properties.Resources.action_cut_image, Keys.Control | Keys.X);
         private readonly DualMenuItem ActionCopy = new DualMenuItem("&Copy", "Copy", Properties.Resources.action_copy_image, Keys.Control | Keys.C);
         private readonly DualMenuItem ActionPaste = new DualMenuItem("&Paste", "Paste", Properties.Resources.action_paste_image, Keys.Control | Keys.V);
-        private readonly DualMenuItem ActionRename = new DualMenuItem("&Rename", "Rename", Properties.Resources.action_rename_image, Keys.F2);
+        private readonly DualMenuItem ActionRename = new DualMenuItem("Re&name", "Rename", Properties.Resources.action_rename_image, Keys.F2);
         private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", Properties.Resources.action_edit_image, Keys.Control | Keys.E);
         private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
@@ -65,6 +67,8 @@ namespace NbtExplorer2.UI
             ActionSaveAs.Click += (s, e) => SaveAs();
             ActionRefresh.Click += (s, e) => DoRefresh();
             ActionSort.Click += (s, e) => Sort();
+            ActionUndo.Click += (s, e) => Undo();
+            ActionRedo.Click += (s, e) => Redo();
             ActionCut.Click += (s, e) => Cut();
             ActionCopy.Click += (s, e) => Copy();
             ActionPaste.Click += (s, e) => Paste();
@@ -84,6 +88,9 @@ namespace NbtExplorer2.UI
             ActionRefresh.AddTo(Tools, MenuFile);
             Tools.Items.Add(ActionSort);
             Tools.Items.Add(new ToolStripSeparator());
+            MenuEdit.DropDownItems.Add(ActionUndo);
+            MenuEdit.DropDownItems.Add(ActionRedo);
+            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             ActionCut.AddTo(Tools, MenuEdit);
             ActionCopy.AddTo(Tools, MenuEdit);
             ActionPaste.AddTo(Tools, MenuEdit);
@@ -206,7 +213,19 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt as INbtCompound;
             if (tag == null) return;
+            ViewModel.StartBatchOperation();
             NbtUtil.Sort(tag, new NbtUtil.TagTypeSorter(), true);
+            ViewModel.FinishBatchOperation();
+        }
+
+        private void Undo()
+        {
+            ViewModel.Undo();
+        }
+
+        private void Redo()
+        {
+            ViewModel.Redo();
         }
 
         private void Cut()
@@ -214,10 +233,12 @@ namespace NbtExplorer2.UI
             if (ViewModel?.SelectedNbt != null)
             {
                 Copy(ViewModel.SelectedNbts);
+                ViewModel.StartBatchOperation();
                 foreach (var item in ViewModel.SelectedNbts.ToList())
                 {
                     item.Remove();
                 }
+                ViewModel.FinishBatchOperation();
             }
         }
 
@@ -257,10 +278,12 @@ namespace NbtExplorer2.UI
 
         private void Delete()
         {
+            ViewModel.StartBatchOperation();
             foreach (var item in ViewModel.SelectedNbts.ToList())
             {
                 item.Remove();
             }
+            ViewModel.FinishBatchOperation();
         }
 
         private void Find()
@@ -346,6 +369,8 @@ namespace NbtExplorer2.UI
             ActionSave.Enabled = ViewModel?.HasUnsavedChanges ?? false;
             ActionSaveAs.Enabled = ViewModel != null;
             ActionRefresh.Enabled = ViewModel != null;
+            ActionUndo.Enabled = ViewModel?.CanUndo ?? false;
+            ActionRedo.Enabled = ViewModel?.CanRedo ?? false;
             NbtTree_SelectionChanged(sender, e);
         }
 
@@ -364,11 +389,13 @@ namespace NbtExplorer2.UI
         private void Paste(INbtContainer destination)
         {
             var snbts = Clipboard.GetText().Split('\n');
+            ViewModel.StartBatchOperation();
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
                     NbtUtil.TransformAdd(tag.Adapt(), destination);
             }
+            ViewModel.FinishBatchOperation();
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -420,11 +447,13 @@ namespace NbtExplorer2.UI
         {
             var insert = NbtUtil.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return;
+            ViewModel.StartBatchOperation();
             // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
             foreach (var tag in tags.Reverse().ToList())
             {
                 NbtUtil.TransformInsert(tag, insert.Item1, insert.Item2);
             }
+            ViewModel.FinishBatchOperation();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

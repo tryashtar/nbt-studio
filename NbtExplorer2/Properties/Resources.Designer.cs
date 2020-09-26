@@ -263,6 +263,26 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon action_redo_icon {
+            get {
+                object obj = ResourceManager.GetObject("action_redo_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap action_redo_image {
+            get {
+                object obj = ResourceManager.GetObject("action_redo_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon action_refresh_icon {
             get {
                 object obj = ResourceManager.GetObject("action_refresh_icon", resourceCulture);
@@ -356,6 +376,26 @@ namespace NbtExplorer2.Properties {
         internal static System.Drawing.Bitmap action_sort_image {
             get {
                 object obj = ResourceManager.GetObject("action_sort_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon action_undo_icon {
+            get {
+                object obj = ResourceManager.GetObject("action_undo_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap action_undo_image {
+            get {
+                object obj = ResourceManager.GetObject("action_undo_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

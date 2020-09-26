@@ -22,6 +22,7 @@ namespace NbtExplorer2.UI
         public bool HasUnsavedChanges { get => _HasUnsavedChanges; private set { _HasUnsavedChanges = value; Changed?.Invoke(this, EventArgs.Empty); } }
         private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
+        private readonly Stack<Action> UndoStack = new Stack<Action>();
 
         public INotifyNode SelectedObject
         {
@@ -162,6 +163,50 @@ namespace NbtExplorer2.UI
                 }
             }
             return null;
+        }
+
+        private void PushUndo(Action action)
+        {
+            if (BatchNumber == 0)
+                UndoStack.Push(action);
+            else
+                UndoBatch.Push(action);
+        }
+
+        public void Undo()
+        {
+            if (UndoStack.Any())
+                UndoStack.Pop()(); // haha
+        }
+
+        public void Redo()
+        {
+
+        }
+
+        public bool CanUndo => UndoStack.Any();
+        public bool CanRedo => false;
+
+        private int BatchNumber = 0;
+        private readonly Stack<Action> UndoBatch = new Stack<Action>();
+        // call this and then do things that signal undos, then call FinishBatchOperation to merge all those undos into one
+        public void StartBatchOperation()
+        {
+            BatchNumber++;
+        }
+
+        public void FinishBatchOperation()
+        {
+            BatchNumber--;
+            if (BatchNumber == 0 && UndoBatch.Any())
+            {
+                var merged_action = UndoBatch.Pop();
+                while (UndoBatch.Any())
+                {
+                    merged_action += UndoBatch.Pop();
+                }
+                UndoStack.Push(merged_action);
+            }
         }
 
         IEnumerable ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);

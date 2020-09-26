@@ -311,5 +311,17 @@
   <ItemGroup>
     <None Include="Resources\action_add_snbt_image.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_redo_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_undo_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_redo_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_undo_image.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
