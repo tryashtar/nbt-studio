@@ -233,12 +233,7 @@ namespace NbtExplorer2.UI
             if (ViewModel?.SelectedNbt != null)
             {
                 Copy(ViewModel.SelectedNbts);
-                ViewModel.StartBatchOperation();
-                foreach (var item in ViewModel.SelectedNbts.ToList())
-                {
-                    item.Remove();
-                }
-                ViewModel.FinishBatchOperation();
+                Delete();
             }
         }
 
@@ -278,12 +273,19 @@ namespace NbtExplorer2.UI
 
         private void Delete()
         {
+            var selected = NbtTree.SelectedNodes;
+            var nexts = selected.Select(x => x.NextNode).Where(x => x != null).ToList();
+            var prevs = selected.Select(x => x.PreviousNode).Where(x => x != null).ToList();
+            var parents = selected.Select(x => x.Parent).Where(x => x != null).ToList();
             ViewModel.StartBatchOperation();
             foreach (var item in ViewModel.SelectedNbts.ToList())
             {
                 item.Remove();
             }
             ViewModel.FinishBatchOperation();
+            var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
+            if (select_next != null)
+                select_next.IsSelected = true;
         }
 
         private void Find()

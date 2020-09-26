@@ -139,7 +139,7 @@ namespace NbtExplorer2.UI
             HasUnsavedChanges = true;
 
             var real_children = GetChildren(path).ToList();
-            var current_children = node == null ? new TreeNodeAdv[0] : node.Children.Select(x => x.Tag).ToArray();
+            var current_children = node.Children.Select(x => x.Tag).ToArray();
             var remove = current_children.Except(real_children).ToArray();
             var add = real_children.Except(current_children).ToArray();
 
