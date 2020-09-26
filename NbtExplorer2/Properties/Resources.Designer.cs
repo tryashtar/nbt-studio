@@ -63,6 +63,26 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon action_add_snbt_icon {
+            get {
+                object obj = ResourceManager.GetObject("action_add_snbt_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap action_add_snbt_image {
+            get {
+                object obj = ResourceManager.GetObject("action_add_snbt_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon action_copy_icon {
             get {
                 object obj = ResourceManager.GetObject("action_copy_icon", resourceCulture);

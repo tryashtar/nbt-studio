@@ -49,6 +49,7 @@ namespace NbtExplorer2.UI
         private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
+        private readonly ToolStripButton ActionAddSnbt = DualMenuItem.Single("Add as SNBT", Properties.Resources.action_add_snbt_image);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -72,6 +73,7 @@ namespace NbtExplorer2.UI
             ActionEditSnbt.Click += (s, e) => EditSnbt();
             ActionDelete.Click += (s, e) => Delete();
             ActionFind.Click += (s, e) => Find();
+            ActionAddSnbt.Click += (s, e) => AddSnbt();
 
             ActionNew.AddTo(Tools, MenuFile);
             ActionOpenFile.AddTo(Tools, MenuFile);
@@ -91,12 +93,14 @@ namespace NbtExplorer2.UI
             ActionEdit.AddTo(Tools, MenuEdit);
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
+            Tools.Items.Add(new ToolStripSeparator());
 
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
             {
                 Tools.Items.Add(item);
             }
+            Tools.Items.Add(ActionAddSnbt);
 
             Tools.Items.Add(new ToolStripSeparator());
             ActionFind.AddTo(Tools, MenuSearch);
@@ -260,8 +264,10 @@ namespace NbtExplorer2.UI
         }
 
         private void Find()
+        { }
+
+        private void AddSnbt()
         {
-            // temporary test
             var parent = ViewModel?.SelectedNbt as INbtContainer;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
@@ -332,6 +338,7 @@ namespace NbtExplorer2.UI
             ActionRename.Enabled = tag != null;
             ActionEdit.Enabled = tag != null;
             ActionEditSnbt.Enabled = tag != null;
+            ActionAddSnbt.Enabled = container != null;
         }
 
         private void ViewModel_Changed(object sender, EventArgs e)

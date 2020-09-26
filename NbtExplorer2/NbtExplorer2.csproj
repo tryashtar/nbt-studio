@@ -144,12 +144,6 @@
     <None Include="Resources\action_edit_image.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\action_edit_snbt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\action_edit_snbt_image.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\action_new_icon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +298,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\action_sort_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_add_snbt_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_add_snbt_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

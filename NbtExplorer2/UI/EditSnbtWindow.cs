@@ -29,7 +29,7 @@ namespace NbtExplorer2.UI
             }
             if (required == null)
             {
-                this.Icon = Properties.Resources.action_edit_snbt_icon;
+                this.Icon = Properties.Resources.action_add_snbt_icon;
                 this.Text = "Create Tag as SNBT";
             }
             else
