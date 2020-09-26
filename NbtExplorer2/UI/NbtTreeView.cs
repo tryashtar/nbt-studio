@@ -79,6 +79,24 @@ namespace NbtExplorer2.UI
             return (TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]));
         }
 
+        public IEnumerable<TreeNodeAdv> BreadthFirstSearch() => BreadthFirstSearch(x => true);
+        public IEnumerable<TreeNodeAdv> BreadthFirstSearch(Predicate<object> predicate)
+        {
+            var queue = new Queue<TreeNodeAdv>();
+            queue.Enqueue(Root);
+            while (queue.Any())
+            {
+                var item = queue.Dequeue();
+                if (!predicate(item))
+                    continue;
+                yield return item;
+                foreach (var sub in item.Children)
+                {
+                    queue.Enqueue(sub);
+                }
+            }
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (SelectedNode != null)

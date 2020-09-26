@@ -75,23 +75,10 @@ namespace NbtExplorer2.UI
         {
             get
             {
-                var queue = new Queue<TreeNodeAdv>();
-                foreach (var item in View.Root.Children)
+                foreach (var item in View.BreadthFirstSearch(x => x is NbtFile || x is NbtFolder))
                 {
-                    queue.Enqueue(item);
-                }
-                while (queue.Any())
-                {
-                    var item = queue.Dequeue();
                     if (item.Tag is NbtFile file)
                         yield return NotifyWrapFile(this, file);
-                    else if (item.Tag is NbtFolder)
-                    {
-                        foreach (var sub in item.Children)
-                        {
-                            queue.Enqueue(sub);
-                        }
-                    }
                 }
             }
         }
@@ -158,20 +145,12 @@ namespace NbtExplorer2.UI
             var quick = View.FindNodeByTag(obj);
             if (quick != null)
                 return quick;
-            // breadth-first search, scan tree for the object
-            var queue = new Queue<TreeNodeAdv>();
-            queue.Enqueue(View.Root);
-            while (queue.Any())
+            foreach (var item in View.BreadthFirstSearch())
             {
-                var item = queue.Dequeue();
                 // notifiers can't tell whether they were added to a file that's being treated as a compound
                 // so here we disambiguate them
                 if (item.Tag is NbtFile file && file.RootTag == obj)
                     return item;
-                foreach (var sub in item.Children)
-                {
-                    queue.Enqueue(sub);
-                }
             }
             return null;
         }
