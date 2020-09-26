@@ -339,6 +339,7 @@ namespace NbtExplorer2.UI
             ActionSave.Enabled = ViewModel?.HasUnsavedChanges ?? false;
             ActionSaveAs.Enabled = ViewModel != null;
             ActionRefresh.Enabled = ViewModel != null;
+            NbtTree_SelectionChanged(sender, e);
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)

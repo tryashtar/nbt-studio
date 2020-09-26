@@ -18,20 +18,24 @@ namespace NbtExplorer2.UI
             WorkingTag = tag;
             TagParent = parent;
             SettingName = set_name;
+            var required = RequiredType();
 
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
-            if (tag == null)
+            if (tag != null)
+            {
+                NameBox.Text = tag.Name;
+                InputBox.Text = tag.ToSnbt(expanded: true);
+            }
+            if (required == null)
             {
                 this.Icon = Properties.Resources.action_edit_snbt_icon;
-                this.Text = $"Create Tag as SNBT";
+                this.Text = "Create Tag as SNBT";
             }
             else
             {
-                this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
-                this.Text = $"Edit {NbtUtil.TagTypeName(tag.TagType)} Tag as SNBT";
-                NameBox.Text = tag.Name;
-                InputBox.Text = tag.ToSnbt(expanded: true);
+                this.Icon = NbtUtil.TagTypeIcon(required.Value);
+                this.Text = tag == null ? $"Create {NbtUtil.TagTypeName(required.Value)} Tag as SNBT" : $"Edit {NbtUtil.TagTypeName(required.Value)} Tag as SNBT";
             }
         }
 
