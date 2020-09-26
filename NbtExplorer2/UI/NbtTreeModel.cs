@@ -181,7 +181,7 @@ namespace NbtExplorer2.UI
             if (BatchNumber == 0)
                 UndoStack.Push(action);
             else
-                UndoBatch.Push(action);
+                UndoBatch.Add(action);
 #if DEBUG
             Console.WriteLine($"Added undo. Undo stack has {UndoStack.Count} items");
 #endif
@@ -224,7 +224,7 @@ namespace NbtExplorer2.UI
         public bool CanRedo => RedoStack.Any();
 
         private int BatchNumber = 0;
-        private readonly Stack<UndoableAction> UndoBatch = new Stack<UndoableAction>();
+        private readonly List<UndoableAction> UndoBatch = new List<UndoableAction>();
         // call this and then do things that signal undos, then call FinishBatchOperation to merge all those undos into one
         public void StartBatchOperation()
         {
@@ -236,11 +236,7 @@ namespace NbtExplorer2.UI
             BatchNumber--;
             if (BatchNumber == 0 && UndoBatch.Any())
             {
-                var merged_action = UndoBatch.Pop();
-                while (UndoBatch.Any())
-                {
-                    merged_action.Add(UndoBatch.Pop());
-                }
+                var merged_action = UndoableAction.Merge(UndoBatch);
                 UndoStack.Push(merged_action);
             }
         }

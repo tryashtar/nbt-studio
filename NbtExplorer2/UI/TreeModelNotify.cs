@@ -153,7 +153,10 @@ namespace NbtExplorer2.UI
             {
                 if (Tag.Parent != null)
                     Remove();
-                PerformAction(
+                if (container is INotifyNbt)
+                    container.Add(Tag);
+                else
+                    PerformAction(
                     () => { container.Add(Tag); Notify(container); },
                     () => { container.Remove(Tag); Notify(container); });
             }
@@ -161,9 +164,12 @@ namespace NbtExplorer2.UI
             {
                 if (Tag.Parent != null)
                     Remove();
-                PerformAction(
-                    () => { container.Insert(index, Tag); Notify(container); },
-                    () => { container.Remove(Tag); Notify(container); });
+                if (container is INotifyNbt)
+                    container.Insert(index, Tag);
+                else
+                    PerformAction(
+                        () => { container.Insert(index, Tag); Notify(container); },
+                        () => { container.Remove(Tag); Notify(container); });
             }
             public bool IsInside(INbtContainer container) => container.Contains(Tag);
         }

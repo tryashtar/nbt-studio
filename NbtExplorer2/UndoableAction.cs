@@ -29,7 +29,18 @@ namespace NbtExplorer2
         public void Add(UndoableAction other)
         {
             DoAction += other.DoAction;
-            UndoAction += other.UndoAction;
+            UndoAction = other.UndoAction + UndoAction;
+        }
+
+        public static UndoableAction Merge(IEnumerable<UndoableAction> actions)
+        {
+            var first = actions.First();
+            var result = new UndoableAction(first.DoAction, first.UndoAction);
+            foreach (var action in actions.Skip(1))
+            {
+                result.Add(action);
+            }
+            return result;
         }
     }
 }
