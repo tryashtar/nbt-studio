@@ -9,12 +9,12 @@ namespace NbtExplorer2.UI
     public partial class EditTagWindow : Form
     {
         private readonly INbtTag WorkingTag;
-        private readonly INbtTag TagParent;
+        private readonly INbtContainer TagParent;
         private readonly bool SettingName;
         private readonly bool SettingValue;
         private readonly bool SettingSize;
 
-        private EditTagWindow(INbtTag tag, INbtTag parent, bool set_name, bool set_value, bool set_size, EditPurpose purpose)
+        private EditTagWindow(INbtTag tag, INbtContainer parent, bool set_name, bool set_value, bool set_size, EditPurpose purpose)
         {
             InitializeComponent();
 
@@ -55,7 +55,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        public static NbtTag CreateTag(NbtTagType type, INbtTag parent, bool bypass_window = false)
+        public static NbtTag CreateTag(NbtTagType type, INbtContainer parent, bool bypass_window = false)
         {
             bool has_name = parent is INbtCompound;
             bool has_value = NbtUtil.IsValueType(type);

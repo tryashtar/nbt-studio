@@ -32,6 +32,8 @@
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.MinifyCheck = new System.Windows.Forms.CheckBox();
+            this.NameLabel = new System.Windows.Forms.Label();
+            this.NameBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // InputBox
@@ -42,12 +44,12 @@
             this.InputBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.InputBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.InputBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.InputBox.Location = new System.Drawing.Point(12, 12);
+            this.InputBox.Location = new System.Drawing.Point(12, 34);
             this.InputBox.MaxLength = 2147483647;
             this.InputBox.Multiline = true;
             this.InputBox.Name = "InputBox";
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.InputBox.Size = new System.Drawing.Size(624, 387);
+            this.InputBox.Size = new System.Drawing.Size(624, 365);
             this.InputBox.TabIndex = 4;
             this.InputBox.WordWrap = false;
             // 
@@ -85,6 +87,26 @@
             this.MinifyCheck.UseVisualStyleBackColor = true;
             this.MinifyCheck.CheckedChanged += new System.EventHandler(this.MinifyCheck_CheckedChanged);
             // 
+            // NameLabel
+            // 
+            this.NameLabel.AutoSize = true;
+            this.NameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NameLabel.Location = new System.Drawing.Point(11, 10);
+            this.NameLabel.Name = "NameLabel";
+            this.NameLabel.Size = new System.Drawing.Size(44, 15);
+            this.NameLabel.TabIndex = 12;
+            this.NameLabel.Text = "Name:";
+            // 
+            // NameBox
+            // 
+            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NameBox.Location = new System.Drawing.Point(69, 7);
+            this.NameBox.Name = "NameBox";
+            this.NameBox.Size = new System.Drawing.Size(209, 21);
+            this.NameBox.TabIndex = 11;
+            // 
             // EditSnbtWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -92,6 +114,8 @@
             this.AutoScroll = true;
             this.CancelButton = this.ButtonCancel;
             this.ClientSize = new System.Drawing.Size(648, 440);
+            this.Controls.Add(this.NameLabel);
+            this.Controls.Add(this.NameBox);
             this.Controls.Add(this.MinifyCheck);
             this.Controls.Add(this.ButtonCancel);
             this.Controls.Add(this.ButtonOk);
@@ -113,5 +137,7 @@
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.CheckBox MinifyCheck;
+        private System.Windows.Forms.Label NameLabel;
+        private System.Windows.Forms.TextBox NameBox;
     }
 }

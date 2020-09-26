@@ -144,6 +144,8 @@ namespace NbtExplorer2.SNBT
             while (Reader.Peek() != Snbt.LIST_CLOSE)
             {
                 var tag = ReadValue();
+                if (arraytype != tag.TagType)
+                    throw new FormatException($"Array of type {arraytype} cannot contain tags of type {tag.TagType}");
                 if (arraytype == NbtTagType.Byte)
                     list.Add(tag.ByteValue);
                 else if (arraytype == NbtTagType.Long)

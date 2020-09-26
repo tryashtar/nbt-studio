@@ -65,13 +65,33 @@ namespace NbtExplorer2
             }
         }
 
-        public static NbtTag GetNbt(object obj)
+        public static object GetValue(INbtTag tag)
         {
-            if (obj is NbtFile file)
-                return file.RootTag;
-            if (obj is NbtTag tag)
-                return tag;
-            return null;
+            if (tag is INbtByte tag_byte)
+                return tag_byte.Value;
+            else if (tag is INbtShort tag_short)
+                return tag_short.Value;
+            else if (tag is INbtInt tag_int)
+                return tag_int.Value;
+            else if (tag is INbtLong tag_long)
+                return tag_long.Value;
+            else if (tag is INbtFloat tag_float)
+                return tag_float.Value;
+            else if (tag is INbtDouble tag_double)
+                return tag_double.Value;
+            else if (tag is INbtString tag_string)
+                return tag_string.Value;
+            else if (tag is INbtByteArray tag_ba)
+                return tag_ba.Value;
+            else if (tag is INbtIntArray tag_ia)
+                return tag_ia.Value;
+            else if (tag is INbtLongArray tag_la)
+                return tag_la.Value;
+            else if (tag is INbtCompound tag_compound)
+                return tag_compound.Tags;
+            else if (tag is INbtList tag_list)
+                return tag_list;
+            throw new ArgumentException($"Can't get value from {tag.TagType}");
         }
 
         public static void SetValue(INbtTag tag, object value)
@@ -90,6 +110,30 @@ namespace NbtExplorer2
                 tag_double.Value = d;
             else if (tag is INbtString tag_string && value is string str)
                 tag_string.Value = str;
+            else if (tag is INbtByteArray tag_ba && value is byte[] bytes)
+                tag_ba.Value = bytes;
+            else if (tag is INbtIntArray tag_ia && value is int[] ints)
+                tag_ia.Value = ints;
+            else if (tag is INbtLongArray tag_la && value is long[] longs)
+                tag_la.Value = longs;
+            else if (tag is INbtCompound tag_compound && value is IEnumerable<INbtTag> c_tags)
+            {
+                var tags = c_tags.ToList();
+                tag_compound.Clear();
+                foreach (var child in tags)
+                {
+                    child.AddTo(tag_compound);
+                }
+            }
+            else if (tag is INbtList tag_list && value is IEnumerable<INbtTag> l_tags)
+            {
+                var tags = l_tags.ToList();
+                tag_list.Clear();
+                foreach (var child in tags)
+                {
+                    child.AddTo(tag_list);
+                }
+            }
         }
 
         public static object ParseValue(string value, NbtTagType type)

@@ -248,7 +248,7 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            //EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
+            EditSnbtWindow.ModifyTag(tag);
         }
 
         private void Delete()
@@ -260,7 +260,14 @@ namespace NbtExplorer2.UI
         }
 
         private void Find()
-        { }
+        {
+            // temporary test
+            var parent = ViewModel?.SelectedNbt as INbtContainer;
+            if (parent == null) return;
+            var tag = EditSnbtWindow.CreateTag(parent);
+            if (tag != null)
+                tag.AddTo(parent);
+        }
 
         private void AddTag(NbtTagType type)
         {

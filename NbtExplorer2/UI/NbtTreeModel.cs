@@ -47,7 +47,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrapNbt(this, View.SelectedNode.Tag, NbtUtil.GetNbt(View.SelectedNode.Tag));
+                return NotifyWrapNbt(this, View.SelectedNode.Tag, GetNbt(View.SelectedNode.Tag));
             }
         }
         public IEnumerable<INotifyNbt> SelectedNbts
@@ -56,7 +56,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.SelectedNodes == null)
                     Enumerable.Empty<INotifyNbt>();
-                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, NbtUtil.GetNbt(x.Tag))).Where(x => x != null);
+                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
             }
         }
         public IEnumerable<NotifyNbtFile> OpenedFiles
@@ -101,7 +101,7 @@ namespace NbtExplorer2.UI
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return Enumerable.Empty<INotifyNbt>();
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, NbtUtil.GetNbt(x.Tag))).Where(x => x != null);
+            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
         }
         public INbtTag DropTag
         {
@@ -109,7 +109,7 @@ namespace NbtExplorer2.UI
             {
                 if (View.DropPosition.Node == null)
                     return null;
-                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, NbtUtil.GetNbt(View.DropPosition.Node.Tag));
+                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, GetNbt(View.DropPosition.Node.Tag));
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
@@ -195,6 +195,15 @@ namespace NbtExplorer2.UI
         {
             var children = GetChildren(obj);
             return children != null && children.Any();
+        }
+
+        private NbtTag GetNbt(object obj)
+        {
+            if (obj is NbtFile file)
+                return file.RootTag;
+            if (obj is NbtTag tag)
+                return tag;
+            return null;
         }
     }
 }
