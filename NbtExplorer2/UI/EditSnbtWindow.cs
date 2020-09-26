@@ -13,7 +13,7 @@ namespace NbtExplorer2.UI
         private readonly bool SettingName;
         public bool CheckWhileTyping = false;
 
-        public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name)
+        public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
 
@@ -39,20 +39,32 @@ namespace NbtExplorer2.UI
                 this.Icon = NbtUtil.TagTypeIcon(required.Value);
                 this.Text = tag == null ? $"Create {NbtUtil.TagTypeName(required.Value)} Tag as SNBT" : $"Edit {NbtUtil.TagTypeName(required.Value)} Tag as SNBT";
             }
+            if (SettingName && purpose != EditPurpose.EditValue)
+            {
+                NameBox.Select();
+                NameBox.SelectAll();
+            }
+            else
+            {
+                InputBox.Select();
+                InputBox.SelectAll();
+            }
         }
 
         public static INbtTag CreateTag(INbtContainer parent)
         {
             bool has_name = parent is INbtCompound;
-            var window = new EditSnbtWindow(null, parent, has_name);
+            var window = new EditSnbtWindow(null, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? window.WorkingTag : null;
         }
 
-        public static bool ModifyTag(INbtTag existing)
+        public static bool ModifyTag(INbtTag existing, EditPurpose purpose)
         {
+            if (purpose == EditPurpose.Create)
+                throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
             bool has_name = parent is INbtCompound;
-            var window = new EditSnbtWindow(existing, parent, has_name);
+            var window = new EditSnbtWindow(existing, parent, has_name, purpose);
             return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
         }
 
@@ -67,7 +79,7 @@ namespace NbtExplorer2.UI
 
         private NbtTag ParseTag()
         {
-            return SnbtParser.Parse(InputBox.Text, named: false);
+            return SnbtParser.Parse(InputBox.Text.Replace("\r", ""), named: false);
         }
 
         private NbtTagType? RequiredType()
@@ -129,6 +141,16 @@ namespace NbtExplorer2.UI
         private void ButtonOk_Click(object sender, EventArgs e)
         {
             Apply();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.Enter))
+            {
+                Apply();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void MinifyCheck_CheckedChanged(object sender, EventArgs e)

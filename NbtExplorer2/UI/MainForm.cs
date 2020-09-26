@@ -158,7 +158,7 @@ namespace NbtExplorer2.UI
             })
             {
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    OpenFolder(Path.GetDirectoryName(dialog.FileName));
+                    OpenFolder(dialog.FileName);
             }
         }
 
@@ -268,7 +268,9 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            EditSnbtWindow.ModifyTag(tag);
+            ViewModel.StartBatchOperation();
+            EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
+            ViewModel.FinishBatchOperation();
         }
 
         private void Delete()
@@ -283,9 +285,13 @@ namespace NbtExplorer2.UI
                 item.Remove();
             }
             ViewModel.FinishBatchOperation();
-            var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
-            if (select_next != null)
-                select_next.IsSelected = true;
+            // Index == -1 checks whether this node has been removed from the tree
+            if (selected.All(x => x.Index == -1))
+            {
+                var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
+                if (select_next != null)
+                    select_next.IsSelected = true;
+            }
         }
 
         private void Find()
