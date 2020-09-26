@@ -119,6 +119,7 @@
             this.MainMenuStrip = this.MenuStrip;
             this.Name = "MainForm";
             this.Text = "NbtExplorer 2";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();

@@ -319,7 +319,7 @@ namespace NbtExplorer2.UI
         {
             if (ViewModel == null || !ViewModel.HasUnsavedChanges)
                 return true;
-            return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
@@ -425,6 +425,12 @@ namespace NbtExplorer2.UI
             {
                 NbtUtil.TransformInsert(tag, insert.Item1, insert.Item2);
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!ConfirmIfUnsaved("Exit anyway?"))
+                e.Cancel = true;
         }
     }
 }

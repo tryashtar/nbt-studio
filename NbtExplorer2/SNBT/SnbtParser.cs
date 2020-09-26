@@ -135,7 +135,7 @@ namespace NbtExplorer2.SNBT
                 return ReadArray(NbtTagType.Long);
             if (type == Snbt.INT_ARRAY_PREFIX)
                 return ReadArray(NbtTagType.Int);
-            throw new FormatException($"{type} is not a valid array type ({Snbt.BYTE_ARRAY_PREFIX}, {Snbt.LONG_ARRAY_PREFIX}, or {Snbt.INT_ARRAY_PREFIX})");
+            throw new FormatException($"'{type}' is not a valid array type ({Snbt.BYTE_ARRAY_PREFIX}, {Snbt.LONG_ARRAY_PREFIX}, or {Snbt.INT_ARRAY_PREFIX})");
         }
 
         private NbtTag ReadArray(NbtTagType arraytype)
@@ -322,7 +322,7 @@ namespace NbtExplorer2.SNBT
                     else
                     {
                         Cursor--;
-                        throw new FormatException($"Tried to escape {c} at position {Cursor}, which is not allowed");
+                        throw new FormatException($"Tried to escape '{c}' at position {Cursor}, which is not allowed");
                     }
                 }
                 else if (c == ESCAPE)
@@ -332,7 +332,7 @@ namespace NbtExplorer2.SNBT
                 else
                     result.Append(c);
             }
-            throw new FormatException($"Expected the string to end with {end}, but reached end of data");
+            throw new FormatException($"Expected the string to end with '{end}', but reached end of data");
         }
 
         public string ReadUnquotedString()
@@ -351,7 +351,7 @@ namespace NbtExplorer2.SNBT
                 return String.Empty;
             char next = Peek();
             if (!IsQuote(next))
-                throw new FormatException($"Expected the string to at position {Cursor} to be quoted, but got {next}");
+                throw new FormatException($"Expected the string to at position {Cursor} to be quoted, but got '{next}'");
             Read();
             return ReadStringUntil(next);
         }
@@ -367,10 +367,10 @@ namespace NbtExplorer2.SNBT
         public void Expect(char c)
         {
             if (!CanRead())
-                throw new FormatException($"Expected {c} at position {Cursor}, but reached end of data");
+                throw new FormatException($"Expected '{c}' at position {Cursor}, but reached end of data");
             char read = Read();
             if (read != c)
-                throw new FormatException($"Expected {c} at position {Cursor}, but got {read}");
+                throw new FormatException($"Expected '{c}' at position {Cursor}, but got '{read}'");
         }
     }
 }
