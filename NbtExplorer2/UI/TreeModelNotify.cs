@@ -78,9 +78,10 @@ namespace NbtExplorer2.UI
             {
                 Tree.Notify(obj);
             }
-            protected void PushUndo(Action undo)
+            protected void PerformAction(Action action, Action undo)
             {
-                Tree.PushUndo(undo);
+                Tree.PushUndo(new UndoableAction(action, undo));
+                action();
             }
             protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
         }
@@ -113,9 +114,9 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current = Tag.Name;
-                    PushUndo(() => { Tag.Name = current; Notify(); });
-                    Tag.Name = value;
-                    Notify();
+                    PerformAction(
+                        () => { Tag.Name = value; Notify(); },
+                        () => { Tag.Name = current; Notify(); });
                 }
             }
             public NbtTagType TagType => Tag.TagType;
@@ -137,31 +138,32 @@ namespace NbtExplorer2.UI
                 int index = Index;
                 if (parent is NbtCompound c)
                 {
-                    PushUndo(() => { c.Insert(index, Tag); Notify(parent); });
-                    c.Remove(Tag);
+                    PerformAction(
+                        () => { c.Remove(Tag); Notify(parent); },
+                        () => { c.Insert(index, Tag); Notify(parent); });
                 }
                 else if (parent is NbtList l)
                 {
-                    PushUndo(() => { l.Insert(index, Tag); Notify(parent); });
-                    l.Remove(Tag);
+                    PerformAction(
+                        () => { l.Remove(Tag); Notify(parent); },
+                        () => { l.Insert(index, Tag); Notify(parent); });
                 }
-                Notify(parent);
             }
             public void AddTo(INbtContainer container)
             {
                 if (Tag.Parent != null)
                     Remove();
-                PushUndo(() => { container.Remove(Tag); Notify(container); });
-                container.Add(Tag);
-                Notify(container);
+                PerformAction(
+                    () => { container.Add(Tag); Notify(container); },
+                    () => { container.Remove(Tag); Notify(container); });
             }
             public void InsertInto(INbtContainer container, int index)
             {
                 if (Tag.Parent != null)
                     Remove();
-                PushUndo(() => { container.Remove(Tag); Notify(container); });
-                container.Insert(index, Tag);
-                Notify(container);
+                PerformAction(
+                    () => { container.Insert(index, Tag); Notify(container); },
+                    () => { container.Remove(Tag); Notify(container); });
             }
             public bool IsInside(INbtContainer container) => container.Contains(Tag);
         }
@@ -176,9 +178,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -193,9 +196,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -210,9 +214,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -227,9 +232,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -244,9 +250,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -261,9 +268,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -278,9 +286,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -295,9 +304,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -312,9 +322,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -329,9 +340,10 @@ namespace NbtExplorer2.UI
                 set
                 {
                     var current_value = Tag.Value;
-                    PushUndo(() => { Tag.Value = current_value; Notify(); });
+                    PerformAction(
+                        () => { Tag.Value = value; Notify(); },
+                        () => { Tag.Value = current_value; Notify(); });
                     Tag.Value = value;
-                    Notify();
                 }
             }
         }
@@ -346,37 +358,38 @@ namespace NbtExplorer2.UI
             public bool CanAdd(NbtTagType type) => List.Count == 0 || List.ListType == type;
             public void Add(NbtTag tag)
             {
-                PushUndo(() => { List.Remove(tag); Notify(); });
-                List.Add(tag);
-                Notify();
+                PerformAction(
+                    () => { List.Add(tag); Notify(); },
+                    () => { List.Remove(tag); Notify(); });
             }
             public void AddRange(IEnumerable<NbtTag> tags)
             {
-                PushUndo(() => { foreach (var tag in tags.ToList()) { List.Remove(tag); } Notify(); });
-                List.AddRange(tags);
-                Notify();
+                PerformAction(
+                    () => { List.AddRange(tags); Notify(); },
+                    () => { foreach (var tag in tags.ToList()) { List.Remove(tag); } Notify(); });
             }
             public void Insert(int index, NbtTag tag)
             {
-                PushUndo(() => { List.Remove(tag); Notify(); });
-                List.Insert(index, tag);
-                Notify();
+                PerformAction(
+                    () => { List.Insert(index, tag); Notify(); },
+                    () => { List.Remove(tag); Notify(); });
             }
             public void Clear()
             {
                 var tags = List.ToList();
-                PushUndo(() => { List.AddRange(tags); Notify(); });
-                List.Clear();
-                Notify();
+                PerformAction(
+                    () => { List.Clear(); Notify(); },
+                    () => { List.AddRange(tags); Notify(); });
             }
             public bool Contains(NbtTag tag) => List.Contains(tag);
             public bool Remove(NbtTag tag)
             {
                 int index = List.IndexOf(tag);
-                if (List.Remove(tag))
+                if (index != -1)
                 {
-                    PushUndo(() => { List.Insert(index, tag); Notify(); });
-                    Notify();
+                    PerformAction(
+                        () => { List.Remove(tag); Notify(); },
+                        () => { List.Insert(index, tag); Notify(); });
                     return true;
                 }
                 return false;
@@ -394,37 +407,38 @@ namespace NbtExplorer2.UI
             public bool CanAdd(NbtTagType type) => true;
             public void Add(NbtTag tag)
             {
-                PushUndo(() => { Compound.Remove(tag); Notify(); });
-                Compound.Add(tag);
-                Notify();
+                PerformAction(
+                    () => { Compound.Add(tag); Notify(); },
+                    () => { Compound.Remove(tag); Notify(); });
             }
             public void AddRange(IEnumerable<NbtTag> tags)
             {
-                PushUndo(() => { foreach (var tag in tags.ToList()) { Compound.Remove(tag); } Notify(); });
-                Compound.AddRange(tags);
-                Notify();
+                PerformAction(
+                    () => { Compound.AddRange(tags); Notify(); },
+                    () => { foreach (var tag in tags.ToList()) { Compound.Remove(tag); } Notify(); });
             }
             public void Insert(int index, NbtTag tag)
             {
-                PushUndo(() => { Compound.Remove(tag); Notify(); });
-                Compound.Insert(index, tag);
-                Notify();
+                PerformAction(
+                    () => { Compound.Insert(index, tag); Notify(); },
+                    () => { Compound.Remove(tag); Notify(); });
             }
             public void Clear()
             {
                 var tags = Compound.Tags.ToList();
-                PushUndo(() => { Compound.AddRange(tags); Notify(); });
-                Compound.Clear();
-                Notify();
+                PerformAction(
+                    () => { Compound.Clear(); Notify(); },
+                    () => { Compound.AddRange(tags); Notify(); });
             }
             public bool Contains(NbtTag tag) => Compound.Contains(tag);
             public bool Remove(NbtTag tag)
             {
                 int index = Compound.IndexOf(tag);
-                if (Compound.Remove(tag))
+                if (index != -1)
                 {
-                    PushUndo(() => { Compound.Insert(index, tag); Notify(); });
-                    Notify();
+                    PerformAction(
+                        () => { Compound.Remove(tag); Notify(); },
+                        () => { Compound.Insert(index, tag); Notify(); });
                     return true;
                 }
                 return false;
@@ -437,10 +451,13 @@ namespace NbtExplorer2.UI
                 if (Compound.TryGet(name, out var tag))
                 {
                     int index = Compound.IndexOf(tag);
-                    PushUndo(() => { Compound.Insert(index, tag); Notify(); });
-                    Compound.Remove(name);
-                    Notify();
-                    return true;
+                    if (index != -1)
+                    {
+                        PerformAction(
+                            () => { Compound.Remove(name); Notify(); },
+                            () => { Compound.Insert(index, tag); Notify(); });
+                        return true;
+                    }
                 }
                 return false;
             }

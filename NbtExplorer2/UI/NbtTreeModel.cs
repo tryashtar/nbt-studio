@@ -19,10 +19,21 @@ namespace NbtExplorer2.UI
         public event EventHandler Changed;
 
         private bool _HasUnsavedChanges = false;
-        public bool HasUnsavedChanges { get => _HasUnsavedChanges; private set { _HasUnsavedChanges = value; Changed?.Invoke(this, EventArgs.Empty); } }
+        public bool HasUnsavedChanges
+        {
+            get => _HasUnsavedChanges;
+            private set
+            {
+                _HasUnsavedChanges = value;
+                if (!IsUndoing)
+                    RedoStack.Clear();
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+        }
         private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
-        private readonly Stack<Action> UndoStack = new Stack<Action>();
+        private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
+        private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
 
         public INotifyNode SelectedObject
         {
@@ -165,30 +176,55 @@ namespace NbtExplorer2.UI
             return null;
         }
 
-        private void PushUndo(Action action)
+        private void PushUndo(UndoableAction action)
         {
             if (BatchNumber == 0)
                 UndoStack.Push(action);
             else
                 UndoBatch.Push(action);
+#if DEBUG
+            Console.WriteLine($"Added undo. Undo stack has {UndoStack.Count} items");
+#endif
         }
 
+        private bool IsUndoing = false;
         public void Undo()
         {
             if (UndoStack.Any())
-                UndoStack.Pop()(); // haha
+            {
+                var action = UndoStack.Pop();
+                RedoStack.Push(action);
+                IsUndoing = true;
+                action.Undo();
+                IsUndoing = false;
+#if DEBUG
+                Console.WriteLine($"Performed undo. Undo stack has {UndoStack.Count} items");
+                Console.WriteLine($"Added redo. Redo stack has {RedoStack.Count} items");
+#endif
+            }
         }
 
         public void Redo()
         {
-
+            if (RedoStack.Any())
+            {
+                var action = RedoStack.Pop();
+                UndoStack.Push(action);
+                IsUndoing = true;
+                action.Do();
+                IsUndoing = false;
+#if DEBUG
+                Console.WriteLine($"Performed redo. Redo stack has {RedoStack.Count} items");
+                Console.WriteLine($"Added undo. Undo stack has {UndoStack.Count} items");
+#endif
+            }
         }
 
         public bool CanUndo => UndoStack.Any();
-        public bool CanRedo => false;
+        public bool CanRedo => RedoStack.Any();
 
         private int BatchNumber = 0;
-        private readonly Stack<Action> UndoBatch = new Stack<Action>();
+        private readonly Stack<UndoableAction> UndoBatch = new Stack<UndoableAction>();
         // call this and then do things that signal undos, then call FinishBatchOperation to merge all those undos into one
         public void StartBatchOperation()
         {
@@ -203,7 +239,7 @@ namespace NbtExplorer2.UI
                 var merged_action = UndoBatch.Pop();
                 while (UndoBatch.Any())
                 {
-                    merged_action += UndoBatch.Pop();
+                    merged_action.Add(UndoBatch.Pop());
                 }
                 UndoStack.Push(merged_action);
             }

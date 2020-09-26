@@ -99,6 +99,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\TreeModelNotify.cs" />
+    <Compile Include="UndoableAction.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
