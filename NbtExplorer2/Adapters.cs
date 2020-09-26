@@ -177,6 +177,8 @@ namespace NbtExplorer2
             container.Insert(index, Tag);
         }
         public bool IsInside(INbtContainer container) => container.Contains(Tag);
+        public override bool Equals(object obj) => obj.Equals(Tag);
+        public override int GetHashCode() => Tag.GetHashCode();
     }
 
     public class NbtByteAdapter : NbtTagAdapter, INbtByte

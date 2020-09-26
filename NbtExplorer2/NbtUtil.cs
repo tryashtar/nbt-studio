@@ -383,22 +383,18 @@ namespace NbtExplorer2
                 return false;
             // check if you're trying to add an item to its own descendent
             var ancestors = Ancestors(destination);
-            foreach (var ancestor in ancestors)
-            {
-                if (tags.Any(x => x.IsInside(ancestor)))
-                    return false;
-            }
+            if (tags.Intersect(ancestors).Any())
+                return false;
             return tags.All(x => destination.CanAdd(x.TagType));
         }
 
-        public static List<INbtContainer> Ancestors(INbtTag tag)
+        public static List<INbtTag> Ancestors(INbtTag tag)
         {
-            var ancestors = new List<INbtContainer>();
-            var parent = tag.Parent;
-            while (parent != null)
+            var ancestors = new List<INbtTag>();
+            while (tag != null)
             {
-                ancestors.Add(parent);
-                parent = parent.Parent;
+                ancestors.Add(tag);
+                tag = tag.Parent;
             }
             return ancestors;
         }
