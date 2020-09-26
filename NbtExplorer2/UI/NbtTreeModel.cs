@@ -183,7 +183,10 @@ namespace NbtExplorer2.UI
             else
                 UndoBatch.Add(action);
 #if DEBUG
-            Console.WriteLine($"Added undo. Undo stack has {UndoStack.Count} items");
+            if (BatchNumber == 0)
+                Console.WriteLine($"Added undo to main stack. Undo stack has {UndoStack.Count} items");
+            else
+                Console.WriteLine($"Added undo to batch. Batch has {UndoBatch.Count} items");
 #endif
         }
 
@@ -233,11 +236,18 @@ namespace NbtExplorer2.UI
 
         public void FinishBatchOperation()
         {
+            if (BatchNumber == 0)
+                return;
             BatchNumber--;
             if (BatchNumber == 0 && UndoBatch.Any())
             {
                 var merged_action = UndoableAction.Merge(UndoBatch);
                 UndoStack.Push(merged_action);
+#if DEBUG
+                Console.WriteLine($"Merged {UndoBatch.Count} batch actions onto stack. Stack has {UndoStack.Count} items");
+#endif
+                UndoBatch.Clear();
+                Changed?.Invoke(this, EventArgs.Empty);
             }
         }
 
