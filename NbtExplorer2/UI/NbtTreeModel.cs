@@ -260,9 +260,12 @@ namespace NbtExplorer2.UI
                 if (!chunk.IsLoaded)
                 {
                     chunk.Load();
+                    if (chunk.IsCorrupt)
+                        Notify(chunk.Region);
                     Changed?.Invoke(this, EventArgs.Empty);
                 }
-                return chunk.Data.Tags;
+                if (chunk.IsLoaded)
+                    return chunk.Data.Tags;
             }
             if (obj is NbtCompound compound)
                 return compound.Tags;

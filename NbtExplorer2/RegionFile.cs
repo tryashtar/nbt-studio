@@ -31,12 +31,12 @@ namespace NbtExplorer2
                     int size = ChunkSize(x, z);
                     if (offset > 0 && offset < 8192)
                         throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
-                    if (offset + size > Stream.Length)
+                    if (offset > Stream.Length)
                         throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {Stream.Length} long");
                     if (size > 0)
                     {
                         ChunkCount++;
-                        Chunks[x, z] = new Chunk(x, z, offset, size, Stream);
+                        Chunks[x, z] = new Chunk(this, x, z, offset, size, Stream);
                         if (ChunkCount == 1)
                             Chunks[x, z].Load(); // load the first one to check if this is really a region file
                     }
@@ -53,6 +53,11 @@ namespace NbtExplorer2
             if (!Chunks[x, z].IsLoaded)
                 Chunks[x, z].Load();
             return Chunks[x, z];
+        }
+
+        public void RemoveChunk(int x, int z)
+        {
+            Chunks[x, z] = null;
         }
 
         public void Dispose()
@@ -93,7 +98,7 @@ namespace NbtExplorer2
                     int location = ChunkDataLocation(x, z);
                     var data = chunk?.SaveBytes() ?? new byte[0];
                     byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
-                    byte[] offset = chunk == null ? new byte[] { 0, 0, 0, 0 } : Util.GetBytes(current_offset / 4096);
+                    byte[] offset = CanWriteChunk(chunk) ? Util.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
                     Locations[location] = offset[1];
                     Locations[location + 1] = offset[2];
                     Locations[location + 2] = offset[3];
@@ -104,7 +109,7 @@ namespace NbtExplorer2
                         byte[] time = Util.GetBytes(timestamp);
                         Array.Copy(time, 0, Timestamps, location, 4);
                     }
-                    if (chunk != null)
+                    if (CanWriteChunk(chunk))
                     {
                         int write_offset = current_offset;
                         chunk_writes.Add(writer =>
@@ -127,6 +132,11 @@ namespace NbtExplorer2
                     action(writer);
                 }
             }
+        }
+
+        private bool CanWriteChunk(Chunk chunk)
+        {
+            return chunk != null && !chunk.IsCorrupt;
         }
 
         public void SaveAs(string path)

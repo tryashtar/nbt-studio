@@ -10,6 +10,7 @@ namespace NbtExplorer2
 {
     public class Chunk
     {
+        public readonly RegionFile Region;
         public readonly int X;
         public readonly int Z;
         public NbtCompound Data;
@@ -18,8 +19,10 @@ namespace NbtExplorer2
         private readonly FileStream Stream;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
-        public Chunk(int x, int z, int offset, int size, FileStream stream)
+        public bool IsCorrupt { get; private set; } = false;
+        public Chunk(RegionFile region, int x, int z, int offset, int size, FileStream stream)
         {
+            Region = region;
             X = x;
             Z = z;
             Offset = offset;
@@ -31,6 +34,8 @@ namespace NbtExplorer2
         {
             if (!IsLoaded)
                 Load();
+            if (IsCorrupt)
+                return new byte[0];
             var file = new fNbt.NbtFile(Data);
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
@@ -52,11 +57,20 @@ namespace NbtExplorer2
 
         public void Load()
         {
+            if (IsCorrupt) return;
             var data = ReadFromStream();
             var file = new fNbt.NbtFile();
-            file.LoadFromBuffer(data, 5, data.Length - 5, NbtCompression.AutoDetect);
-            Compression = file.FileCompression;
-            Data = file.RootTag;
+            try
+            {
+                file.LoadFromBuffer(data, 5, data.Length - 5, NbtCompression.AutoDetect);
+                Compression = file.FileCompression;
+                Data = file.RootTag;
+            }
+            catch
+            {
+                IsCorrupt = true;
+                Region.RemoveChunk(X, Z);
+            }
         }
     }
 }
