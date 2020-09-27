@@ -10,7 +10,7 @@ namespace NbtExplorer2
 {
     public class RegionFile : ISaveable, IDisposable
     {
-        public readonly int ChunkCount;
+        public int ChunkCount { get; private set; }
         private readonly Chunk[,] Chunks = new Chunk[32, 32];
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
@@ -57,6 +57,8 @@ namespace NbtExplorer2
 
         public void RemoveChunk(int x, int z)
         {
+            if (Chunks[x, z] != null)
+                ChunkCount--;
             Chunks[x, z] = null;
         }
 

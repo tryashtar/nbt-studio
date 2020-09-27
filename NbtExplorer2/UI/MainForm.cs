@@ -342,7 +342,7 @@ namespace NbtExplorer2.UI
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            var files = paths.Select(x => OpenFile(x));
+            var files = paths.Select(x => OpenFile(x)).ToList();
             var bad = files.Where(x => x == null);
             var good = files.Where(x => x != null);
             if (bad.Any())
