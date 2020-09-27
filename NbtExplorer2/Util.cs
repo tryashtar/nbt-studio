@@ -44,5 +44,25 @@ namespace NbtExplorer2
             stream.Read(bytes, 0, count);
             return bytes;
         }
+
+        // always big endian
+        public static byte[] GetBytes(int value)
+        {
+            byte[] result = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(result);
+            return result;
+        }
+
+        public static int ToInt32(byte[] bytes)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                byte[] swap = bytes.Take(4).Reverse().ToArray();
+                return BitConverter.ToInt32(swap, 0);
+            }
+            else
+                return BitConverter.ToInt32(bytes, 0);
+        }
     }
 }

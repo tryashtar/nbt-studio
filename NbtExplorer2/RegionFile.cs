@@ -29,8 +29,10 @@ namespace NbtExplorer2
                 {
                     int offset = ChunkOffset(x, z);
                     int size = ChunkSize(x, z);
+                    if (offset > 0 && offset < 8192)
+                        throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
                     if (offset + size > Stream.Length)
-                        throw new FormatException($"Invalid region file, thinks there a {size}-long chunk at position {offset} but file is only {Stream.Length} long");
+                        throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {Stream.Length} long");
                     if (size > 0)
                     {
                         ChunkCount++;
@@ -72,18 +74,59 @@ namespace NbtExplorer2
         private int ChunkOffset(int x, int z)
         {
             int location = ChunkDataLocation(x, z);
-            return 4096 * Combine(Locations[location], Locations[location + 1], Locations[location + 2]);
-        }
-
-        private static int Combine(byte b1, byte b2, byte b3)
-        {
-            return b1 << 16 & 0xFF0000 | b2 << 8 & 0xFF00 | b3 & 0xFF;
+            byte[] four = new byte[4];
+            Array.Copy(Locations, location, four, 1, 3);
+            return 4096 * Util.ToInt32(four);
         }
 
         public bool CanSave => true;
         public void Save()
         {
-            throw new NotImplementedException();
+            int current_offset = 8192;
+            var chunk_writes = new List<Action<FileStream>>();
+            for (int z = 0; z < Chunks.GetLength(1); z++)
+            {
+                for (int x = 0; x < Chunks.GetLength(0); x++)
+                {
+                    var chunk = Chunks[x, z];
+                    bool update_timestamp = chunk != null && chunk.IsLoaded;
+                    int location = ChunkDataLocation(x, z);
+                    var data = chunk?.SaveBytes() ?? new byte[0];
+                    byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
+                    byte[] offset = chunk == null ? new byte[] { 0, 0, 0, 0 } : Util.GetBytes(current_offset / 4096);
+                    Locations[location] = offset[1];
+                    Locations[location + 1] = offset[2];
+                    Locations[location + 2] = offset[3];
+                    Locations[location + 3] = size;
+                    if (update_timestamp)
+                    {
+                        int timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                        byte[] time = Util.GetBytes(timestamp);
+                        Array.Copy(time, 0, Timestamps, location, 4);
+                    }
+                    if (chunk != null)
+                    {
+                        int write_offset = current_offset;
+                        chunk_writes.Add(writer =>
+                            {
+                                writer.Seek(write_offset, SeekOrigin.Begin);
+                                writer.Write(data, 0, data.Length);
+                            });
+                    }
+                    current_offset += data.Length;
+                    current_offset = (int)Math.Ceiling((decimal)current_offset / 4096) * 4096;
+                }
+            }
+            Stream.Dispose();
+            using (var writer = File.OpenWrite(Path))
+            {
+                writer.Write(Locations, 0, Locations.Length);
+                writer.Write(Timestamps, 0, Locations.Length);
+                foreach (var action in chunk_writes)
+                {
+                    action(writer);
+                }
+            }
         }
 
         public void SaveAs(string path)
