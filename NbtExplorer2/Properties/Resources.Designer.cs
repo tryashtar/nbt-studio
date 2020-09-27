@@ -403,6 +403,26 @@ namespace NbtExplorer2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon chunk_icon {
+            get {
+                object obj = ResourceManager.GetObject("chunk_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap chunk_image {
+            get {
+                object obj = ResourceManager.GetObject("chunk_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon file_icon {
             get {
                 object obj = ResourceManager.GetObject("file_icon", resourceCulture);
@@ -436,6 +456,26 @@ namespace NbtExplorer2.Properties {
         internal static System.Drawing.Bitmap folder_image {
             get {
                 object obj = ResourceManager.GetObject("folder_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon region_icon {
+            get {
+                object obj = ResourceManager.GetObject("region_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap region_image {
+            get {
+                object obj = ResourceManager.GetObject("region_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -3,6 +3,7 @@ using NbtExplorer2.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,13 @@ namespace NbtExplorer2
         public static string FloatToString(float f)
         {
             return f.ToString("0." + new string('#', 339));
+        }
+
+        public static byte[] ReadBytes(FileStream stream, int count)
+        {
+            byte[] bytes = new byte[count];
+            stream.Read(bytes, 0, count);
+            return bytes;
         }
     }
 }

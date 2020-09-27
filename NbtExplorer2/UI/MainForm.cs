@@ -137,7 +137,7 @@ namespace NbtExplorer2.UI
                 Title = "Select NBT files",
                 RestoreDirectory = true,
                 Multiselect = true,
-                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt",
+                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.mca;*.mcr;*.schematic;*.mcstructure;*.snbt",
             })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
@@ -189,7 +189,7 @@ namespace NbtExplorer2.UI
             {
                 Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
                 RestoreDirectory = true,
-                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.schematic;*.mcstructure;*.snbt"
+                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.mca;*.mcr;*.schematic;*.mcstructure;*.snbt"
             })
             {
                 if (file.Path != null)
@@ -337,13 +337,24 @@ namespace NbtExplorer2.UI
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            var files = paths.Select(x => NbtFile.TryCreate(x));
+            var files = paths.Select(x => OpenFile(x));
             var bad = files.Where(x => x == null);
             var good = files.Where(x => x != null);
             if (bad.Any())
                 MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load failure");
             if (good.Any())
                 ViewModel = new NbtTreeModel(good, NbtTree);
+        }
+
+        private object OpenFile(string path)
+        {
+            var file = NbtFile.TryCreate(path);
+            if (file != null)
+                return file;
+            try
+            { return new RegionFile(path); }
+            catch { }
+            return null;
         }
 
         private bool ConfirmIfUnsaved(string message)

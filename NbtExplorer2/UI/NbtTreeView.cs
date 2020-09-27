@@ -20,6 +20,15 @@ namespace NbtExplorer2.UI
             NodeControls.Add(new NbtText());
             this.RowHeight = 20;
             this.SelectionMode = TreeSelectionMode.Multi;
+            this.Collapsing += NbtTreeView_Collapsing;
+            this.LoadOnDemand = true;
+        }
+
+        private void NbtTreeView_Collapsing(object sender, TreeViewAdvEventArgs e)
+        {
+            this.Collapsing -= NbtTreeView_Collapsing;
+            e.Node.CollapseAll();
+            this.Collapsing += NbtTreeView_Collapsing;
         }
 
         private void ToggleExpansion(TreeNodeAdv node, bool all = false)
@@ -80,7 +89,7 @@ namespace NbtExplorer2.UI
         }
 
         public IEnumerable<TreeNodeAdv> BreadthFirstSearch() => BreadthFirstSearch(x => true);
-        public IEnumerable<TreeNodeAdv> BreadthFirstSearch(Predicate<object> predicate)
+        public IEnumerable<TreeNodeAdv> BreadthFirstSearch(Predicate<TreeNodeAdv> predicate)
         {
             var queue = new Queue<TreeNodeAdv>();
             queue.Enqueue(Root);
@@ -162,6 +171,10 @@ namespace NbtExplorer2.UI
                 return Properties.Resources.file_image;
             if (obj is NbtFolder)
                 return Properties.Resources.folder_image;
+            if (obj is RegionFile)
+                return Properties.Resources.region_image;
+            if (obj is Chunk)
+                return Properties.Resources.chunk_image;
             if (obj is NbtTag tag)
                 return NbtUtil.TagTypeImage(tag.TagType);
             return null;
@@ -221,11 +234,7 @@ namespace NbtExplorer2.UI
             string name = PreviewName(obj);
             string value = PreviewValue(obj);
             if (name == null)
-            {
-                if (value == null)
-                    return null;
                 return Tuple.Create((string)null, value);
-            }
             return Tuple.Create(name + ": ", value);
         }
 
@@ -235,6 +244,10 @@ namespace NbtExplorer2.UI
                 return Path.GetFileName(file.Path);
             if (obj is NbtFolder folder)
                 return Path.GetFileName(folder.Path);
+            if (obj is RegionFile region)
+                return Path.GetFileName(region.Path);
+            if (obj is Chunk chunk)
+                return $"Chunk [{chunk.X}, {chunk.Z}]";
             if (obj is NbtTag tag)
                 return tag.Name;
             return null;
@@ -246,6 +259,15 @@ namespace NbtExplorer2.UI
                 return NbtUtil.PreviewNbtValue(file.RootTag.Adapt());
             if (obj is NbtFolder folder)
                 return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+            if (obj is RegionFile region)
+                return $"[{Util.Pluralize(region.ChunkCount, "chunk")}]";
+            if (obj is Chunk chunk)
+            {
+                if (chunk.IsLoaded)
+                    return NbtUtil.PreviewNbtValue(chunk.Data.Adapt());
+                else
+                    return "(open to load)";
+            }
             if (obj is NbtTag tag)
                 return NbtUtil.PreviewNbtValue(tag.Adapt());
             return null;

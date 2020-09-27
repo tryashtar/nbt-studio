@@ -220,6 +220,12 @@
   <data name="action_undo_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_undo_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="chunk_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\chunk_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="chunk_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\chunk_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="file_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\file_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -231,6 +237,12 @@
   </data>
   <data name="folder_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\folder_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="region_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\region_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="region_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\region_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="tag_byte_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\tag_byte_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

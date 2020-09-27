@@ -75,7 +75,7 @@ namespace NbtExplorer2.UI
         {
             get
             {
-                foreach (var item in View.BreadthFirstSearch(x => x is NbtFile || x is NbtFolder))
+                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFile || x.Tag is NbtFolder))
                 {
                     if (item.Tag is NbtFile file)
                         yield return NotifyWrapFile(this, file);
@@ -150,6 +150,8 @@ namespace NbtExplorer2.UI
                 // notifiers can't tell whether they were added to a file that's being treated as a compound
                 // so here we disambiguate them
                 if (item.Tag is NbtFile file && file.RootTag == obj)
+                    return item;
+                if (item.Tag is Chunk chunk && chunk.IsLoaded && chunk.Data == obj)
                     return item;
             }
             return null;
@@ -250,6 +252,17 @@ namespace NbtExplorer2.UI
                 return folder.Subfolders.Concat<object>(folder.Files);
             if (obj is NbtFile file)
                 return file.RootTag.Tags;
+            if (obj is RegionFile region)
+                return region.AllChunks.Where(x => x != null);
+            if (obj is Chunk chunk)
+            {
+                if (!chunk.IsLoaded)
+                {
+                    chunk.Load();
+                    Changed?.Invoke(this, EventArgs.Empty);
+                }
+                return chunk.Data.Tags;
+            }
             if (obj is NbtCompound compound)
                 return compound.Tags;
             if (obj is NbtList list)
@@ -259,6 +272,8 @@ namespace NbtExplorer2.UI
 
         private bool HasChildren(object obj)
         {
+            if (obj is Chunk)
+                return true;
             var children = GetChildren(obj);
             return children != null && children.Any();
         }
@@ -267,6 +282,8 @@ namespace NbtExplorer2.UI
         {
             if (obj is NbtFile file)
                 return file.RootTag;
+            if (obj is Chunk chunk)
+                return chunk.Data;
             if (obj is NbtTag tag)
                 return tag;
             return null;

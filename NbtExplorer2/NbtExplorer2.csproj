@@ -55,11 +55,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Chunk.cs" />
     <Compile Include="ExportSettings.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />
+    <Compile Include="RegionFile.cs" />
     <Compile Include="UI\DualMenuItem.cs" />
     <Compile Include="UI\EditSnbtWindow.cs">
       <SubType>Form</SubType>
@@ -323,6 +325,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\action_undo_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\region_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\region_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chunk_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chunk_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
