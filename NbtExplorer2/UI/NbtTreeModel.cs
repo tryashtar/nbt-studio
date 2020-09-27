@@ -97,6 +97,19 @@ namespace NbtExplorer2.UI
         {
             return View.NodesFromDrag(e).Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
         }
+        public ISaveable FileFromClick(TreeNodeAdvMouseEventArgs e)
+        {
+            if (e.Node.Tag is ISaveable saveable)
+                return NotifyWrapSaveable(this, e.Node.Tag, saveable);
+            return null;
+        }
+        public INotifyNbt NbtFromClick(TreeNodeAdvMouseEventArgs e)
+        {
+            var nbt = GetNbt(e.Node.Tag);
+            if (nbt != null)
+                return NotifyWrapNbt(this, e.Node.Tag, nbt);
+            return null;
+        }
         public INbtTag DropTag
         {
             get
@@ -130,7 +143,7 @@ namespace NbtExplorer2.UI
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
             if (add.Any())
             {
-                if (node.IsExpandedOnce) // avoid duplicating children when this is called at the same time the view loads them
+                if (node.IsExpandedOnce || node.IsLeaf) // avoid duplicating children when this is called at the same time the view loads them
                     NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
                 node.Expand();
             }

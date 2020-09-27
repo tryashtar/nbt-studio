@@ -167,10 +167,7 @@ namespace NbtExplorer2.UI
             if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                if (file.CanSave)
-                    file.Save();
-                else
-                    SaveAs(file);
+                Save(file);
             }
         }
 
@@ -181,6 +178,14 @@ namespace NbtExplorer2.UI
             {
                 SaveAs(file);
             }
+        }
+
+        private void Save(ISaveable file)
+        {
+            if (file.CanSave)
+                file.Save();
+            else
+                SaveAs(file);
         }
 
         private void SaveAs(ISaveable file)
@@ -212,6 +217,9 @@ namespace NbtExplorer2.UI
         }
 
         private void DoRefresh()
+        { }
+
+        private void DoRefresh(ISaveable file)
         { }
 
         private void Sort()
@@ -315,9 +323,14 @@ namespace NbtExplorer2.UI
         {
             var parent = ViewModel?.SelectedNbt as INbtContainer;
             if (parent == null) return;
-            var tag = EditTagWindow.CreateTag(type, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
+            AddTag(parent, type);
+        }
+
+        private void AddTag(INbtContainer container, NbtTagType type)
+        {
+            var tag = EditTagWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
-                parent.Add(tag);
+                container.Add(tag);
         }
 
         private Dictionary<NbtTagType, ToolStripButton> MakeCreateTagButtons()
@@ -481,7 +494,35 @@ namespace NbtExplorer2.UI
         private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
-                MessageBox.Show("Test");
+            {
+                var file = ViewModel.FileFromClick(e);
+                var nbt = ViewModel.NbtFromClick(e);
+                var menu = new ContextMenuStrip();
+                if (file != null)
+                {
+                    menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
+                    menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
+                    menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => DoRefresh(file));
+                }
+                if (nbt is INbtContainer container)
+                {
+                    if (menu.Items.Count > 0)
+                        menu.Items.Add(new ToolStripSeparator());
+                    var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
+                    bool single = !addable.Skip(1).Any();
+                    Func<NbtTagType, string> display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
+                    var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(x), (s, ea) => AddTag(container, x))).ToArray();
+                    if (single)
+                        menu.Items.AddRange(items);
+                    else
+                    {
+                        var add = new ToolStripMenuItem("Add...");
+                        add.DropDownItems.AddRange(items);
+                        menu.Items.Add(add);
+                    }
+                }
+                menu.Show(NbtTree.PointToScreen(e.Location));
+            }
         }
     }
 }
