@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace NbtExplorer2
 {
-    public class RegionFile : IDisposable
+    public class RegionFile : ISaveable, IDisposable
     {
         public readonly int ChunkCount;
         private readonly Chunk[,] Chunks = new Chunk[32, 32];
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
         private readonly FileStream Stream;
-        public readonly string Path;
+        public string Path { get; private set; }
         public RegionFile(string path)
         {
             Path = path;
@@ -78,6 +78,18 @@ namespace NbtExplorer2
         private static int Combine(byte b1, byte b2, byte b3)
         {
             return b1 << 16 & 0xFF0000 | b2 << 8 & 0xFF00 | b3 & 0xFF;
+        }
+
+        public bool CanSave => true;
+        public void Save()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveAs(string path)
+        {
+            Path = path;
+            Save();
         }
     }
 }

@@ -96,7 +96,7 @@ namespace NbtExplorer2.UI
             while (queue.Any())
             {
                 var item = queue.Dequeue();
-                if (!predicate(item))
+                if (item != Root && !predicate(item))
                     continue;
                 yield return item;
                 foreach (var sub in item.Children)

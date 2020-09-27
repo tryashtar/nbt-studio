@@ -71,14 +71,14 @@ namespace NbtExplorer2.UI
                 return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
             }
         }
-        public IEnumerable<NotifyNbtFile> OpenedFiles
+        public IEnumerable<ISaveable> OpenedFiles
         {
             get
             {
-                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFile || x.Tag is NbtFolder))
+                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFile || x.Tag is NbtFolder || x.Tag is RegionFile))
                 {
-                    if (item.Tag is NbtFile file)
-                        yield return NotifyWrapFile(this, file);
+                    if (item.Tag is ISaveable saveable)
+                        yield return NotifyWrapSaveable(this, item.Tag, saveable);
                 }
             }
         }
@@ -135,8 +135,9 @@ namespace NbtExplorer2.UI
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
             if (add.Any())
             {
+                if (node.IsExpandedOnce) // avoid duplicating children when this is called at the same time the view loads them
+                    NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
                 node.Expand();
-                NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
             }
         }
 

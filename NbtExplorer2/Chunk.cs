@@ -26,12 +26,17 @@ namespace NbtExplorer2
             Stream = stream;
         }
 
+        public byte[] RawData()
+        {
+            Stream.Seek(Offset, SeekOrigin.Begin);
+            return Util.ReadBytes(Stream, Size);
+        }
+
         public void Load()
         {
-            Stream.Seek(Offset + 5, SeekOrigin.Begin);
-            var data = Util.ReadBytes(Stream, Size);
+            var data = RawData();
             var file = new fNbt.NbtFile();
-            file.LoadFromBuffer(data, 0, data.Length, NbtCompression.AutoDetect);
+            file.LoadFromBuffer(data, 5, data.Length - 5, NbtCompression.AutoDetect);
             Data = file.RootTag;
         }
     }

@@ -183,7 +183,7 @@ namespace NbtExplorer2.UI
             }
         }
 
-        private void SaveAs(INbtFile file)
+        private void SaveAs(ISaveable file)
         {
             using (var dialog = new SaveFileDialog
             {
@@ -199,9 +199,14 @@ namespace NbtExplorer2.UI
                 }
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    var export = new ExportWindow(file.ExportSettings);
-                    if (export.ShowDialog() == DialogResult.OK)
-                        file.SaveAs(dialog.FileName, export.GetSettings());
+                    if (file is INbtFile nbtfile)
+                    {
+                        var export = new ExportWindow(nbtfile.ExportSettings);
+                        if (export.ShowDialog() == DialogResult.OK)
+                            nbtfile.SaveAs(dialog.FileName, export.GetSettings());
+                    }
+                    else
+                        file.SaveAs(dialog.FileName);
                 }
             }
         }

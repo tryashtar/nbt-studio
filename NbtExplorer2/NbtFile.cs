@@ -94,6 +94,12 @@ namespace NbtExplorer2
             ExportSettings.Export(Path, RootTag);
         }
 
+        public void SaveAs(string path)
+        {
+            Path = path;
+            Save();
+        }
+
         public void SaveAs(string path, ExportSettings settings)
         {
             Path = path;
@@ -102,12 +108,17 @@ namespace NbtExplorer2
         }
     }
 
-    public interface INbtFile
+    public interface ISaveable
     {
         string Path { get; }
-        ExportSettings ExportSettings { get; }
         bool CanSave { get; }
         void Save();
+        void SaveAs(string path);
+    }
+
+    public interface INbtFile : ISaveable
+    {
+        ExportSettings ExportSettings { get; }
         void SaveAs(string path, ExportSettings settings);
     }
 }

@@ -14,14 +14,18 @@ namespace NbtExplorer2.UI
         {
             if (obj is NbtTag tag)
                 return NotifyWrapNbt(tree, obj, tag);
-            if (obj is NbtFile file)
-                return new NotifyNbtFile(file, tree, obj);
+            if (obj is ISaveable saveable)
+                return NotifyWrapSaveable(tree, obj, saveable);
             throw new ArgumentException($"Can't notify wrap {obj.GetType()}");
         }
 
-        private static NotifyNbtFile NotifyWrapFile(NbtTreeModel tree, NbtFile file)
+        private static SaveableNotifyNode NotifyWrapSaveable(NbtTreeModel tree, object original, ISaveable saveable)
         {
-            return new NotifyNbtFile(file, tree, file);
+            if (saveable is NbtFile file)
+                return new NotifyNbtFile(file, tree, original);
+            if (saveable is RegionFile region)
+                return new NotifyRegionFile(region, tree, original);
+            throw new ArgumentException($"Can't notify wrap {saveable.GetType()}");
         }
 
         private static INotifyNbt NotifyWrapNbt(NbtTreeModel tree, object original, NbtTag tag)
@@ -86,22 +90,45 @@ namespace NbtExplorer2.UI
             protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
         }
 
-        public class NotifyNbtFile : NotifyNode, INbtFile
+        public abstract class SaveableNotifyNode : NotifyNode, ISaveable
+        {
+            protected SaveableNotifyNode(NbtTreeModel tree, object source) : base(tree, source) { }
+            public abstract string Path { get; }
+            public abstract bool CanSave { get; }
+            public abstract void Save();
+            public abstract void SaveAs(string path);
+            protected void NotifySaved()
+            {
+                Tree.HasUnsavedChanges = false;
+            }
+        }
+
+        public class NotifyNbtFile : SaveableNotifyNode, INbtFile
         {
             private readonly NbtFile File;
             public NotifyNbtFile(NbtFile file, NbtTreeModel tree, object original) : base(tree, original)
             {
                 File = file;
             }
-            private void NotifySaved()
-            {
-                Tree.HasUnsavedChanges = false;
-            }
-            public string Path => File.Path;
+            public override string Path => File.Path;
             public ExportSettings ExportSettings => File.ExportSettings;
-            public bool CanSave => File.CanSave;
-            public void Save() { File.Save(); NotifySaved(); }
+            public override bool CanSave => File.CanSave;
+            public override void Save() { File.Save(); NotifySaved(); }
+            public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
             public void SaveAs(string path, ExportSettings settings) { File.SaveAs(path, settings); Notify(); NotifySaved(); }
+        }
+
+        public class NotifyRegionFile : SaveableNotifyNode
+        {
+            private readonly RegionFile File;
+            public NotifyRegionFile(RegionFile file, NbtTreeModel tree, object original) : base(tree, original)
+            {
+                File = file;
+            }
+            public override string Path => File.Path;
+            public override bool CanSave => File.CanSave;
+            public override void Save() { File.Save(); NotifySaved(); }
+            public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
         }
 
         public abstract class NotifyNbtTag : NotifyNode, INotifyNbt
