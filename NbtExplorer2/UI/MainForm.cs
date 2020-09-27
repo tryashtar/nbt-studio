@@ -392,6 +392,9 @@ namespace NbtExplorer2.UI
         {
             ActionSave.Enabled = ViewModel?.HasUnsavedChanges ?? false;
             ActionSaveAs.Enabled = ViewModel != null;
+            var save_image = ViewModel != null && ViewModel.OpenedFiles.Skip(1).Any() ? Properties.Resources.action_save_all_image : Properties.Resources.action_save_image;
+            ActionSave.Image = save_image;
+            ActionSaveAs.Image = save_image;
             ActionRefresh.Enabled = ViewModel != null;
             ActionUndo.Enabled = ViewModel?.CanUndo ?? false;
             ActionRedo.Enabled = ViewModel?.CanRedo ?? false;

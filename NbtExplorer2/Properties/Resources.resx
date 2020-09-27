@@ -196,6 +196,12 @@
   <data name="action_rename_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_rename_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="action_save_all_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_save_all_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="action_save_all_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_save_all_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="action_save_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_save_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

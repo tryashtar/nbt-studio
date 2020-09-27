@@ -338,5 +338,11 @@
   <ItemGroup>
     <None Include="Resources\chunk_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_all_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_all_image.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -49,20 +49,14 @@ namespace NbtExplorer2
             return with_header;
         }
 
-        private byte[] ReadFromStream()
-        {
-            Stream.Seek(Offset, SeekOrigin.Begin);
-            return Util.ReadBytes(Stream, Size);
-        }
-
         public void Load()
         {
             if (IsCorrupt) return;
-            var data = ReadFromStream();
+            Stream.Seek(Offset + 5, SeekOrigin.Begin);
             var file = new fNbt.NbtFile();
             try
             {
-                file.LoadFromBuffer(data, 5, data.Length - 5, NbtCompression.AutoDetect);
+                file.LoadFromStream(Stream, NbtCompression.AutoDetect);
                 Compression = file.FileCompression;
                 Data = file.RootTag;
             }

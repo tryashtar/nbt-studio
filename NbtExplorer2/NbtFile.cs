@@ -35,9 +35,9 @@ namespace NbtExplorer2
         public static NbtFile TryCreate(string path)
         {
             return TryCreateFromSnbt(path)
+                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true) // java files
                    ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false) // bedrock files
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8) // bedrock level.dat files
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true); // java files
+                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8); // bedrock level.dat files
         }
 
         public static NbtFile TryCreateFromSnbt(string path)

@@ -24,8 +24,20 @@ namespace NbtExplorer2.UI
                 Button.Enabled = value;
             }
         }
+        private Image _Image;
+        public Image Image
+        {
+            get => _Image;
+            set
+            {
+                _Image = value;
+                MenuItem.Image = value;
+                Button.Image = value;
+            }
+        }
         public DualMenuItem(string text, string hover, Image image, Keys shortcut)
         {
+            _Image = image;
             MenuItem = Single(text, image, shortcut);
             Button = Single(hover, image);
             MenuItem.Click += (s, e) => Click?.Invoke(s, e);
