@@ -93,6 +93,7 @@
             this.NbtTree.DragDropMarkColor = System.Drawing.Color.Black;
             this.NbtTree.Font = new System.Drawing.Font("Arial", 9F);
             this.NbtTree.LineColor = System.Drawing.SystemColors.ControlDark;
+            this.NbtTree.LoadOnDemand = true;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);
             this.NbtTree.Model = null;
             this.NbtTree.Name = "NbtTree";
@@ -103,6 +104,7 @@
             this.NbtTree.TabIndex = 3;
             this.NbtTree.Text = "NBT Tree";
             this.NbtTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.NbtTree_ItemDrag);
+            this.NbtTree.NodeMouseClick += new System.EventHandler<Aga.Controls.Tree.TreeNodeAdvMouseEventArgs>(this.NbtTree_NodeMouseClick);
             this.NbtTree.NodeMouseDoubleClick += new System.EventHandler<Aga.Controls.Tree.TreeNodeAdvMouseEventArgs>(this.NbtTree_NodeMouseDoubleClick);
             this.NbtTree.SelectionChanged += new System.EventHandler(this.NbtTree_SelectionChanged);
             this.NbtTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragDrop);

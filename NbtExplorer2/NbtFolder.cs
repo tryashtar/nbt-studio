@@ -11,27 +11,50 @@ namespace NbtExplorer2
     public class NbtFolder
     {
         public readonly string Path;
+        public readonly bool Recursive;
+        public bool HasScanned { get; private set; } = false;
         public IReadOnlyCollection<NbtFolder> Subfolders => _Subfolders.AsReadOnly();
-        public IReadOnlyCollection<NbtFile> Files => _Files.AsReadOnly();
+        public IReadOnlyCollection<ISaveable> Files => _Files.AsReadOnly();
         private readonly List<NbtFolder> _Subfolders = new List<NbtFolder>();
-        private readonly List<NbtFile> _Files = new List<NbtFile>();
+        private readonly List<ISaveable> _Files = new List<ISaveable>();
 
         public NbtFolder(string path, bool recursive)
         {
             Path = path;
-            foreach (var item in Directory.GetFiles(path))
+            Recursive = recursive;
+        }
+
+        public void Scan()
+        {
+            HasScanned = true;
+            _Files.Clear();
+            _Subfolders.Clear();
+            foreach (var item in Directory.GetFiles(Path))
             {
-                var file = NbtFile.TryCreate(item);
+                var file = OpenFile(item);
                 if (file != null)
                     _Files.Add(file);
             }
-            if (recursive)
+            if (Recursive)
             {
-                foreach (var item in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+                foreach (var item in Directory.GetDirectories(Path, "*", SearchOption.AllDirectories))
                 {
                     _Subfolders.Add(new NbtFolder(item, true));
                 }
             }
+        }
+
+        public static ISaveable OpenFile(string path)
+        {
+            return (ISaveable)NbtFile.TryCreate(path) ??
+                RegionFile.TryCreate(path);
+        }
+
+        public static object OpenFileOrFolder(string path)
+        {
+            if (Directory.Exists(path))
+                return new NbtFolder(path, true);
+            return OpenFile(path);
         }
     }
 }

@@ -342,24 +342,13 @@ namespace NbtExplorer2.UI
 
         private void OpenFiles(IEnumerable<string> paths)
         {
-            var files = paths.Select(x => OpenFile(x)).ToList();
+            var files = paths.Select(x => NbtFolder.OpenFileOrFolder(x)).ToList();
             var bad = files.Where(x => x == null);
             var good = files.Where(x => x != null);
             if (bad.Any())
                 MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load failure");
             if (good.Any())
                 ViewModel = new NbtTreeModel(good, NbtTree);
-        }
-
-        private object OpenFile(string path)
-        {
-            var file = NbtFile.TryCreate(path);
-            if (file != null)
-                return file;
-            try
-            { return new RegionFile(path); }
-            catch { }
-            return null;
         }
 
         private bool ConfirmIfUnsaved(string message)
@@ -487,6 +476,12 @@ namespace NbtExplorer2.UI
         {
             if (!ConfirmIfUnsaved("Exit anyway?"))
                 e.Cancel = true;
+        }
+
+        private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                MessageBox.Show("Test");
         }
     }
 }

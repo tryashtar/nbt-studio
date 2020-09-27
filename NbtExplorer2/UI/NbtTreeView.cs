@@ -81,10 +81,10 @@ namespace NbtExplorer2.UI
             base.OnDragOver(drgevent);
         }
 
-        private IEnumerable<object> NodesFromDrag(DragEventArgs e)
+        public TreeNodeAdv[] NodesFromDrag(DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
-                return null;
+                return new TreeNodeAdv[0];
             return (TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]));
         }
 
@@ -113,13 +113,19 @@ namespace NbtExplorer2.UI
                 // space to toggle collapsed/expanded
                 if (keyData == Keys.Space)
                 {
-                    ToggleExpansion(SelectedNode);
+                    foreach (var item in SelectedNodes)
+                    {
+                        ToggleExpansion(item);
+                    }
                     return true;
                 }
                 // control-space to expand all
                 if (keyData == (Keys.Space | Keys.Control))
                 {
-                    ToggleExpansion(SelectedNode, true);
+                    foreach (var item in SelectedNodes)
+                    {
+                        ToggleExpansion(item, true);
+                    }
                     return true;
                 }
                 // control-up to select parent
@@ -258,7 +264,17 @@ namespace NbtExplorer2.UI
             if (obj is NbtFile file)
                 return NbtUtil.PreviewNbtValue(file.RootTag.Adapt());
             if (obj is NbtFolder folder)
-                return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+            {
+                if (folder.HasScanned)
+                {
+                    if (folder.Subfolders.Any())
+                        return $"[{Util.Pluralize(folder.Subfolders.Count, "folder")}, {Util.Pluralize(folder.Files.Count, "file")}]";
+                    else
+                        return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+                }
+                else
+                    return "(open to load)";
+            }
             if (obj is RegionFile region)
                 return $"[{Util.Pluralize(region.ChunkCount, "chunk")}]";
             if (obj is Chunk chunk)

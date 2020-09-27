@@ -88,19 +88,14 @@ namespace NbtExplorer2.UI
             Roots = roots;
             View = view;
             View.Model = this;
-            // expand all top-level objects
-            foreach (var item in View.Root.Children)
-            {
-                item.Expand();
-            }
+            if (Roots.Take(2).Count() == 1) // if there is one item, expand it
+                View.Root.Children.First().Expand();
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
         public IEnumerable<INotifyNbt> NbtsFromDrag(DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
-                return Enumerable.Empty<INotifyNbt>();
-            return ((TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]))).Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
+            return View.NodesFromDrag(e).Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
         }
         public INbtTag DropTag
         {
@@ -250,7 +245,14 @@ namespace NbtExplorer2.UI
         private IEnumerable<object> GetChildren(object obj)
         {
             if (obj is NbtFolder folder)
+            {
+                if (!folder.HasScanned)
+                {
+                    folder.Scan();
+                    Changed?.Invoke(this, EventArgs.Empty);
+                }
                 return folder.Subfolders.Concat<object>(folder.Files);
+            }
             if (obj is NbtFile file)
                 return file.RootTag.Tags;
             if (obj is RegionFile region)
@@ -276,7 +278,9 @@ namespace NbtExplorer2.UI
 
         private bool HasChildren(object obj)
         {
-            if (obj is Chunk)
+            if (obj is Chunk chunk && !chunk.IsLoaded)
+                return true;
+            if (obj is NbtFolder folder && !folder.HasScanned)
                 return true;
             var children = GetChildren(obj);
             return children != null && children.Any();

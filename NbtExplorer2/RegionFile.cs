@@ -46,6 +46,13 @@ namespace NbtExplorer2
                 throw new FormatException($"Region doesn't contain any chunks");
         }
 
+        public static RegionFile TryCreate(string path)
+        {
+            try
+            { return new RegionFile(path); }
+            catch { return null; }
+        }
+
         public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
 
         public Chunk GetChunk(int x, int z)
