@@ -47,8 +47,8 @@
             this.SizeBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.SizeBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.SizeBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.SizeBox.Location = new System.Drawing.Point(59, 36);
-            this.SizeBox.Margin = new System.Windows.Forms.Padding(5, 5, 10, 5);
+            this.SizeBox.Location = new System.Drawing.Point(64, 41);
+            this.SizeBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.SizeBox.Name = "SizeBox";
             this.SizeBox.Size = new System.Drawing.Size(71, 21);
             this.SizeBox.TabIndex = 3;
@@ -57,8 +57,8 @@
             // 
             this.SizeLabel.AutoSize = true;
             this.SizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.SizeLabel.Location = new System.Drawing.Point(5, 36);
-            this.SizeLabel.Margin = new System.Windows.Forms.Padding(10, 5, 5, 5);
+            this.SizeLabel.Location = new System.Drawing.Point(10, 41);
+            this.SizeLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.SizeLabel.Name = "SizeLabel";
             this.SizeLabel.Size = new System.Drawing.Size(34, 15);
             this.SizeLabel.TabIndex = 2;
@@ -68,8 +68,8 @@
             // 
             this.NameLabel.AutoSize = true;
             this.NameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.NameLabel.Location = new System.Drawing.Point(5, 5);
-            this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 5);
+            this.NameLabel.Location = new System.Drawing.Point(10, 10);
+            this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
             this.NameLabel.TabIndex = 0;
@@ -80,8 +80,8 @@
             this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
             this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.NameBox.Location = new System.Drawing.Point(59, 5);
-            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 5);
+            this.NameBox.Location = new System.Drawing.Point(64, 10);
+            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(209, 21);
             this.NameBox.TabIndex = 1;
@@ -114,8 +114,8 @@
             // 
             this.ValueLabel.AutoSize = true;
             this.ValueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ValueLabel.Location = new System.Drawing.Point(5, 67);
-            this.ValueLabel.Margin = new System.Windows.Forms.Padding(10, 5, 5, 5);
+            this.ValueLabel.Location = new System.Drawing.Point(10, 72);
+            this.ValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.ValueLabel.Name = "ValueLabel";
             this.ValueLabel.Size = new System.Drawing.Size(41, 15);
             this.ValueLabel.TabIndex = 4;
@@ -126,8 +126,8 @@
             this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ValueBox.Location = new System.Drawing.Point(59, 67);
-            this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 5, 10, 5);
+            this.ValueBox.Location = new System.Drawing.Point(64, 72);
+            this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.ValueBox.Name = "ValueBox";
             this.ValueBox.Size = new System.Drawing.Size(209, 21);
             this.ValueBox.TabIndex = 5;
@@ -143,8 +143,8 @@
             this.MainTable.Controls.Add(this.SizeLabel, 0, 1);
             this.MainTable.Controls.Add(this.NameBox, 1, 0);
             this.MainTable.Controls.Add(this.ValueLabel, 0, 2);
-            this.MainTable.Controls.Add(this.ValueBox, 1, 2);
             this.MainTable.Controls.Add(this.ButtonsPanel, 1, 3);
+            this.MainTable.Controls.Add(this.ValueBox, 1, 2);
             this.MainTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTable.Location = new System.Drawing.Point(0, 0);
             this.MainTable.Name = "MainTable";
@@ -162,7 +162,7 @@
             this.ButtonsPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ButtonsPanel.Controls.Add(this.ButtonOk);
             this.ButtonsPanel.Controls.Add(this.ButtonCancel);
-            this.ButtonsPanel.Location = new System.Drawing.Point(57, 96);
+            this.ButtonsPanel.Location = new System.Drawing.Point(283, 141);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
             this.ButtonsPanel.TabIndex = 8;
