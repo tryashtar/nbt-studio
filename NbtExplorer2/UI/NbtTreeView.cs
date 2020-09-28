@@ -1,4 +1,4 @@
-﻿using Aga.Controls.Tree;
+using Aga.Controls.Tree;
 using Aga.Controls.Tree.NodeControls;
 using fNbt;
 using System;
@@ -46,7 +46,7 @@ namespace NbtExplorer2.UI
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            if (e.Clicks == 2)
+            if (e.Clicks == 2 && e.Button == MouseButtons.Left)
                 base.OnMouseDoubleClick(e); // toggle expansion
             base.OnMouseDown(e);
         }

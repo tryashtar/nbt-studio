@@ -33,6 +33,13 @@ namespace NbtExplorer2.UI
             SizeLabel.Visible = SettingSize;
             SizeBox.Visible = SettingSize;
 
+            if (tag.TagType == NbtTagType.String)
+            {
+                ValueBox.Multiline = true;
+                ValueBox.AcceptsReturn = true;
+                ValueBox.Width *= 2;
+                ValueBox.Height *= 6;
+            }
             this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
             if (purpose == EditPurpose.Create)
                 this.Text = $"Create {NbtUtil.TagTypeName(tag.TagType)} Tag";
@@ -40,7 +47,7 @@ namespace NbtExplorer2.UI
             {
                 this.Text = $"Edit {NbtUtil.TagTypeName(tag.TagType)} Tag";
                 NameBox.Text = tag.Name;
-                ValueBox.Text = NbtUtil.PreviewNbtValue(tag);
+                ValueBox.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
             }
 
             if (SettingName && purpose != EditPurpose.EditValue)
@@ -108,7 +115,7 @@ namespace NbtExplorer2.UI
             var name = NameBox.Text.Trim();
             var str_size = SizeBox.Text.Trim();
             int? int_size = null;
-            var str_value = ValueBox.Text.Trim();
+            var str_value = ValueBox.Text.Trim().Replace("\r", "");
             object parsed_value = null;
 
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
