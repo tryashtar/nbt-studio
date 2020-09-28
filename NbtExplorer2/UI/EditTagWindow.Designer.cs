@@ -50,7 +50,7 @@
             this.SizeBox.Location = new System.Drawing.Point(64, 41);
             this.SizeBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.SizeBox.Name = "SizeBox";
-            this.SizeBox.Size = new System.Drawing.Size(71, 21);
+            this.SizeBox.Size = new System.Drawing.Size(96, 21);
             this.SizeBox.TabIndex = 3;
             // 
             // SizeLabel
@@ -135,6 +135,7 @@
             // MainTable
             // 
             this.MainTable.AutoSize = true;
+            this.MainTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.MainTable.ColumnCount = 2;
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());

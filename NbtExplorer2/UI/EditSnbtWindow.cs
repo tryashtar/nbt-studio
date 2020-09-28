@@ -16,11 +16,27 @@ namespace NbtExplorer2.UI
         public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
+            InputBox.Size = new Size(0, 0);
 
             WorkingTag = tag;
             TagParent = parent;
             SettingName = set_name;
             var required = RequiredType();
+            if (required == null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
+            {
+                this.Width = this.Width * 5 / 2;
+                this.Height = this.Height * 5 / 2;
+                MinifyCheck.Visible = true;
+            }
+            else if (required.Value == NbtTagType.String || NbtUtil.IsArrayType(required.Value))
+            {
+                this.Width = this.Width * 2;
+                this.Height = this.Height * 3 / 2;
+            }
+            else if (required.Value == NbtTagType.Float || required.Value == NbtTagType.Double)
+            {
+                this.Width = this.Width * 3 / 2;
+            }
 
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
