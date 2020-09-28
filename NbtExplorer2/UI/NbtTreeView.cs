@@ -1,4 +1,4 @@
-using Aga.Controls.Tree;
+﻿using Aga.Controls.Tree;
 using Aga.Controls.Tree.NodeControls;
 using fNbt;
 using System;
@@ -195,13 +195,13 @@ namespace NbtExplorer2.UI
             if (halves != null)
             {
                 var size = MeasureSize(node, context);
-                Point point = new Point(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
+                PointF point = new PointF(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
                 DrawSelection(node, context);
                 var boldfont = new Font(context.Font, FontStyle.Bold);
                 if (halves.Item1 != null)
                 {
                     context.Graphics.DrawString(halves.Item1, boldfont, new SolidBrush(Parent.ForeColor), point);
-                    point.X += TextRenderer.MeasureText(halves.Item1, boldfont).Width;
+                    point.X += context.Graphics.MeasureString(halves.Item1, boldfont).Width;
                 }
                 context.Graphics.DrawString(halves.Item2, context.Font, new SolidBrush(Parent.ForeColor), point);
             }
@@ -223,12 +223,12 @@ namespace NbtExplorer2.UI
             if (halves == null)
                 return Size.Empty;
             var boldfont = new Font(context.Font, FontStyle.Bold);
-            Size s1 = halves.Item1 == null ? Size.Empty : TextRenderer.MeasureText(halves.Item1, boldfont);
-            Size s2 = TextRenderer.MeasureText(halves.Item2, context.Font);
-            return new Size(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
+            SizeF s1 = halves.Item1 == null ? SizeF.Empty : context.Graphics.MeasureString(halves.Item1, boldfont);
+            SizeF s2 = context.Graphics.MeasureString(halves.Item2, context.Font);
+            return new Size((int)Math.Round(s1.Width + s2.Width), (int)Math.Ceiling(Math.Max(s1.Height, s2.Height)));
         }
 
-        private Tuple<string, string> GetText(TreeNodeAdv node)
+        private static Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
             var text = PreviewNameAndValue(obj);
@@ -289,7 +289,7 @@ namespace NbtExplorer2.UI
             return null;
         }
 
-        private string Flatten(string text)
+        private static string Flatten(string text)
         {
             if (text == null) return null;
             return text.Replace("\n", "⏎").Replace("\r", "⏎");
