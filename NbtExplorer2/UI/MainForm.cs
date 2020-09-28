@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using Aga.Controls.Tree;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NbtExplorer2.SNBT;
+using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace NbtExplorer2.UI
 {
@@ -39,7 +41,8 @@ namespace NbtExplorer2.UI
         private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", Properties.Resources.action_open_folder_image, Keys.Control | Keys.Shift | Keys.O);
         private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", Properties.Resources.action_save_image, Keys.Control | Keys.S);
         private readonly ToolStripMenuItem ActionSaveAs = DualMenuItem.Single("Save &As", Properties.Resources.action_save_image, Keys.Control | Keys.Shift | Keys.S);
-        private readonly DualMenuItem ActionRefresh = new DualMenuItem("&Refresh", "Refresh", Properties.Resources.action_refresh_image, Keys.F5);
+        private readonly DualMenuItem ActionRefresh = new DualMenuItem("Re&fresh", "Refresh", Properties.Resources.action_refresh_image, Keys.F5);
+        private readonly ToolStripMenuItem DropDownRecent = DualMenuItem.Single("&Recent...", null, Keys.None);
         private readonly ToolStripButton ActionSort = DualMenuItem.Single("Sort", Properties.Resources.action_sort_image);
         private readonly ToolStripMenuItem ActionUndo = DualMenuItem.Single("&Undo", Properties.Resources.action_undo_image, Keys.Control | Keys.Z);
         private readonly ToolStripMenuItem ActionRedo = DualMenuItem.Single("&Redo", Properties.Resources.action_redo_image, Keys.Control | Keys.Shift | Keys.Z);
@@ -55,6 +58,8 @@ namespace NbtExplorer2.UI
         public MainForm(string[] args)
         {
             ClickedFiles = args;
+            if (Properties.Settings.Default.RecentFiles == null)
+                Properties.Settings.Default.RecentFiles = new StringCollection();
 
             // stuff from the designer
             InitializeComponent();
@@ -86,6 +91,8 @@ namespace NbtExplorer2.UI
             ActionSave.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(ActionSaveAs);
             ActionRefresh.AddTo(Tools, MenuFile);
+            MenuFile.DropDownItems.Add(new ToolStripSeparator());
+            MenuFile.DropDownItems.Add(DropDownRecent);
             Tools.Items.Add(ActionSort);
             Tools.Items.Add(new ToolStripSeparator());
             MenuEdit.DropDownItems.Add(ActionUndo);
@@ -141,7 +148,7 @@ namespace NbtExplorer2.UI
             })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
-                    OpenFiles(dialog.FileNames);
+                    OpenFiles(dialog.FileNames, skip_confirm: true);
             }
         }
 
@@ -158,7 +165,7 @@ namespace NbtExplorer2.UI
             })
             {
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    OpenFolder(dialog.FileName);
+                    OpenFolder(dialog.FileName, skip_confirm: true);
             }
         }
 
@@ -221,6 +228,12 @@ namespace NbtExplorer2.UI
 
         private void DoRefresh(ISaveable file)
         { }
+
+        private void OpenInExplorer(ISaveable file)
+        {
+            var info = new ProcessStartInfo { FileName = "explorer", Arguments = $"/select, \"{file.Path}\"" };
+            Process.Start(info);
+        }
 
         private void Sort()
         {
@@ -348,20 +361,28 @@ namespace NbtExplorer2.UI
             return buttons;
         }
 
-        private void OpenFolder(string path)
+        private void OpenFolder(string path, bool skip_confirm = false)
         {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
+                return;
+            Properties.Settings.Default.RecentFiles.Add(path);
             ViewModel = new NbtTreeModel(new NbtFolder(path, true), NbtTree);
         }
 
-        private void OpenFiles(IEnumerable<string> paths)
+        private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
         {
-            var files = paths.Select(x => NbtFolder.OpenFileOrFolder(x)).ToList();
-            var bad = files.Where(x => x == null);
-            var good = files.Where(x => x != null);
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
+                return;
+            var files = paths.Distinct().ToDictionary(x => Path.GetFullPath(x), x => NbtFolder.OpenFileOrFolder(x)).ToList();
+            var bad = files.Where(x => x.Value == null);
+            var good = files.Where(x => x.Value != null);
             if (bad.Any())
                 MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load failure");
             if (good.Any())
-                ViewModel = new NbtTreeModel(good, NbtTree);
+            {
+                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.Key).ToArray());
+                ViewModel = new NbtTreeModel(good.Select(x => x.Value), NbtTree);
+            }
         }
 
         private bool ConfirmIfUnsaved(string message)
@@ -502,6 +523,8 @@ namespace NbtExplorer2.UI
                 {
                     menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
                     menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
+                    if (file.Path != null)
+                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(file));
                     menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => DoRefresh(file));
                 }
                 if (nbt is INbtContainer container)
@@ -523,6 +546,54 @@ namespace NbtExplorer2.UI
                 }
                 menu.Show(NbtTree.PointToScreen(e.Location));
             }
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private void MenuFile_DropDownOpening(object sender, EventArgs e)
+        {
+            // remove duplicates of recent files and limit to 20 most recent
+            var distinct = Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Distinct();
+            var recents = distinct.Take(20).ToList();
+
+            DropDownRecent.Enabled = recents.Count > 0;
+            DropDownRecent.DropDownItems.Clear();
+            var items = new List<ToolStripMenuItem>();
+            foreach (string path in recents.ToList())
+            {
+                var item = RecentEntry(path);
+                if (item == null)
+                    recents.Remove(path);
+                else
+                    items.Add(item);
+            }
+            DropDownRecent.DropDownItems.AddRange(items.ToArray());
+
+            Properties.Settings.Default.RecentFiles.Clear();
+            Properties.Settings.Default.RecentFiles.AddRange(recents.AsEnumerable().Reverse().ToArray());
+        }
+
+        private ToolStripMenuItem RecentEntry(string path)
+        {
+            bool directory = Directory.Exists(path);
+            Image image;
+            EventHandler click;
+            if (directory)
+            {
+                image = Properties.Resources.folder_image;
+                click = (s, e) => OpenFolder(path);
+            }
+            else
+            {
+                if (!File.Exists(path))
+                    return null;
+                image = Properties.Resources.file_image;
+                click = (s, e) => OpenFiles(new[] { path });
+            }
+            return new ToolStripMenuItem(path, image, click);
         }
     }
 }

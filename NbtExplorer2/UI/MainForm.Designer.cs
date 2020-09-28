@@ -64,6 +64,7 @@
             this.MenuFile.Name = "MenuFile";
             this.MenuFile.Size = new System.Drawing.Size(37, 20);
             this.MenuFile.Text = "&File";
+            this.MenuFile.DropDownOpening += new System.EventHandler(this.MenuFile_DropDownOpening);
             // 
             // MenuEdit
             // 
@@ -122,6 +123,7 @@
             this.Name = "MainForm";
             this.Text = "NbtExplorer 2";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();
