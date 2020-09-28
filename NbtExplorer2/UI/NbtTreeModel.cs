@@ -138,7 +138,8 @@ namespace NbtExplorer2.UI
             var remove = current_children.Except(real_children).ToArray();
             var add = real_children.Except(current_children).ToArray();
 
-            NodesChanged?.Invoke(this, new TreeModelEventArgs(path, real_children.ToArray()));
+            var parent_path = new TreePath(path.FullPath.Take(path.FullPath.Length - 1).ToArray());
+            NodesChanged?.Invoke(this, new TreeModelEventArgs(parent_path, new object[] { changed }));
             if (remove.Any())
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
             if (add.Any())
