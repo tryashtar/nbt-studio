@@ -83,7 +83,7 @@
             this.ButtonsPanel.Controls.Add(this.ButtonCancel);
             this.ButtonsPanel.Controls.Add(this.ButtonOk);
             this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ButtonsPanel.Location = new System.Drawing.Point(0, 96);
+            this.ButtonsPanel.Location = new System.Drawing.Point(0, 80);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(284, 41);
             this.ButtonsPanel.TabIndex = 13;
@@ -98,10 +98,9 @@
             this.InputBox.Location = new System.Drawing.Point(10, 41);
             this.InputBox.Margin = new System.Windows.Forms.Padding(10);
             this.InputBox.MaxLength = 2147483647;
-            this.InputBox.Multiline = true;
             this.InputBox.Name = "InputBox";
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.InputBox.Size = new System.Drawing.Size(264, 45);
+            this.InputBox.Size = new System.Drawing.Size(264, 26);
             this.InputBox.TabIndex = 4;
             this.InputBox.WordWrap = false;
             this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
@@ -143,22 +142,24 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.MainTable.Size = new System.Drawing.Size(284, 96);
+            this.MainTable.Size = new System.Drawing.Size(284, 80);
             this.MainTable.TabIndex = 13;
             // 
             // EditSnbtWindow
             // 
+            this.AcceptButton = this.ButtonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.AutoSize = true;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(284, 137);
+            this.ClientSize = new System.Drawing.Size(284, 121);
             this.Controls.Add(this.MainTable);
             this.Controls.Add(this.ButtonsPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(300, 176);
+            this.MinimumSize = new System.Drawing.Size(300, 147);
             this.Name = "EditSnbtWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

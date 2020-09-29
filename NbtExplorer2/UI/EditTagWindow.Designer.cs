@@ -129,6 +129,7 @@
             this.ValueBox.Location = new System.Drawing.Point(64, 72);
             this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.ValueBox.Name = "ValueBox";
+            this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ValueBox.Size = new System.Drawing.Size(209, 21);
             this.ValueBox.TabIndex = 5;
             // 

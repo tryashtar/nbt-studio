@@ -27,16 +27,23 @@ namespace NbtExplorer2.UI
                 this.Width = this.Width * 5 / 2;
                 this.Height = this.Height * 5 / 2;
                 MinifyCheck.Visible = true;
+                InputBox.Multiline = true;
             }
             else if (required.Value == NbtTagType.String || NbtUtil.IsArrayType(required.Value))
             {
                 this.Width = this.Width * 2;
                 this.Height = this.Height * 3 / 2;
+                InputBox.Multiline = true;
+                InputBox.WordWrap = true;
+                InputBox.ScrollBars = ScrollBars.Vertical;
             }
             else if (required.Value == NbtTagType.Float || required.Value == NbtTagType.Double)
             {
                 this.Width = this.Width * 3 / 2;
             }
+            InputBox.AcceptsReturn = InputBox.Multiline;
+            if (InputBox.Multiline)
+                this.FormBorderStyle = FormBorderStyle.Sizable;
 
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
