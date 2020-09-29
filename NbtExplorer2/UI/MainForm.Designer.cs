@@ -119,6 +119,7 @@
             this.Controls.Add(this.NbtTree);
             this.Controls.Add(this.Tools);
             this.Controls.Add(this.MenuStrip);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.MenuStrip;
             this.Name = "MainForm";
             this.Text = "NbtExplorer 2";

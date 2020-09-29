@@ -37,6 +37,7 @@ namespace NbtExplorer2.UI
         private readonly string[] ClickedFiles;
 
         private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", Properties.Resources.action_new_image, Keys.Control | Keys.N);
+        private readonly ToolStripMenuItem ActionNewClipboard = DualMenuItem.Single("New from &Clipboard", Properties.Resources.action_paste_image, Keys.Control | Keys.Alt | Keys.V);
         private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", Properties.Resources.action_open_file_image, Keys.Control | Keys.O);
         private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", Properties.Resources.action_open_folder_image, Keys.Control | Keys.Shift | Keys.O);
         private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", Properties.Resources.action_save_image, Keys.Control | Keys.S);
@@ -66,6 +67,7 @@ namespace NbtExplorer2.UI
 
             // stuff excluded from the designer for cleaner/less duplicated code
             ActionNew.Click += (s, e) => New();
+            ActionNewClipboard.Click += (s, e) => NewPaste();
             ActionOpenFile.Click += (s, e) => OpenFile();
             ActionOpenFolder.Click += (s, e) => OpenFolder();
             ActionSave.Click += (s, e) => Save();
@@ -91,6 +93,7 @@ namespace NbtExplorer2.UI
             ActionSave.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(ActionSaveAs);
             ActionRefresh.AddTo(Tools, MenuFile);
+            MenuFile.DropDownItems.Add(ActionNewClipboard);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             MenuFile.DropDownItems.Add(DropDownRecent);
             Tools.Items.Add(ActionSort);
@@ -132,7 +135,28 @@ namespace NbtExplorer2.UI
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
-            ViewModel = new NbtTreeModel(new NbtFile(), NbtTree);
+            OpenFile(new NbtFile(), skip_confirm: true);
+        }
+
+        private void NewPaste()
+        {
+            if (!Clipboard.ContainsText())
+                return;
+            var text = Clipboard.GetText();
+            if (SnbtParser.TryParse(text, named: false, out var tag) || SnbtParser.TryParse(text, named: true, out tag))
+            {
+                if (tag is NbtCompound compound)
+                    OpenFile(new NbtFile(compound));
+                else
+                {
+                    var root = new NbtCompound();
+                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), root.AdaptCompound());
+                    root.Add(tag);
+                    OpenFile(new NbtFile(root));
+                }
+            }
+            else
+                MessageBox.Show("Failed to parse SNBT from clipboard.", "Clipboard Error");
         }
 
         private void OpenFile()
@@ -144,12 +168,19 @@ namespace NbtExplorer2.UI
                 Title = "Select NBT files",
                 RestoreDirectory = true,
                 Multiselect = true,
-                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.mca;*.mcr;*.schematic;*.mcstructure;*.snbt",
+                Filter = NbtUtil.OpenFilter()
             })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
                     OpenFiles(dialog.FileNames, skip_confirm: true);
             }
+        }
+
+        private void OpenFile(NbtFile file, bool skip_confirm = false)
+        {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
+                return;
+            ViewModel = new NbtTreeModel(file, NbtTree);
         }
 
         private void OpenFolder()
@@ -201,7 +232,8 @@ namespace NbtExplorer2.UI
             {
                 Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
                 RestoreDirectory = true,
-                Filter = "All Files|*|NBT Files|*.dat;*.nbt;*.mca;*.mcr;*.schematic;*.mcstructure;*.snbt"
+                FileName = file.Path,
+                Filter = NbtUtil.SaveFilter()
             })
             {
                 if (file.Path != null)
@@ -380,7 +412,7 @@ namespace NbtExplorer2.UI
             var bad = files.Where(x => x.Value == null);
             var good = files.Where(x => x.Value != null);
             if (bad.Any())
-                MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load failure");
+                MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load Failure");
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.Key).ToArray());
@@ -511,8 +543,10 @@ namespace NbtExplorer2.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+#if !DEBUG
             if (!ConfirmIfUnsaved("Exit anyway?"))
                 e.Cancel = true;
+#endif
         }
 
         private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
@@ -522,13 +556,24 @@ namespace NbtExplorer2.UI
                 var file = ViewModel.FileFromClick(e);
                 var nbt = ViewModel.NbtFromClick(e);
                 var menu = new ContextMenuStrip();
+                if (e.Node.CanExpand)
+                {
+                    if (e.Node.IsExpanded)
+                        menu.Items.Add("&Collapse", null, (s, ea) => e.Node.Collapse());
+                    else
+                        menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
+                }
                 if (file != null)
                 {
+                    if (menu.Items.Count > 0)
+                        menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
                     menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
                     if (file.Path != null)
+                    {
                         menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(file));
-                    menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => DoRefresh(file));
+                        menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => DoRefresh(file));
+                    }
                 }
                 if (nbt is INbtContainer container)
                 {
@@ -558,6 +603,8 @@ namespace NbtExplorer2.UI
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)
         {
+            ActionNewClipboard.Enabled = Clipboard.ContainsText();
+
             // remove duplicates of recent files and limit to 20 most recent
             var distinct = Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Distinct();
             var recents = distinct.Take(20).ToList();

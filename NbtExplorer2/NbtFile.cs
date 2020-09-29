@@ -25,9 +25,14 @@ namespace NbtExplorer2
             ExportSettings = settings;
         }
 
-        public NbtFile()
+        public NbtFile() : this(new NbtCompound(""))
+        { }
+
+        public NbtFile(NbtCompound root)
         {
-            RootTag = new NbtCompound("");
+            if (root.Name == null)
+                root.Name = "";
+            RootTag = root;
             Path = null;
             ExportSettings = null;
         }

@@ -399,6 +399,16 @@ namespace NbtExplorer2
             return ancestors;
         }
 
+        private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };
+        public static string SaveFilter()
+        {
+            return "NBT Files|" + String.Join("; ", NbtExtensions.Select(x => "*." + x)) + "|All Files|*";
+        }
+        public static string OpenFilter()
+        {
+            return "All Files|*|NBT Files|" + String.Join("; ", NbtExtensions.Select(x => "*." + x));
+        }
+
         public static Image TagTypeImage(NbtTagType type)
         {
             switch (type)

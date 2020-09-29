@@ -90,6 +90,8 @@ namespace NbtExplorer2.UI
             View.Model = this;
             if (Roots.Take(2).Count() == 1) // if there is one item, expand it
                 View.Root.Children.First().Expand();
+            if (OpenedFiles.Any(x => x.Path == null))
+                HasUnsavedChanges = true;
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
