@@ -105,6 +105,28 @@ namespace NbtExplorer2.UI
                 }
             }
         }
+        public IEnumerable<TreeNodeAdv> DepthFirstSearch() => DepthFirstSearch(x => true);
+        public IEnumerable<TreeNodeAdv> DepthFirstSearch(Predicate<TreeNodeAdv> predicate)
+        {
+            var stack = new Stack<TreeNodeAdv>();
+            stack.Push(Root);
+            while (stack.Any())
+            {
+                var item = stack.Pop();
+                if (item != Root && !predicate(item))
+                    continue;
+                if (!item.IsExpandedOnce)
+                {
+                    item.IsExpanded = !item.IsExpanded;
+                    item.IsExpanded = !item.IsExpanded;
+                }
+                yield return item;
+                foreach (var sub in item.Children.Reverse())
+                {
+                    stack.Push(sub);
+                }
+            }
+        }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -228,7 +250,7 @@ namespace NbtExplorer2.UI
             return new Size((int)Math.Round(s1.Width + s2.Width), (int)Math.Ceiling(Math.Max(s1.Height, s2.Height)));
         }
 
-        private static Tuple<string, string> GetText(TreeNodeAdv node)
+        public static Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
             var text = PreviewNameAndValue(obj);

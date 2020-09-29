@@ -69,6 +69,12 @@
     <Compile Include="UI\EditSnbtWindow.Designer.cs">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\FindWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FindWindow.Designer.cs">
+      <DependentUpon>FindWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -105,6 +111,9 @@
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FindWindow.resx">
+      <DependentUpon>FindWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>

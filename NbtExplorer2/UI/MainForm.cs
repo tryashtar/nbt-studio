@@ -321,7 +321,10 @@ namespace NbtExplorer2.UI
         }
 
         private void Find()
-        { }
+        {
+            var search = new FindWindow(NbtTree);
+            search.Show(this);
+        }
 
         private void AddSnbt()
         {
