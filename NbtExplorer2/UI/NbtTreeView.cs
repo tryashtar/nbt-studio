@@ -227,6 +227,15 @@ namespace NbtExplorer2.UI
             return null;
         }
 
+        public IEnumerable<TreeNodeAdv> Search(Predicate<TreeNodeAdv> predicate)
+        {
+            foreach (var item in SearchForward(Root))
+            {
+                if (predicate(item))
+                    yield return item;
+            }
+        }
+
         public TreeNodeAdv FinalNode
         {
             get

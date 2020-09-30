@@ -75,6 +75,21 @@ namespace NbtExplorer2.UI
             }
         }
 
+        public void SearchAll()
+        {
+            var results = SearchingView.Search(Matches);
+            if (results.Any())
+            {
+                SearchingView.ClearSelection();
+                LastFound = results.Last();
+                foreach (var item in results)
+                {
+                    SearchingView.EnsureVisible(item);
+                    item.IsSelected = true;
+                }
+            }
+        }
+
         private void ButtonFindNext_Click(object sender, EventArgs e)
         {
             Search(SearchDirection.Forward);
@@ -85,6 +100,11 @@ namespace NbtExplorer2.UI
             Search(SearchDirection.Backward);
         }
 
+        private void ButtonFindAll_Click(object sender, EventArgs e)
+        {
+            SearchAll();
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             // handle shift-enter to search backwards
@@ -92,6 +112,11 @@ namespace NbtExplorer2.UI
             if (keyData == (Keys.Shift | Keys.Enter))
             {
                 Search(SearchDirection.Backward);
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.Enter))
+            {
+                SearchAll();
                 return true;
             }
             if (keyData == Keys.Escape)
