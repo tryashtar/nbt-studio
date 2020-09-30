@@ -93,6 +93,9 @@
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\NbtNodeControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\NbtTreeModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

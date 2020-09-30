@@ -14,12 +14,6 @@ namespace NbtExplorer2.UI
         private TreeNodeAdv LastFound;
         private readonly NbtTreeView SearchingView;
 
-        public enum SearchDirection
-        {
-            Forward,
-            Backward
-        }
-
         public FindWindow(NbtTreeView view)
         {
             InitializeComponent();
@@ -56,7 +50,7 @@ namespace NbtExplorer2.UI
         {
             var backup = direction == SearchDirection.Forward ? SearchingView.Root : SearchingView.FinalNode;
             var start = SearchingView.SelectedNode ?? LastFound ?? backup;
-            var find = SearchingView.SearchFrom(start, Matches, direction == SearchDirection.Forward);
+            var find = SearchingView.SearchFrom(start, Matches, direction);
             if (find == SearchingView.Root)
                 find = null;
             if (find == null)
@@ -65,7 +59,7 @@ namespace NbtExplorer2.UI
                 if (backup != start && backup != SearchingView.Root && Matches(backup))
                     find = backup;
                 else
-                    find = SearchingView.SearchFrom(backup, x => x != start && Matches(x), true);
+                    find = SearchingView.SearchFrom(backup, x => x != start && Matches(x), direction);
             }
             if (find != null)
             {
