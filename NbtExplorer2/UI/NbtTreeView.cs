@@ -115,16 +115,161 @@ namespace NbtExplorer2.UI
                 var item = stack.Pop();
                 if (item != Root && !predicate(item))
                     continue;
-                if (!item.IsExpandedOnce)
-                {
-                    item.IsExpanded = !item.IsExpanded;
-                    item.IsExpanded = !item.IsExpanded;
-                }
                 yield return item;
                 foreach (var sub in item.Children.Reverse())
                 {
                     stack.Push(sub);
                 }
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> AllChildren(TreeNodeAdv start)
+        {
+            if (!start.IsExpandedOnce)
+            {
+                start.IsExpanded = true;
+                start.IsExpanded = false;
+            }
+            foreach (var item in start.Children)
+            {
+                yield return item;
+                foreach (var sub in AllChildren(item))
+                {
+                    yield return sub;
+                }
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> AllChildrenReversed(TreeNodeAdv start)
+        {
+            if (!start.IsExpandedOnce)
+            {
+                start.IsExpanded = true;
+                start.IsExpanded = false;
+            }
+            foreach (var item in start.Children.Reverse())
+            {
+                foreach (var sub in AllChildrenReversed(item))
+                {
+                    yield return sub;
+                }
+                yield return item;
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> AllSuccessors(TreeNodeAdv start)
+        {
+            foreach (var item in SucceedingNodes(start))
+            {
+                yield return item;
+                foreach (var sub in AllChildren(item))
+                {
+                    yield return sub;
+                }
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> AllPredecessors(TreeNodeAdv start)
+        {
+            foreach (var item in PrecedingNodes(start))
+            {
+                foreach (var sub in AllChildrenReversed(item))
+                {
+                    yield return sub;
+                }
+                yield return item;
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> SearchForward(TreeNodeAdv start)
+        {
+            foreach (var item in AllChildren(start))
+            {
+                yield return item;
+            }
+            foreach (var item in AllSuccessors(start))
+            {
+                yield return item;
+            }
+            foreach (var item in Ancestors(start))
+            {
+                foreach (var sub in AllSuccessors(item))
+                {
+                    yield return sub;
+                }
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> SearchBackward(TreeNodeAdv start)
+        {
+            foreach (var item in AllPredecessors(start))
+            {
+                yield return item;
+            }
+            foreach (var item in Ancestors(start))
+            {
+                yield return item;
+                foreach (var sub in AllPredecessors(item))
+                {
+                    yield return sub;
+                }
+            }
+        }
+
+        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, bool forward)
+        {
+            var search = forward ? SearchForward(start) : SearchBackward(start);
+            foreach (var item in search)
+            {
+                if (predicate(item))
+                    return item;
+            }
+            return null;
+        }
+
+        public TreeNodeAdv FinalNode
+        {
+            get
+            {
+                var current = Root;
+                while (true)
+                {
+                    if (!current.IsExpandedOnce)
+                    {
+                        current.IsExpanded = true;
+                        current.IsExpanded = false;
+                    }
+                    if (current.Children.Count == 0)
+                        return current;
+                    current = current.Children.Last();
+                }
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> SucceedingNodes(TreeNodeAdv start)
+        {
+            while (start.NextNode != null)
+            {
+                start = start.NextNode;
+                yield return start;
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> PrecedingNodes(TreeNodeAdv start)
+        {
+            while (start.PreviousNode != null)
+            {
+                start = start.PreviousNode;
+                yield return start;
+            }
+        }
+
+        private IEnumerable<TreeNodeAdv> Ancestors(TreeNodeAdv bottom)
+        {
+            while (bottom.Parent != null)
+            {
+                bottom = bottom.Parent;
+                yield return bottom;
             }
         }
 
@@ -233,7 +378,7 @@ namespace NbtExplorer2.UI
         {
             // selected nodes are not "active" while dragging
             // hovered nodes are "active" while dragging
-            if (context.DrawSelection == DrawSelectionMode.Active)
+            if (context.DrawSelection == DrawSelectionMode.Active || (node.IsSelected && !node.Tree.Focused))
                 context.Graphics.FillRectangle(Brushes.LightBlue, context.Bounds);
             else if (node.IsSelected)
                 context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);

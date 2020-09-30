@@ -352,10 +352,14 @@ namespace NbtExplorer2.UI
             }
         }
 
+        private FindWindow FindWindow;
         private void Find()
         {
-            var search = new FindWindow(NbtTree);
-            search.Show(this);
+            if (FindWindow == null || FindWindow.IsDisposed)
+                FindWindow = new FindWindow(NbtTree);
+            if (!FindWindow.Visible)
+                FindWindow.Show(this);
+            FindWindow.Focus();
         }
 
         private void AddSnbt()

@@ -83,11 +83,11 @@
             // 
             // FindWindow
             // 
+            this.AcceptButton = this.ButtonFindNext;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.CancelButton = this.ButtonFindNext;
             this.ClientSize = new System.Drawing.Size(295, 89);
             this.Controls.Add(this.SearchBox);
             this.Controls.Add(this.ButtonFindPrev);
@@ -100,6 +100,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Find...";
+            this.Load += new System.EventHandler(this.FindWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
