@@ -415,15 +415,15 @@ namespace NbtExplorer2.UI
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
-            var files = paths.Distinct().ToDictionary(x => Path.GetFullPath(x), x => NbtFolder.OpenFileOrFolder(x)).ToList();
-            var bad = files.Where(x => x.Value == null);
-            var good = files.Where(x => x.Value != null);
+            var files = paths.Distinct().Select(x => NbtFolder.OpenFileOrFolder(Path.GetFullPath(x))).ToList();
+            var bad = files.Where(x => x == null);
+            var good = files.Where(x => x != null);
             if (bad.Any())
                 MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load Failure");
             if (good.Any())
             {
-                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.Key).ToArray());
-                ViewModel = new NbtTreeModel(good.Select(x => x.Value), NbtTree);
+                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.Path).ToArray());
+                ViewModel = new NbtTreeModel(good, NbtTree);
             }
         }
 

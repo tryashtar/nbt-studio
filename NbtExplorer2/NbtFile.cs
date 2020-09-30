@@ -113,9 +113,13 @@ namespace NbtExplorer2
         }
     }
 
-    public interface ISaveable
+    public interface IHavePath
     {
         string Path { get; }
+    }
+
+    public interface ISaveable : IHavePath
+    {
         bool CanSave { get; }
         void Save();
         void SaveAs(string path);

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace NbtExplorer2
 {
-    public class NbtFolder
+    public class NbtFolder : IHavePath
     {
-        public readonly string Path;
+        public string Path { get; private set; }
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
         public IReadOnlyCollection<NbtFolder> Subfolders => _Subfolders.AsReadOnly();
@@ -50,7 +50,7 @@ namespace NbtExplorer2
                 RegionFile.TryCreate(path);
         }
 
-        public static object OpenFileOrFolder(string path)
+        public static IHavePath OpenFileOrFolder(string path)
         {
             if (Directory.Exists(path))
                 return new NbtFolder(path, true);
