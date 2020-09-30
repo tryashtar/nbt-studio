@@ -37,7 +37,7 @@ namespace NbtExplorer2
             }
             if (Recursive)
             {
-                foreach (var item in Directory.GetDirectories(Path, "*", SearchOption.AllDirectories))
+                foreach (var item in Directory.GetDirectories(Path, "*", SearchOption.TopDirectoryOnly))
                 {
                     _Subfolders.Add(new NbtFolder(item, true));
                 }
