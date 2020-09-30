@@ -97,38 +97,43 @@ namespace NbtExplorer2.UI
             return new Size((int)Math.Round(s1.Width + s2.Width), (int)Math.Ceiling(Math.Max(s1.Height, s2.Height)));
         }
 
-        private static Tuple<string, string> GetText(TreeNodeAdv node)
+        private Tuple<string, string> GetText(TreeNodeAdv node)
         {
-            var obj = node.Tag;
-            var text = PreviewNameAndValue(obj);
+            var text = PreviewNameAndValue(node);
             return Tuple.Create(Flatten(text.Item1), Flatten(text.Item2));
         }
 
-        private static Tuple<string, string> PreviewNameAndValue(object obj)
+        private Tuple<string, string> PreviewNameAndValue(TreeNodeAdv node)
         {
-            string name = PreviewName(obj);
-            string value = PreviewValue(obj);
+            string name = PreviewName(node.Tag, this.Parent);
+            string value = PreviewValue(node.Tag);
             if (name == null)
                 return Tuple.Create((string)null, value);
             return Tuple.Create(name + ": ", value);
         }
 
-        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag);
+        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag, null);
         public static string PreviewValue(TreeNodeAdv node) => PreviewValue(node.Tag);
 
-        private static string PreviewName(object obj)
+        private static string PreviewName(object obj, TreeViewAdv view)
         {
+            string prefix = "";
+            if (obj is ISaveable saveable && view != null && view.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
+                prefix = "* ";
+            string result = null;
             if (obj is NbtFile file)
-                return Path.GetFileName(file.Path);
-            if (obj is NbtFolder folder)
-                return Path.GetFileName(folder.Path);
-            if (obj is RegionFile region)
-                return Path.GetFileName(region.Path);
-            if (obj is Chunk chunk)
-                return $"Chunk [{chunk.X}, {chunk.Z}]";
-            if (obj is NbtTag tag)
-                return tag.Name;
-            return null;
+                result = Path.GetFileName(file.Path);
+            else if (obj is NbtFolder folder)
+                result = Path.GetFileName(folder.Path);
+            else if (obj is RegionFile region)
+                result = Path.GetFileName(region.Path);
+            else if (obj is Chunk chunk)
+                result = $"Chunk [{chunk.X}, {chunk.Z}]";
+            else if (obj is NbtTag tag)
+                result = tag.Name;
+            if (result == null)
+                return null;
+            return prefix + result;
         }
 
         private static string PreviewValue(object obj)

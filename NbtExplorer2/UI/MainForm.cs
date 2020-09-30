@@ -221,7 +221,10 @@ namespace NbtExplorer2.UI
         private void Save(ISaveable file)
         {
             if (file.CanSave)
+            {
                 file.Save();
+                NbtTree.Refresh();
+            }
             else
                 SaveAs(file);
         }
@@ -426,7 +429,7 @@ namespace NbtExplorer2.UI
 
         private bool ConfirmIfUnsaved(string message)
         {
-            if (ViewModel == null || !ViewModel.HasUnsavedChanges)
+            if (ViewModel == null || !ViewModel.HasAnyUnsavedChanges)
                 return true;
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
         }
@@ -452,9 +455,10 @@ namespace NbtExplorer2.UI
 
         private void ViewModel_Changed(object sender, EventArgs e)
         {
-            ActionSave.Enabled = ViewModel?.HasUnsavedChanges ?? false;
+            ActionSave.Enabled = ViewModel?.HasAnyUnsavedChanges ?? false;
             ActionSaveAs.Enabled = ViewModel != null;
-            var save_image = ViewModel != null && ViewModel.OpenedFiles.Skip(1).Any() ? Properties.Resources.action_save_all_image : Properties.Resources.action_save_image;
+            bool multiple_files = ViewModel != null && ViewModel.OpenedFiles.Skip(1).Any();
+            var save_image = multiple_files ? Properties.Resources.action_save_all_image : Properties.Resources.action_save_image;
             ActionSave.Image = save_image;
             ActionSaveAs.Image = save_image;
             ActionRefresh.Enabled = ViewModel != null;

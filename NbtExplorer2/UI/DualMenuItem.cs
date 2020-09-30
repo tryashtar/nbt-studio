@@ -35,6 +35,7 @@ namespace NbtExplorer2.UI
                 Button.Image = value;
             }
         }
+
         public DualMenuItem(string text, string hover, Image image, Keys shortcut)
         {
             _Image = image;

@@ -18,16 +18,11 @@ namespace NbtExplorer2.UI
         public event EventHandler<TreePathEventArgs> StructureChanged;
         public event EventHandler Changed;
 
-        private bool _HasUnsavedChanges = false;
-        public bool HasUnsavedChanges
+        public bool HasAnyUnsavedChanges
         {
-            get => _HasUnsavedChanges;
-            private set
+            get
             {
-                _HasUnsavedChanges = value;
-                if (!IsUndoing)
-                    RedoStack.Clear();
-                Changed?.Invoke(this, EventArgs.Empty);
+                return UnsavedChanges.Values.Any(x => x);
             }
         }
         private readonly IEnumerable<object> Roots;
@@ -90,8 +85,10 @@ namespace NbtExplorer2.UI
             View.Model = this;
             if (Roots.Take(2).Count() == 1) // if there is one item, expand it
                 View.Root.Children.First().Expand();
-            if (OpenedFiles.Any(x => x.Path == null))
-                HasUnsavedChanges = true;
+            foreach (var file in OpenedFiles)
+            {
+                UnsavedChanges[file] = file.Path == null;
+            }
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
@@ -133,7 +130,15 @@ namespace NbtExplorer2.UI
             var node = FindNodeByObject(changed);
             if (node == null) return;
             var path = View.GetPath(node);
-            HasUnsavedChanges = true;
+
+            foreach (var item in path.FullPath)
+            {
+                if (item is ISaveable saveable)
+                    MarkChanged(saveable);
+            }
+            if (!IsUndoing)
+                RedoStack.Clear();
+            Changed?.Invoke(this, EventArgs.Empty);
 
             var real_children = GetChildren(path).ToList();
             var current_children = node.Children.Select(x => x.Tag).ToArray();
@@ -150,6 +155,24 @@ namespace NbtExplorer2.UI
                     NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
                 node.Expand();
             }
+        }
+
+        private readonly Dictionary<ISaveable, bool> UnsavedChanges = new Dictionary<ISaveable, bool>();
+        private void NotifySaved(ISaveable saveable)
+        {
+            UnsavedChanges[saveable] = false;
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void MarkChanged(ISaveable saveable)
+        {
+            UnsavedChanges[saveable] = true;
+        }
+        public bool HasUnsavedChanges(ISaveable saveable)
+        {
+            if (UnsavedChanges.TryGetValue(saveable, out bool result))
+                return result;
+            return false;
         }
 
         private TreeNodeAdv FindNodeByObject(object obj)

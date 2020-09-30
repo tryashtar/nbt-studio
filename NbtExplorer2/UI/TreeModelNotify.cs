@@ -97,10 +97,7 @@ namespace NbtExplorer2.UI
             public abstract bool CanSave { get; }
             public abstract void Save();
             public abstract void SaveAs(string path);
-            protected void NotifySaved()
-            {
-                Tree.HasUnsavedChanges = false;
-            }
+            protected abstract void NotifySaved();
         }
 
         public class NotifyNbtFile : SaveableNotifyNode, INbtFile
@@ -110,12 +107,24 @@ namespace NbtExplorer2.UI
             {
                 File = file;
             }
+            protected override void NotifySaved()
+            {
+                Tree.NotifySaved(File);
+            }
             public override string Path => File.Path;
             public ExportSettings ExportSettings => File.ExportSettings;
             public override bool CanSave => File.CanSave;
             public override void Save() { File.Save(); NotifySaved(); }
             public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
             public void SaveAs(string path, ExportSettings settings) { File.SaveAs(path, settings); Notify(); NotifySaved(); }
+            public override bool Equals(object obj)
+            {
+                return obj.Equals(File);
+            }
+            public override int GetHashCode()
+            {
+                return File.GetHashCode();
+            }
         }
 
         public class NotifyRegionFile : SaveableNotifyNode
@@ -125,10 +134,22 @@ namespace NbtExplorer2.UI
             {
                 File = file;
             }
+            protected override void NotifySaved()
+            {
+                Tree.NotifySaved(File);
+            }
             public override string Path => File.Path;
             public override bool CanSave => File.CanSave;
             public override void Save() { File.Save(); NotifySaved(); }
             public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
+            public override bool Equals(object obj)
+            {
+                return obj.Equals(File);
+            }
+            public override int GetHashCode()
+            {
+                return File.GetHashCode();
+            }
         }
 
         public abstract class NotifyNbtTag : NotifyNode, INotifyNbt
