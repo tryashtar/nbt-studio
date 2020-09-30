@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace NbtExplorer2.UI
 {
@@ -29,9 +30,26 @@ namespace NbtExplorer2.UI
 
         private bool Matches(TreeNodeAdv adv)
         {
-            var texts = NbtText.GetText(adv);
-            var combined = texts.Item1 + texts.Item2;
-            return combined.IndexOf(SearchBox.Text, StringComparison.OrdinalIgnoreCase) != -1;
+            var name = NbtText.PreviewName(adv);
+            var value = NbtText.PreviewValue(adv);
+            bool skip_name = NameBox.Text == "";
+            bool skip_value = ValueBox.Text == "";
+            if (!skip_name && String.IsNullOrEmpty(name))
+                return false;
+            if (!skip_value && String.IsNullOrEmpty(value))
+                return false;
+            if (RegexCheck.Checked)
+            {
+                var name_regex = new Regex(NameBox.Text, RegexOptions.IgnoreCase);
+                var value_regex = new Regex(ValueBox.Text, RegexOptions.IgnoreCase);
+                return (skip_name || name_regex.IsMatch(name)) &&
+                    (skip_value || value_regex.IsMatch(value));
+            }
+            else
+            {
+                return (skip_name || name.IndexOf(NameBox.Text, StringComparison.OrdinalIgnoreCase) != -1) &&
+                    (skip_value || value.IndexOf(ValueBox.Text, StringComparison.OrdinalIgnoreCase) != -1);
+            }
         }
 
         public void Search(SearchDirection direction)
@@ -76,9 +94,14 @@ namespace NbtExplorer2.UI
                 Search(SearchDirection.Backward);
                 return true;
             }
-            if (keyData==Keys.Escape)
+            if (keyData == Keys.Escape)
             {
                 this.Close();
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.R))
+            {
+                RegexCheck.Checked = !RegexCheck.Checked;
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -87,6 +110,12 @@ namespace NbtExplorer2.UI
         private void FindWindow_Load(object sender, EventArgs e)
         {
             CenterToParent();
+            RegexCheck.Checked = Properties.Settings.Default.FindRegex;
+        }
+
+        private void FindWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.FindRegex = RegexCheck.Checked;
         }
     }
 }

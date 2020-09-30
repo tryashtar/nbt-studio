@@ -395,7 +395,7 @@ namespace NbtExplorer2.UI
             return new Size((int)Math.Round(s1.Width + s2.Width), (int)Math.Ceiling(Math.Max(s1.Height, s2.Height)));
         }
 
-        public static Tuple<string, string> GetText(TreeNodeAdv node)
+        private static Tuple<string, string> GetText(TreeNodeAdv node)
         {
             var obj = node.Tag;
             var text = PreviewNameAndValue(obj);
@@ -410,6 +410,9 @@ namespace NbtExplorer2.UI
                 return Tuple.Create((string)null, value);
             return Tuple.Create(name + ": ", value);
         }
+
+        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag);
+        public static string PreviewValue(TreeNodeAdv node) => PreviewValue(node.Tag);
 
         private static string PreviewName(object obj)
         {

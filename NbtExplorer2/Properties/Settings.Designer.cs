@@ -33,5 +33,17 @@ namespace NbtExplorer2.Properties {
                 this["RecentFiles"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FindRegex {
+            get {
+                return ((bool)(this["FindRegex"]));
+            }
+            set {
+                this["FindRegex"] = value;
+            }
+        }
     }
 }
