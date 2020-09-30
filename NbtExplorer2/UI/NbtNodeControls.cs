@@ -105,35 +105,31 @@ namespace NbtExplorer2.UI
 
         private Tuple<string, string> PreviewNameAndValue(TreeNodeAdv node)
         {
-            string name = PreviewName(node.Tag, this.Parent);
+            string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
+            if (node.Tag is ISaveable saveable && Parent.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
+                name = "* " + name;
             if (name == null)
                 return Tuple.Create((string)null, value);
             return Tuple.Create(name + ": ", value);
         }
 
-        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag, null);
+        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag);
         public static string PreviewValue(TreeNodeAdv node) => PreviewValue(node.Tag);
 
-        private static string PreviewName(object obj, TreeViewAdv view)
+        private static string PreviewName(object obj)
         {
-            string prefix = "";
-            if (obj is ISaveable saveable && view != null && view.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
-                prefix = "* ";
-            string result = null;
             if (obj is NbtFile file)
-                result = Path.GetFileName(file.Path);
-            else if (obj is NbtFolder folder)
-                result = Path.GetFileName(folder.Path);
-            else if (obj is RegionFile region)
-                result = Path.GetFileName(region.Path);
-            else if (obj is Chunk chunk)
-                result = $"Chunk [{chunk.X}, {chunk.Z}]";
-            else if (obj is NbtTag tag)
-                result = tag.Name;
-            if (result == null)
-                return null;
-            return prefix + result;
+                return Path.GetFileName(file.Path);
+            if (obj is NbtFolder folder)
+                return Path.GetFileName(folder.Path);
+            if (obj is RegionFile region)
+                return Path.GetFileName(region.Path);
+            if (obj is Chunk chunk)
+                return $"Chunk [{chunk.X}, {chunk.Z}]";
+            if (obj is NbtTag tag)
+                return tag.Name;
+            return null;
         }
 
         private static string PreviewValue(object obj)
