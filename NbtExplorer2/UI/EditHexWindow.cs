@@ -3,6 +3,7 @@ using fNbt;
 using NbtExplorer2.SNBT;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace NbtExplorer2.UI
@@ -12,6 +13,7 @@ namespace NbtExplorer2.UI
         private readonly INbtTag WorkingTag;
         private readonly INbtContainer TagParent;
         private readonly bool SettingName;
+        private readonly IByteTransformer Provider;
 
         private EditHexWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
         {
@@ -24,17 +26,30 @@ namespace NbtExplorer2.UI
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
 
-            var provider = ByteProviders.GetByteProvider(tag);
-            HexBox.ByteProvider = provider;
-            HexBox.UseFixedBytesPerLine = true;
-            HexBox.BytesPerLine = provider.BytesPerValue;
+            Provider = ByteProviders.GetByteProvider(tag);
+            HexBox.ByteProvider = Provider;
+            HexBox.GroupSize = Provider.BytesPerValue;
+            HexBox.GroupSeparatorVisible = Provider.BytesPerValue > 1;
+            HexBox.SelectionBackColor = Color.LightBlue;
+            HexBox.SelectionForeColor = HexBox.ForeColor;
+            HexBox.Size = new Size(0, 0);
 
-            this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
+            string tagname;
+            if (tag is INbtList list)
+            {
+                tagname = NbtUtil.TagTypeName(list.ListType) + " List";
+                this.Icon = NbtUtil.TagTypeIcon(list.ListType);
+            }
+            else
+            {
+                tagname = NbtUtil.TagTypeName(tag.TagType);
+                this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
+            }
             if (purpose == EditPurpose.Create)
-                this.Text = $"Create {NbtUtil.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Create {tagname} Tag";
             else if (purpose == EditPurpose.EditValue || purpose == EditPurpose.Rename)
             {
-                this.Text = $"Edit {NbtUtil.TagTypeName(tag.TagType)} Tag";
+                this.Text = $"Edit {tagname} Tag";
                 NameBox.Text = tag.Name;
             }
 
@@ -104,6 +119,31 @@ namespace NbtExplorer2.UI
         private void ButtonOk_Click(object sender, EventArgs e)
         {
             Confirm();
+        }
+
+        private void UpdateCursorLabel()
+        {
+            long selected_byte = HexBox.SelectionStart;
+            CursorLabel.Text = $"Element {selected_byte / Provider.BytesPerValue}";
+        }
+
+        private void HexBox_CurrentLineChanged(object sender, EventArgs e)
+        {
+            UpdateCursorLabel();
+        }
+
+        private void HexBox_CurrentPositionInLineChanged(object sender, EventArgs e)
+        {
+            UpdateCursorLabel();
+        }
+
+        private void HexBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == (Keys.Control | Keys.A))
+            {
+                HexBox.SelectAll();
+                e.Handled = true;
+            }
         }
     }
 }
