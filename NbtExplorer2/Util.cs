@@ -54,7 +54,7 @@ namespace NbtExplorer2
             return result;
         }
 
-        public static int ToInt32(byte[] bytes)
+        public static int ToInt32(params byte[] bytes)
         {
             if (BitConverter.IsLittleEndian)
             {
@@ -63,6 +63,60 @@ namespace NbtExplorer2
             }
             else
                 return BitConverter.ToInt32(bytes, 0);
+        }
+
+        public static byte[] ToByteArray(params short[] shorts)
+        {
+            byte[] result = new byte[shorts.Length * sizeof(short)];
+            Buffer.BlockCopy(shorts, 0, result, 0, result.Length);
+            return result;
+        }
+
+        public static byte[] ToByteArray(params int[] ints)
+        {
+            byte[] result = new byte[ints.Length * sizeof(int)];
+            Buffer.BlockCopy(ints, 0, result, 0, result.Length);
+            return result;
+        }
+
+        public static byte[] ToByteArray(params long[] longs)
+        {
+            byte[] result = new byte[longs.Length * sizeof(long)];
+            Buffer.BlockCopy(longs, 0, result, 0, result.Length);
+            return result;
+        }
+
+        public static short[] ToShortArray(params byte[] bytes)
+        {
+            var size = bytes.Length / sizeof(short);
+            var shorts = new short[size];
+            for (int index = 0; index < size; index++)
+            {
+                shorts[index] = BitConverter.ToInt16(bytes, index * sizeof(short));
+            }
+            return shorts;
+        }
+
+        public static int[] ToIntArray(params byte[] bytes)
+        {
+            var size = bytes.Length / sizeof(int);
+            var ints = new int[size];
+            for (int index = 0; index < size; index++)
+            {
+                ints[index] = BitConverter.ToInt32(bytes, index * sizeof(int));
+            }
+            return ints;
+        }
+
+        public static long[] ToLongArray(params byte[] bytes)
+        {
+            var size = bytes.Length / sizeof(long);
+            var longs = new long[size];
+            for (int index = 0; index < size; index++)
+            {
+                longs[index] = BitConverter.ToInt64(bytes, index * sizeof(long));
+            }
+            return longs;
         }
     }
 }

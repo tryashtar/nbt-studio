@@ -306,14 +306,27 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
+            Rename(tag);
         }
 
         private void Edit()
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            Edit(tag);
+        }
+
+        private void Edit(INbtTag tag)
+        {
+            if (ByteProviders.HasProvider(tag))
+                EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
+            else
+                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+        }
+
+        private void Rename(INbtTag tag)
+        {
+            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
         }
 
         private void EditSnbt()
@@ -459,9 +472,9 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag != null && NbtUtil.IsValueType(tag.TagType))
-                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            var tag = ViewModel?.NbtFromClick(e);
+            if (tag != null && !(tag is INbtContainer))
+                Edit(tag);
         }
 
         private void Copy(IEnumerable<INbtTag> objects)
@@ -639,6 +652,16 @@ namespace NbtExplorer2.UI
                 click = (s, e) => OpenFiles(new[] { path });
             }
             return new ToolStripMenuItem(path, image, click);
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData==Keys.Enter)
+            {
+                Edit();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }
