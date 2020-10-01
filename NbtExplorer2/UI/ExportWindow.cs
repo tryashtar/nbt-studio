@@ -30,7 +30,7 @@ namespace NbtExplorer2.UI
             if (RadioSnbt.Checked)
                 return ExportSettings.AsSnbt(CheckMinify.Checked);
             else
-                return ExportSettings.AsNbt(CheckGzip.Checked ? NbtCompression.GZip : NbtCompression.None, CheckLittleEndian.Checked, Header);
+                return ExportSettings.AsNbt(CheckGzip.Checked ? NbtCompression.GZip : NbtCompression.None, !CheckLittleEndian.Checked, Header);
         }
 
         private void Apply()

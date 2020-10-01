@@ -318,15 +318,21 @@ namespace NbtExplorer2.UI
 
         private void Edit(INbtTag tag)
         {
+            // batch operation to combine the rename and value change into one undo
+            ViewModel.StartBatchOperation();
             if (ByteProviders.HasProvider(tag))
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
             else
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            ViewModel.FinishBatchOperation();
         }
 
         private void Rename(INbtTag tag)
         {
+            // likewise
+            ViewModel.StartBatchOperation();
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
+            ViewModel.FinishBatchOperation();
         }
 
         private void EditSnbt()
@@ -656,7 +662,7 @@ namespace NbtExplorer2.UI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData==Keys.Enter)
+            if (keyData == Keys.Enter)
             {
                 Edit();
                 return true;
