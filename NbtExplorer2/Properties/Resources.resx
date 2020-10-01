@@ -226,6 +226,18 @@
   <data name="action_undo_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_undo_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="app_icon_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\app_icon_16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="app_icon_256" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\app_icon_256.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="app_image_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\app_image_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="app_image_256" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\app_image_256.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="chunk_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\chunk_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

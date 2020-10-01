@@ -47,7 +47,7 @@
             this.ButtonCancel.Location = new System.Drawing.Point(119, 9);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 9;
+            this.ButtonCancel.TabIndex = 4;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
@@ -57,7 +57,7 @@
             this.ButtonOk.Location = new System.Drawing.Point(200, 9);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 8;
+            this.ButtonOk.TabIndex = 5;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -70,7 +70,7 @@
             this.MinifyCheck.Margin = new System.Windows.Forms.Padding(10);
             this.MinifyCheck.Name = "MinifyCheck";
             this.MinifyCheck.Size = new System.Drawing.Size(53, 17);
-            this.MinifyCheck.TabIndex = 10;
+            this.MinifyCheck.TabIndex = 3;
             this.MinifyCheck.Text = "Minify";
             this.MinifyCheck.UseVisualStyleBackColor = true;
             this.MinifyCheck.Visible = false;
@@ -101,7 +101,7 @@
             this.InputBox.Name = "InputBox";
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.InputBox.Size = new System.Drawing.Size(264, 26);
-            this.InputBox.TabIndex = 4;
+            this.InputBox.TabIndex = 2;
             this.InputBox.WordWrap = false;
             this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
             // 
@@ -114,7 +114,7 @@
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 11;
+            this.NameBox.TabIndex = 1;
             // 
             // NameLabel
             // 
@@ -124,7 +124,7 @@
             this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
-            this.NameLabel.TabIndex = 12;
+            this.NameLabel.TabIndex = 0;
             this.NameLabel.Text = "Name:";
             // 
             // MainTable

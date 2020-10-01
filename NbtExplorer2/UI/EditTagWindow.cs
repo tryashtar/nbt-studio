@@ -12,9 +12,8 @@ namespace NbtExplorer2.UI
         private readonly INbtContainer TagParent;
         private readonly bool SettingName;
         private readonly bool SettingValue;
-        private readonly bool SettingSize;
 
-        private EditTagWindow(INbtTag tag, INbtContainer parent, bool set_name, bool set_value, bool set_size, EditPurpose purpose)
+        private EditTagWindow(INbtTag tag, INbtContainer parent, bool set_name, bool set_value, EditPurpose purpose)
         {
             InitializeComponent();
 
@@ -28,10 +27,6 @@ namespace NbtExplorer2.UI
             SettingValue = set_value;
             ValueLabel.Visible = SettingValue;
             ValueBox.Visible = SettingValue;
-
-            SettingSize = set_size;
-            SizeLabel.Visible = SettingSize;
-            SizeBox.Visible = SettingSize;
 
             if (tag.TagType == NbtTagType.String)
             {
@@ -66,7 +61,6 @@ namespace NbtExplorer2.UI
         {
             bool has_name = parent is INbtCompound;
             bool has_value = NbtUtil.IsValueType(type);
-            bool has_size = NbtUtil.IsArrayType(type);
 
             var tag = NbtUtil.CreateTag(type);
 
@@ -76,9 +70,9 @@ namespace NbtExplorer2.UI
                     tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
                 return tag;
             }
-            else if (has_name || has_value || has_size)
+            else if (has_name || has_value)
             {
-                var window = new EditTagWindow(tag.Adapt(), parent, has_name, has_value, has_size, EditPurpose.Create);
+                var window = new EditTagWindow(tag.Adapt(), parent, has_name, has_value, EditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? tag : null;
             }
             else
@@ -95,7 +89,7 @@ namespace NbtExplorer2.UI
 
             if (has_name || has_value)
             {
-                var window = new EditTagWindow(existing, parent, has_name, has_value, false, purpose);
+                var window = new EditTagWindow(existing, parent, has_name, has_value, purpose);
                 return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
             }
             return false;
@@ -113,8 +107,6 @@ namespace NbtExplorer2.UI
         private bool TryModify()
         {
             var name = NameBox.Text.Trim();
-            var str_size = SizeBox.Text.Trim();
-            int? int_size = null;
             var str_value = ValueBox.Text.Trim().Replace("\r", "");
             object parsed_value = null;
 
@@ -131,29 +123,6 @@ namespace NbtExplorer2.UI
                     MessageBox.Show($"Duplicate name; this compound already contains a tag named \"{name}\"");
                     return false;
                 }
-            }
-            if (SettingSize && str_size != "")
-            {
-                try
-                {
-                    int_size = Util.ParseNonNegativeInt(str_size);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show($"The size is formatted incorrectly");
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    MessageBox.Show($"The value for size must be between 0 and {int.MinValue}");
-                    return false;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    MessageBox.Show($"The size cannot be less than zero");
-                    return false;
-                }
-                catch { return false; }
             }
             if (SettingValue && str_value != "")
             {
@@ -176,8 +145,6 @@ namespace NbtExplorer2.UI
             }
             if (SettingName)
                 WorkingTag.Name = name;
-            if (SettingSize && int_size.HasValue)
-                NbtUtil.SetSize(WorkingTag, int_size.Value);
             if (SettingValue && parsed_value != null)
                 NbtUtil.SetValue(WorkingTag, parsed_value);
             return true;

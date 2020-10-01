@@ -63,6 +63,7 @@ namespace NbtExplorer2.UI
 
             // stuff from the designer
             InitializeComponent();
+            this.Icon = Properties.Resources.app_icon_256;
 
             // stuff excluded from the designer for cleaner/less duplicated code
             ActionNew.Click += (s, e) => New();
@@ -306,14 +307,33 @@ namespace NbtExplorer2.UI
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
+            Rename(tag);
         }
 
         private void Edit()
         {
             var tag = ViewModel?.SelectedNbt;
             if (tag == null) return;
-            EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            Edit(tag);
+        }
+
+        private void Edit(INbtTag tag)
+        {
+            // batch operation to combine the rename and value change into one undo
+            ViewModel.StartBatchOperation();
+            if (ByteProviders.HasProvider(tag))
+                EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
+            else
+                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            ViewModel.FinishBatchOperation();
+        }
+
+        private void Rename(INbtTag tag)
+        {
+            // likewise
+            ViewModel.StartBatchOperation();
+            EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
+            ViewModel.FinishBatchOperation();
         }
 
         private void EditSnbt()
@@ -374,7 +394,11 @@ namespace NbtExplorer2.UI
 
         private void AddTag(INbtContainer container, NbtTagType type)
         {
-            var tag = EditTagWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
+            NbtTag tag;
+            if (NbtUtil.IsArrayType(type))
+                tag = EditHexWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
+            else
+                tag = EditTagWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
                 container.Add(tag);
         }
@@ -459,9 +483,9 @@ namespace NbtExplorer2.UI
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag != null && NbtUtil.IsValueType(tag.TagType))
-                EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
+            var tag = ViewModel?.NbtFromClick(e);
+            if (tag != null && !(tag is INbtContainer))
+                Edit(tag);
         }
 
         private void Copy(IEnumerable<INbtTag> objects)
@@ -639,6 +663,16 @@ namespace NbtExplorer2.UI
                 click = (s, e) => OpenFiles(new[] { path });
             }
             return new ToolStripMenuItem(path, image, click);
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Enter)
+            {
+                Edit();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

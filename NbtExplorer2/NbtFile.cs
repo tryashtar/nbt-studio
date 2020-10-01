@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NbtExplorer2
@@ -37,12 +38,39 @@ namespace NbtExplorer2
             ExportSettings = null;
         }
 
+        private static bool LooksSuspicious(NbtTag tag)
+        {
+            foreach (var ch in tag.Name)
+            {
+                if (Char.IsControl(ch))
+                    return true;
+            }
+            return false;
+        }
+
         public static NbtFile TryCreate(string path)
         {
-            return TryCreateFromSnbt(path)
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true) // java files
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false) // bedrock files
-                   ?? TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8); // bedrock level.dat files
+            // try loading the file four different ways
+            // if loading fails or looks suspicious, try a different way
+            // if all loads are suspicious, choose the first that didn't fail
+
+            // SNBT
+            var attempt1 = TryCreateFromSnbt(path);
+            if (attempt1 != null && !attempt1.RootTag.Tags.Any(LooksSuspicious))
+                return attempt1;
+            // java files
+            var attempt2 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true);
+            if (attempt2 != null && !attempt2.RootTag.Tags.Any(LooksSuspicious))
+                return attempt2;
+            // bedrock files
+            var attempt3 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false);
+            if (attempt3 != null && !attempt3.RootTag.Tags.Any(LooksSuspicious))
+                return attempt3;
+            // bedrock level.dat files
+            var attempt4 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8);
+            if (attempt4 != null && !attempt4.RootTag.Tags.Any(LooksSuspicious))
+                return attempt4;
+            return attempt1 ?? attempt2 ?? attempt3 ?? attempt4;
         }
 
         public static NbtFile TryCreateFromSnbt(string path)

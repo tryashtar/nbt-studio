@@ -32,6 +32,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app_icon_256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>NbtExplorer2.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
       <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
@@ -55,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteProviders.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ExportSettings.cs" />
     <Compile Include="NbtUtil.cs" />
@@ -68,6 +75,12 @@
     </Compile>
     <Compile Include="UI\EditSnbtWindow.Designer.cs">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\EditHexWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditHexWindow.Designer.cs">
+      <DependentUpon>EditHexWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\FindWindow.cs">
       <SubType>Form</SubType>
@@ -115,6 +128,9 @@
     <EmbeddedResource Include="UI\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\EditHexWindow.resx">
+      <DependentUpon>EditHexWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\FindWindow.resx">
       <DependentUpon>FindWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -147,6 +163,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Be.Windows.Forms.HexBox\Be.Windows.Forms.HexBox.csproj">
+      <Project>{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}</Project>
+      <Name>Be.Windows.Forms.HexBox</Name>
+    </ProjectReference>
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
       <Project>{4488498d-976d-4da3-bf72-109531af0488}</Project>
       <Name>fNbt</Name>
@@ -355,6 +375,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\action_save_all_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app_icon_256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
