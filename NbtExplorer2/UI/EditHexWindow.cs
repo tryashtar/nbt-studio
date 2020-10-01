@@ -4,6 +4,7 @@ using NbtExplorer2.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace NbtExplorer2.UI
@@ -18,6 +19,7 @@ namespace NbtExplorer2.UI
         private EditHexWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
+            TabView.Size = new Size(0, 0);
 
             WorkingTag = tag;
             TagParent = parent;
@@ -32,7 +34,6 @@ namespace NbtExplorer2.UI
             HexBox.GroupSeparatorVisible = Provider.BytesPerValue > 1;
             HexBox.SelectionBackColor = Color.LightBlue;
             HexBox.SelectionForeColor = HexBox.ForeColor;
-            HexBox.Size = new Size(0, 0);
 
             string tagname;
             if (tag is INbtList list)
@@ -118,6 +119,10 @@ namespace NbtExplorer2.UI
 
         private void ButtonOk_Click(object sender, EventArgs e)
         {
+            if (TabView.SelectedTab == TextPage)
+            {
+                Provider.SetBytes(ConvertFromText(TextBox.Text, Provider.BytesPerValue));
+            }
             Confirm();
         }
 
@@ -144,6 +149,80 @@ namespace NbtExplorer2.UI
                 HexBox.SelectAll();
                 e.Handled = true;
             }
+        }
+
+        private void TabView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (TabView.SelectedTab == HexPage)
+            {
+                Provider.SetBytes(ConvertFromText(TextBox.Text, Provider.BytesPerValue));
+            }
+            else if (TabView.SelectedTab == TextPage)
+            {
+                TextBox.Text = ConvertToText(Provider);
+            }
+        }
+
+        private string ConvertToText(IByteTransformer provider)
+        {
+            var bytes = provider.CurrentBytes.ToArray();
+            int size = provider.BytesPerValue;
+            if (size == sizeof(byte))
+                return String.Join(" ", bytes.Select(x => (sbyte)x));
+            if (size == sizeof(short))
+                return String.Join(" ", Util.ToShortArray(bytes));
+            if (size == sizeof(int))
+                return String.Join(" ", Util.ToIntArray(bytes));
+            if (size == sizeof(long))
+                return String.Join(" ", Util.ToLongArray(bytes));
+            throw new ArgumentException($"Can't convert bytes to a numeric type with size {size}");
+        }
+
+        private byte[] ConvertFromText(string text, int size)
+        {
+            string[] vals = text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries); // whitespace as delimiter
+            if (size == sizeof(byte))
+                return vals.Select(ParseByte).Select(x => (byte)x).ToArray();
+            if (size == sizeof(short))
+                return Util.ToByteArray(vals.Select(ParseShort).ToArray());
+            if (size == sizeof(int))
+                return Util.ToByteArray(vals.Select(ParseInt).ToArray());
+            if (size == sizeof(long))
+                return Util.ToByteArray(vals.Select(ParseLong).ToArray());
+            throw new ArgumentException($"Can't convert bytes to a numeric type with size {size}");
+        }
+
+        private sbyte ParseByte(string text)
+        {
+            if (sbyte.TryParse(text, out sbyte val))
+                return val;
+            return 0;
+        }
+
+        private short ParseShort(string text)
+        {
+            if (short.TryParse(text, out short val))
+                return val;
+            return 0;
+        }
+
+        private int ParseInt(string text)
+        {
+            if (int.TryParse(text, out int val))
+                return val;
+            return 0;
+        }
+
+        private long ParseLong(string text)
+        {
+            if (long.TryParse(text, out long val))
+                return val;
+            return 0;
+        }
+
+        private void EditHexWindow_Load(object sender, EventArgs e)
+        {
+            TabView_SelectedIndexChanged(sender, e);
         }
     }
 }

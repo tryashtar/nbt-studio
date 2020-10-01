@@ -57,12 +57,16 @@ namespace NbtExplorer2
     public interface IByteTransformer : IByteProvider
     {
         int BytesPerValue { get; }
+        IEnumerable<byte> CurrentBytes { get; }
+        void WriteBytes(long initial_index, IEnumerable<byte> bytes);
+        void SetBytes(IEnumerable<byte> bytes);
     }
 
     public abstract class NbtByteProvider : IByteTransformer
     {
         protected readonly INbtTag Tag;
         private readonly List<byte> Bytes = new List<byte>();
+        public IEnumerable<byte> CurrentBytes => Bytes.AsReadOnly();
         private bool HasChanged = false;
         public NbtByteProvider(INbtTag tag)
         {
@@ -113,6 +117,31 @@ namespace NbtExplorer2
         public void WriteByte(long index, byte value)
         {
             Bytes[(int)index] = value;
+            OnChanged();
+        }
+
+        public void WriteBytes(long initial_index, IEnumerable<byte> bytes)
+        {
+            var overwritable = bytes.Take((int)(Length - initial_index)).GetEnumerator();
+            var append = bytes.Skip((int)(Length - initial_index));
+            for (int i = (int)initial_index; i < Length; i++)
+            {
+                Bytes[i] = overwritable.Current;
+                overwritable.MoveNext();
+            }
+            if (append.Any())
+            {
+                Bytes.AddRange(append);
+                OnLengthChanged();
+            }
+            OnChanged();
+        }
+
+        public void SetBytes(IEnumerable<byte> bytes)
+        {
+            Bytes.Clear();
+            Bytes.AddRange(bytes);
+            OnLengthChanged();
             OnChanged();
         }
 
