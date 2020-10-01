@@ -63,6 +63,7 @@ namespace NbtExplorer2.UI
 
             // stuff from the designer
             InitializeComponent();
+            this.Icon = Properties.Resources.app_icon_256;
 
             // stuff excluded from the designer for cleaner/less duplicated code
             ActionNew.Click += (s, e) => New();

@@ -32,6 +32,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app_icon_256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>NbtExplorer2.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
       <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
@@ -369,6 +375,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\action_save_all_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app_icon_256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
