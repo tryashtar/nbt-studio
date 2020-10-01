@@ -186,7 +186,7 @@ namespace NbtExplorer2.UI
 
         private byte[] ConvertFromText(string text, int size)
         {
-            string[] vals = text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries); // whitespace as delimiter
+            string[] vals = text.Replace(',', ' ').Split((char[])null, StringSplitOptions.RemoveEmptyEntries); // whitespace as delimiter
             if (size == sizeof(byte))
                 return vals.Select(ParseByte).Select(x => (byte)x).ToArray();
             if (size == sizeof(short))
