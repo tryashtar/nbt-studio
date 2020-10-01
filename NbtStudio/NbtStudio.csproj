@@ -1,0 +1,395 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{15C9ED53-E930-4FF3-AD1C-D92769464CB7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>NbtStudio</RootNamespace>
+    <AssemblyName>NbtStudio</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app_icon_256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>NbtStudio.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ByteProviders.cs" />
+    <Compile Include="Chunk.cs" />
+    <Compile Include="ExportSettings.cs" />
+    <Compile Include="NbtUtil.cs" />
+    <Compile Include="NbtFile.cs" />
+    <Compile Include="NbtFolder.cs" />
+    <Compile Include="Adapters.cs" />
+    <Compile Include="RegionFile.cs" />
+    <Compile Include="UI\DualMenuItem.cs" />
+    <Compile Include="UI\EditSnbtWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditSnbtWindow.Designer.cs">
+      <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\EditHexWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditHexWindow.Designer.cs">
+      <DependentUpon>EditHexWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\FindWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\FindWindow.Designer.cs">
+      <DependentUpon>FindWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\EditTagWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditTagWindow.Designer.cs">
+      <DependentUpon>EditTagWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ExportWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ExportWindow.Designer.cs">
+      <DependentUpon>ExportWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\NbtNodeControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\NbtTreeModel.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SNBT\SnbtMaker.cs" />
+    <Compile Include="SNBT\SnbtParser.cs" />
+    <Compile Include="UI\NbtTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\TreeModelNotify.cs" />
+    <Compile Include="UndoableAction.cs" />
+    <Compile Include="Util.cs" />
+    <EmbeddedResource Include="UI\EditSnbtWindow.resx">
+      <DependentUpon>EditSnbtWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\EditHexWindow.resx">
+      <DependentUpon>EditHexWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\FindWindow.resx">
+      <DependentUpon>FindWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\EditTagWindow.resx">
+      <DependentUpon>EditTagWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ExportWindow.resx">
+      <DependentUpon>ExportWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Be.Windows.Forms.HexBox\Be.Windows.Forms.HexBox.csproj">
+      <Project>{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}</Project>
+      <Name>Be.Windows.Forms.HexBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
+      <Project>{4488498d-976d-4da3-bf72-109531af0488}</Project>
+      <Name>fNbt</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_new_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_new_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_file_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_file_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_folder_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_open_folder_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_paste_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_paste_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_refresh_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_refresh_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_rename_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_rename_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_copy_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_copy_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_cut_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_cut_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_delete_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_delete_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_search_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_search_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_byte_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_compound_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_compound_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_double_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_double_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_float_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_float_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_int_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_list_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_list_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_array_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_array_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_long_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_short_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_short_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_string_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tag_string_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\file_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\file_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_sort_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_edit_snbt_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_add_snbt_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_add_snbt_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_redo_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_undo_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_redo_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_undo_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\region_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\region_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chunk_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chunk_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_all_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\action_save_all_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_icon_256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\app_image_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app_icon_256.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
