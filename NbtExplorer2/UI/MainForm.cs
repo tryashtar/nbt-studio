@@ -393,7 +393,11 @@ namespace NbtExplorer2.UI
 
         private void AddTag(INbtContainer container, NbtTagType type)
         {
-            var tag = EditTagWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
+            NbtTag tag;
+            if (NbtUtil.IsArrayType(type))
+                tag = EditHexWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
+            else
+                tag = EditTagWindow.CreateTag(type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag != null)
                 container.Add(tag);
         }

@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SizeBox = new System.Windows.Forms.TextBox();
-            this.SizeLabel = new System.Windows.Forms.Label();
             this.NameLabel = new System.Windows.Forms.Label();
             this.NameBox = new System.Windows.Forms.TextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
@@ -41,28 +39,6 @@
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // SizeBox
-            // 
-            this.SizeBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.SizeBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.SizeBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.SizeBox.Location = new System.Drawing.Point(64, 41);
-            this.SizeBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.SizeBox.Name = "SizeBox";
-            this.SizeBox.Size = new System.Drawing.Size(96, 21);
-            this.SizeBox.TabIndex = 3;
-            // 
-            // SizeLabel
-            // 
-            this.SizeLabel.AutoSize = true;
-            this.SizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.SizeLabel.Location = new System.Drawing.Point(10, 41);
-            this.SizeLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
-            this.SizeLabel.Name = "SizeLabel";
-            this.SizeLabel.Size = new System.Drawing.Size(34, 15);
-            this.SizeLabel.TabIndex = 2;
-            this.SizeLabel.Text = "Size:";
             // 
             // NameLabel
             // 
@@ -114,7 +90,7 @@
             // 
             this.ValueLabel.AutoSize = true;
             this.ValueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ValueLabel.Location = new System.Drawing.Point(10, 72);
+            this.ValueLabel.Location = new System.Drawing.Point(10, 41);
             this.ValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.ValueLabel.Name = "ValueLabel";
             this.ValueLabel.Size = new System.Drawing.Size(41, 15);
@@ -126,7 +102,7 @@
             this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ValueBox.Location = new System.Drawing.Point(64, 72);
+            this.ValueBox.Location = new System.Drawing.Point(64, 41);
             this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.ValueBox.Name = "ValueBox";
             this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -140,21 +116,19 @@
             this.MainTable.ColumnCount = 2;
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.MainTable.Controls.Add(this.SizeBox, 1, 1);
             this.MainTable.Controls.Add(this.NameLabel, 0, 0);
-            this.MainTable.Controls.Add(this.SizeLabel, 0, 1);
             this.MainTable.Controls.Add(this.NameBox, 1, 0);
-            this.MainTable.Controls.Add(this.ValueLabel, 0, 2);
-            this.MainTable.Controls.Add(this.ButtonsPanel, 1, 3);
-            this.MainTable.Controls.Add(this.ValueBox, 1, 2);
+            this.MainTable.Controls.Add(this.ValueLabel, 0, 1);
+            this.MainTable.Controls.Add(this.ButtonsPanel, 1, 2);
+            this.MainTable.Controls.Add(this.ValueBox, 1, 1);
             this.MainTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTable.Location = new System.Drawing.Point(0, 0);
             this.MainTable.Name = "MainTable";
-            this.MainTable.RowCount = 4;
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.MainTable.RowCount = 3;
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
+            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.MainTable.Size = new System.Drawing.Size(463, 185);
             this.MainTable.TabIndex = 8;
             // 
@@ -195,9 +169,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox SizeBox;
-        private System.Windows.Forms.Label SizeLabel;
         private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.TextBox NameBox;
         private System.Windows.Forms.Button ButtonCancel;

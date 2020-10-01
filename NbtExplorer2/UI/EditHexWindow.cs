@@ -63,11 +63,17 @@ namespace NbtExplorer2.UI
                 HexBox.Select();
         }
 
-        public static NbtTag CreateTag(NbtTagType type, INbtContainer parent)
+        public static NbtTag CreateTag(NbtTagType type, INbtContainer parent, bool bypass_window = false)
         {
             bool has_name = parent is INbtCompound;
             var tag = NbtUtil.CreateTag(type);
 
+            if (bypass_window)
+            {
+                if (has_name)
+                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
+                return tag;
+            }
             var window = new EditHexWindow(tag.Adapt(), parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? tag : null;
         }
