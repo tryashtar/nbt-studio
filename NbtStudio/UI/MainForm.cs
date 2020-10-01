@@ -54,6 +54,7 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
+        private readonly ToolStripMenuItem ActionAbout = DualMenuItem.Single("&About", Properties.Resources.app_image_16, Keys.Shift | Keys.F1);
         private readonly ToolStripButton ActionAddSnbt = DualMenuItem.Single("Add as SNBT", Properties.Resources.action_add_snbt_image);
         public MainForm(string[] args)
         {
@@ -83,6 +84,7 @@ namespace NbtStudio.UI
             ActionEditSnbt.Click += (s, e) => EditSnbt();
             ActionDelete.Click += (s, e) => Delete();
             ActionFind.Click += (s, e) => Find();
+            ActionAbout.Click += (s, e) => About();
             ActionAddSnbt.Click += (s, e) => AddSnbt();
 
             ActionNew.AddTo(Tools, MenuFile);
@@ -109,6 +111,7 @@ namespace NbtStudio.UI
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
             Tools.Items.Add(new ToolStripSeparator());
+            MenuHelp.DropDownItems.Add(ActionAbout);
 
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
@@ -374,6 +377,16 @@ namespace NbtStudio.UI
             if (!FindWindow.Visible)
                 FindWindow.Show(this);
             FindWindow.Focus();
+        }
+
+        private AboutWindow AboutWindow;
+        private void About()
+        {
+            if (AboutWindow == null || AboutWindow.IsDisposed)
+                AboutWindow = new AboutWindow();
+            if (!AboutWindow.Visible)
+                AboutWindow.Show(this);
+            AboutWindow.Focus();
         }
 
         private void AddSnbt()
