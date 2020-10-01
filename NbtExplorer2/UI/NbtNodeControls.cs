@@ -105,13 +105,14 @@ namespace NbtExplorer2.UI
 
         private Tuple<string, string> PreviewNameAndValue(TreeNodeAdv node)
         {
+            string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
             if (node.Tag is ISaveable saveable && Parent.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
-                name = "* " + name;
+                prefix = "* ";
             if (name == null)
-                return Tuple.Create((string)null, value);
-            return Tuple.Create(name + ": ", value);
+                return Tuple.Create(prefix, value);
+            return Tuple.Create(prefix + name + ": ", value);
         }
 
         public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag);

@@ -42,7 +42,6 @@ namespace NbtExplorer2.UI
         private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", Properties.Resources.action_open_folder_image, Keys.Control | Keys.Shift | Keys.O);
         private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", Properties.Resources.action_save_image, Keys.Control | Keys.S);
         private readonly ToolStripMenuItem ActionSaveAs = DualMenuItem.Single("Save &As", Properties.Resources.action_save_image, Keys.Control | Keys.Shift | Keys.S);
-        private readonly DualMenuItem ActionRefresh = new DualMenuItem("Re&fresh", "Refresh", Properties.Resources.action_refresh_image, Keys.F5);
         private readonly ToolStripMenuItem DropDownRecent = DualMenuItem.Single("&Recent...", null, Keys.None);
         private readonly ToolStripButton ActionSort = DualMenuItem.Single("Sort", Properties.Resources.action_sort_image);
         private readonly ToolStripMenuItem ActionUndo = DualMenuItem.Single("&Undo", Properties.Resources.action_undo_image, Keys.Control | Keys.Z);
@@ -72,7 +71,6 @@ namespace NbtExplorer2.UI
             ActionOpenFolder.Click += (s, e) => OpenFolder();
             ActionSave.Click += (s, e) => Save();
             ActionSaveAs.Click += (s, e) => SaveAs();
-            ActionRefresh.Click += (s, e) => DoRefresh();
             ActionSort.Click += (s, e) => Sort();
             ActionUndo.Click += (s, e) => Undo();
             ActionRedo.Click += (s, e) => Redo();
@@ -92,7 +90,6 @@ namespace NbtExplorer2.UI
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             ActionSave.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(ActionSaveAs);
-            ActionRefresh.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(ActionNewClipboard);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             MenuFile.DropDownItems.Add(DropDownRecent);
@@ -257,12 +254,6 @@ namespace NbtExplorer2.UI
                 }
             }
         }
-
-        private void DoRefresh()
-        { }
-
-        private void DoRefresh(ISaveable file)
-        { }
 
         private void OpenInExplorer(ISaveable file)
         {
@@ -461,7 +452,6 @@ namespace NbtExplorer2.UI
             var save_image = multiple_files ? Properties.Resources.action_save_all_image : Properties.Resources.action_save_image;
             ActionSave.Image = save_image;
             ActionSaveAs.Image = save_image;
-            ActionRefresh.Enabled = ViewModel != null;
             ActionUndo.Enabled = ViewModel?.CanUndo ?? false;
             ActionRedo.Enabled = ViewModel?.CanRedo ?? false;
             NbtTree_SelectionChanged(sender, e);
@@ -578,10 +568,7 @@ namespace NbtExplorer2.UI
                     menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
                     menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
                     if (file.Path != null)
-                    {
                         menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(file));
-                        menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => DoRefresh(file));
-                    }
                 }
                 if (nbt is INbtContainer container)
                 {
