@@ -16,14 +16,14 @@ NBT Studio supports reading and writing the following NBT formats. Features mark
 
 <img src="NbtStudio/Resources/action_new_image.png" width=16> ☆ NBT Studio also allows the creation of blank NBT files. You can start from scratch and export to any format. Additionally, you can use `Ctrl-Alt-V` to create a file from SNBT data on your clipboard.
 
-## SNBT Support
+## <img src="NbtStudio/Resources/action_edit_snbt_image.png" width=16> SNBT Support
 NBT Studio is designed around the easy transfer and conversion between textual SNBT data and structured NBT data. As mentioned, SNBT can be opened as a file or pasted as a new document.
 
 * <img src="NbtStudio/Resources/action_add_snbt_image.png" width=16> You can add a tag as SNBT anywhere in the document. Whatever type is parsed will be the resulting type of the tag. Compounds and lists will be fully parsed with all of their children.
 * <img src="NbtStudio/Resources/action_edit_snbt_image.png" width=16> Existing tags can also be inspected and edited as SNBT. You can modify entire compounds in-place, or simpler tags.
 * <img src="NbtStudio/Resources/action_paste_image.png" width=16> The cut, copy, and paste actions add the tag to your clipboard as SNBT. You can copy multiple tags as text, or import SNBT data obtained elsewhere.
 
-## Tag Editing
+## <img src="NbtStudio/Resources/action_edit_image.png" width=16> Tag Editing
 NBT Studio adds an assortment of convenience features to make navigating and editing NBT data easier.
 
 * <img src="NbtStudio/Resources/tag_byte_image.png" width=16> The tag creation and edit menus have fields for both tag name and value, so you don't have to do it in two steps
