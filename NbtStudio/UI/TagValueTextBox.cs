@@ -36,6 +36,7 @@ namespace NbtStudio.UI
                     break;
             }
         }
+
         private void ShowTooltip(ValueCheckResult result)
         {
             if (result == ValueCheckResult.InvalidFormat)

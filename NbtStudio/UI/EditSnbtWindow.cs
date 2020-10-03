@@ -11,7 +11,6 @@ namespace NbtStudio.UI
         private INbtTag WorkingTag;
         private readonly INbtContainer TagParent;
         private readonly bool SettingName;
-        public bool CheckWhileTyping = false;
 
         public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
         {
@@ -20,10 +19,11 @@ namespace NbtStudio.UI
 
             WorkingTag = tag;
             TagParent = parent;
+            var required = RequiredType();
             NameBox.SetTags(tag, parent);
+            InputBox.RequiredType = required;
 
             SettingName = set_name;
-            var required = RequiredType();
             if (required == null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
             {
                 this.Width = this.Width * 5 / 2;
@@ -102,11 +102,6 @@ namespace NbtStudio.UI
             }
         }
 
-        private NbtTag ParseTag()
-        {
-            return SnbtParser.Parse(InputBox.Text.Replace("\r", ""), named: false);
-        }
-
         private NbtTagType? RequiredType()
         {
             if (WorkingTag == null)
@@ -127,28 +122,19 @@ namespace NbtStudio.UI
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
             if (SettingName && !NameBox.CheckName())
                 return false;
-            NbtTag tag;
-            try
-            {
-                tag = ParseTag();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"The SNBT is not valid:\n{ex.Message}");
+            NbtTag tag = null;
+            if (!InputBox.CheckTag(out tag))
                 return false;
-            }
-            var required_type = RequiredType();
-            if (required_type != null && required_type.Value != tag.TagType)
-            {
-                MessageBox.Show($"The SNBT must be of type {required_type}, not {tag.TagType}");
-                return false;
-            }
+
             if (WorkingTag == null)
                 WorkingTag = tag.Adapt();
             else
                 NbtUtil.SetValue(WorkingTag, NbtUtil.GetValue(tag.Adapt()));
             if (SettingName)
+            {
+                NameBox.SetTags(WorkingTag, TagParent);
                 NameBox.ApplyName();
+            }
             return true;
         }
 
@@ -169,47 +155,13 @@ namespace NbtStudio.UI
 
         private void MinifyCheck_CheckedChanged(object sender, EventArgs e)
         {
-            try
-            {
-                var tag = ParseTag();
-                InputBox.Text = tag.Adapt().ToSnbt(!MinifyCheck.Checked);
-            }
-            catch
+            if (!InputBox.TryMinify(MinifyCheck.Checked))
             {
                 // change it back
                 MinifyCheck.CheckedChanged -= MinifyCheck_CheckedChanged;
                 MinifyCheck.Checked ^= true;
                 MinifyCheck.CheckedChanged += MinifyCheck_CheckedChanged;
             }
-        }
-
-        private void InputBox_TextChanged(object sender, EventArgs e)
-        {
-            if (!CheckWhileTyping)
-                return;
-            bool valid = true;
-            InputBox.BackColor = SystemColors.Window;
-            try
-            {
-                var tag = ParseTag();
-                var required = RequiredType();
-                if (required != null && tag.TagType != required)
-                    valid = false;
-            }
-            catch
-            {
-                valid = false;
-            }
-            if (!valid)
-                InputBox.BackColor = Blend(Color.Red, SystemColors.Window, 0.1);
-        }
-
-        private static Color Blend(Color color, Color backColor, double amount)
-        {
-            byte r = (byte)((color.R * amount) + backColor.R * (1 - amount));
-            byte g = (byte)((color.G * amount) + backColor.G * (1 - amount));
-            byte b = (byte)((color.B * amount) + backColor.B * (1 - amount));
-            return Color.FromArgb(r, g, b);
         }
     }
 }

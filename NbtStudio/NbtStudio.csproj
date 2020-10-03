@@ -121,6 +121,9 @@
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\TagSnbtTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\TagValueTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

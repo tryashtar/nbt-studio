@@ -32,7 +32,7 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.MinifyCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.InputBox = new System.Windows.Forms.TextBox();
+            this.InputBox = new TagSnbtTextBox();
             this.NameBox = new TagNameTextBox();
             this.NameLabel = new System.Windows.Forms.Label();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
@@ -103,7 +103,6 @@
             this.InputBox.Size = new System.Drawing.Size(264, 26);
             this.InputBox.TabIndex = 2;
             this.InputBox.WordWrap = false;
-            this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
             // 
             // NameBox
             // 
@@ -180,6 +179,6 @@
         private System.Windows.Forms.TableLayoutPanel MainTable;
         private System.Windows.Forms.Label NameLabel;
         private TagNameTextBox NameBox;
-        private System.Windows.Forms.TextBox InputBox;
+        private TagSnbtTextBox InputBox;
     }
 }

@@ -62,7 +62,7 @@ namespace NbtStudio.UI
 
         private NameCheckResult CheckNameInternal()
         {
-            if (NbtTag == null || NbtParent == null)
+            if (NbtParent == null)
                 return NameCheckResult.Valid;
             var name = GetName();
             if (NbtParent is INbtList)
@@ -71,7 +71,7 @@ namespace NbtStudio.UI
             {
                 if (name == "")
                     return NameCheckResult.InvalidMissingName;
-                if (name != NbtTag.Name && compound.Contains(name))
+                if (compound.Contains(name) && !(NbtTag != null && name == NbtTag.Name))
                     return NameCheckResult.InvalidDuplicateName;
             }
             return NameCheckResult.Valid;
