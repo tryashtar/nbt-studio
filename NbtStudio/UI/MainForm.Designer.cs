@@ -92,7 +92,7 @@
             this.NbtTree.DefaultToolTipProvider = null;
             this.NbtTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.NbtTree.DragDropMarkColor = System.Drawing.Color.Black;
-            this.NbtTree.Font = new System.Drawing.Font("Arial", 9F);
+            this.NbtTree.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NbtTree.LineColor = System.Drawing.SystemColors.ControlDark;
             this.NbtTree.LoadOnDemand = true;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);

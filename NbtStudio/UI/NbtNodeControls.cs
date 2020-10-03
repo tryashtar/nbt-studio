@@ -63,7 +63,7 @@ namespace NbtStudio.UI
             var halves = GetText(node);
             if (halves != null)
             {
-                var size = MeasureSize(node, context);
+                var size = MeasureSizeF(node, context);
                 PointF point = new PointF(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
                 DrawSelection(node, context);
                 var boldfont = new Font(context.Font, FontStyle.Bold);
@@ -88,13 +88,19 @@ namespace NbtStudio.UI
 
         public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
         {
+            var size = MeasureSizeF(node, context);
+            return new Size((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
+        }
+
+        private SizeF MeasureSizeF(TreeNodeAdv node, DrawContext context)
+        {
             var halves = GetText(node);
             if (halves == null)
                 return Size.Empty;
             var boldfont = new Font(context.Font, FontStyle.Bold);
             SizeF s1 = halves.Item1 == null ? SizeF.Empty : context.Graphics.MeasureString(halves.Item1, boldfont);
             SizeF s2 = context.Graphics.MeasureString(halves.Item2, context.Font);
-            return new Size((int)Math.Round(s1.Width + s2.Width), (int)Math.Ceiling(Math.Max(s1.Height, s2.Height)));
+            return new SizeF(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
         private Tuple<string, string> GetText(TreeNodeAdv node)

@@ -23,6 +23,7 @@ namespace NbtStudio.UI
 
             WorkingTag = tag;
             TagParent = parent;
+            NameBox.SetTags(tag, parent);
 
             SettingName = set_name;
             NameLabel.Visible = SettingName;
@@ -100,24 +101,11 @@ namespace NbtStudio.UI
 
         private bool TryModify()
         {
-            var name = NameBox.Text.Trim();
-
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
+            if (SettingName && !NameBox.CheckName())
+                return false;
             if (SettingName)
-            {
-                if (name == "")
-                {
-                    MessageBox.Show("The name cannot be empty");
-                    return false;
-                }
-                if (TagParent is INbtCompound compound && name != WorkingTag.Name && compound.Contains(name))
-                {
-                    MessageBox.Show($"Duplicate name; this compound already contains a tag named \"{name}\"");
-                    return false;
-                }
-            }
-            if (SettingName)
-                WorkingTag.Name = name;
+                NameBox.ApplyName();
 
             HexBox.ByteProvider.ApplyChanges();
             return true;
@@ -135,7 +123,11 @@ namespace NbtStudio.UI
         private void UpdateCursorLabel()
         {
             long selected_byte = HexBox.SelectionStart;
-            CursorLabel.Text = $"Element {selected_byte / Provider.BytesPerValue}";
+            long selected_byte2 = HexBox.SelectionStart + HexBox.SelectionLength;
+            if (HexBox.SelectionLength > 1)
+                CursorLabel.Text = $"Elements {selected_byte / Provider.BytesPerValue} - {selected_byte2 / Provider.BytesPerValue}";
+            else
+                CursorLabel.Text = $"Element {selected_byte / Provider.BytesPerValue}";
         }
 
         private void HexBox_CurrentLineChanged(object sender, EventArgs e)
@@ -144,6 +136,16 @@ namespace NbtStudio.UI
         }
 
         private void HexBox_CurrentPositionInLineChanged(object sender, EventArgs e)
+        {
+            UpdateCursorLabel();
+        }
+
+        private void HexBox_SelectionLengthChanged(object sender, EventArgs e)
+        {
+            UpdateCursorLabel();
+        }
+
+        private void HexBox_SelectionStartChanged(object sender, EventArgs e)
         {
             UpdateCursorLabel();
         }

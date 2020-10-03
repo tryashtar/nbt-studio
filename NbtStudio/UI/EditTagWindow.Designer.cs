@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new System.Windows.Forms.TextBox();
+            this.NameBox = new TagNameTextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ValueLabel = new System.Windows.Forms.Label();
@@ -170,7 +170,7 @@
 
         #endregion
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.TextBox NameBox;
+        private TagNameTextBox NameBox;
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.Label ValueLabel;

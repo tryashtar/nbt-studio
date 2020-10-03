@@ -2,6 +2,7 @@
 using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace NbtStudio.UI
@@ -19,6 +20,7 @@ namespace NbtStudio.UI
 
             WorkingTag = tag;
             TagParent = parent;
+            NameBox.SetTags(tag, parent);
 
             SettingName = set_name;
             NameLabel.Visible = SettingName;
@@ -106,24 +108,12 @@ namespace NbtStudio.UI
 
         private bool TryModify()
         {
-            var name = NameBox.Text.Trim();
             var str_value = ValueBox.Text.Trim().Replace("\r", "");
             object parsed_value = null;
 
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
-            if (SettingName)
-            {
-                if (name == "")
-                {
-                    MessageBox.Show("The name cannot be empty");
-                    return false;
-                }
-                if (TagParent is INbtCompound compound && name != WorkingTag.Name && compound.Contains(name))
-                {
-                    MessageBox.Show($"Duplicate name; this compound already contains a tag named \"{name}\"");
-                    return false;
-                }
-            }
+            if (SettingName && !NameBox.CheckName())
+                return false;
             if (SettingValue && str_value != "")
             {
                 try
@@ -144,7 +134,7 @@ namespace NbtStudio.UI
                 catch { return false; }
             }
             if (SettingName)
-                WorkingTag.Name = name;
+                NameBox.ApplyName();
             if (SettingValue && parsed_value != null)
                 NbtUtil.SetValue(WorkingTag, parsed_value);
             return true;

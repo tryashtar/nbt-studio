@@ -20,6 +20,8 @@ namespace NbtStudio.UI
 
             WorkingTag = tag;
             TagParent = parent;
+            NameBox.SetTags(tag, parent);
+
             SettingName = set_name;
             var required = RequiredType();
             if (required == null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
@@ -122,20 +124,9 @@ namespace NbtStudio.UI
 
         private bool TryModify()
         {
-            var name = NameBox.Text.Trim();
-            if (SettingName)
-            {
-                if (name == "")
-                {
-                    MessageBox.Show("The name cannot be empty");
-                    return false;
-                }
-                if (TagParent is INbtCompound compound && (WorkingTag == null || name != WorkingTag.Name) && compound.Contains(name))
-                {
-                    MessageBox.Show($"Duplicate name; this compound already contains a tag named \"{name}\"");
-                    return false;
-                }
-            }
+            // check conditions first, tag must not be modified at ALL until we can be sure it's safe
+            if (SettingName && !NameBox.CheckName())
+                return false;
             NbtTag tag;
             try
             {
@@ -157,7 +148,7 @@ namespace NbtStudio.UI
             else
                 NbtUtil.SetValue(WorkingTag, NbtUtil.GetValue(tag.Adapt()));
             if (SettingName)
-                WorkingTag.Name = name;
+                NameBox.ApplyName();
             return true;
         }
 

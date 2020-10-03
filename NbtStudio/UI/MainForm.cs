@@ -473,7 +473,7 @@ namespace NbtStudio.UI
             ActionSort.Enabled = tag is INbtCompound;
             ActionCut.Enabled = tag != null;
             ActionCopy.Enabled = tag != null;
-            ActionPaste.Enabled = container != null;
+            ActionPaste.Enabled = container != null; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
             ActionDelete.Enabled = tag != null;
             ActionRename.Enabled = tag != null;
             ActionEdit.Enabled = tag != null;
@@ -508,6 +508,8 @@ namespace NbtStudio.UI
 
         private void Paste(INbtContainer destination)
         {
+            if (!Clipboard.ContainsText())
+                return;
             var snbts = Clipboard.GetText().Split('\n');
             ViewModel.StartBatchOperation();
             foreach (var nbt in snbts)

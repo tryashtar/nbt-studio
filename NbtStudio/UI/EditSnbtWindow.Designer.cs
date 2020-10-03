@@ -33,7 +33,7 @@
             this.MinifyCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.InputBox = new System.Windows.Forms.TextBox();
-            this.NameBox = new System.Windows.Forms.TextBox();
+            this.NameBox = new TagNameTextBox();
             this.NameLabel = new System.Windows.Forms.Label();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.ButtonsPanel.SuspendLayout();
@@ -179,7 +179,7 @@
         private System.Windows.Forms.Panel ButtonsPanel;
         private System.Windows.Forms.TableLayoutPanel MainTable;
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.TextBox NameBox;
+        private TagNameTextBox NameBox;
         private System.Windows.Forms.TextBox InputBox;
     }
 }

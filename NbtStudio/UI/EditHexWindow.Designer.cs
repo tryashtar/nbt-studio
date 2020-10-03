@@ -29,24 +29,24 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new System.Windows.Forms.TextBox();
+            this.NameBox = new TagNameTextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.HexBox = new Be.Windows.Forms.HexBox();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-            this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.TabView = new System.Windows.Forms.TabControl();
-            this.HexPage = new System.Windows.Forms.TabPage();
             this.TextPage = new System.Windows.Forms.TabPage();
+            this.TextBox = new System.Windows.Forms.TextBox();
+            this.HexPage = new System.Windows.Forms.TabPage();
             this.HexInfoPanel = new System.Windows.Forms.Panel();
             this.CursorLabel = new System.Windows.Forms.Label();
-            this.TextBox = new System.Windows.Forms.TextBox();
+            this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.MainTable.SuspendLayout();
-            this.ButtonsPanel.SuspendLayout();
             this.TabView.SuspendLayout();
-            this.HexPage.SuspendLayout();
             this.TextPage.SuspendLayout();
+            this.HexPage.SuspendLayout();
             this.HexInfoPanel.SuspendLayout();
+            this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // NameLabel
@@ -106,6 +106,8 @@
             this.HexBox.Size = new System.Drawing.Size(678, 210);
             this.HexBox.TabIndex = 2;
             this.HexBox.VScrollBarVisible = true;
+            this.HexBox.SelectionStartChanged += new System.EventHandler(this.HexBox_SelectionStartChanged);
+            this.HexBox.SelectionLengthChanged += new System.EventHandler(this.HexBox_SelectionLengthChanged);
             this.HexBox.CurrentLineChanged += new System.EventHandler(this.HexBox_CurrentLineChanged);
             this.HexBox.CurrentPositionInLineChanged += new System.EventHandler(this.HexBox_CurrentPositionInLineChanged);
             this.HexBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HexBox_KeyDown);
@@ -130,16 +132,6 @@
             this.MainTable.Size = new System.Drawing.Size(712, 311);
             this.MainTable.TabIndex = 14;
             // 
-            // ButtonsPanel
-            // 
-            this.ButtonsPanel.Controls.Add(this.ButtonCancel);
-            this.ButtonsPanel.Controls.Add(this.ButtonOk);
-            this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ButtonsPanel.Location = new System.Drawing.Point(0, 311);
-            this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(712, 42);
-            this.ButtonsPanel.TabIndex = 9;
-            // 
             // TabView
             // 
             this.MainTable.SetColumnSpan(this.TabView, 2);
@@ -154,6 +146,33 @@
             this.TabView.TabIndex = 15;
             this.TabView.SelectedIndexChanged += new System.EventHandler(this.TabView_SelectedIndexChanged);
             // 
+            // TextPage
+            // 
+            this.TextPage.Controls.Add(this.TextBox);
+            this.TextPage.Location = new System.Drawing.Point(4, 22);
+            this.TextPage.Name = "TextPage";
+            this.TextPage.Padding = new System.Windows.Forms.Padding(3);
+            this.TextPage.Size = new System.Drawing.Size(684, 244);
+            this.TextPage.TabIndex = 1;
+            this.TextPage.Text = "Text View";
+            this.TextPage.UseVisualStyleBackColor = true;
+            // 
+            // TextBox
+            // 
+            this.TextBox.AcceptsReturn = true;
+            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.TextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TextBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextBox.Location = new System.Drawing.Point(3, 3);
+            this.TextBox.Margin = new System.Windows.Forms.Padding(0);
+            this.TextBox.MaxLength = 2147483647;
+            this.TextBox.Multiline = true;
+            this.TextBox.Name = "TextBox";
+            this.TextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TextBox.Size = new System.Drawing.Size(678, 238);
+            this.TextBox.TabIndex = 3;
+            // 
             // HexPage
             // 
             this.HexPage.Controls.Add(this.HexBox);
@@ -165,17 +184,6 @@
             this.HexPage.TabIndex = 0;
             this.HexPage.Text = "Hex View";
             this.HexPage.UseVisualStyleBackColor = true;
-            // 
-            // TextPage
-            // 
-            this.TextPage.Controls.Add(this.TextBox);
-            this.TextPage.Location = new System.Drawing.Point(4, 22);
-            this.TextPage.Name = "TextPage";
-            this.TextPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TextPage.Size = new System.Drawing.Size(684, 244);
-            this.TextPage.TabIndex = 1;
-            this.TextPage.Text = "Text View";
-            this.TextPage.UseVisualStyleBackColor = true;
             // 
             // HexInfoPanel
             // 
@@ -196,21 +204,15 @@
             this.CursorLabel.Size = new System.Drawing.Size(0, 15);
             this.CursorLabel.TabIndex = 6;
             // 
-            // TextBox
+            // ButtonsPanel
             // 
-            this.TextBox.AcceptsReturn = true;
-            this.TextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.TextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.TextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TextBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextBox.Location = new System.Drawing.Point(3, 3);
-            this.TextBox.Margin = new System.Windows.Forms.Padding(0);
-            this.TextBox.MaxLength = 2147483647;
-            this.TextBox.Multiline = true;
-            this.TextBox.Name = "TextBox";
-            this.TextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextBox.Size = new System.Drawing.Size(678, 238);
-            this.TextBox.TabIndex = 3;
+            this.ButtonsPanel.Controls.Add(this.ButtonCancel);
+            this.ButtonsPanel.Controls.Add(this.ButtonOk);
+            this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ButtonsPanel.Location = new System.Drawing.Point(0, 311);
+            this.ButtonsPanel.Name = "ButtonsPanel";
+            this.ButtonsPanel.Size = new System.Drawing.Size(712, 42);
+            this.ButtonsPanel.TabIndex = 9;
             // 
             // EditHexWindow
             // 
@@ -231,20 +233,20 @@
             this.Load += new System.EventHandler(this.EditHexWindow_Load);
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
-            this.ButtonsPanel.ResumeLayout(false);
             this.TabView.ResumeLayout(false);
-            this.HexPage.ResumeLayout(false);
             this.TextPage.ResumeLayout(false);
             this.TextPage.PerformLayout();
+            this.HexPage.ResumeLayout(false);
             this.HexInfoPanel.ResumeLayout(false);
             this.HexInfoPanel.PerformLayout();
+            this.ButtonsPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.TextBox NameBox;
+        private TagNameTextBox NameBox;
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOk;
         private Be.Windows.Forms.HexBox HexBox;
