@@ -75,6 +75,9 @@
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />
     <Compile Include="RegionFile.cs" />
+    <Compile Include="UI\ConvenienceTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\DualMenuItem.cs" />
     <Compile Include="UI\EditSnbtWindow.cs">
       <SubType>Form</SubType>
@@ -117,6 +120,9 @@
     </Compile>
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TagValueTextBox.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\TagNameTextBox.cs">
       <SubType>Component</SubType>

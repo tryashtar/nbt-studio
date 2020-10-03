@@ -8,49 +8,45 @@ using System.Windows.Forms;
 
 namespace NbtStudio.UI
 {
-    public class TagNameTextBox : TextBox
+    public class TagNameTextBox : ConvenienceTextBox
     {
         private INbtTag NbtTag;
         private INbtContainer NbtParent;
-        private Color TrueBackColor;
-        private bool ChangingBackColor;
         public TagNameTextBox()
         {
-            this.BackColorChanged += NameTextBox_BackColorChanged;
-            this.TextChanged += NameTextBox_TextChanged;
+            this.TextChanged += TagNameTextBox_TextChanged;
         }
 
-        private void NameTextBox_BackColorChanged(object sender, EventArgs e)
-        {
-            if (!ChangingBackColor)
-                TrueBackColor = this.BackColor;
-        }
-
-        private void NameTextBox_TextChanged(object sender, EventArgs e)
+        private void TagNameTextBox_TextChanged(object sender, EventArgs e)
         {
             SetColor(CheckNameInternal());
         }
 
         private void SetColor(NameCheckResult result)
         {
-            ChangingBackColor = true;
             switch (result)
             {
                 case NameCheckResult.InvalidMissingName:
                 case NameCheckResult.InvalidHasName:
-                    this.BackColor = Color.FromArgb(255, 230, 230);
+                    SetBackColor(Color.FromArgb(255, 230, 230));
                     break;
                 case NameCheckResult.InvalidDuplicateName:
-                    this.BackColor = Color.FromArgb(255, 230, 230);
+                    SetBackColor(Color.FromArgb(255, 230, 230));
                     break;
                 case NameCheckResult.Valid:
-                    if (this.BackColor != TrueBackColor)
-                        this.BackColor = TrueBackColor;
-                    break;
-                default:
+                    RestoreBackColor();
                     break;
             }
-            ChangingBackColor = false;
+        }
+
+        private void ShowTooltip(NameCheckResult result)
+        {
+            if (result == NameCheckResult.InvalidMissingName)
+                ShowTooltip("Missing Name", "You must specify a name for this tag", TimeSpan.FromSeconds(2));
+            else if (result == NameCheckResult.InvalidHasName)
+                ShowTooltip("Name Disallowed", "This tag must not have a name", TimeSpan.FromSeconds(2));
+            else if (result == NameCheckResult.InvalidDuplicateName)
+                ShowTooltip("Duplicate Name", "The compound already contains a tag with this name", TimeSpan.FromSeconds(2));
         }
 
         public void SetTags(INbtTag tag, INbtContainer parent)
@@ -87,7 +83,10 @@ namespace NbtStudio.UI
             bool valid = result == NameCheckResult.Valid;
             SetColor(result);
             if (!valid)
+            {
+                ShowTooltip(result);
                 this.Select();
+            }
             return valid;
         }
 
@@ -99,7 +98,7 @@ namespace NbtStudio.UI
             NbtTag.Name = name;
         }
 
-        private enum NameCheckResult
+        public enum NameCheckResult
         {
             Valid,
             InvalidMissingName,

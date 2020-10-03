@@ -33,7 +33,7 @@
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ValueLabel = new System.Windows.Forms.Label();
-            this.ValueBox = new System.Windows.Forms.TextBox();
+            this.ValueBox = new TagValueTextBox();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.MainTable.SuspendLayout();
@@ -174,7 +174,7 @@
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.Label ValueLabel;
-        private System.Windows.Forms.TextBox ValueBox;
+        private TagValueTextBox ValueBox;
         private System.Windows.Forms.TableLayoutPanel MainTable;
         private System.Windows.Forms.Panel ButtonsPanel;
     }

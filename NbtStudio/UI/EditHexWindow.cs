@@ -104,6 +104,7 @@ namespace NbtStudio.UI
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
             if (SettingName && !NameBox.CheckName())
                 return false;
+
             if (SettingName)
                 NameBox.ApplyName();
 

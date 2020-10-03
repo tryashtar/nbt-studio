@@ -21,6 +21,7 @@ namespace NbtStudio.UI
             WorkingTag = tag;
             TagParent = parent;
             NameBox.SetTags(tag, parent);
+            ValueBox.SetTags(tag, parent);
 
             SettingName = set_name;
             NameLabel.Visible = SettingName;
@@ -108,35 +109,17 @@ namespace NbtStudio.UI
 
         private bool TryModify()
         {
-            var str_value = ValueBox.Text.Trim().Replace("\r", "");
-            object parsed_value = null;
-
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
             if (SettingName && !NameBox.CheckName())
                 return false;
-            if (SettingValue && str_value != "")
-            {
-                try
-                {
-                    parsed_value = NbtUtil.ParseValue(str_value, WorkingTag.TagType);
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show($"The value is formatted incorrectly for a {NbtUtil.TagTypeName(WorkingTag.TagType).ToLower()}");
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    var minmax = NbtUtil.MinMaxFor(WorkingTag.TagType);
-                    MessageBox.Show($"The value for {NbtUtil.TagTypeName(WorkingTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}");
-                    return false;
-                }
-                catch { return false; }
-            }
+            object value = null;
+            if (SettingValue && !ValueBox.CheckValue(out value))
+                return false;
+
             if (SettingName)
                 NameBox.ApplyName();
-            if (SettingValue && parsed_value != null)
-                NbtUtil.SetValue(WorkingTag, parsed_value);
+            if (SettingValue)
+                ValueBox.ApplyValue(value);
             return true;
         }
 

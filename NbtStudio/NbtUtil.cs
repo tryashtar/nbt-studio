@@ -216,9 +216,9 @@ namespace NbtStudio
                 case NbtTagType.Long:
                     return Tuple.Create(long.MinValue.ToString(), long.MaxValue.ToString());
                 case NbtTagType.Float:
-                    return Tuple.Create(Util.FloatToString(float.MinValue), Util.FloatToString(float.MaxValue));
+                    return Tuple.Create(float.MinValue.ToString(), float.MaxValue.ToString());
                 case NbtTagType.Double:
-                    return Tuple.Create(Util.DoubleToString(double.MinValue), Util.DoubleToString(double.MaxValue));
+                    return Tuple.Create(double.MinValue.ToString(), double.MaxValue.ToString());
                 default:
                     throw new ArgumentException($"{type} isn't numeric, has no min and max");
             }
