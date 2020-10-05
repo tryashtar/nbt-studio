@@ -271,7 +271,7 @@ namespace NbtStudio.UI
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             NbtUtil.Sort(tag, new NbtUtil.TagTypeSorter(), true);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Sort {tag.TagDescription()}", true);
         }
 
         private void Undo()
@@ -328,7 +328,7 @@ namespace NbtStudio.UI
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
             else
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()}", false);
         }
 
         private void Rename(INbtTag tag)
@@ -336,7 +336,7 @@ namespace NbtStudio.UI
             // likewise
             ViewModel.StartBatchOperation();
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Rename {tag.TagDescription()}", false);
         }
 
         private void EditSnbt()
@@ -345,7 +345,7 @@ namespace NbtStudio.UI
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()} as SNBT", false);
         }
 
         private void Delete()
@@ -355,11 +355,12 @@ namespace NbtStudio.UI
             var prevs = selected.Select(x => x.PreviousNode).Where(x => x != null).ToList();
             var parents = selected.Select(x => x.Parent).Where(x => x != null).ToList();
             ViewModel.StartBatchOperation();
-            foreach (var item in ViewModel.SelectedNbts.ToList())
+            var items = ViewModel.SelectedNbts.ToList();
+            foreach (var item in items)
             {
                 item.Remove();
             }
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Delete {NbtUtil.TagDescription(items)}", false);
             // Index == -1 checks whether this node has been removed from the tree
             if (selected.All(x => x.Index == -1))
             {
@@ -512,12 +513,16 @@ namespace NbtStudio.UI
                 return;
             var snbts = Clipboard.GetText().Split('\n');
             ViewModel.StartBatchOperation();
+            var success = new List<NbtTag>();
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                {
                     NbtUtil.TransformAdd(tag.Adapt(), destination);
+                    success.Add(tag);
+                }
             }
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Paste {NbtUtil.TagDescription(success)} into {destination.TagDescription()}", true);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -575,7 +580,7 @@ namespace NbtStudio.UI
             {
                 NbtUtil.TransformInsert(tag, insert.Item1, insert.Item2);
             }
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Move {NbtUtil.TagDescription(tags)} into {insert.Item1.TagDescription()} at position {insert.Item2}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -633,6 +638,14 @@ namespace NbtStudio.UI
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuEdit_DropDownOpening(object sender, EventArgs e)
+        {
+            if (ViewModel == null) return;
+            var history = ViewModel.GetUndoHistory();
+            ActionUndo.DropDownItems.Clear();
+            ActionUndo.DropDownItems.AddRange(history.Select(x => new ToolStripMenuItem(x.Value, null, (s2, e2) => ViewModel.Undo(x.Key))).ToArray());
         }
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)

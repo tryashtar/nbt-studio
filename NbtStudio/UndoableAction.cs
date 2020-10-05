@@ -8,10 +8,12 @@ namespace NbtStudio
 {
     public class UndoableAction
     {
+        public readonly string Description;
         private Action DoAction;
         private Action UndoAction;
-        public UndoableAction(Action action, Action undo)
+        public UndoableAction(string description, Action action, Action undo)
         {
+            Description = description;
             DoAction = action;
             UndoAction = undo;
         }
@@ -32,10 +34,10 @@ namespace NbtStudio
             UndoAction = other.UndoAction + UndoAction;
         }
 
-        public static UndoableAction Merge(IEnumerable<UndoableAction> actions)
+        public static UndoableAction Merge(string description, IEnumerable<UndoableAction> actions)
         {
             var first = actions.First();
-            var result = new UndoableAction(first.DoAction, first.UndoAction);
+            var result = new UndoableAction(description, first.DoAction, first.UndoAction);
             foreach (var action in actions.Skip(1))
             {
                 result.Add(action);

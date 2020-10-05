@@ -71,6 +71,7 @@
             this.MenuEdit.Name = "MenuEdit";
             this.MenuEdit.Size = new System.Drawing.Size(39, 20);
             this.MenuEdit.Text = "&Edit";
+            this.MenuEdit.DropDownOpening += new System.EventHandler(this.MenuEdit_DropDownOpening);
             // 
             // MenuSearch
             // 
