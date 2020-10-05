@@ -13,6 +13,8 @@ namespace NbtStudio.UI
     {
         private TreeNodeAdv LastFound;
         private readonly NbtTreeView SearchingView;
+        public string SearchName => NameBox.Text;
+        public string SearchValue => ValueBox.Text;
 
         public FindWindow(NbtTreeView view)
         {
@@ -24,30 +26,14 @@ namespace NbtStudio.UI
 
         private bool Matches(TreeNodeAdv adv)
         {
-            var name = NbtText.PreviewName(adv);
-            var value = NbtText.PreviewValue(adv);
-            bool skip_name = NameBox.Text == "";
-            bool skip_value = ValueBox.Text == "";
-            if (!skip_name && String.IsNullOrEmpty(name))
-                return false;
-            if (!skip_value && String.IsNullOrEmpty(value))
-                return false;
-            if (RegexCheck.Checked)
-            {
-                var name_regex = new Regex(NameBox.Text, RegexOptions.IgnoreCase);
-                var value_regex = new Regex(ValueBox.Text, RegexOptions.IgnoreCase);
-                return (skip_name || name_regex.IsMatch(name)) &&
-                    (skip_value || value_regex.IsMatch(value));
-            }
-            else
-            {
-                return (skip_name || name.IndexOf(NameBox.Text, StringComparison.OrdinalIgnoreCase) != -1) &&
-                    (skip_value || value.IndexOf(ValueBox.Text, StringComparison.OrdinalIgnoreCase) != -1);
-            }
+            string name = NbtText.PreviewName(adv);
+            string value = NbtText.PreviewValue(adv);
+            return NameBox.IsMatch(name) && ValueBox.IsMatch(value);
         }
 
         public void Search(SearchDirection direction)
         {
+            if (!ValidateRegex()) return;
             var backup = direction == SearchDirection.Forward ? SearchingView.Root : SearchingView.FinalNode;
             var start = SearchingView.SelectedNode ?? LastFound ?? backup;
             var find = SearchingView.SearchFrom(start, Matches, direction);
@@ -71,6 +57,7 @@ namespace NbtStudio.UI
 
         public void SearchAll()
         {
+            if (!ValidateRegex()) return;
             var results = SearchingView.Search(Matches);
             if (results.Any())
             {
@@ -82,6 +69,11 @@ namespace NbtStudio.UI
                     item.IsSelected = true;
                 }
             }
+        }
+
+        private bool ValidateRegex()
+        {
+            return NameBox.CheckRegex(out _) && ValueBox.CheckRegex(out _);
         }
 
         private void ButtonFindNext_Click(object sender, EventArgs e)
@@ -135,6 +127,12 @@ namespace NbtStudio.UI
         private void FindWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.FindRegex = RegexCheck.Checked;
+        }
+
+        private void RegexCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            NameBox.RegexMode = RegexCheck.Checked;
+            ValueBox.RegexMode = RegexCheck.Checked;
         }
     }
 }

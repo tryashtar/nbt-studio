@@ -32,9 +32,9 @@
             this.ButtonFindPrev = new System.Windows.Forms.Button();
             this.RegexCheck = new System.Windows.Forms.CheckBox();
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new System.Windows.Forms.TextBox();
+            this.NameBox = new NbtStudio.UI.RegexTextBox();
             this.ValueLabel = new System.Windows.Forms.Label();
-            this.ValueBox = new System.Windows.Forms.TextBox();
+            this.ValueBox = new NbtStudio.UI.RegexTextBox();
             this.ButtonFindAll = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -74,6 +74,7 @@
             this.RegexCheck.TabIndex = 2;
             this.RegexCheck.Text = "Regex";
             this.RegexCheck.UseVisualStyleBackColor = true;
+            this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
             // 
             // NameLabel
             // 
@@ -96,6 +97,7 @@
             this.NameBox.Location = new System.Drawing.Point(73, 14);
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
+            this.NameBox.RegexMode = false;
             this.NameBox.Size = new System.Drawing.Size(274, 21);
             this.NameBox.TabIndex = 0;
             // 
@@ -120,6 +122,7 @@
             this.ValueBox.Location = new System.Drawing.Point(73, 41);
             this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.ValueBox.Name = "ValueBox";
+            this.ValueBox.RegexMode = false;
             this.ValueBox.Size = new System.Drawing.Size(274, 21);
             this.ValueBox.TabIndex = 1;
             // 
@@ -171,9 +174,9 @@
         private System.Windows.Forms.Button ButtonFindPrev;
         private System.Windows.Forms.CheckBox RegexCheck;
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.TextBox NameBox;
+        private RegexTextBox NameBox;
         private System.Windows.Forms.Label ValueLabel;
-        private System.Windows.Forms.TextBox ValueBox;
+        private RegexTextBox ValueBox;
         private System.Windows.Forms.Button ButtonFindAll;
     }
 }
