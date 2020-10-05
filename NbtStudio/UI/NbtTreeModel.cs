@@ -136,8 +136,6 @@ namespace NbtStudio.UI
                 if (item is ISaveable saveable)
                     MarkChanged(saveable);
             }
-            if (!IsUndoing)
-                RedoStack.Clear();
             Changed?.Invoke(this, EventArgs.Empty);
 
             var real_children = GetChildren(path).ToList();
@@ -194,6 +192,7 @@ namespace NbtStudio.UI
 
         private void PushUndo(UndoableAction action)
         {
+            RedoStack.Clear();
             if (BatchNumber == 0)
                 UndoStack.Push(action);
             else
@@ -207,10 +206,8 @@ namespace NbtStudio.UI
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        private bool IsUndoing = false;
         public void Undo(int count = 1)
         {
-            IsUndoing = true;
             for (int i = 0; i < count && UndoStack.Any(); i++)
             {
                 var action = UndoStack.Pop();
@@ -220,13 +217,11 @@ namespace NbtStudio.UI
                 Console.WriteLine($"Performed undo of action \"{action.Description}\". Undo stack has {UndoStack.Count} items. Redo stack has {RedoStack.Count} items");
 #endif
             }
-            IsUndoing = false;
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void Redo(int count = 1)
         {
-            IsUndoing = true;
             for (int i = 0; i < count && RedoStack.Any(); i++)
             {
                 var action = RedoStack.Pop();
@@ -236,7 +231,6 @@ namespace NbtStudio.UI
                 Console.WriteLine($"Performed redo of action \"{action.Description}\". Redo stack has {RedoStack.Count} items. Undo stack has {UndoStack.Count} items");
 #endif
             }
-            IsUndoing = false;
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
