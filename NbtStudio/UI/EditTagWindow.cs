@@ -69,8 +69,7 @@ namespace NbtStudio.UI
 
             if (bypass_window)
             {
-                if (has_name)
-                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
+                tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), parent);
                 return tag;
             }
             else if (has_name || has_value)

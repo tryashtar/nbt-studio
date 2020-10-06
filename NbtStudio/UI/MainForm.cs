@@ -570,11 +570,7 @@ namespace NbtStudio.UI
             var insert = NbtUtil.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return;
             ViewModel.StartBatchOperation();
-            // reverse so that if we start with ABC, then insert C at index 0, B at index 0, A at index 0, it ends up ABC
-            foreach (var tag in tags.Reverse().ToList())
-            {
-                NbtUtil.TransformInsert(tag, insert.Item1, insert.Item2);
-            }
+            NbtUtil.TransformInsert(tags, insert.Item1, insert.Item2);
             ViewModel.FinishBatchOperation();
         }
 

@@ -71,8 +71,7 @@ namespace NbtStudio.UI
 
             if (bypass_window)
             {
-                if (has_name)
-                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), (INbtCompound)parent);
+                tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), parent);
                 return tag;
             }
             var window = new EditHexWindow(tag.Adapt(), parent, has_name, EditPurpose.Create);

@@ -346,35 +346,55 @@ namespace NbtStudio
             }
         }
 
-        public static void TransformInsert(INbtTag tag, INbtContainer destination, int index)
+        public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformAdd(new[] { tag }, destination);
+        public static void TransformAdd(IEnumerable<INbtTag> tags, INbtContainer destination) => TransformInsert(tags, destination, destination.Count);
+        public static void TransformInsert(INbtTag tag, INbtContainer destination, int index) => TransformInsert(new[] { tag }, destination, index);
+        public static void TransformInsert(IEnumerable<INbtTag> tags, INbtContainer destination, int index)
         {
-            if (!destination.CanAdd(tag.TagType))
-                return;
-            if (tag.IsInside(destination) && index > tag.Index)
-                index--;
-            tag.Remove();
-            if (destination is INbtCompound compound)
-                tag.Name = GetAutomaticName(tag, compound);
-            else if (destination is INbtList)
-                tag.Name = null;
-            tag.InsertInto(destination, index);
-        }
-
-        public static string GetAutomaticName(INbtTag tag, INbtCompound parent)
-        {
-            if (tag.Name != null && !parent.Contains(tag.Name))
-                return tag.Name;
-            string basename = tag.Name ?? TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
-            for (int i = 1; i < 999999; i++)
+            var adding = tags.ToList();
+            int original_index = index;
+            foreach (var tag in tags)
             {
-                string name = basename + i.ToString();
-                if (!parent.Contains(name))
-                    return name;
+                if (!destination.CanAdd(tag.TagType))
+                {
+                    adding.Remove(tag);
+                    continue;
+                }
+                if (tag.IsInside(destination) && original_index > tag.Index)
+                    index--;
             }
-            throw new InvalidOperationException("This compound really contains 999999 similarly named tags?!");
+            foreach (var tag in adding)
+            {
+                tag.Remove();
+            }
+            foreach (var tag in adding)
+            {
+                tag.Name = GetAutomaticName(tag, destination);
+                tag.InsertInto(destination, index);
+                index++;
+            }
         }
 
-        public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformInsert(tag, destination, destination.Count);
+        public static string GetAutomaticName(INbtTag tag, INbtContainer parent)
+        {
+            if (parent is INbtList list)
+                return null;
+            if (parent is INbtCompound compound)
+            {
+                if (tag.Name != null && !compound.Contains(tag.Name))
+                    return tag.Name;
+                string basename = tag.Name ?? TagTypeName(tag.TagType).ToLower().Replace(' ', '_');
+                for (int i = 1; i < 999999; i++)
+                {
+                    string name = basename + i.ToString();
+                    if (!compound.Contains(name))
+                        return name;
+                }
+                throw new InvalidOperationException("This compound really contains 999999 similarly named tags?!");
+            }
+            throw new ArgumentException($"Can't get automatic name for tags inside a {parent.TagType}");
+        }
+
 
         public static bool CanAddAll(IEnumerable<INbtTag> tags, INbtContainer destination)
         {

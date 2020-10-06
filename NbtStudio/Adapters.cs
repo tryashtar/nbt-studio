@@ -179,6 +179,7 @@ namespace NbtStudio
         public bool IsInside(INbtContainer container) => container.Contains(Tag);
         public override bool Equals(object obj) => obj.Equals(Tag);
         public override int GetHashCode() => Tag.GetHashCode();
+        public override string ToString() => Tag.ToString();
     }
 
     public class NbtByteAdapter : NbtTagAdapter, INbtByte
