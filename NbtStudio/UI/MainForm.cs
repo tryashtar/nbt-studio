@@ -53,6 +53,8 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", Properties.Resources.action_edit_image, Keys.Control | Keys.E);
         private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
+        private readonly ToolStripMenuItem DropDownUndoHistory = DualMenuItem.Single("Undo History...", Properties.Resources.action_undo_image, Keys.None);
+        private readonly ToolStripMenuItem DropDownRedoHistory = DualMenuItem.Single("Redo History...", Properties.Resources.action_redo_image, Keys.None);
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
         private readonly ToolStripMenuItem ActionAbout = DualMenuItem.Single("&About", Properties.Resources.app_image_16, Keys.Shift | Keys.F1);
         private readonly ToolStripButton ActionAddSnbt = DualMenuItem.Single("Add as SNBT", Properties.Resources.action_add_snbt_image);
@@ -110,6 +112,9 @@ namespace NbtStudio.UI
             ActionEdit.AddTo(Tools, MenuEdit);
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
+            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
+            MenuEdit.DropDownItems.Add(DropDownUndoHistory);
+            MenuEdit.DropDownItems.Add(DropDownRedoHistory);
             Tools.Items.Add(new ToolStripSeparator());
             MenuHelp.DropDownItems.Add(ActionAbout);
 
@@ -642,10 +647,31 @@ namespace NbtStudio.UI
 
         private void MenuEdit_DropDownOpening(object sender, EventArgs e)
         {
+            DropDownUndoHistory.Enabled = false;
+            DropDownRedoHistory.Enabled = false;
             if (ViewModel == null) return;
-            var history = ViewModel.GetUndoHistory();
-            ActionUndo.DropDownItems.Clear();
-            ActionUndo.DropDownItems.AddRange(history.Select(x => new ToolStripMenuItem(x.Value, null, (s2, e2) => ViewModel.Undo(x.Key))).ToArray());
+
+            var undo_history = ViewModel.GetUndoHistory();
+            var redo_history = ViewModel.GetRedoHistory();
+
+            var undo_dropdown = new ToolStripDropDown();
+            DropDownUndoHistory.DropDown = undo_dropdown;
+            var undo_actions = new ActionHistory(undo_history,
+                x => { ViewModel.Undo(x + 1); MenuEdit.HideDropDown(); },
+                x => $"Undo {Util.Pluralize(x + 1, "action")}",
+                DropDownUndoHistory.Font);
+            undo_dropdown.Items.Add(new ToolStripControlHost(undo_actions));
+
+            var redo_dropdown = new ToolStripDropDown();
+            DropDownRedoHistory.DropDown = redo_dropdown;
+            var redo_actions = new ActionHistory(redo_history,
+                x => { ViewModel.Redo(x + 1); MenuEdit.HideDropDown(); },
+                x => $"Redo {Util.Pluralize(x + 1, "action")}",
+                DropDownRedoHistory.Font);
+            redo_dropdown.Items.Add(new ToolStripControlHost(redo_actions));
+
+            DropDownUndoHistory.Enabled = undo_history.Any();
+            DropDownRedoHistory.Enabled = redo_history.Any();
         }
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)

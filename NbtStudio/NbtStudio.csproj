@@ -147,6 +147,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\TreeModelNotify.cs" />
+    <Compile Include="UI\ActionHistory.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\ActionHistory.Designer.cs">
+      <DependentUpon>ActionHistory.cs</DependentUpon>
+    </Compile>
     <Compile Include="UndoableAction.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\EditSnbtWindow.resx">
@@ -174,6 +180,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ActionHistory.resx">
+      <DependentUpon>ActionHistory.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

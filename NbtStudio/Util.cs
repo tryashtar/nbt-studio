@@ -12,6 +12,7 @@ namespace NbtStudio
 {
     public static class Util
     {
+        public static readonly Color SelectionColor = Color.FromArgb(181, 215, 243);
         public static string Pluralize(int count, string word) => Pluralize(count, word, word + "s");
         public static string Pluralize(int count, string word, string plural)
         {

@@ -33,7 +33,7 @@ namespace NbtStudio.UI
             HexBox.ByteProvider = Provider;
             HexBox.GroupSize = Provider.BytesPerValue;
             HexBox.GroupSeparatorVisible = Provider.BytesPerValue > 1;
-            HexBox.SelectionBackColor = Color.LightBlue;
+            HexBox.SelectionBackColor = Util.SelectionColor;
             HexBox.SelectionForeColor = HexBox.ForeColor;
 
             string tagname;
