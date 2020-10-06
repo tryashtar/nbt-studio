@@ -81,7 +81,7 @@ namespace NbtStudio.UI
             // selected nodes are not "active" while dragging
             // hovered nodes are "active" while dragging
             if (context.DrawSelection == DrawSelectionMode.Active || (node.IsSelected && !node.Tree.Focused))
-                context.Graphics.FillRectangle(Brushes.LightBlue, context.Bounds);
+                context.Graphics.FillRectangle(new SolidBrush(Util.SelectionColor), context.Bounds);
             else if (node.IsSelected)
                 context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);
         }

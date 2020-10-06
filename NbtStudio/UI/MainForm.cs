@@ -53,6 +53,8 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", Properties.Resources.action_edit_image, Keys.Control | Keys.E);
         private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", Properties.Resources.action_edit_snbt_image, Keys.Control | Keys.Shift | Keys.E);
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", Properties.Resources.action_delete_image, Keys.Delete);
+        private readonly ToolStripMenuItem DropDownUndoHistory = DualMenuItem.Single("Undo History...", Properties.Resources.action_undo_image, Keys.None);
+        private readonly ToolStripMenuItem DropDownRedoHistory = DualMenuItem.Single("Redo History...", Properties.Resources.action_redo_image, Keys.None);
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
         private readonly ToolStripMenuItem ActionAbout = DualMenuItem.Single("&About", Properties.Resources.app_image_16, Keys.Shift | Keys.F1);
         private readonly ToolStripButton ActionAddSnbt = DualMenuItem.Single("Add as SNBT", Properties.Resources.action_add_snbt_image);
@@ -110,6 +112,9 @@ namespace NbtStudio.UI
             ActionEdit.AddTo(Tools, MenuEdit);
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
+            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
+            MenuEdit.DropDownItems.Add(DropDownUndoHistory);
+            MenuEdit.DropDownItems.Add(DropDownRedoHistory);
             Tools.Items.Add(new ToolStripSeparator());
             MenuHelp.DropDownItems.Add(ActionAbout);
 
@@ -271,7 +276,7 @@ namespace NbtStudio.UI
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             NbtUtil.Sort(tag, new NbtUtil.TagTypeSorter(), true);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Sort {tag.TagDescription()}", true);
         }
 
         private void Undo()
@@ -328,7 +333,7 @@ namespace NbtStudio.UI
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
             else
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()}", false);
         }
 
         private void Rename(INbtTag tag)
@@ -336,7 +341,7 @@ namespace NbtStudio.UI
             // likewise
             ViewModel.StartBatchOperation();
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Rename {tag.TagDescription()}", false);
         }
 
         private void EditSnbt()
@@ -345,7 +350,7 @@ namespace NbtStudio.UI
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()} as SNBT", false);
         }
 
         private void Delete()
@@ -355,11 +360,12 @@ namespace NbtStudio.UI
             var prevs = selected.Select(x => x.PreviousNode).Where(x => x != null).ToList();
             var parents = selected.Select(x => x.Parent).Where(x => x != null).ToList();
             ViewModel.StartBatchOperation();
-            foreach (var item in ViewModel.SelectedNbts.ToList())
+            var items = ViewModel.SelectedNbts.ToList();
+            foreach (var item in items)
             {
                 item.Remove();
             }
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Delete {NbtUtil.TagDescription(items)}", false);
             // Index == -1 checks whether this node has been removed from the tree
             if (selected.All(x => x.Index == -1))
             {
@@ -512,12 +518,16 @@ namespace NbtStudio.UI
                 return;
             var snbts = Clipboard.GetText().Split('\n');
             ViewModel.StartBatchOperation();
+            var success = new List<NbtTag>();
             foreach (var nbt in snbts)
             {
                 if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                {
                     NbtUtil.TransformAdd(tag.Adapt(), destination);
+                    success.Add(tag);
+                }
             }
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Paste {NbtUtil.TagDescription(success)} into {destination.TagDescription()}", true);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -571,7 +581,7 @@ namespace NbtStudio.UI
             if (insert.Item1 == null) return;
             ViewModel.StartBatchOperation();
             NbtUtil.TransformInsert(tags, insert.Item1, insert.Item2);
-            ViewModel.FinishBatchOperation();
+            ViewModel.FinishBatchOperation($"Move {NbtUtil.TagDescription(tags)} into {insert.Item1.TagDescription()} at position {insert.Item2}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -629,6 +639,35 @@ namespace NbtStudio.UI
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.Save();
+        }
+
+        private void MenuEdit_DropDownOpening(object sender, EventArgs e)
+        {
+            DropDownUndoHistory.Enabled = false;
+            DropDownRedoHistory.Enabled = false;
+            if (ViewModel == null) return;
+
+            var undo_history = ViewModel.GetUndoHistory();
+            var redo_history = ViewModel.GetRedoHistory();
+
+            var undo_dropdown = new ToolStripDropDown();
+            DropDownUndoHistory.DropDown = undo_dropdown;
+            var undo_actions = new ActionHistory(undo_history,
+                x => { ViewModel.Undo(x + 1); MenuEdit.HideDropDown(); },
+                x => $"Undo {Util.Pluralize(x + 1, "action")}",
+                DropDownUndoHistory.Font);
+            undo_dropdown.Items.Add(new ToolStripControlHost(undo_actions));
+
+            var redo_dropdown = new ToolStripDropDown();
+            DropDownRedoHistory.DropDown = redo_dropdown;
+            var redo_actions = new ActionHistory(redo_history,
+                x => { ViewModel.Redo(x + 1); MenuEdit.HideDropDown(); },
+                x => $"Redo {Util.Pluralize(x + 1, "action")}",
+                DropDownRedoHistory.Font);
+            redo_dropdown.Items.Add(new ToolStripControlHost(redo_actions));
+
+            DropDownUndoHistory.Enabled = undo_history.Any();
+            DropDownRedoHistory.Enabled = redo_history.Any();
         }
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)

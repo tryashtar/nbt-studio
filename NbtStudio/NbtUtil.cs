@@ -419,6 +419,34 @@ namespace NbtStudio
             return ancestors;
         }
 
+        public static string TagDescription(this INbtTag tag)
+        {
+            string type = NbtUtil.TagTypeName(tag.TagType).ToLower();
+            if (!String.IsNullOrEmpty(tag.Name))
+                return $"'{tag.Name}' {type}";
+            if (tag.Index != -1)
+            {
+                if (!String.IsNullOrEmpty(tag.Parent?.Name))
+                    return $"{type} at index {tag.Index} in '{tag.Parent.Name}'";
+                else if (tag.Parent?.TagType != null)
+                    return $"{type} at index {tag.Index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
+            }
+            return $"{type}";
+        }
+        public static string TagDescription(this NbtTag tag) => TagDescription(tag.Adapt());
+        public static string TagDescription(IEnumerable<INbtTag> tags)
+        {
+            if (!tags.Skip(1).Any())
+                return TagDescription(tags.Single());
+            return Util.Pluralize(tags.Count(), "tag");
+        }
+        public static string TagDescription(IEnumerable<NbtTag> tags)
+        {
+            if (!tags.Skip(1).Any())
+                return TagDescription(tags.Single());
+            return Util.Pluralize(tags.Count(), "tag");
+        }
+
         private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };
         public static string SaveFilter()
         {

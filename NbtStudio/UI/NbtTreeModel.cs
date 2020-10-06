@@ -136,8 +136,6 @@ namespace NbtStudio.UI
                 if (item is ISaveable saveable)
                     MarkChanged(saveable);
             }
-            if (!IsUndoing)
-                RedoStack.Clear();
             Changed?.Invoke(this, EventArgs.Empty);
 
             var real_children = GetChildren(path).ToList();
@@ -194,53 +192,59 @@ namespace NbtStudio.UI
 
         private void PushUndo(UndoableAction action)
         {
+            RedoStack.Clear();
             if (BatchNumber == 0)
                 UndoStack.Push(action);
             else
                 UndoBatch.Add(action);
 #if DEBUG
             if (BatchNumber == 0)
-                Console.WriteLine($"Added undo to main stack. Undo stack has {UndoStack.Count} items");
+                Console.WriteLine($"Added action to main stack: \"{action.Description}\". Undo stack has {UndoStack.Count} items");
             else
-                Console.WriteLine($"Added undo to batch. Batch has {UndoBatch.Count} items");
+                Console.WriteLine($"Added action to batch: \"{action.Description}\". Batch has {UndoBatch.Count} items");
 #endif
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        private bool IsUndoing = false;
-        public void Undo()
+        public void Undo(int count = 1)
         {
-            if (UndoStack.Any())
+            for (int i = 0; i < count && UndoStack.Any(); i++)
             {
                 var action = UndoStack.Pop();
                 RedoStack.Push(action);
-                IsUndoing = true;
                 action.Undo();
-                IsUndoing = false;
 #if DEBUG
-                Console.WriteLine($"Performed undo. Undo stack has {UndoStack.Count} items");
-                Console.WriteLine($"Added redo. Redo stack has {RedoStack.Count} items");
+                Console.WriteLine($"Performed undo of action \"{action.Description}\". Undo stack has {UndoStack.Count} items. Redo stack has {RedoStack.Count} items");
 #endif
             }
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        public void Redo()
+        public void Redo(int count = 1)
         {
-            if (RedoStack.Any())
+            for (int i = 0; i < count && RedoStack.Any(); i++)
             {
                 var action = RedoStack.Pop();
                 UndoStack.Push(action);
-                IsUndoing = true;
                 action.Do();
-                IsUndoing = false;
 #if DEBUG
-                Console.WriteLine($"Performed redo. Redo stack has {RedoStack.Count} items");
-                Console.WriteLine($"Added undo. Undo stack has {UndoStack.Count} items");
+                Console.WriteLine($"Performed redo of action \"{action.Description}\". Redo stack has {RedoStack.Count} items. Undo stack has {UndoStack.Count} items");
 #endif
             }
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public bool CanUndo => UndoStack.Any();
         public bool CanRedo => RedoStack.Any();
+
+        public List<KeyValuePair<int, string>> GetUndoHistory()
+        {
+            return UndoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, v.Description)).ToList();
+        }
+        public List<KeyValuePair<int, string>> GetRedoHistory()
+        {
+            return RedoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, v.Description)).ToList();
+        }
 
         private int BatchNumber = 0;
         private readonly List<UndoableAction> UndoBatch = new List<UndoableAction>();
@@ -250,17 +254,21 @@ namespace NbtStudio.UI
             BatchNumber++;
         }
 
-        public void FinishBatchOperation()
+        public void FinishBatchOperation(string description, bool replace_single)
         {
             if (BatchNumber == 0)
                 return;
             BatchNumber--;
             if (BatchNumber == 0 && UndoBatch.Any())
             {
-                var merged_action = UndoableAction.Merge(UndoBatch);
+                UndoableAction merged_action;
+                if (replace_single || UndoBatch.Count > 1)
+                    merged_action = UndoableAction.Merge(description, UndoBatch);
+                else
+                    merged_action = UndoBatch.Single();
                 UndoStack.Push(merged_action);
 #if DEBUG
-                Console.WriteLine($"Merged {UndoBatch.Count} batch actions onto stack. Stack has {UndoStack.Count} items");
+                Console.WriteLine($"Merged {UndoBatch.Count} batch actions onto stack as action: \"{description}\". Stack has {UndoStack.Count} items");
 #endif
                 UndoBatch.Clear();
                 Changed?.Invoke(this, EventArgs.Empty);
