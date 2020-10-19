@@ -21,12 +21,51 @@ namespace NbtStudio
             return $"{count} {plural}";
         }
 
-        public static int ParseNonNegativeInt(string value)
+        public static sbyte ParseByte(string value)
         {
-            int val = int.Parse(value);
-            if (val < 0)
-                throw new ArgumentOutOfRangeException(nameof(value));
-            return val;
+            if (value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                return 1;
+            if (value.Equals("false", StringComparison.OrdinalIgnoreCase))
+                return 0;
+            return sbyte.Parse(value);
+        }
+
+        public static double ParseDouble(string value)
+        {
+            if (value.Equals("∞", StringComparison.OrdinalIgnoreCase))
+                return double.PositiveInfinity;
+            if (value.Equals("+∞", StringComparison.OrdinalIgnoreCase))
+                return double.PositiveInfinity;
+            if (value.Equals("-∞", StringComparison.OrdinalIgnoreCase))
+                return double.NegativeInfinity;
+            if (value.Equals("Infinity", StringComparison.OrdinalIgnoreCase))
+                return double.PositiveInfinity;
+            if (value.Equals("+Infinity", StringComparison.OrdinalIgnoreCase))
+                return double.PositiveInfinity;
+            if (value.Equals("-Infinity", StringComparison.OrdinalIgnoreCase))
+                return double.NegativeInfinity;
+            if (value.Equals("NaN", StringComparison.OrdinalIgnoreCase))
+                return double.NaN;
+            return double.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        public static float ParseFloat(string value)
+        {
+            if (value.Equals("∞", StringComparison.OrdinalIgnoreCase))
+                return float.PositiveInfinity;
+            if (value.Equals("+∞", StringComparison.OrdinalIgnoreCase))
+                return float.PositiveInfinity;
+            if (value.Equals("-∞", StringComparison.OrdinalIgnoreCase))
+                return float.NegativeInfinity;
+            if (value.Equals("Infinity", StringComparison.OrdinalIgnoreCase))
+                return float.PositiveInfinity;
+            if (value.Equals("+Infinity", StringComparison.OrdinalIgnoreCase))
+                return float.PositiveInfinity;
+            if (value.Equals("-Infinity", StringComparison.OrdinalIgnoreCase))
+                return float.NegativeInfinity;
+            if (value.Equals("NaN", StringComparison.OrdinalIgnoreCase))
+                return float.NaN;
+            return float.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
         }
 
         public static string DoubleToString(double d)

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    // provides psuedo-interfaces to NBT tags as methods
     public static class NbtUtil
     {
         // everything except End and Unknown
@@ -141,7 +140,7 @@ namespace NbtStudio
             switch (type)
             {
                 case NbtTagType.Byte:
-                    return (byte)sbyte.Parse(value);
+                    return (byte)Util.ParseByte(value);
                 case NbtTagType.Short:
                     return short.Parse(value);
                 case NbtTagType.Int:
@@ -149,9 +148,9 @@ namespace NbtStudio
                 case NbtTagType.Long:
                     return long.Parse(value);
                 case NbtTagType.Float:
-                    return float.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                    return Util.ParseFloat(value);
                 case NbtTagType.Double:
-                    return double.Parse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                    return Util.ParseDouble(value);
                 case NbtTagType.String:
                     return value;
                 default:
@@ -377,7 +376,7 @@ namespace NbtStudio
 
         public static string GetAutomaticName(INbtTag tag, INbtContainer parent)
         {
-            if (parent is INbtList list)
+            if (parent is INbtList)
                 return null;
             if (parent is INbtCompound compound)
             {

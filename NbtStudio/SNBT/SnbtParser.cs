@@ -212,28 +212,32 @@ namespace NbtStudio.SNBT
                     return new NbtDouble(double.Parse(sub, System.Globalization.NumberStyles.Float));
                 if (DOUBLE_PATTERN_NOSUFFIX.IsMatch(str))
                     return new NbtDouble(double.Parse(str, System.Globalization.NumberStyles.Float));
-                if (String.Equals(str, "true", StringComparison.OrdinalIgnoreCase))
-                    return new NbtByte(1);
-                if (String.Equals(str, "false", StringComparison.OrdinalIgnoreCase))
-                    return new NbtByte(0);
-                if (String.Equals(str, "Infinity" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
-                    return new NbtFloat(float.PositiveInfinity);
-                if (String.Equals(str, "-Infinity" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
-                    return new NbtFloat(float.NegativeInfinity);
-                if (String.Equals(str, "NaN" + Snbt.FLOAT_SUFFIX, StringComparison.OrdinalIgnoreCase))
-                    return new NbtFloat(float.NaN);
-                if (String.Equals(str, "Infinity" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "Infinity", StringComparison.OrdinalIgnoreCase))
-                    return new NbtDouble(double.PositiveInfinity);
-                if (String.Equals(str, "-Infinity" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "-Infinity", StringComparison.OrdinalIgnoreCase))
-                    return new NbtDouble(double.NegativeInfinity);
-                if (String.Equals(str, "NaN" + Snbt.DOUBLE_SUFFIX, StringComparison.OrdinalIgnoreCase) || String.Equals(str, "NaN", StringComparison.OrdinalIgnoreCase))
-                    return new NbtDouble(double.NaN);
+                var special = SpecialCase(str);
+                if (special != null)
+                    return special;
             }
             catch (FormatException)
             { }
             catch (OverflowException)
             { }
             return new NbtString(str);
+        }
+
+        private NbtTag SpecialCase(string text)
+        {
+            if (String.IsNullOrEmpty(text))
+                return null;
+            if (text[text.Length - 1] == Snbt.FLOAT_SUFFIX)
+            {
+                try { return new NbtFloat(Util.ParseFloat(text.Substring(0, text.Length - 1))); } catch { }
+            }
+            if (text[text.Length - 1] == Snbt.DOUBLE_SUFFIX)
+            {
+                try { return new NbtDouble(Util.ParseDouble(text.Substring(0, text.Length - 1))); } catch { }
+            }
+            try { return new NbtDouble(Util.ParseDouble(text)); } catch { }
+            try { return new NbtByte((byte)Util.ParseByte(text)); } catch { }
+            return null;
         }
 
         private void Expect(char c)
@@ -267,7 +271,8 @@ namespace NbtStudio.SNBT
                 || c >= 'A' && c <= 'Z'
                 || c >= 'a' && c <= 'z'
                 || c == '_' || c == '-'
-                || c == '.' || c == '+';
+                || c == '.' || c == '+'
+                || c == '∞';
         }
 
         public bool CanRead(int length = 1)

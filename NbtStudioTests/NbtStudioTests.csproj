@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Snbt.cs" />
     <Compile Include="DragDrop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
