@@ -8,16 +8,27 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class RegionFile : ISaveable, IDisposable
+    public interface IRegion : ISaveable
     {
+        int ChunkCount { get; }
+        IEnumerable<IChunk> AllChunks { get; }
+        IChunk GetChunk(int x, int z);
+        void RemoveChunk(int x, int z);
+        void AddChunk(Chunk chunk);
+    }
+    public class RegionFile : IRegion, IDisposable
+    {
+        public const int ChunkXDimension = 32;
+        public const int ChunkZDimension = 32;
         public int ChunkCount { get; private set; }
-        private readonly Chunk[,] Chunks = new Chunk[32, 32];
+        private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
         private readonly FileStream Stream;
         public string Path { get; private set; }
         public RegionFile(string path)
         {
+            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             Path = path;
             Stream = File.OpenRead(path);
             Locations = Util.ReadBytes(Stream, 4096);
@@ -36,7 +47,7 @@ namespace NbtStudio
                     if (size > 0)
                     {
                         ChunkCount++;
-                        Chunks[x, z] = new Chunk(this, x, z, offset, size, Stream);
+                        Chunks[x, z] = new Chunk(this, x, z, offset, Stream);
                         if (ChunkCount == 1)
                             Chunks[x, z].Load(); // load the first one to check if this is really a region file
                     }
@@ -46,6 +57,20 @@ namespace NbtStudio
                 throw new FormatException($"Region doesn't contain any chunks");
         }
 
+        private RegionFile()
+        {
+            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
+            Path = null;
+            Stream = null;
+            Locations = new byte[4096];
+            Timestamps = new byte[4096];
+            ChunkCount = 0;
+        }
+        public static RegionFile EmptyRegion()
+        {
+            return new RegionFile();
+        }
+
         public static RegionFile TryCreate(string path)
         {
             try
@@ -53,30 +78,40 @@ namespace NbtStudio
             catch { return null; }
         }
 
-        public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
+        public IEnumerable<IChunk> AllChunks => Chunks.Cast<Chunk>();
 
-        public Chunk GetChunk(int x, int z)
+        public IChunk GetChunk(int x, int z)
         {
-            if (!Chunks[x, z].IsLoaded)
-                Chunks[x, z].Load();
             return Chunks[x, z];
         }
 
         public void RemoveChunk(int x, int z)
         {
             if (Chunks[x, z] != null)
+            {
+                Chunks[x, z].Region = null;
                 ChunkCount--;
+            }
             Chunks[x, z] = null;
+        }
+
+        public void AddChunk(Chunk chunk)
+        {
+            if (Chunks[chunk.X, chunk.Z] != null)
+                throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
+            ChunkCount++;
+            Chunks[chunk.X, chunk.Z] = chunk;
+            chunk.Region = this;
         }
 
         public void Dispose()
         {
-            Stream.Dispose();
+            Stream?.Dispose();
         }
 
         private static int ChunkDataLocation(int x, int z)
         {
-            return (x % 32 + (z % 32) * 32) * 4;
+            return (x % ChunkXDimension + (z % ChunkZDimension) * ChunkZDimension) * 4;
         }
 
         private int ChunkSize(int x, int z)
@@ -93,7 +128,7 @@ namespace NbtStudio
             return 4096 * Util.ToInt32(four);
         }
 
-        public bool CanSave => true;
+        public bool CanSave => Path != null;
         public void Save()
         {
             int current_offset = 8192;
@@ -131,7 +166,7 @@ namespace NbtStudio
                     current_offset = (int)Math.Ceiling((decimal)current_offset / 4096) * 4096;
                 }
             }
-            Stream.Dispose();
+            Stream?.Dispose();
             using (var writer = File.OpenWrite(Path))
             {
                 writer.Write(Locations, 0, Locations.Length);

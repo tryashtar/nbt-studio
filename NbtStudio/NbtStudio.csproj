@@ -75,9 +75,7 @@
     <Compile Include="NbtFolder.cs" />
     <Compile Include="Adapters.cs" />
     <Compile Include="RegionFile.cs" />
-    <Compile Include="UI\ConvenienceTextBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="UI\ConvenienceTextBox.cs" />
     <Compile Include="UI\DualMenuItem.cs" />
     <Compile Include="UI\EditSnbtWindow.cs">
       <SubType>Form</SubType>
@@ -96,6 +94,12 @@
     </Compile>
     <Compile Include="UI\AboutWindow.Designer.cs">
       <DependentUpon>AboutWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\EditChunkWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EditChunkWindow.Designer.cs">
+      <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\FindWindow.cs">
       <SubType>Form</SubType>
@@ -124,6 +128,7 @@
     <Compile Include="UI\RegexTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\ChunkCoordEditControl.cs" />
     <Compile Include="UI\TagSnbtTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -166,6 +171,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AboutWindow.resx">
       <DependentUpon>AboutWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\EditChunkWindow.resx">
+      <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FindWindow.resx">
       <DependentUpon>FindWindow.cs</DependentUpon>

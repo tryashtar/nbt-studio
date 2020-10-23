@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,14 @@ namespace NbtStudio.UI
                 return NotifyWrapNbt(tree, obj, tag);
             if (obj is ISaveable saveable)
                 return NotifyWrapSaveable(tree, obj, saveable);
+            if (obj is Chunk chunk)
+                return NotifyWrapChunk(tree, obj, chunk);
             throw new ArgumentException($"Can't notify wrap {obj.GetType()}");
+        }
+
+        private static NotifyChunk NotifyWrapChunk(NbtTreeModel tree, object original, Chunk chunk)
+        {
+            return new NotifyChunk(chunk, tree, original);
         }
 
         private static SaveableNotifyNode NotifyWrapSaveable(NbtTreeModel tree, object original, ISaveable saveable)
@@ -127,7 +135,50 @@ namespace NbtStudio.UI
             }
         }
 
-        public class NotifyRegionFile : SaveableNotifyNode
+        public class NotifyChunk : NotifyNode, IChunk
+        {
+            private readonly Chunk Chunk;
+            public NotifyChunk(Chunk chunk, NbtTreeModel tree, object original) : base(tree, original)
+            {
+                Chunk = chunk;
+            }
+            public IRegion Region => Chunk.Region;
+            public int X => Chunk.X;
+            public int Z => Chunk.Z;
+            public bool IsLoaded => Chunk.IsLoaded;
+            public bool IsCorrupt => Chunk.IsCorrupt;
+            public void Load() => Chunk.Load();
+            public void Remove()
+            {
+                var region = Chunk.Region;
+                int x = Chunk.X;
+                int z = Chunk.Z;
+                PerformAction($"Remove {NbtUtil.ChunkDescription(Chunk)}",
+                    () => { Chunk.Remove(); Notify(region); },
+                    () => { region.AddChunk(Chunk); Notify(region); });
+            }
+            public void AddTo(IRegion region)
+            {
+                if (Chunk.Region != null)
+                    Remove();
+                if (region is NotifyRegionFile)
+                    region.AddChunk(Chunk);
+                else
+                    PerformAction($"Add {NbtUtil.ChunkDescription(Chunk)} to {Path.GetFileName(region.Path)}",
+                    () => { region.AddChunk(Chunk); Notify(region); },
+                    () => { region.RemoveChunk(Chunk.X, Chunk.Z); Notify(region); });
+            }
+            public void Move(int x, int z)
+            {
+                int current_x = Chunk.X;
+                int current_z = Chunk.Z;
+                PerformAction($"Move {NbtUtil.ChunkDescription(Chunk)} to ({x}, {z})",
+                    () => { Chunk.Move(x, z); Notify(); },
+                    () => { Chunk.Move(current_x, current_z); Notify(); });
+            }
+        }
+
+        public class NotifyRegionFile : SaveableNotifyNode, IRegion
         {
             private readonly RegionFile File;
             public NotifyRegionFile(RegionFile file, NbtTreeModel tree, object original) : base(tree, original)
@@ -138,6 +189,27 @@ namespace NbtStudio.UI
             {
                 Tree.NotifySaved(File);
             }
+            public int ChunkCount => File.ChunkCount;
+            public IEnumerable<IChunk> AllChunks => File.AllChunks; // to do: notify wrap these
+            public IChunk GetChunk(int x, int z) => File.GetChunk(x, z); // to do: notify wrap these
+            public void RemoveChunk(int x, int z)
+            {
+                var chunk = File.GetChunk(x, z);
+                if (chunk == null)
+                    return;
+                PerformAction($"Remove {NbtUtil.ChunkDescription(chunk)}",
+                    () => { File.RemoveChunk(x, z); Notify(); },
+                    () => { chunk.AddTo(File); Notify(); });
+            }
+            public void AddChunk(Chunk chunk)
+            {
+                int x = chunk.X;
+                int z = chunk.Z;
+                PerformAction($"Add {NbtUtil.ChunkDescription(chunk)} to {System.IO.Path.GetFileName(File.Path)}",
+                    () => { File.AddChunk(chunk); Notify(); },
+                    () => { File.RemoveChunk(x, z); Notify(); });
+            }
+
             public override string Path => File.Path;
             public override bool CanSave => File.CanSave;
             public override void Save() { File.Save(); NotifySaved(); }

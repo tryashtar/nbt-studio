@@ -1,4 +1,4 @@
-using fNbt;
+﻿using fNbt;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +38,7 @@ namespace NbtStudio.UI
 
         private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", Properties.Resources.action_new_image, Keys.Control | Keys.N);
         private readonly ToolStripMenuItem ActionNewClipboard = DualMenuItem.Single("New from &Clipboard", Properties.Resources.action_paste_image, Keys.Control | Keys.Alt | Keys.V);
+        private readonly ToolStripMenuItem ActionNewRegion = DualMenuItem.Single("New &Region File", Properties.Resources.region_image, Keys.Control | Keys.Alt | Keys.R);
         private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", Properties.Resources.action_open_file_image, Keys.Control | Keys.O);
         private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", Properties.Resources.action_open_folder_image, Keys.Control | Keys.Shift | Keys.O);
         private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", Properties.Resources.action_save_image, Keys.Control | Keys.S);
@@ -58,6 +59,7 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", Properties.Resources.action_search_image, Keys.Control | Keys.F);
         private readonly ToolStripMenuItem ActionAbout = DualMenuItem.Single("&About", Properties.Resources.app_image_16, Keys.Shift | Keys.F1);
         private readonly ToolStripButton ActionAddSnbt = DualMenuItem.Single("Add as SNBT", Properties.Resources.action_add_snbt_image);
+        private readonly ToolStripButton ActionAddChunk = DualMenuItem.Single("Add Chunk", Properties.Resources.chunk_image);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -71,6 +73,7 @@ namespace NbtStudio.UI
             // stuff excluded from the designer for cleaner/less duplicated code
             ActionNew.Click += (s, e) => New();
             ActionNewClipboard.Click += (s, e) => NewPaste();
+            ActionNewRegion.Click += (s, e) => NewRegion();
             ActionOpenFile.Click += (s, e) => OpenFile();
             ActionOpenFolder.Click += (s, e) => OpenFolder();
             ActionSave.Click += (s, e) => Save();
@@ -88,6 +91,7 @@ namespace NbtStudio.UI
             ActionFind.Click += (s, e) => Find();
             ActionAbout.Click += (s, e) => About();
             ActionAddSnbt.Click += (s, e) => AddSnbt();
+            ActionAddChunk.Click += (s, e) => AddChunk();
 
             ActionNew.AddTo(Tools, MenuFile);
             ActionOpenFile.AddTo(Tools, MenuFile);
@@ -95,6 +99,7 @@ namespace NbtStudio.UI
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             ActionSave.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(ActionSaveAs);
+            MenuFile.DropDownItems.Add(ActionNewRegion);
             MenuFile.DropDownItems.Add(ActionNewClipboard);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             MenuFile.DropDownItems.Add(DropDownRecent);
@@ -116,6 +121,7 @@ namespace NbtStudio.UI
             MenuEdit.DropDownItems.Add(DropDownUndoHistory);
             MenuEdit.DropDownItems.Add(DropDownRedoHistory);
             Tools.Items.Add(new ToolStripSeparator());
+            Tools.Items.Add(ActionAddChunk);
             MenuHelp.DropDownItems.Add(ActionAbout);
 
             CreateTagButtons = MakeCreateTagButtons();
@@ -142,6 +148,13 @@ namespace NbtStudio.UI
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
             OpenFile(new NbtFile(), skip_confirm: true);
+        }
+
+        private void NewRegion()
+        {
+            if (!ConfirmIfUnsaved("Create a new file anyway?"))
+                return;
+            OpenFile(RegionFile.EmptyRegion(), skip_confirm: true);
         }
 
         private void NewPaste()
@@ -182,7 +195,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void OpenFile(NbtFile file, bool skip_confirm = false)
+        private void OpenFile(ISaveable file, bool skip_confirm = false)
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
@@ -314,15 +327,27 @@ namespace NbtStudio.UI
         private void Rename()
         {
             var tag = ViewModel?.SelectedNbt;
-            if (tag == null) return;
-            Rename(tag);
+            if (tag != null)
+                Rename(tag);
+            else
+            {
+                var chunk = ViewModel?.SelectedObject as IChunk;
+                if (chunk != null)
+                    EditChunk(chunk);
+            }
         }
 
         private void Edit()
         {
             var tag = ViewModel?.SelectedNbt;
-            if (tag == null) return;
-            Edit(tag);
+            if (tag != null)
+                Edit(tag);
+            else
+            {
+                var chunk = ViewModel?.SelectedObject as IChunk;
+                if (chunk != null)
+                    EditChunk(chunk);
+            }
         }
 
         private void Edit(INbtTag tag)
@@ -334,6 +359,11 @@ namespace NbtStudio.UI
             else
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
             ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()}", false);
+        }
+
+        private void EditChunk(IChunk chunk)
+        {
+            EditChunkWindow.MoveChunk(chunk);
         }
 
         private void Rename(INbtTag tag)
@@ -360,12 +390,26 @@ namespace NbtStudio.UI
             var prevs = selected.Select(x => x.PreviousNode).Where(x => x != null).ToList();
             var parents = selected.Select(x => x.Parent).Where(x => x != null).ToList();
             ViewModel.StartBatchOperation();
-            var items = ViewModel.SelectedNbts.ToList();
-            foreach (var item in items)
+            var nbts = ViewModel.SelectedNbts.Where(x => x.Parent != null).ToList(); // don't false-delete chunks
+            var chunks = ViewModel.SelectedChunks.ToList();
+            foreach (var item in nbts)
             {
                 item.Remove();
             }
-            ViewModel.FinishBatchOperation($"Delete {NbtUtil.TagDescription(items)}", false);
+            foreach (var chunk in chunks)
+            {
+                chunk.Remove();
+            }
+            string description;
+            if (nbts.Count > 0 && chunks.Count > 0)
+                description = $"Delete {NbtUtil.TagDescription(nbts)} and {NbtUtil.ChunkDescription(chunks)}";
+            else if (nbts.Count > 0)
+                description = $"Delete {NbtUtil.TagDescription(nbts)}";
+            else if (chunks.Count > 0)
+                description = $"Delete {NbtUtil.ChunkDescription(chunks)}";
+            else
+                description = "Delete absolutely nothing";
+            ViewModel.FinishBatchOperation(description, false);
             // Index == -1 checks whether this node has been removed from the tree
             if (selected.All(x => x.Index == -1))
             {
@@ -402,6 +446,15 @@ namespace NbtStudio.UI
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
                 tag.AddTo(parent);
+        }
+
+        private void AddChunk()
+        {
+            var parent = ViewModel?.SelectedObject as IRegion;
+            if (parent == null) return;
+            var chunk = EditChunkWindow.CreateChunk(parent, bypass_window: Control.ModifierKeys == Keys.Shift);
+            if (chunk != null)
+                chunk.AddTo(parent);
         }
 
         private void AddTag(NbtTagType type)
@@ -470,21 +523,25 @@ namespace NbtStudio.UI
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
+            var obj = ViewModel?.SelectedObject;
             var tag = ViewModel?.SelectedNbt;
             var container = tag as INbtContainer;
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
+                item.Value.Visible = !(obj is IRegion);
             }
             ActionSort.Enabled = tag is INbtCompound;
             ActionCut.Enabled = tag != null;
             ActionCopy.Enabled = tag != null;
             ActionPaste.Enabled = container != null; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
-            ActionDelete.Enabled = tag != null;
-            ActionRename.Enabled = tag != null;
-            ActionEdit.Enabled = tag != null;
+            ActionDelete.Enabled = tag != null || obj is IChunk;
+            ActionRename.Enabled = tag != null || obj is IChunk;
+            ActionEdit.Enabled = tag != null || obj is IChunk;
             ActionEditSnbt.Enabled = tag != null;
             ActionAddSnbt.Enabled = container != null;
+            ActionAddSnbt.Visible = !(obj is IRegion);
+            ActionAddChunk.Visible = obj is IRegion;
         }
 
         private void ViewModel_Changed(object sender, EventArgs e)

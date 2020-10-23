@@ -435,6 +435,8 @@ namespace NbtStudio
         public static string TagDescription(this NbtTag tag) => TagDescription(tag.Adapt());
         public static string TagDescription(IEnumerable<INbtTag> tags)
         {
+            if (!tags.Any())
+                return "0 tags";
             if (!tags.Skip(1).Any())
                 return TagDescription(tags.Single());
             return Util.Pluralize(tags.Count(), "tag");
@@ -444,6 +446,21 @@ namespace NbtStudio
             if (!tags.Skip(1).Any())
                 return TagDescription(tags.Single());
             return Util.Pluralize(tags.Count(), "tag");
+        }
+
+        public static string ChunkDescription(IChunk chunk)
+        {
+            if (chunk.Region == null)
+                return $"chunk at ({chunk.X}, {chunk.Z})";
+            return $"chunk at ({chunk.X}, {chunk.Z}) in {Path.GetFileName(chunk.Region.Path)}";
+        }
+        public static string ChunkDescription(IEnumerable<IChunk> chunks)
+        {
+            if (!chunks.Any())
+                return "0 chunks";
+            if (!chunks.Skip(1).Any())
+                return ChunkDescription(chunks.Single());
+            return Util.Pluralize(chunks.Count(), "chunk");
         }
 
         private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };

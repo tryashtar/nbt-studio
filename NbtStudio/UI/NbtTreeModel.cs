@@ -62,8 +62,17 @@ namespace NbtStudio.UI
             get
             {
                 if (View.SelectedNodes == null)
-                    Enumerable.Empty<INotifyNbt>();
+                    return Enumerable.Empty<INotifyNbt>();
                 return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
+            }
+        }
+        public IEnumerable<NotifyChunk> SelectedChunks
+        {
+            get
+            {
+                if (View.SelectedNodes == null)
+                    return Enumerable.Empty<NotifyChunk>();
+                return View.SelectedNodes.Where(x => x.Tag is Chunk).Select(x => NotifyWrapChunk(this, (Chunk)x.Tag, (Chunk)x.Tag)).Where(x => x != null);
             }
         }
         public IEnumerable<ISaveable> OpenedFiles

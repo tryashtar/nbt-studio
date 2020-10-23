@@ -8,26 +8,48 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class Chunk
+    public interface IChunk
     {
-        public readonly RegionFile Region;
-        public readonly int X;
-        public readonly int Z;
-        public NbtCompound Data;
+        IRegion Region { get; }
+        int X { get; }
+        int Z { get; }
+        bool IsLoaded { get; }
+        bool IsCorrupt { get; }
+        void Load();
+        void Remove();
+        void AddTo(IRegion region);
+        void Move(int x, int z);
+    }
+
+    public class Chunk : IChunk
+    {
+        public IRegion Region { get; internal set; }
+        public int X { get; private set; }
+        public int Z { get; private set; }
+        public NbtCompound Data { get; private set; }
         private readonly int Offset;
-        private readonly int Size;
-        private readonly FileStream Stream;
+        private readonly Stream Stream;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
         public bool IsCorrupt { get; private set; } = false;
-        public Chunk(RegionFile region, int x, int z, int offset, int size, FileStream stream)
+        internal Chunk(IRegion region, int x, int z, int offset, Stream stream)
         {
             Region = region;
             X = x;
             Z = z;
             Offset = offset;
-            Size = size;
             Stream = stream;
+        }
+
+        public static Chunk EmptyChunk()
+        {
+            var stream = new MemoryStream();
+            var file = new fNbt.NbtFile();
+            file.SaveToStream(stream, NbtCompression.None);
+            var chunk = new Chunk(null, -1, -1, 0, stream);
+            chunk.Data = file.RootTag;
+            chunk.Compression = NbtCompression.ZLib;
+            return chunk;
         }
 
         public byte[] SaveBytes()
@@ -63,8 +85,32 @@ namespace NbtStudio
             catch
             {
                 IsCorrupt = true;
-                Region.RemoveChunk(X, Z);
+                Remove();
             }
+        }
+
+        public void Remove()
+        {
+            if (Region != null)
+                Region.RemoveChunk(X, Z);
+        }
+
+        public void AddTo(IRegion region)
+        {
+            if (Region != null)
+                Region.RemoveChunk(X, Z);
+            region.AddChunk(this);
+        }
+
+        public void Move(int x, int z)
+        {
+            var region = Region;
+            if (region != null)
+                Region.RemoveChunk(X, Z);
+            X = x;
+            Z = z;
+            if (region != null)
+                region.AddChunk(this);
         }
     }
 }

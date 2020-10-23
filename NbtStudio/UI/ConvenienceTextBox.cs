@@ -8,25 +8,31 @@ using System.Windows.Forms;
 
 namespace NbtStudio.UI
 {
-    public class ConvenienceTextBox : TextBox
+    public class ConvenienceManager
     {
+        public readonly Control Control;
         private Color TrueBackColor;
         private bool ChangingBackColor;
         private ToolTip Tooltip;
-        public ConvenienceTextBox()
-        { }
+        public ConvenienceManager(Control control)
+        {
+            Control = control;
+            Control.BackColorChanged += Control_BackColorChanged;
+            Control.LostFocus += Control_LostFocus;
+            Control.TextChanged += Control_TextChanged;
+        }
 
         public void SetBackColor(Color color)
         {
             ChangingBackColor = true;
-            this.BackColor = color;
+            Control.BackColor = color;
             ChangingBackColor = false;
         }
 
         public void HideTooltip()
         {
             if (Tooltip != null)
-                Tooltip.Hide(this);
+                Tooltip.Hide(Control);
         }
 
         public void ShowTooltip(string title, string text, TimeSpan duration)
@@ -38,30 +44,55 @@ namespace NbtStudio.UI
                 UseFading = true,
                 UseAnimation = true
             };
-            Tooltip.Show(String.Empty, this, 0); // a bug apparently
+            Tooltip.Show(String.Empty, Control, 0); // a bug apparently
             Tooltip.ToolTipTitle = title;
-            Tooltip.Show(text, this, (int)duration.TotalMilliseconds);
+            Tooltip.Show(text, Control, (int)duration.TotalMilliseconds);
         }
 
         public void RestoreBackColor() => SetBackColor(TrueBackColor);
 
-        protected override void OnBackColorChanged(EventArgs e)
+        private void Control_BackColorChanged(object sender, EventArgs e)
         {
             if (!ChangingBackColor)
-                TrueBackColor = this.BackColor;
-            base.OnBackColorChanged(e);
+                TrueBackColor = Control.BackColor;
         }
 
-        protected override void OnLostFocus(EventArgs e)
+        private void Control_TextChanged(object sender, EventArgs e)
         {
             HideTooltip();
-            base.OnLostFocus(e);
         }
 
-        protected override void OnTextChanged(EventArgs e)
+        private void Control_LostFocus(object sender, EventArgs e)
         {
             HideTooltip();
-            base.OnTextChanged(e);
         }
+    }
+
+    public class ConvenienceTextBox : TextBox
+    {
+        private readonly ConvenienceManager Convenience;
+        public ConvenienceTextBox()
+        {
+            Convenience = new ConvenienceManager(this);
+        }
+
+        public void SetBackColor(Color color) => Convenience.SetBackColor(color);
+        public void HideTooltip() => Convenience.HideTooltip();
+        public void ShowTooltip(string title, string text, TimeSpan duration) => Convenience.ShowTooltip(title, text, duration);
+        public void RestoreBackColor() => Convenience.RestoreBackColor();
+    }
+
+    public class ConvenienceNumericUpDown : NumericUpDown
+    {
+        private readonly ConvenienceManager Convenience;
+        public ConvenienceNumericUpDown()
+        {
+            Convenience = new ConvenienceManager(this);
+        }
+
+        public void SetBackColor(Color color) => Convenience.SetBackColor(color);
+        public void HideTooltip() => Convenience.HideTooltip();
+        public void ShowTooltip(string title, string text, TimeSpan duration) => Convenience.ShowTooltip(title, text, duration);
+        public void RestoreBackColor() => Convenience.RestoreBackColor();
     }
 }
