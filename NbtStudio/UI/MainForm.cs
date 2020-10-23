@@ -304,17 +304,20 @@ namespace NbtStudio.UI
 
         private void Cut()
         {
-            if (ViewModel?.SelectedNbt != null)
-            {
-                Copy(ViewModel.SelectedNbts);
-                Delete();
-            }
+            Copy();
+            Delete();
         }
 
         private void Copy()
         {
-            if (ViewModel?.SelectedNbt != null)
-                Copy(ViewModel.SelectedNbts);
+            if (ViewModel == null)
+                return;
+            foreach (var item in ViewModel.SelectedChunks)
+            {
+                if (!item.IsLoaded)
+                    item.Load();
+            }
+            Copy(ViewModel.SelectedNbts);
         }
 
         private void Paste()
@@ -322,6 +325,12 @@ namespace NbtStudio.UI
             var parent = ViewModel?.SelectedNbt as INbtContainer;
             if (parent != null)
                 Paste(parent);
+            else
+            {
+                var region = ViewModel?.SelectedObject as IRegion;
+                if (region != null)
+                    PasteChunk(region);
+            }
         }
 
         private void Rename()
@@ -532,9 +541,9 @@ namespace NbtStudio.UI
                 item.Value.Visible = !(obj is IRegion);
             }
             ActionSort.Enabled = tag is INbtCompound;
-            ActionCut.Enabled = tag != null;
-            ActionCopy.Enabled = tag != null;
-            ActionPaste.Enabled = container != null; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
+            ActionCut.Enabled = tag != null || obj is IChunk;
+            ActionCopy.Enabled = tag != null || obj is IChunk;
+            ActionPaste.Enabled = container != null || obj is IRegion; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
             ActionDelete.Enabled = tag != null || obj is IChunk;
             ActionRename.Enabled = tag != null || obj is IChunk;
             ActionEdit.Enabled = tag != null || obj is IChunk;
@@ -569,22 +578,39 @@ namespace NbtStudio.UI
             Clipboard.SetText(String.Join("\n", objects.Select(x => x.ToSnbt(include_name: true))));
         }
 
+        private static IEnumerable<NbtTag> ParseTags(string text)
+        {
+            var snbts = text.Split('\n');
+            foreach (var nbt in snbts)
+            {
+                if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                    yield return tag;
+            }
+        }
+
         private void Paste(INbtContainer destination)
         {
             if (!Clipboard.ContainsText())
                 return;
-            var snbts = Clipboard.GetText().Split('\n');
+            var snbts = ParseTags(Clipboard.GetText());
             ViewModel.StartBatchOperation();
-            var success = new List<NbtTag>();
             foreach (var nbt in snbts)
             {
-                if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
-                {
-                    NbtUtil.TransformAdd(tag.Adapt(), destination);
-                    success.Add(tag);
-                }
+                NbtUtil.TransformAdd(nbt.Adapt(), destination);
             }
-            ViewModel.FinishBatchOperation($"Paste {NbtUtil.TagDescription(success)} into {destination.TagDescription()}", true);
+            ViewModel.FinishBatchOperation($"Paste {NbtUtil.TagDescription(snbts)} into {destination.TagDescription()}", true);
+        }
+
+        private void PasteChunk(IRegion region)
+        {
+            if (!Clipboard.ContainsText())
+                return;
+            var snbt = ParseTags(Clipboard.GetText()).FirstOrDefault() as NbtCompound;
+            if (snbt == null)
+                return;
+            var chunk = EditChunkWindow.CreateChunk(region, false, snbt);
+            if (chunk != null)
+                chunk.AddTo(region);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)

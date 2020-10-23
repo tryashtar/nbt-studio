@@ -147,7 +147,12 @@ namespace NbtStudio.UI
             public int Z => Chunk.Z;
             public bool IsLoaded => Chunk.IsLoaded;
             public bool IsCorrupt => Chunk.IsCorrupt;
-            public void Load() => Chunk.Load();
+            public void Load()
+            {
+                Chunk.Load();
+                Notify();
+            }
+
             public void Remove()
             {
                 var region = Chunk.Region;

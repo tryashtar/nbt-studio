@@ -41,13 +41,13 @@ namespace NbtStudio
             Stream = stream;
         }
 
-        public static Chunk EmptyChunk()
+        public static Chunk EmptyChunk(NbtCompound data)
         {
             var stream = new MemoryStream();
             var file = new fNbt.NbtFile();
             file.SaveToStream(stream, NbtCompression.None);
             var chunk = new Chunk(null, -1, -1, 0, stream);
-            chunk.Data = file.RootTag;
+            chunk.Data = data ?? file.RootTag;
             chunk.Compression = NbtCompression.ZLib;
             return chunk;
         }

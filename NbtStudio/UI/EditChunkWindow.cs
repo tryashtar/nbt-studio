@@ -34,9 +34,9 @@ namespace NbtStudio.UI
             XBox.Select();
         }
 
-        public static IChunk CreateChunk(IRegion parent, bool bypass_window = false)
+        public static IChunk CreateChunk(IRegion parent, bool bypass_window = false, NbtCompound data = null)
         {
-            var chunk = Chunk.EmptyChunk();
+            var chunk = Chunk.EmptyChunk(data);
 
             if (bypass_window)
             {

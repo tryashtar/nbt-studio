@@ -441,12 +441,7 @@ namespace NbtStudio
                 return TagDescription(tags.Single());
             return Util.Pluralize(tags.Count(), "tag");
         }
-        public static string TagDescription(IEnumerable<NbtTag> tags)
-        {
-            if (!tags.Skip(1).Any())
-                return TagDescription(tags.Single());
-            return Util.Pluralize(tags.Count(), "tag");
-        }
+        public static string TagDescription(IEnumerable<NbtTag> tags) => TagDescription(tags.Select(x => x.Adapt()));
 
         public static string ChunkDescription(IChunk chunk)
         {
