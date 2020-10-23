@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -556,8 +556,6 @@ namespace NbtStudio.UI
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                if (!ConfirmIfUnsaved("Open a new file anyway?"))
-                    return;
                 OpenFiles(files);
             }
             else
