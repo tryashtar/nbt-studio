@@ -19,7 +19,14 @@ namespace NbtStudio.UI
                 return NotifyWrapSaveable(tree, obj, saveable);
             if (obj is Chunk chunk)
                 return NotifyWrapChunk(tree, obj, chunk);
+            if (obj is NbtFolder folder)
+                return NotifyWrapFolder(tree, obj, folder);
             throw new ArgumentException($"Can't notify wrap {obj.GetType()}");
+        }
+
+        private static NotifyNbtFolder NotifyWrapFolder(NbtTreeModel tree, object original, NbtFolder folder)
+        {
+            return new NotifyNbtFolder(folder, tree, original);
         }
 
         private static NotifyChunk NotifyWrapChunk(NbtTreeModel tree, object original, Chunk chunk)
@@ -132,6 +139,15 @@ namespace NbtStudio.UI
             public override int GetHashCode()
             {
                 return File.GetHashCode();
+            }
+        }
+
+        public class NotifyNbtFolder : NotifyNode
+        {
+            private readonly NbtFolder Folder;
+            public NotifyNbtFolder(NbtFolder folder, NbtTreeModel tree, object original) : base(tree, original)
+            {
+                Folder = folder;
             }
         }
 
