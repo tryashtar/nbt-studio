@@ -78,12 +78,14 @@ namespace NbtStudio
             catch { return null; }
         }
 
-        public IEnumerable<IChunk> AllChunks => Chunks.Cast<Chunk>();
+        public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
+        IEnumerable<IChunk> IRegion.AllChunks => AllChunks;
 
-        public IChunk GetChunk(int x, int z)
+        public Chunk GetChunk(int x, int z)
         {
             return Chunks[x, z];
         }
+        IChunk IRegion.GetChunk(int x, int z) => GetChunk(x, z);
 
         public void RemoveChunk(int x, int z)
         {

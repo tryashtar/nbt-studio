@@ -1,4 +1,5 @@
 ﻿using fNbt;
+using NbtStudio.SNBT;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace NbtStudio.UI
 {
     public partial class NbtTreeModel
     {
-        private static INotifyNode NotifyWrap(NbtTreeModel tree, object obj)
+        private static INode NotifyWrap(NbtTreeModel tree, object obj)
         {
             if (obj is NbtTag tag)
                 return NotifyWrapNbt(tree, obj, tag);
@@ -43,7 +44,7 @@ namespace NbtStudio.UI
             throw new ArgumentException($"Can't notify wrap {saveable.GetType()}");
         }
 
-        private static INotifyNbt NotifyWrapNbt(NbtTreeModel tree, object original, NbtTag tag)
+        private static INbtNode NotifyWrapNbt(NbtTreeModel tree, object original, NbtTag tag)
         {
             if (tag == null)
                 return null;
@@ -74,26 +75,54 @@ namespace NbtStudio.UI
             throw new ArgumentException($"Can't notify wrap {tag.GetType()}");
         }
 
-        public interface INotifyNode
+        public static string Description(IEnumerable<INode> nodes)
+        {
+            if (!nodes.Any())
+                return "0 nodes";
+            if (!nodes.Skip(1).Any())
+                return nodes.Single().Description;
+            return Util.Pluralize(nodes.Count(), "node"); // to do: more specific
+        }
+
+        public interface INode
+        {
+            string Description { get; }
+            bool CanDelete { get; }
+            void Delete();
+            bool CanSort { get; }
+            void Sort();
+            bool CanCopy { get; }
+            string Copy();
+            bool CanPaste { get; }
+            IEnumerable<INode> Paste(string data);
+            bool CanRename { get; }
+            bool CanEdit { get; }
+        }
+
+        public interface ISaveableNode : INode, ISaveable
         { }
 
-        public interface INotifyNbt : INotifyNode, INbtTag
+        public interface INbtNode : INode, INbtTag
         { }
 
-        public abstract class NotifyNode : INotifyNode
+        public interface INbtContainerNode : INbtNode, INbtContainer
+        { }
+
+        public abstract class NotifyNode : INode
         {
             protected readonly NbtTreeModel Tree;
-            private readonly object SourceObject;
+            protected readonly object SourceObject;
             protected NotifyNode(NbtTreeModel tree, object source)
             {
                 Tree = tree;
                 SourceObject = source;
             }
-            protected void Notify()
+
+            protected virtual void Notify()
             {
                 Tree.Notify(SourceObject);
             }
-            protected void Notify(object obj)
+            protected virtual void Notify(object obj)
             {
                 Tree.Notify(obj);
             }
@@ -102,36 +131,62 @@ namespace NbtStudio.UI
                 Tree.PushUndo(new UndoableAction(description, action, undo));
                 action();
             }
-            protected INotifyNbt Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
+
+            public virtual string Description => "unknown node";
+            public virtual bool CanDelete => false;
+            public virtual bool CanSort => false;
+            public virtual bool CanCopy => false;
+            public virtual bool CanPaste => false;
+            public virtual bool CanRename => false;
+            public virtual bool CanEdit => false;
+            public virtual string Copy() => null;
+            public virtual void Delete() { }
+            public virtual IEnumerable<INode> Paste(string data) => null;
+            public virtual void Sort() { }
         }
 
-        public abstract class SaveableNotifyNode : NotifyNode, ISaveable
+        public abstract class SaveableNotifyNode : NotifyNode, ISaveableNode
         {
             protected SaveableNotifyNode(NbtTreeModel tree, object source) : base(tree, source) { }
+            public bool AllChangesSaved { get; protected set; }
             public abstract string Path { get; }
             public abstract bool CanSave { get; }
             public abstract void Save();
             public abstract void SaveAs(string path);
-            protected abstract void NotifySaved();
+            public void MarkUnsaved() => AllChangesSaved = false;
+            protected void MarkSaved() => AllChangesSaved = true;
         }
 
-        public class NotifyNbtFile : SaveableNotifyNode, INbtFile
+        public class NotifyNbtFile : SaveableNotifyNode, INbtNode, INbtFile
         {
             private readonly NbtFile File;
+            private readonly NotifyNbtCompound WrappedCompound;
             public NotifyNbtFile(NbtFile file, NbtTreeModel tree, object original) : base(tree, original)
             {
                 File = file;
+                AllChangesSaved = File.Path != null;
+                WrappedCompound = (NotifyNbtCompound)NotifyWrapNbt(tree, original, file.RootTag);
             }
-            protected override void NotifySaved()
+            protected override void Notify()
             {
-                Tree.NotifySaved(File);
+                AllChangesSaved = false;
+                base.Notify();
             }
+
+            public override string Description => $"file {System.IO.Path.GetFileName(File.Path)}";
+            public override bool CanSort => WrappedCompound.CanSort;
+            public override void Sort() => WrappedCompound.Sort();
+            public override bool CanCopy => WrappedCompound.CanCopy;
+            public override string Copy() => WrappedCompound.Copy();
+            public override bool CanPaste => WrappedCompound.CanPaste;
+            public override IEnumerable<INode> Paste(string text) => WrappedCompound.Paste(text);
+
             public override string Path => File.Path;
             public ExportSettings ExportSettings => File.ExportSettings;
             public override bool CanSave => File.CanSave;
-            public override void Save() { File.Save(); NotifySaved(); }
-            public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
-            public void SaveAs(string path, ExportSettings settings) { File.SaveAs(path, settings); Notify(); NotifySaved(); }
+            public override void Save() { File.Save(); MarkSaved(); }
+            public override void SaveAs(string path) { File.SaveAs(path); Notify(); MarkSaved(); }
+            public void SaveAs(string path, ExportSettings settings) { File.SaveAs(path, settings); Notify(); MarkSaved(); }
             public override bool Equals(object obj)
             {
                 return obj.Equals(File);
@@ -140,6 +195,16 @@ namespace NbtStudio.UI
             {
                 return File.GetHashCode();
             }
+
+            public string Name { get => WrappedCompound.Name; set => WrappedCompound.Name = value; }
+            public NbtTagType TagType => WrappedCompound.TagType;
+            public bool CanAdd(NbtTagType type) => WrappedCompound.CanAdd(type);
+            public INbtContainer Parent => null;
+            public int Index => -1;
+            public void Remove() { }
+            public void AddTo(INbtContainer container) { }
+            public void InsertInto(INbtContainer container, int index) { }
+            public bool IsInside(INbtContainer container) => false;
         }
 
         public class NotifyNbtFolder : NotifyNode
@@ -149,15 +214,36 @@ namespace NbtStudio.UI
             {
                 Folder = folder;
             }
+
+            public override string Description => $"folder {System.IO.Path.GetFileName(Folder.Path)}";
         }
 
-        public class NotifyChunk : NotifyNode, IChunk
+        public class NotifyChunk : NotifyNode, INbtNode, IChunk
         {
             private readonly Chunk Chunk;
+            private NotifyNbtCompound WrappedCompound;
             public NotifyChunk(Chunk chunk, NbtTreeModel tree, object original) : base(tree, original)
             {
                 Chunk = chunk;
+                SetWrappedCompound();
             }
+
+            private void SetWrappedCompound()
+            {
+                if (Chunk.IsLoaded)
+                    WrappedCompound = (NotifyNbtCompound)NotifyWrapNbt(Tree, SourceObject, Chunk.Data);
+                else
+                    WrappedCompound = null;
+            }
+
+            public override string Description => NbtUtil.ChunkDescription(Chunk);
+            public override bool CanSort => WrappedCompound.CanSort;
+            public override void Sort() => WrappedCompound.Sort();
+            public override bool CanCopy => WrappedCompound.CanCopy;
+            public override string Copy() => WrappedCompound.Copy();
+            public override bool CanPaste => WrappedCompound.CanPaste;
+            public override IEnumerable<INode> Paste(string text) => WrappedCompound.Paste(text);
+
             public IRegion Region => Chunk.Region;
             public int X => Chunk.X;
             public int Z => Chunk.Z;
@@ -166,6 +252,7 @@ namespace NbtStudio.UI
             public void Load()
             {
                 Chunk.Load();
+                SetWrappedCompound();
                 Notify();
             }
 
@@ -197,6 +284,15 @@ namespace NbtStudio.UI
                     () => { Chunk.Move(x, z); Notify(); },
                     () => { Chunk.Move(current_x, current_z); Notify(); });
             }
+
+            public string Name { get => WrappedCompound.Name; set => WrappedCompound.Name = value; }
+            public NbtTagType TagType => WrappedCompound.TagType;
+            public INbtContainer Parent => WrappedCompound.Parent;
+            public int Index => WrappedCompound.Index;
+            public bool CanAdd(NbtTagType type) => WrappedCompound.CanAdd(type);
+            public void AddTo(INbtContainer container) => WrappedCompound.AddTo(container);
+            public void InsertInto(INbtContainer container, int index) => WrappedCompound.InsertInto(container, index);
+            public bool IsInside(INbtContainer container) => WrappedCompound.IsInside(container);
         }
 
         public class NotifyRegionFile : SaveableNotifyNode, IRegion
@@ -206,13 +302,16 @@ namespace NbtStudio.UI
             {
                 File = file;
             }
-            protected override void NotifySaved()
-            {
-                Tree.NotifySaved(File);
-            }
+
+            public override string Description => $"region {System.IO.Path.GetFileName(File.Path)}";
+
             public int ChunkCount => File.ChunkCount;
-            public IEnumerable<IChunk> AllChunks => File.AllChunks; // to do: notify wrap these
-            public IChunk GetChunk(int x, int z) => File.GetChunk(x, z); // to do: notify wrap these
+            public IEnumerable<IChunk> AllChunks => File.AllChunks.Select(x => NotifyWrapChunk(Tree, x, x));
+            public IChunk GetChunk(int x, int z)
+            {
+                var chunk = File.GetChunk(x, z);
+                return NotifyWrapChunk(Tree, chunk, chunk);
+            }
             public void RemoveChunk(int x, int z)
             {
                 var chunk = File.GetChunk(x, z);
@@ -233,8 +332,8 @@ namespace NbtStudio.UI
 
             public override string Path => File.Path;
             public override bool CanSave => File.CanSave;
-            public override void Save() { File.Save(); NotifySaved(); }
-            public override void SaveAs(string path) { File.SaveAs(path); Notify(); NotifySaved(); }
+            public override void Save() { File.Save(); MarkSaved(); }
+            public override void SaveAs(string path) { File.SaveAs(path); Notify(); MarkSaved(); }
             public override bool Equals(object obj)
             {
                 return obj.Equals(File);
@@ -245,10 +344,29 @@ namespace NbtStudio.UI
             }
         }
 
-        public abstract class NotifyNbtTag : NotifyNode, INotifyNbt
+        public abstract class NotifyNbtTag : NotifyNode, INbtNode
         {
             protected readonly NbtTag Tag;
             public NotifyNbtTag(NbtTag tag, NbtTreeModel tree, object original) : base(tree, original) { Tag = tag; }
+            protected INbtNode Wrap(NbtTag tag) => NotifyWrapNbt(Tree, tag, tag);
+            protected static IEnumerable<NbtTag> ParseTags(string text)
+            {
+                var snbts = text.Split('\n');
+                foreach (var nbt in snbts)
+                {
+                    if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                        yield return tag;
+                }
+            }
+
+            public override string Description => NbtUtil.TagDescription(Tag);
+            public override bool CanCopy => true;
+            public override string Copy() => this.ToSnbt(include_name: true);
+            public override bool CanDelete => true;
+            public override void Delete() => Remove();
+            public override bool CanEdit => true;
+            public override bool CanRename => true;
+
             public string Name
             {
                 get => Tag.Name;
@@ -295,7 +413,7 @@ namespace NbtStudio.UI
             {
                 if (Tag.Parent != null)
                     Remove();
-                if (container is INotifyNbt)
+                if (container is INbtNode)
                     container.Add(Tag);
                 else
                     PerformAction($"Add {Tag.TagDescription()} to {container.TagDescription()}",
@@ -306,7 +424,7 @@ namespace NbtStudio.UI
             {
                 if (Tag.Parent != null)
                     Remove();
-                if (container is INotifyNbt)
+                if (container is INbtNode)
                     container.Insert(index, Tag);
                 else
                     PerformAction($"Insert {Tag.TagDescription()} into {container.TagDescription()} at position {index}",
@@ -508,10 +626,22 @@ namespace NbtStudio.UI
             }
         }
 
-        public class NotifyNbtList : NotifyNbtTag, INbtList
+        public class NotifyNbtList : NotifyNbtTag, INbtContainerNode, INbtList
         {
             private NbtList List => (NbtList)base.Tag;
             public NotifyNbtList(NbtList list, NbtTreeModel tree, object original) : base(list, tree, original) { }
+
+            public override bool CanPaste => true;
+            public override IEnumerable<INode> Paste(string data)
+            {
+                var tags = ParseTags(data);
+                foreach (var item in tags)
+                {
+                    NbtUtil.TransformAdd(item.Adapt(), this);
+                    yield return Wrap(item);
+                }
+            }
+
             public INbtTag this[int index] => Wrap(List[index]);
             public int Count => List.Count;
             public NbtTagType ListType => List.ListType;
@@ -558,10 +688,27 @@ namespace NbtStudio.UI
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        public class NotifyNbtCompound : NotifyNbtTag, INbtCompound
+        public class NotifyNbtCompound : NotifyNbtTag, INbtContainerNode, INbtCompound
         {
             private NbtCompound Compound => (NbtCompound)base.Tag;
             public NotifyNbtCompound(NbtCompound compound, NbtTreeModel tree, object original) : base(compound, tree, original) { }
+
+            public override bool CanPaste => true;
+            public override IEnumerable<INode> Paste(string data)
+            {
+                var tags = ParseTags(data);
+                foreach (var item in tags)
+                {
+                    NbtUtil.TransformAdd(item.Adapt(), this);
+                    yield return Wrap(item);
+                }
+            }
+            public override bool CanSort => true;
+            public override void Sort()
+            {
+                NbtUtil.Sort(this, new NbtUtil.TagTypeSorter(), true);
+            }
+
             public int Count => Compound.Count;
             public IEnumerable<INbtTag> Tags => Compound.Tags.Select(Wrap);
             public bool CanAdd(NbtTagType type) => true;

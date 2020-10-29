@@ -114,7 +114,7 @@ namespace NbtStudio.UI
             string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
-            if (node.Tag is ISaveable saveable && Parent.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
+            if (node.Tag is NbtTreeModel.SaveableNotifyNode saveable && !saveable.AllChangesSaved)
                 prefix = "* ";
             if (name == null)
                 return Tuple.Create(prefix, value);

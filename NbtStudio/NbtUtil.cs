@@ -1,4 +1,4 @@
-﻿using Aga.Controls.Tree;
+using Aga.Controls.Tree;
 using fNbt;
 using NbtStudio.SNBT;
 using NbtStudio.UI;
@@ -448,14 +448,6 @@ namespace NbtStudio
             if (chunk.Region == null)
                 return $"chunk at ({chunk.X}, {chunk.Z})";
             return $"chunk at ({chunk.X}, {chunk.Z}) in {Path.GetFileName(chunk.Region.Path)}";
-        }
-        public static string ChunkDescription(IEnumerable<IChunk> chunks)
-        {
-            if (!chunks.Any())
-                return "0 chunks";
-            if (!chunks.Skip(1).Any())
-                return ChunkDescription(chunks.Single());
-            return Util.Pluralize(chunks.Count(), "chunk");
         }
 
         private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };
