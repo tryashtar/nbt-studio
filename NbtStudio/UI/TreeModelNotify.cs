@@ -408,8 +408,8 @@ namespace NbtStudio.UI
             public override string Copy() => this.ToSnbt(include_name: true);
             public override bool CanDelete => true;
             public override void Delete() => Remove();
-            public override bool CanEdit => true;
-            public override bool CanRename => true;
+            public override bool CanEdit => NbtUtil.IsValueType(Tag.TagType);
+            public override bool CanRename => Tag.Parent is NbtCompound;
 
             public string Name
             {

@@ -537,9 +537,9 @@ namespace NbtStudio.UI
             ActionCopy.Enabled = obj != null && obj.CanCopy;
             ActionPaste.Enabled = obj != null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
             ActionDelete.Enabled = obj != null && obj.CanDelete;
-            ActionRename.Enabled = obj != null && obj.CanRename;
-            ActionEdit.Enabled = obj != null && obj.CanEdit;
-            ActionEditSnbt.Enabled = nbt != null && nbt.CanEdit;
+            ActionRename.Enabled = obj != null && (obj.CanRename || obj.CanEdit);
+            ActionEdit.Enabled = obj != null && (obj.CanEdit || obj.CanRename);
+            ActionEditSnbt.Enabled = nbt != null;
             ActionAddSnbt.Enabled = container != null;
             ActionAddSnbt.Visible = region == null;
             ActionAddChunk.Visible = region != null;
