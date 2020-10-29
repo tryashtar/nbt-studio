@@ -236,6 +236,10 @@ namespace NbtStudio.UI
             private NotifyNbtCompound WrappedCompound;
             public NotifyChunk(Chunk chunk, NbtTreeModel tree, object original) : base(tree, original)
             {
+#if DEBUG
+                if (chunk == null)
+                    throw new ArgumentNullException(nameof(chunk));
+#endif
                 Chunk = chunk;
                 SetWrappedCompound();
             }
@@ -256,6 +260,8 @@ namespace NbtStudio.UI
             }
 
             public override string Description => NbtUtil.ChunkDescription(Chunk);
+            public override bool CanDelete => true;
+            public override void Delete() => Remove();
             public override bool CanSort => true;
             public override void Sort() => AccessCompound().Sort();
             public override bool CanCopy => true;
@@ -341,6 +347,7 @@ namespace NbtStudio.UI
             public IChunk GetChunk(int x, int z)
             {
                 var chunk = File.GetChunk(x, z);
+                if (chunk == null) return null;
                 return NotifyWrapChunk(Tree, chunk, chunk);
             }
             public void RemoveChunk(int x, int z)

@@ -396,6 +396,7 @@ namespace NbtStudio.UI
 
         private void Delete()
         {
+            if (ViewModel == null) return;
             var selected_nodes = NbtTree.SelectedNodes;
             var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x != null).ToList();
             var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x != null).ToList();
