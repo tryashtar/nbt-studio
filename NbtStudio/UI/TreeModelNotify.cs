@@ -157,7 +157,7 @@ namespace NbtStudio.UI
             protected void MarkSaved() => AllChangesSaved = true;
         }
 
-        public class NotifyNbtFile : SaveableNotifyNode, INbtContainerNode, INbtFile
+        public class NotifyNbtFile : SaveableNotifyNode, INbtContainerNode, INbtCompound, INbtFile
         {
             private readonly NbtFile File;
             private readonly NotifyNbtCompound WrappedCompound;
@@ -202,6 +202,7 @@ namespace NbtStudio.UI
             public INbtContainer Parent => null;
             public int Index => -1;
             public int Count => WrappedCompound.Count;
+            public IEnumerable<INbtTag> Tags => WrappedCompound.Tags;
             public void Remove() { }
             public void AddTo(INbtContainer container) { }
             public void InsertInto(INbtContainer container, int index) { }
@@ -214,6 +215,8 @@ namespace NbtStudio.UI
             public bool Remove(NbtTag tag) => WrappedCompound.Remove(tag);
             public IEnumerator<INbtTag> GetEnumerator() => WrappedCompound.GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            public bool Contains(string name) => WrappedCompound.Contains(name);
+            public bool Remove(string name) => WrappedCompound.Remove(name);
         }
 
         public class NotifyNbtFolder : NotifyNode
@@ -227,7 +230,7 @@ namespace NbtStudio.UI
             public override string Description => $"folder {System.IO.Path.GetFileName(Folder.Path)}";
         }
 
-        public class NotifyChunk : NotifyNode, INbtContainerNode, IChunk
+        public class NotifyChunk : NotifyNode, INbtContainerNode, INbtCompound, IChunk
         {
             private readonly Chunk Chunk;
             private NotifyNbtCompound WrappedCompound;
@@ -306,6 +309,7 @@ namespace NbtStudio.UI
             public INbtContainer Parent => AccessCompound().Parent;
             public int Index => AccessCompound().Index;
             public int Count => AccessCompound().Count;
+            public IEnumerable<INbtTag> Tags => AccessCompound().Tags;
             public bool CanAdd(NbtTagType type) => true;
             public void AddTo(INbtContainer container) => AccessCompound().AddTo(container);
             public void InsertInto(INbtContainer container, int index) => AccessCompound().InsertInto(container, index);
@@ -318,6 +322,8 @@ namespace NbtStudio.UI
             public bool Remove(NbtTag tag) => AccessCompound().Remove(tag);
             public IEnumerator<INbtTag> GetEnumerator() => AccessCompound().GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            public bool Contains(string name) => AccessCompound().Contains(name);
+            public bool Remove(string name) => AccessCompound().Remove(name);
         }
 
         public class NotifyRegionFile : SaveableNotifyNode, IRegion
