@@ -321,7 +321,6 @@ namespace NbtStudio.UI
 
         private void Paste()
         {
-
             var parent = ViewModel?.SelectedObject;
             if (parent == null) return;
             Paste(parent);
