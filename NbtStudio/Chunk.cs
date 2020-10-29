@@ -28,16 +28,18 @@ namespace NbtStudio
         public int Z { get; private set; }
         public NbtCompound Data { get; private set; }
         private readonly int Offset;
+        private readonly int Size;
         private readonly Stream Stream;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
         public bool IsCorrupt { get; private set; } = false;
-        internal Chunk(IRegion region, int x, int z, int offset, Stream stream)
+        internal Chunk(IRegion region, int x, int z, int offset, int size, Stream stream)
         {
             Region = region;
             X = x;
             Z = z;
             Offset = offset;
+            Size = size;
             Stream = stream;
         }
 
@@ -46,7 +48,7 @@ namespace NbtStudio
             var stream = new MemoryStream();
             var file = new fNbt.NbtFile();
             file.SaveToStream(stream, NbtCompression.None);
-            var chunk = new Chunk(null, -1, -1, 0, stream);
+            var chunk = new Chunk(null, -1, -1, 0, 0, stream);
             chunk.Data = data ?? file.RootTag;
             chunk.Compression = NbtCompression.ZLib;
             return chunk;
@@ -55,7 +57,12 @@ namespace NbtStudio
         public byte[] SaveBytes()
         {
             if (!IsLoaded)
-                Load();
+            {
+                Stream.Seek(Offset, SeekOrigin.Begin);
+                byte[] result = new byte[Size];
+                Stream.Read(result, 0, Size);
+                return result;
+            }
             if (IsCorrupt)
                 return new byte[0];
             var file = new fNbt.NbtFile(Data);

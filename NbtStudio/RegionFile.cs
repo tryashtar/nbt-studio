@@ -24,7 +24,7 @@ namespace NbtStudio
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
-        private readonly FileStream Stream;
+        private FileStream Stream;
         public string Path { get; private set; }
         public RegionFile(string path)
         {
@@ -47,7 +47,7 @@ namespace NbtStudio
                     if (size > 0)
                     {
                         ChunkCount++;
-                        Chunks[x, z] = new Chunk(this, x, z, offset, Stream);
+                        Chunks[x, z] = new Chunk(this, x, z, offset, size, Stream);
                         if (ChunkCount == 1)
                             Chunks[x, z].Load(); // load the first one to check if this is really a region file
                     }
@@ -178,6 +178,7 @@ namespace NbtStudio
                     action(writer);
                 }
             }
+            Stream = File.OpenRead(Path);
         }
 
         private bool CanWriteChunk(Chunk chunk)
