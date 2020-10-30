@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NbtStudio.UI;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public partial class NbtTreeModel : ITreeModel
     {
@@ -84,7 +85,7 @@ namespace NbtStudio.UI
         public NodePosition DropPosition => View.DropPosition.Position;
 
         // an object changed, refresh the nodes through ITreeModel's API to ensure it matches the true object
-        private void Notify(object changed)
+        public void Notify(object changed)
         {
 #if DEBUG
             if (changed != null)
@@ -135,7 +136,7 @@ namespace NbtStudio.UI
             return null;
         }
 
-        private void PushUndo(UndoableAction action)
+        public void PerformAction(UndoableAction action)
         {
             RedoStack.Clear();
             if (BatchNumber == 0)
@@ -148,6 +149,7 @@ namespace NbtStudio.UI
             else
                 Console.WriteLine($"Added action to batch: \"{action.Description}\". Batch has {UndoBatch.Count} items");
 #endif
+            action.Do();
             Changed?.Invoke(this, EventArgs.Empty);
         }
 

@@ -67,13 +67,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteProviders.cs" />
+    <Compile Include="Models\ByteProviders.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ExportSettings.cs" />
+    <Compile Include="Models\NotifyNodes.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
-    <Compile Include="Adapters.cs" />
+    <Compile Include="Models\Adapters.cs" />
     <Compile Include="RegionFile.cs" />
     <Compile Include="UI\ConvenienceTextBox.cs" />
     <Compile Include="UI\DualMenuItem.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="UI\NbtNodeControls.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\NbtTreeModel.cs" />
+    <Compile Include="Models\NbtTreeModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -154,7 +155,7 @@
     <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\TreeModelNotify.cs" />
+    <Compile Include="Models\TreeModelNotify.cs" />
     <Compile Include="UI\ActionHistory.cs">
       <SubType>UserControl</SubType>
     </Compile>

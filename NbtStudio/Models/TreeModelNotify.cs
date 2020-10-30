@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public partial class NbtTreeModel
     {
@@ -128,7 +128,7 @@ namespace NbtStudio.UI
             }
             protected void PerformAction(string description, Action action, Action undo)
             {
-                Tree.PushUndo(new UndoableAction(description, action, undo));
+                Tree.PerformAction(new UndoableAction(description, action, undo));
                 action();
             }
 
