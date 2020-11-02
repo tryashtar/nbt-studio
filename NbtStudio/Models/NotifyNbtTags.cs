@@ -9,6 +9,38 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
+    // Unwrap is not good, let's at least keep it here where we know it's "safe"
+    public static class NbtUnwrapExtensions
+    {
+        public static void AddTo(this INbtTag tag, INbtContainer container)
+        {
+            container.Add(tag.Unwrap());
+        }
+
+        public static void InsertInto(this INbtTag tag, INbtContainer container, int index)
+        {
+            container.Insert(index, tag.Unwrap());
+        }
+
+        public static int GetIndex(this INbtTag tag)
+        {
+            if (tag.Parent == null)
+                return -1;
+            return tag.Parent.IndexOf(tag.Unwrap());
+        }
+
+        public static bool IsInside(this INbtTag tag, INbtContainer container)
+        {
+            return container.Contains(tag.Unwrap());
+        }
+
+        public static void Remove(this INbtTag tag)
+        {
+            if (tag.Parent != null)
+                tag.Parent.Remove(tag.Unwrap());
+        }
+    }
+
     public abstract class NotifyNbtTag : INbtTag
     {
         protected readonly NbtTag Tag;
@@ -18,6 +50,8 @@ namespace NbtStudio
         {
             Tag = tag;
         }
+
+        public NbtTag Unwrap() => Tag;
 
         protected void RaiseChanged(INbtTag tag) => Changed?.Invoke(tag, EventArgs.Empty);
         protected void RaiseChanged() => RaiseChanged(Tag);

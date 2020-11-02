@@ -338,7 +338,7 @@ namespace NbtStudio
             else
             {
                 var parent = target.Parent;
-                int index = target.Index;
+                int index = target.GetIndex();
                 if (position == NodePosition.After)
                     index++;
                 return Tuple.Create(parent, index);
@@ -359,7 +359,7 @@ namespace NbtStudio
                     adding.Remove(tag);
                     continue;
                 }
-                if (tag.IsInside(destination) && original_index > tag.Index)
+                if (tag.IsInside(destination) && original_index > tag.GetIndex())
                     index--;
             }
             foreach (var tag in adding)
@@ -435,12 +435,13 @@ namespace NbtStudio
             string type = NbtUtil.TagTypeName(tag.TagType).ToLower();
             if (!String.IsNullOrEmpty(tag.Name))
                 return $"'{tag.Name}' {type}";
-            if (tag.Index != -1)
+            int index = tag.GetIndex();
+            if (index != -1)
             {
                 if (!String.IsNullOrEmpty(tag.Parent?.Name))
-                    return $"{type} at index {tag.Index} in '{tag.Parent.Name}'";
+                    return $"{type} at index {index} in '{tag.Parent.Name}'";
                 else if (tag.Parent?.TagType != null)
-                    return $"{type} at index {tag.Index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
+                    return $"{type} at index {index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
             }
             return type;
         }

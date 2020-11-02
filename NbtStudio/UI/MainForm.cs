@@ -224,7 +224,7 @@ namespace NbtStudio.UI
             if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                Save(file);
+                Save(file.GetSaveable());
             }
         }
 
@@ -233,7 +233,7 @@ namespace NbtStudio.UI
             if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                SaveAs(file);
+                SaveAs(file.GetSaveable());
             }
         }
 
