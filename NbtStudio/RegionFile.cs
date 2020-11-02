@@ -18,7 +18,7 @@ namespace NbtStudio
         private readonly byte[] Timestamps;
         private FileStream Stream;
         public string Path { get; private set; }
-        public bool HasUnsavedChanges => AllChunks.Any(x => x.HasUnsavedChanges);
+        public bool HasUnsavedChanges => AllChunks.Any(x => x != null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
             Chunks = new Chunk[ChunkXDimension, ChunkZDimension];

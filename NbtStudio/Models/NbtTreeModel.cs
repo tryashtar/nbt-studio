@@ -20,7 +20,7 @@ namespace NbtStudio
         public event EventHandler Changed;
 
         public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.GetSaveable().HasUnsavedChanges);
-        private readonly IEnumerable<object> Roots;
+        private readonly List<object> Roots;
         private readonly NbtTreeView View;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
         private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
@@ -57,7 +57,7 @@ namespace NbtStudio
 
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
-            Roots = roots;
+            Roots = roots.ToList();
             View = view;
             View.Model = this;
             if (Roots.Take(2).Count() == 1) // if there is one item, expand it
@@ -110,7 +110,7 @@ namespace NbtStudio
             var remove = current_children.Except(real_children).ToArray();
             var add = real_children.Except(current_children).ToArray();
 
-            var parent_path = new TreePath(path.FullPath.Take(path.FullPath.Length - 1).ToArray());
+            var parent_path = ParentPath(path);
             NodesChanged?.Invoke(this, new TreeModelEventArgs(parent_path, new object[] { changed }));
             if (remove.Any())
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
@@ -120,6 +120,34 @@ namespace NbtStudio
                     NodesInserted?.Invoke(this, new TreeModelEventArgs(path, add.Select(x => real_children.IndexOf(x)).ToArray(), add));
                 node.Expand();
             }
+        }
+
+        public void Remove(object removed)
+        {
+#if DEBUG
+            if (removed != null)
+                Console.WriteLine($"removed: {removed.GetType()}");
+#endif
+            var node = FindNodeByObject(removed);
+            if (node == null)
+            {
+#if DEBUG
+                Console.WriteLine($"could not find node on tree, not updating model");
+#endif
+                return;
+            }
+            TreePath path;
+            if (Roots.Remove(removed))
+                path = TreePath.Empty;
+            else
+                path = ParentPath(View.GetPath(node));
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, new[] { removed }));
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        private static TreePath ParentPath(TreePath path)
+        {
+            return new TreePath(path.FullPath.Take(path.FullPath.Length - 1).ToArray());
         }
 
         private TreeNodeAdv FindNodeByObject(object obj)

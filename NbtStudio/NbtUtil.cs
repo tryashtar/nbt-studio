@@ -449,7 +449,7 @@ namespace NbtStudio
         {
             if (!tags.Any()) // none
                 return "0 tags";
-            if (!tags.Skip(1).Any()) // exactly one
+            if (Util.ExactlyOne(tags)) // exactly one
                 return TagDescription(tags.Single()); // more than one
             return Util.Pluralize(tags.Count(), "tag");
         }

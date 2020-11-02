@@ -1,4 +1,5 @@
 ﻿using fNbt;
+using Microsoft.VisualBasic.FileIO;
 using NbtStudio;
 using NbtStudio.SNBT;
 using System;
@@ -44,7 +45,7 @@ namespace NbtStudio
         {
             if (!nodes.Any()) // none
                 return "0 nodes";
-            if (!nodes.Skip(1).Any()) // exactly one
+            if (Util.ExactlyOne(nodes)) // exactly one
                 return nodes.Single().Description;
             var results = new Dictionary<Type, int>();
             int unknowns = 0;
@@ -131,13 +132,17 @@ namespace NbtStudio
             SourceObject = source;
         }
 
-        protected virtual void Notify()
+        protected void Notify()
         {
             Tree.Notify(SourceObject);
         }
-        protected virtual void Notify(object obj)
+        protected void Notify(object obj)
         {
             Tree.Notify(obj);
+        }
+        protected void RemoveSelf()
+        {
+            Tree.Remove(SourceObject);
         }
         protected void PerformAction(UndoableAction action)
         {
@@ -171,7 +176,10 @@ namespace NbtStudio
 
         public virtual string Description => "unknown node";
         public virtual bool CanDelete => false;
-        public virtual void Delete() { }
+        public virtual void Delete()
+        {
+            RemoveSelf();
+        }
         public virtual bool CanSort => false;
         public virtual void Sort() { }
         public virtual bool CanCopy => false;
@@ -266,6 +274,7 @@ namespace NbtStudio
         public override void Delete()
         {
             Tag.Remove();
+            base.Delete();
         }
         public override bool CanEdit => NbtNodeOperations.CanEdit(Tag);
         public override bool CanPaste => NbtNodeOperations.CanPaste(Tag);
@@ -308,7 +317,8 @@ namespace NbtStudio
         public override void Delete()
         {
             if (File.Path != null)
-                System.IO.File.Delete(File.Path);
+                FileSystem.DeleteFile(File.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+            base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => NbtNodeOperations.CanPaste(File.RootTag);
@@ -328,14 +338,16 @@ namespace NbtStudio
         public ChunkNode(NbtTreeModel tree, Chunk chunk) : base(tree, chunk)
         {
             Chunk = chunk;
-            Chunk.Data.Changed += RootTag_Changed;
-            Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
         }
 
         public NotifyNbtCompound AccessChunkData()
         {
             if (!Chunk.IsLoaded)
+            {
                 Chunk.Load();
+                Chunk.Data.Changed += RootTag_Changed;
+                Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
+            }
             return Chunk.Data;
         }
 
@@ -357,7 +369,8 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            Chunk.Region.RemoveChunk(Chunk.X, Chunk.Z);
+            Chunk.Region?.RemoveChunk(Chunk.X, Chunk.Z);
+            base.Delete();
         }
         public override bool CanEdit => true;
         public override bool CanPaste => true;
@@ -386,7 +399,11 @@ namespace NbtStudio
         public override void Delete()
         {
             if (Region.Path != null)
-                File.Delete(Region.Path);
+            {
+                Region.Dispose();
+                FileSystem.DeleteFile(Region.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+            }
+            base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => true;
@@ -421,6 +438,7 @@ namespace NbtStudio
         {
             if (Folder.Path != null)
                 Directory.Delete(Folder.Path, true);
+            base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => true;

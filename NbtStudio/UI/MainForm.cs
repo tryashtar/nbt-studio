@@ -408,11 +408,7 @@ namespace NbtStudio.UI
 
             var selected_objects = ViewModel.SelectedObjects.ToList();
             ViewModel.StartBatchOperation();
-            foreach (var item in selected_objects)
-            {
-                if (item.CanDelete)
-                    item.Delete();
-            }
+            Delete(selected_objects);
             ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(selected_objects)}", false);
 
             // Index == -1 checks whether this node has been removed from the tree
@@ -421,6 +417,53 @@ namespace NbtStudio.UI
                 var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
                 if (select_next != null)
                     select_next.IsSelected = true;
+            }
+        }
+
+        private void Delete(IEnumerable<INode> nodes)
+        {
+            nodes = nodes.Where(x => x.CanDelete);
+            var files = nodes.Select(x => x.GetSaveable()).Where(x => x != null);
+            if (files.Any())
+            {
+                DialogResult result;
+                if (Util.ExactlyOne(files))
+                {
+                    var file = files.Single();
+                    if (file.Path == null)
+                        result = MessageBox.Show(
+                            $"Are you sure you want to remove this file?",
+                            $"Really delete this unsaved file?",
+                            MessageBoxButtons.YesNo);
+                    else
+                        result = MessageBox.Show(
+                            $"Are you sure you want to delete this file?\n\n" +
+                            $"It will be sent to the recycle bin. This cannot be undone.",
+                            $"Really delete {Path.GetFileName(file.Path)}?",
+                            MessageBoxButtons.YesNo);
+                }
+                else
+                {
+                    var unsaved = files.Where(x => x.Path == null);
+                    var saved = files.Where(x => x.Path != null);
+                    if (!saved.Any())
+                        result = MessageBox.Show(
+                            $"Are you sure you want to remove {Util.Pluralize(files.Count(), "file")}?",
+                            $"Really delete these unsaved files?",
+                            MessageBoxButtons.YesNo);
+                    else
+                        result = MessageBox.Show(
+                            $"Are you sure you want to delete {Util.Pluralize(files.Count(), "file")}?\n\n" +
+                            $"{Util.Pluralize(saved.Count(), "file")} will be send to the recycle bin. This cannot be undone.",
+                            $"Really delete these files?",
+                            MessageBoxButtons.YesNo);
+                }
+                if (result != DialogResult.Yes)
+                    return;
+            }
+            foreach (var node in nodes)
+            {
+                node.Delete();
             }
         }
 
@@ -663,7 +706,7 @@ namespace NbtStudio.UI
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());
                     var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
-                    bool single = !addable.Skip(1).Any();
+                    bool single = Util.ExactlyOne(addable);
                     Func<NbtTagType, string> display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
                     var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(x), (s, ea) => AddTag(container, x))).ToArray();
                     if (single)
