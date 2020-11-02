@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using NbtStudio;
 using System;
 using System.Collections;
@@ -53,17 +53,26 @@ namespace NbtStudio
 
         public NbtTag Unwrap() => Tag;
 
-        protected void RaiseChanged(INbtTag tag) => Changed?.Invoke(tag, EventArgs.Empty);
-        protected void RaiseChanged() => RaiseChanged(this);
-        protected void PrepareAction(INbtTag tag, UndoableAction action)
+        private void RaiseChanged(INbtTag tag) => Changed?.Invoke(tag, EventArgs.Empty);
+        protected void RaiseChanged()
         {
-            ActionPrepared?.Invoke(tag, action);
+            var tag = this;
+            while (tag != null)
+            {
+                tag.RaiseChanged(this);
+                tag = (NotifyNbtTag)tag.Parent;
+            }
         }
-        protected void PrepareAction(INbtTag tag, string description, Action action, Action undo)
+        private void PrepareAction(INbtTag tag, UndoableAction action) => ActionPrepared?.Invoke(tag, action);
+        protected void PrepareAction(string description, Action action, Action undo)
         {
-            PrepareAction(tag, new UndoableAction(description, action, undo));
+            var tag = this;
+            while (tag != null)
+            {
+                tag.PrepareAction(this, new UndoableAction(description, action, undo));
+                tag = (NotifyNbtTag)tag.Parent;
+            }
         }
-        protected void PrepareAction(string description, Action action, Action undo) => PrepareAction(Tag, description, action, undo);
 
         public string Name
         {
@@ -80,8 +89,20 @@ namespace NbtStudio
         public NbtTagType TagType => Tag.TagType;
         public INbtContainer Parent => (INbtContainer)Wrap(Tag.Parent);
 
+        public override bool Equals(object obj)
+        {
+            return obj.Equals(Tag);
+        }
+
+        public override int GetHashCode()
+        {
+            return Tag.GetHashCode();
+        }
+
         public static NotifyNbtTag CreateFrom(NbtTag tag)
         {
+            if (tag == null)
+                return null;
             if (tag is NbtByte b)
                 return new NotifyNbtByte(b);
             if (tag is NbtShort s)
@@ -109,13 +130,7 @@ namespace NbtStudio
             throw new ArgumentException($"Can't wrap {tag.TagType}");
         }
 
-        public NotifyNbtTag Wrap(NbtTag tag)
-        {
-            var result = CreateFrom(tag);
-            result.ActionPrepared += (_, e) => PrepareAction(result, e);
-            result.Changed += (_, e) => RaiseChanged(result);
-            return result;
-        }
+        public NotifyNbtTag Wrap(NbtTag tag) => CreateFrom(tag);
     }
 
     public class NotifyNbtByte : NotifyNbtTag, INbtByte

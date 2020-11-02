@@ -94,7 +94,13 @@ namespace NbtStudio
                 Console.WriteLine($"changed: {changed.GetType()}");
 #endif
             var node = FindNodeByObject(changed);
-            if (node == null) return;
+            if (node == null)
+            {
+#if DEBUG
+                Console.WriteLine($"could not find node on tree, not updating model");
+#endif
+                return;
+            }
             var path = View.GetPath(node);
 
             Changed?.Invoke(this, EventArgs.Empty);

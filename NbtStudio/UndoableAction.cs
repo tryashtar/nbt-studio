@@ -26,6 +26,12 @@ namespace NbtStudio
                 UndoAction();
                 IsDone = false;
             }
+#if DEBUG
+            else
+            {
+                Console.WriteLine($"Tried to undo action '{UndoAction}' twice");
+            }
+#endif
         }
 
         public void Do()
@@ -35,6 +41,12 @@ namespace NbtStudio
                 DoAction();
                 IsDone = true;
             }
+#if DEBUG
+            else
+            {
+                Console.WriteLine($"Tried to do action '{DoAction}' twice");
+            }
+#endif
         }
 
         public void Add(UndoableAction other)

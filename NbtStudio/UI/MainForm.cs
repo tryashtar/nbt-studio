@@ -567,7 +567,7 @@ namespace NbtStudio.UI
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var tag = ViewModel?.ObjectFromClick(e);
-            if (tag.CanEdit)
+            if (!e.Node.CanExpand && tag.CanEdit)
                 Edit(tag);
         }
 
