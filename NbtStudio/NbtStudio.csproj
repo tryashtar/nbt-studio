@@ -70,6 +70,7 @@
     <Compile Include="Models\ByteProviders.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="ExportSettings.cs" />
+    <Compile Include="Models\NotifyNbtTags.cs" />
     <Compile Include="Models\NotifyNodes.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
