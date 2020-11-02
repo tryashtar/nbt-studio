@@ -407,9 +407,7 @@ namespace NbtStudio.UI
             var parents = selected_nodes.Select(x => x.Parent).Where(x => x != null).ToList();
 
             var selected_objects = ViewModel.SelectedObjects.ToList();
-            ViewModel.StartBatchOperation();
             Delete(selected_objects);
-            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(selected_objects)}", false);
 
             // Index == -1 checks whether this node has been removed from the tree
             if (selected_nodes.All(x => x.Index == -1))
@@ -461,10 +459,12 @@ namespace NbtStudio.UI
                 if (result != DialogResult.Yes)
                     return;
             }
+            ViewModel.StartBatchOperation();
             foreach (var node in nodes)
             {
                 node.Delete();
             }
+            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(nodes)}", false);
         }
 
         private FindWindow FindWindow;

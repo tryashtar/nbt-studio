@@ -238,7 +238,7 @@ namespace NbtStudio
             if (tag is INbtContainer container)
             {
                 var tags = ParseTags(text).ToList();
-                container.AddRange(tags);
+                NbtUtil.TransformAdd(tags, container);
                 return tags;
             }
             return Enumerable.Empty<INbtTag>();
@@ -369,8 +369,12 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            Chunk.Region?.RemoveChunk(Chunk.X, Chunk.Z);
-            base.Delete();
+            var region = Chunk.Region;
+            if (region != null)
+                PerformAction(new UndoableAction($"Remove {NbtUtil.ChunkDescription(Chunk)}",
+                    () => { region.RemoveChunk(Chunk.X, Chunk.Z); base.Delete(); },
+                    () => { region.AddChunk(Chunk); }
+                ));
         }
         public override bool CanEdit => true;
         public override bool CanPaste => true;
@@ -390,6 +394,12 @@ namespace NbtStudio
         public RegionFileNode(NbtTreeModel tree, RegionFile region) : base(tree, region)
         {
             Region = region;
+            Region.ChunksChanged += Region_ChunksChanged;
+        }
+
+        private void Region_ChunksChanged(object sender, EventArgs e)
+        {
+            Notify(sender);
         }
 
         public override string Description => Path.GetFileName(Region.Path);

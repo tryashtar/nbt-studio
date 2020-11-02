@@ -59,9 +59,12 @@ namespace NbtStudio
         {
             var first = actions.First();
             var result = new UndoableAction(description, first.DoAction, first.UndoAction);
+            result.IsDone = first.IsDone;
             foreach (var action in actions.Skip(1))
             {
                 result.Add(action);
+                if (action.IsDone != result.IsDone)
+                    throw new ArgumentException($"Can't merge actions with mismatching done-ness: [{action.Description}: {action.IsDone}] and [{result.Description}: {action.IsDone}]");
             }
             return result;
         }

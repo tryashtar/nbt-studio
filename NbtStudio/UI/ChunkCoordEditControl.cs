@@ -20,6 +20,19 @@ namespace NbtStudio.UI
             Region = region;
             XBox = xbox;
             ZBox = zbox;
+            XBox.Maximum = RegionFile.ChunkXDimension - 1;
+            ZBox.Maximum = RegionFile.ChunkZDimension - 1;
+            XBox.Value = Math.Min(Math.Max(chunk.X, XBox.Minimum), XBox.Maximum);
+            ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
+            if (CheckCoordsInternal() != CoordCheckResult.Valid)
+            {
+                var auto = NbtUtil.GetAvailableCoords(region).FirstOrDefault();
+                if (auto != null)
+                {
+                    XBox.Value = auto.Item1;
+                    ZBox.Value = auto.Item2;
+                }
+            }
             XBox.TextChanged += Box_TextChanged;
             ZBox.TextChanged += Box_TextChanged;
         }

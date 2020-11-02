@@ -13,12 +13,14 @@ namespace NbtStudio
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
         public int ChunkCount { get; private set; }
+        public event EventHandler ChunksChanged;
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
         private FileStream Stream;
         public string Path { get; private set; }
-        public bool HasUnsavedChanges => AllChunks.Any(x => x != null && x.HasUnsavedChanges);
+        public bool HasChunkChanges { get; private set; } = false;
+        public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
             Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
@@ -84,6 +86,8 @@ namespace NbtStudio
             {
                 Chunks[x, z].Region = null;
                 ChunkCount--;
+                HasChunkChanges = true;
+                ChunksChanged?.Invoke(this, EventArgs.Empty);
             }
             Chunks[x, z] = null;
         }
@@ -92,9 +96,11 @@ namespace NbtStudio
         {
             if (Chunks[chunk.X, chunk.Z] != null)
                 throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
-            ChunkCount++;
             Chunks[chunk.X, chunk.Z] = chunk;
             chunk.Region = this;
+            ChunkCount++;
+            HasChunkChanges = true;
+            ChunksChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void Dispose()

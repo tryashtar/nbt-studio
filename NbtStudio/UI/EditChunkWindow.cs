@@ -27,10 +27,6 @@ namespace NbtStudio.UI
             else if (purpose == ChunkEditPurpose.Move)
                 this.Text = $"Move Chunk";
 
-            XBox.Maximum = RegionFile.ChunkXDimension - 1;
-            ZBox.Maximum = RegionFile.ChunkZDimension - 1;
-            XBox.Value = Math.Min(Math.Max(chunk.X, XBox.Minimum), XBox.Maximum);
-            ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
             XBox.Select();
         }
 
