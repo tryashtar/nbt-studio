@@ -444,6 +444,14 @@ namespace NbtStudio
             }
             return type;
         }
+        public static string TagDescription(IEnumerable<INbtTag> tags)
+        {
+            if (!tags.Any()) // none
+                return "0 tags";
+            if (!tags.Skip(1).Any()) // exactly one
+                return TagDescription(tags.Single()); // more than one
+            return Util.Pluralize(tags.Count(), "tag");
+        }
 
         public static string ChunkDescription(Chunk chunk)
         {

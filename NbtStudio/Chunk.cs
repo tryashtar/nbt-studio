@@ -34,11 +34,8 @@ namespace NbtStudio
 
         public static Chunk EmptyChunk(NbtCompound data, int x = -1, int z = -1)
         {
-            var stream = new MemoryStream();
-            var file = new fNbt.NbtFile();
-            file.SaveToStream(stream, NbtCompression.None);
-            var chunk = new Chunk(null, x, z, 0, 0, stream);
-            chunk.SetData(data ?? file.RootTag);
+            var chunk = new Chunk(null, x, z, 0, 0, null);
+            chunk.SetData(data ?? new NbtCompound(""));
             chunk.Compression = NbtCompression.ZLib;
             chunk.HasUnsavedChanges = true;
             return chunk;
