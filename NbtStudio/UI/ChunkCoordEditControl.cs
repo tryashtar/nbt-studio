@@ -10,11 +10,11 @@ namespace NbtStudio.UI
 {
     public class ChunkCoordsEditControls
     {
-        public readonly IChunk Chunk;
-        public readonly IRegion Region;
+        public readonly Chunk Chunk;
+        public readonly RegionFile Region;
         public readonly ChunkCoordEditControl XBox;
         public readonly ChunkCoordEditControl ZBox;
-        public ChunkCoordsEditControls(IChunk chunk, IRegion region, ChunkCoordEditControl xbox, ChunkCoordEditControl zbox)
+        public ChunkCoordsEditControls(Chunk chunk, RegionFile region, ChunkCoordEditControl xbox, ChunkCoordEditControl zbox)
         {
             Chunk = chunk;
             Region = region;

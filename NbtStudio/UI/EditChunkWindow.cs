@@ -9,11 +9,11 @@ namespace NbtStudio.UI
 {
     public partial class EditChunkWindow : Form
     {
-        private readonly IChunk WorkingChunk;
-        private readonly IRegion ChunkRegion;
+        private readonly Chunk WorkingChunk;
+        private readonly RegionFile ChunkRegion;
         private readonly ChunkCoordsEditControls Manager;
 
-        private EditChunkWindow(IChunk chunk, IRegion region, ChunkEditPurpose purpose)
+        private EditChunkWindow(Chunk chunk, RegionFile region, ChunkEditPurpose purpose)
         {
             InitializeComponent();
 
@@ -34,7 +34,7 @@ namespace NbtStudio.UI
             XBox.Select();
         }
 
-        public static IChunk CreateChunk(IRegion parent, bool bypass_window = false, NbtCompound data = null)
+        public static Chunk CreateChunk(RegionFile parent, bool bypass_window = false, NbtCompound data = null)
         {
             var chunk = Chunk.EmptyChunk(data);
 
@@ -61,7 +61,7 @@ namespace NbtStudio.UI
             }
         }
 
-        public static bool MoveChunk(IChunk existing)
+        public static bool MoveChunk(Chunk existing)
         {
             var region = existing.Region;
             var window = new EditChunkWindow(existing, region, ChunkEditPurpose.Move);

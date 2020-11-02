@@ -169,7 +169,7 @@ namespace NbtStudio.UI
                 else
                 {
                     var root = new NbtCompound();
-                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), root.AdaptCompound());
+                    tag.Name = NbtUtil.GetAutomaticName(tag, root);
                     root.Add(tag);
                     OpenFile(new NbtFile(root));
                 }
@@ -341,7 +341,7 @@ namespace NbtStudio.UI
             if (obj == null || !obj.CanRename) return;
             if (obj is INbtTag tag)
                 Rename(tag);
-            else if (obj is IChunk chunk)
+            else if (obj is Chunk chunk)
                 EditChunk(chunk);
         }
 
@@ -359,7 +359,7 @@ namespace NbtStudio.UI
             if (!node.CanEdit) return;
             if (node is INbtTag tag)
                 EditTag(tag);
-            else if (node is IChunk chunk)
+            else if (node is Chunk chunk)
                 EditChunk(chunk);
             ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
         }
@@ -372,7 +372,7 @@ namespace NbtStudio.UI
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
         }
 
-        private void EditChunk(IChunk chunk)
+        private void EditChunk(Chunk chunk)
         {
             EditChunkWindow.MoveChunk(chunk);
         }
@@ -460,7 +460,7 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedObject as NbtTreeModel.INbtContainerNode;
+            var parent = ViewModel?.SelectedObject as INbtContainerNode;
             if (parent == null) return;
             AddTag(parent, type);
         }
@@ -525,8 +525,8 @@ namespace NbtStudio.UI
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
             var obj = ViewModel?.SelectedObject;
-            var nbt = obj as NbtTreeModel.INbtNode;
-            var container = obj as NbtTreeModel.INbtContainerNode;
+            var nbt = obj as INbtNode;
+            var container = obj as INbtContainerNode;
             var region = obj as IRegion;
             foreach (var item in CreateTagButtons)
             {

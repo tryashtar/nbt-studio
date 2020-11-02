@@ -8,15 +8,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public interface IRegion : ISaveable
-    {
-        int ChunkCount { get; }
-        IEnumerable<IChunk> AllChunks { get; }
-        IChunk GetChunk(int x, int z);
-        void RemoveChunk(int x, int z);
-        void AddChunk(Chunk chunk);
-    }
-    public class RegionFile : IRegion, IDisposable
+    public class RegionFile : ISaveable, IDisposable
     {
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
@@ -26,6 +18,7 @@ namespace NbtStudio
         private readonly byte[] Timestamps;
         private FileStream Stream;
         public string Path { get; private set; }
+        public bool HasUnsavedChanges => AllChunks.Any(x => x.HasUnsavedChanges);
         public RegionFile(string path)
         {
             Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
@@ -79,13 +72,11 @@ namespace NbtStudio
         }
 
         public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
-        IEnumerable<IChunk> IRegion.AllChunks => AllChunks;
 
         public Chunk GetChunk(int x, int z)
         {
             return Chunks[x, z];
         }
-        IChunk IRegion.GetChunk(int x, int z) => GetChunk(x, z);
 
         public void RemoveChunk(int x, int z)
         {

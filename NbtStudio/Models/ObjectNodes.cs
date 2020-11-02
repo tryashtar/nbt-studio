@@ -24,6 +24,48 @@ namespace NbtStudio
         bool CanEdit { get; }
     }
 
+    public static class NodeExtractions
+    {
+        public static INbtTag GetNbtTag(this INode node)
+        {
+            if (node is NbtTagNode nbt)
+                return nbt.Tag;
+            if (node is NbtFileNode file)
+                return file.File.RootTag;
+            if (node is ChunkNode chunk)
+                return chunk.Data;
+            return null;
+        }
+
+        public static NbtFile GetNbtFile(this INode node)
+        {
+            if (node is NbtFileNode file)
+                return file.File;
+            return null;
+        }
+
+        public static RegionFile GetRegionFile(this INode node)
+        {
+            if (node is RegionFileNode region)
+                return region.Region;
+            return null;
+        }
+
+        public static Chunk GetChunk(this INode node)
+        {
+            if (node is ChunkNode chunk)
+                return chunk.Chunk;
+            return null;
+        }
+
+        public static NbtFolder GetNbtFolder(this INode node)
+        {
+            if (node is FolderNode folder)
+                return folder.Folder;
+            return null;
+        }
+    }
+
     public abstract class NotifyNode : INode
     {
         protected readonly NbtTreeModel Tree;

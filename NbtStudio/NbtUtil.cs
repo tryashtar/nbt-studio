@@ -432,7 +432,6 @@ namespace NbtStudio
             }
             return $"{type}";
         }
-        public static string TagDescription(this NbtTag tag) => TagDescription(tag.Adapt());
         public static string TagDescription(IEnumerable<INbtTag> tags)
         {
             if (!tags.Any())
@@ -441,9 +440,8 @@ namespace NbtStudio
                 return TagDescription(tags.Single());
             return Util.Pluralize(tags.Count(), "tag");
         }
-        public static string TagDescription(IEnumerable<NbtTag> tags) => TagDescription(tags.Select(x => x.Adapt()));
 
-        public static string ChunkDescription(IChunk chunk)
+        public static string ChunkDescription(Chunk chunk)
         {
             if (chunk.Region == null)
                 return $"chunk at ({chunk.X}, {chunk.Z})";

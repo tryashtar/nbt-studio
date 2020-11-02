@@ -31,7 +31,7 @@ namespace NbtStudio
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrap(this, View.SelectedNode.Tag);
+                return Wrap(View.SelectedNode.Tag);
             }
         }
         public IEnumerable<INode> SelectedObjects
@@ -40,17 +40,17 @@ namespace NbtStudio
             {
                 if (View.SelectedNodes == null)
                     return Enumerable.Empty<INode>();
-                return View.SelectedNodes.Select(x => NotifyWrap(this, x.Tag));
+                return View.SelectedNodes.Select(x => Wrap(x.Tag));
             }
         }
-        public IEnumerable<SaveableNotifyNode> OpenedFiles
+        public IEnumerable<ISaveableNode> OpenedFiles
         {
             get
             {
                 foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFolder || x.Tag is ISaveable))
                 {
                     if (item.Tag is ISaveable saveable)
-                        yield return NotifyWrapSaveable(this, item.Tag, saveable);
+                        yield return (ISaveableNode)Wrap(saveable);
                 }
             }
         }
@@ -65,13 +65,15 @@ namespace NbtStudio
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
+        private INode Wrap(object obj) => NotifyNode.Create(this, obj);
+
         public IEnumerable<INode> ObjectsFromDrag(DragEventArgs e)
         {
-            return View.NodesFromDrag(e).Select(x => NotifyWrap(this, x.Tag)).Where(x => x != null);
+            return View.NodesFromDrag(e).Select(x => Wrap(x.Tag)).Where(x => x != null);
         }
         public INode ObjectFromClick(TreeNodeAdvMouseEventArgs e)
         {
-            return NotifyWrap(this, e.Node.Tag);
+            return Wrap(e.Node.Tag);
         }
         public INode DropObject
         {
@@ -79,7 +81,7 @@ namespace NbtStudio
             {
                 if (View.DropPosition.Node == null)
                     return null;
-                return NotifyWrap(this, View.DropPosition.Node.Tag);
+                return Wrap(View.DropPosition.Node.Tag);
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
@@ -97,7 +99,7 @@ namespace NbtStudio
 
             foreach (var item in path.FullPath)
             {
-                if (item is SaveableNotifyNode saveable)
+                if (item is ISaveableNode saveable)
                     saveable.MarkUnsaved();
             }
             Changed?.Invoke(this, EventArgs.Empty);

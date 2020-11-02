@@ -8,32 +8,21 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public interface IChunk
+    public class Chunk
     {
-        IRegion Region { get; }
-        int X { get; }
-        int Z { get; }
-        bool IsLoaded { get; }
-        bool IsCorrupt { get; }
-        void Load();
-        void Remove();
-        void AddTo(IRegion region);
-        void Move(int x, int z);
-    }
-
-    public class Chunk : IChunk
-    {
-        public IRegion Region { get; internal set; }
+        public RegionFile Region { get; internal set; }
         public int X { get; private set; }
         public int Z { get; private set; }
-        public NbtCompound Data { get; private set; }
+        public NotifyNbtCompound Data { get; private set; }
+        private NbtCompound RawData;
+        public bool HasUnsavedChanges { get; private set; } = false;
         private readonly int Offset;
         private readonly int Size;
         private readonly Stream Stream;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
         public bool IsCorrupt { get; private set; } = false;
-        internal Chunk(IRegion region, int x, int z, int offset, int size, Stream stream)
+        internal Chunk(RegionFile region, int x, int z, int offset, int size, Stream stream)
         {
             Region = region;
             X = x;
@@ -49,9 +38,17 @@ namespace NbtStudio
             var file = new fNbt.NbtFile();
             file.SaveToStream(stream, NbtCompression.None);
             var chunk = new Chunk(null, -1, -1, 0, 0, stream);
-            chunk.Data = data ?? file.RootTag;
+            chunk.SetData(data ?? file.RootTag);
             chunk.Compression = NbtCompression.ZLib;
+            chunk.HasUnsavedChanges = true;
             return chunk;
+        }
+
+        private void SetData(NbtCompound data)
+        {
+            RawData = data;
+            Data = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(data);
+            Data.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
         public byte[] SaveBytes()
@@ -65,7 +62,7 @@ namespace NbtStudio
             }
             if (IsCorrupt)
                 return new byte[0];
-            var file = new fNbt.NbtFile(Data);
+            var file = new fNbt.NbtFile(RawData);
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
             Array.Copy(bytes, 0, with_header, 5, bytes.Length);
@@ -87,7 +84,7 @@ namespace NbtStudio
             {
                 file.LoadFromStream(Stream, NbtCompression.AutoDetect);
                 Compression = file.FileCompression;
-                Data = file.RootTag;
+                SetData(file.RootTag);
             }
             catch
             {
@@ -102,7 +99,7 @@ namespace NbtStudio
                 Region.RemoveChunk(X, Z);
         }
 
-        public void AddTo(IRegion region)
+        public void AddTo(RegionFile region)
         {
             if (Region != null)
                 Region.RemoveChunk(X, Z);
