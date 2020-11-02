@@ -17,7 +17,7 @@ namespace NbtStudio
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
-        private FileStream Stream;
+        internal FileStream Stream { get; private set; }
         public string Path { get; private set; }
         public bool HasChunkChanges { get; private set; } = false;
         public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
@@ -42,7 +42,7 @@ namespace NbtStudio
                     if (size > 0)
                     {
                         ChunkCount++;
-                        Chunks[x, z] = new Chunk(this, x, z, offset, size, Stream);
+                        Chunks[x, z] = new Chunk(this, x, z, offset, size);
                         if (ChunkCount == 1)
                             Chunks[x, z].Load(); // load the first one to check if this is really a region file
                     }
@@ -85,17 +85,19 @@ namespace NbtStudio
             if (Chunks[x, z] != null)
             {
                 Chunks[x, z].Region = null;
+                Chunks[x, z] = null;
                 ChunkCount--;
                 HasChunkChanges = true;
                 ChunksChanged?.Invoke(this, EventArgs.Empty);
             }
-            Chunks[x, z] = null;
         }
 
         public void AddChunk(Chunk chunk)
         {
             if (Chunks[chunk.X, chunk.Z] != null)
                 throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
+            if (chunk.Region != null)
+                chunk.Region.RemoveChunk(chunk.X, chunk.Z);
             Chunks[chunk.X, chunk.Z] = chunk;
             chunk.Region = this;
             ChunkCount++;
@@ -175,6 +177,7 @@ namespace NbtStudio
                     action(writer);
                 }
             }
+            HasChunkChanges = false;
             Stream = File.OpenRead(Path);
         }
 

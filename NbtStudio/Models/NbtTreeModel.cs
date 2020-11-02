@@ -19,7 +19,7 @@ namespace NbtStudio
         public event EventHandler<TreePathEventArgs> StructureChanged;
         public event EventHandler Changed;
 
-        public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.GetSaveable().HasUnsavedChanges);
+        public bool HasAnyUnsavedChanges => OpenedFiles.Filter(x => x.GetSaveable()).Any(x => x.HasUnsavedChanges);
         private readonly List<object> Roots;
         private readonly NbtTreeView View;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
@@ -165,6 +165,24 @@ namespace NbtStudio
                     return item;
             }
             return null;
+        }
+
+        public Tuple<INode, int> GetInsertionLocation(INode target, NodePosition position)
+        {
+            var obj = target.Object;
+            var path = View.GetPath(FindNodeByObject(obj));
+            var children = GetChildren(obj);
+            if (position == NodePosition.Inside)
+                return Tuple.Create(target, children.Count());
+            else
+            {
+                var parent = path.FullPath[path.FullPath.Length - 2];
+                var parent_children = GetChildren(parent).ToList();
+                int index = parent_children.IndexOf(obj);
+                if (position == NodePosition.After)
+                    index++;
+                return Tuple.Create(Wrap(parent), index);
+            }
         }
 
         public void PerformAction(UndoableAction action)

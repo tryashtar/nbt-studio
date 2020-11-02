@@ -18,23 +18,21 @@ namespace NbtStudio
         public bool HasUnsavedChanges { get; private set; } = false;
         private readonly int Offset;
         private readonly int Size;
-        private readonly Stream Stream;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
         public bool IsCorrupt { get; private set; } = false;
-        internal Chunk(RegionFile region, int x, int z, int offset, int size, Stream stream)
+        internal Chunk(RegionFile region, int x, int z, int offset, int size)
         {
             Region = region;
             X = x;
             Z = z;
             Offset = offset;
             Size = size;
-            Stream = stream;
         }
 
         public static Chunk EmptyChunk(NbtCompound data, int x = -1, int z = -1)
         {
-            var chunk = new Chunk(null, x, z, 0, 0, null);
+            var chunk = new Chunk(null, x, z, 0, 0);
             chunk.SetData(data ?? new NbtCompound(""));
             chunk.Compression = NbtCompression.ZLib;
             chunk.HasUnsavedChanges = true;
@@ -46,15 +44,16 @@ namespace NbtStudio
             RawData = data;
             Data = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(data);
             Data.Changed += (s, e) => HasUnsavedChanges = true;
+            Data.ActionPrepared += (s, e) => e.Do();
         }
 
         public byte[] SaveBytes()
         {
             if (!IsLoaded)
             {
-                Stream.Seek(Offset, SeekOrigin.Begin);
+                Region.Stream.Seek(Offset, SeekOrigin.Begin);
                 byte[] result = new byte[Size];
-                Stream.Read(result, 0, Size);
+                Region.Stream.Read(result, 0, Size);
                 return result;
             }
             if (IsCorrupt)
@@ -69,17 +68,18 @@ namespace NbtStudio
                 with_header[4] = 1;
             else if (Compression == NbtCompression.ZLib)
                 with_header[4] = 2;
+            HasUnsavedChanges = false;
             return with_header;
         }
 
         public void Load()
         {
             if (IsCorrupt) return;
-            Stream.Seek(Offset + 5, SeekOrigin.Begin);
+            Region.Stream.Seek(Offset + 5, SeekOrigin.Begin);
             var file = new fNbt.NbtFile();
             try
             {
-                file.LoadFromStream(Stream, NbtCompression.AutoDetect);
+                file.LoadFromStream(Region.Stream, NbtCompression.AutoDetect);
                 Compression = file.FileCompression;
                 SetData(file.RootTag);
             }

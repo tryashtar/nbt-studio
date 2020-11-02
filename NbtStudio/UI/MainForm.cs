@@ -421,7 +421,7 @@ namespace NbtStudio.UI
         private void Delete(IEnumerable<INode> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
-            var files = nodes.Select(x => x.GetSaveable()).Where(x => x != null);
+            var files = nodes.Filter(x => x.GetSaveable());
             if (files.Any())
             {
                 DialogResult result;
@@ -654,19 +654,18 @@ namespace NbtStudio.UI
 
         private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            //var insert = NbtUtil.GetInsertionLocation(target, position);
-            //if (insert.Item1 == null) return false;
-            //return NbtUtil.CanAddAll(nodes, insert.Item1);
-            return false;
+            var insert = ViewModel.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return false;
+            return insert.Item1.CanReceiveDrop(nodes);
         }
 
         private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            //var insert = NbtUtil.GetInsertionLocation(target, position);
-            //if (insert.Item1 == null) return;
-            //ViewModel.StartBatchOperation();
-            //NbtUtil.TransformInsert(tags, insert.Item1, insert.Item2);
-            //ViewModel.FinishBatchOperation($"Move {NbtUtil.TagDescription(tags)} into {insert.Item1.TagDescription()} at position {insert.Item2}", true);
+            var insert = ViewModel.GetInsertionLocation(target, position);
+            if (insert.Item1 == null) return;
+            ViewModel.StartBatchOperation();
+            insert.Item1.ReceiveDrop(nodes, insert.Item2);
+            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {insert.Item1.Description} at position {insert.Item2}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

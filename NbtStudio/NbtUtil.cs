@@ -328,23 +328,6 @@ namespace NbtStudio
             }
         }
 
-        public static Tuple<INbtContainer, int> GetInsertionLocation(INbtTag target, NodePosition position)
-        {
-            if (position == NodePosition.Inside)
-            {
-                var container = target as INbtContainer;
-                return Tuple.Create(container, container?.Count ?? 0);
-            }
-            else
-            {
-                var parent = target.Parent;
-                int index = target.GetIndex();
-                if (position == NodePosition.After)
-                    index++;
-                return Tuple.Create(parent, index);
-            }
-        }
-
         public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformAdd(new[] { tag }, destination);
         public static void TransformAdd(IEnumerable<INbtTag> tags, INbtContainer destination) => TransformInsert(tags, destination, destination.Count);
         public static void TransformInsert(INbtTag tag, INbtContainer destination, int index) => TransformInsert(new[] { tag }, destination, index);

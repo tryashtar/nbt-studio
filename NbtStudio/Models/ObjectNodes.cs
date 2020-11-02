@@ -14,6 +14,7 @@ namespace NbtStudio
 {
     public interface INode
     {
+        object Object { get; }
         string Description { get; }
         bool CanDelete { get; }
         void Delete();
@@ -25,6 +26,8 @@ namespace NbtStudio
         IEnumerable<INode> Paste(string data);
         bool CanRename { get; }
         bool CanEdit { get; }
+        bool CanReceiveDrop(IEnumerable<INode> nodes);
+        void ReceiveDrop(IEnumerable<INode> nodes, int index);
     }
 
     public static class NodeExtractions
@@ -71,6 +74,11 @@ namespace NbtStudio
             if (unknowns > 0)
                 strings.Add(Util.Pluralize(unknowns, "unknown node"));
             return String.Join(", ", strings);
+        }
+
+        public static IEnumerable<T> Filter<T>(this IEnumerable<INode> nodes, Func<INode, T> transformer)
+        {
+            return nodes.Select(transformer).Where(x => x != null);
         }
 
         public static INbtTag GetNbtTag(this INode node)
@@ -126,6 +134,7 @@ namespace NbtStudio
     {
         protected readonly NbtTreeModel Tree;
         protected readonly object SourceObject;
+        public object Object => SourceObject;
         protected NotifyNode(NbtTreeModel tree, object source)
         {
             Tree = tree;
@@ -188,6 +197,8 @@ namespace NbtStudio
         public virtual IEnumerable<INode> Paste(string data) => Enumerable.Empty<INode>();
         public virtual bool CanRename => false;
         public virtual bool CanEdit => false;
+        public virtual bool CanReceiveDrop(IEnumerable<INode> nodes) => false;
+        public virtual void ReceiveDrop(IEnumerable<INode> nodes, int index) { }
     }
 
     public static class NbtNodeOperations
@@ -243,14 +254,26 @@ namespace NbtStudio
             }
             return Enumerable.Empty<INbtTag>();
         }
+
+        public static bool CanReceiveDrop(INbtTag tag, IEnumerable<INbtTag> tags)
+        {
+            if (!(tag is INbtContainer container))
+                return false;
+            return NbtUtil.CanAddAll(tags, container);
+        }
+
+        public static void ReceiveDrop(INbtTag tag, IEnumerable<INbtTag> tags, int index)
+        {
+            if (tag is INbtContainer container)
+                NbtUtil.TransformInsert(tags, container, index);
+        }
     }
 
     public class NbtTagNode : NotifyNode
     {
-        public readonly NotifyNbtTag Tag;
-        public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, tag)
+        public NotifyNbtTag Tag => (NotifyNbtTag)SourceObject;
+        public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, NotifyNbtTag.CreateFrom(tag))
         {
-            Tag = NotifyNbtTag.CreateFrom(tag);
             Tag.Changed += Tag_Changed;
             Tag.ActionPrepared += Tag_ActionPrepared;
         }
@@ -286,14 +309,19 @@ namespace NbtStudio
             var tags = NbtNodeOperations.Paste(Tag, data);
             return tags.Select(x => Create(Tree, x));
         }
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(Tag, nodes.Filter(x => x.GetNbtTag()));
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var tags = nodes.Filter(x => x.GetNbtTag());
+            NbtNodeOperations.ReceiveDrop(Tag, tags, index);
+        }
     }
 
     public class NbtFileNode : NotifyNode
     {
-        public readonly NbtFile File;
+        public NbtFile File => (NbtFile)SourceObject;
         public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
         {
-            File = file;
             File.RootTag.Changed += RootTag_Changed;
             File.RootTag.ActionPrepared += RootTag_ActionPrepared;
         }
@@ -330,15 +358,19 @@ namespace NbtStudio
             var tags = NbtNodeOperations.Paste(File.RootTag, data);
             return tags.Select(x => Create(Tree, x));
         }
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(File.RootTag, nodes.Filter(x => x.GetNbtTag()));
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var tags = nodes.Filter(x => x.GetNbtTag());
+            NbtNodeOperations.ReceiveDrop(File.RootTag, tags, index);
+        }
     }
 
     public class ChunkNode : NotifyNode
     {
-        public readonly Chunk Chunk;
+        public Chunk Chunk => (Chunk)SourceObject;
         public ChunkNode(NbtTreeModel tree, Chunk chunk) : base(tree, chunk)
-        {
-            Chunk = chunk;
-        }
+        { }
 
         public NotifyNbtCompound AccessChunkData()
         {
@@ -386,6 +418,12 @@ namespace NbtStudio
             var tags = NbtNodeOperations.Paste(AccessChunkData(), data);
             return tags.Select(x => Create(Tree, x));
         }
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode);
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var tags = nodes.Filter(x => x.GetNbtTag());
+            NbtNodeOperations.ReceiveDrop(AccessChunkData(), tags, index);
+        }
     }
 
     public class RegionFileNode : NotifyNode
@@ -429,6 +467,15 @@ namespace NbtStudio
                 Region.AddChunk(chunk);
             }
             return chunks.Select(x => Create(Tree, x));
+        }
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is ChunkNode);
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var chunks = nodes.Filter(x => x.GetChunk());
+            foreach (var chunk in chunks)
+            {
+                Region.AddChunk(chunk);
+            }
         }
     }
 
