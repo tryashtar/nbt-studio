@@ -277,7 +277,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void OpenInExplorer(ISaveable file)
+        private void OpenInExplorer(IHavePath file)
         {
             var info = new ProcessStartInfo { FileName = "explorer", Arguments = $"/select, \"{file.Path}\"" };
             Process.Start(info);
@@ -339,9 +339,11 @@ namespace NbtStudio.UI
         {
             var obj = ViewModel?.SelectedObject;
             if (obj == null || !obj.CanRename) return;
-            if (obj is INbtTag tag)
+            var tag = obj.GetNbtTag();
+            var chunk = obj.GetChunk();
+            if (tag != null)
                 Rename(tag);
-            else if (obj is Chunk chunk)
+            else if (chunk != null)
                 EditChunk(chunk);
         }
 
@@ -357,9 +359,11 @@ namespace NbtStudio.UI
             // batch operation to combine the rename and value change into one undo
             ViewModel.StartBatchOperation();
             if (!node.CanEdit) return;
-            if (node is INbtTag tag)
+            var tag = node.GetNbtTag();
+            var chunk = node.GetChunk();
+            if (tag != null)
                 EditTag(tag);
-            else if (node is Chunk chunk)
+            else if (chunk != null)
                 EditChunk(chunk);
             ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
         }
@@ -387,11 +391,11 @@ namespace NbtStudio.UI
 
         private void EditSnbt()
         {
-            var obj = ViewModel?.SelectedObject as INbtTag;
-            if (obj == null) return;
+            var tag = ViewModel?.SelectedObject?.GetNbtTag();
+            if (tag == null) return;
             ViewModel.StartBatchOperation();
-            EditSnbtWindow.ModifyTag(obj, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation($"Edit {obj.TagDescription()} as SNBT", false);
+            EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
+            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()} as SNBT", false);
         }
 
         private void Delete()
@@ -442,7 +446,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = ViewModel?.SelectedObject as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
@@ -451,7 +455,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = ViewModel?.SelectedObject as RegionFile;
+            var parent = ViewModel?.SelectedObject?.GetRegionFile();
             if (parent == null) return;
             var chunk = EditChunkWindow.CreateChunk(parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk != null)
@@ -460,7 +464,7 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedObject as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
             if (parent == null) return;
             AddTag(parent, type);
         }
@@ -525,9 +529,9 @@ namespace NbtStudio.UI
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
             var obj = ViewModel?.SelectedObject;
-            var nbt = obj as INbtTag;
-            var container = obj as INbtContainer;
-            var region = obj as RegionFile;
+            var nbt = obj.GetNbtTag();
+            var container = nbt as INbtContainer;
+            var region = obj.GetRegionFile();
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
@@ -542,6 +546,7 @@ namespace NbtStudio.UI
             ActionEdit.Enabled = obj != null && (obj.CanEdit || obj.CanRename);
             ActionEditSnbt.Enabled = nbt != null;
             ActionAddSnbt.Enabled = container != null;
+
             ActionAddSnbt.Visible = region == null;
             ActionAddChunk.Visible = region != null;
         }
@@ -642,16 +647,18 @@ namespace NbtStudio.UI
                     else
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
                 }
-                if (obj is NbtFile file)
+                var saveable = obj.GetSaveable();
+                if (saveable != null)
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
-                    menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
-                    if (file.Path != null)
-                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(file));
+                    menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(saveable));
+                    menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(saveable));
+                    if (saveable.Path != null)
+                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(saveable));
                 }
-                if (obj is INbtContainer container)
+                var container = obj.GetNbtTag() as INbtContainer;
+                if (container != null)
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());

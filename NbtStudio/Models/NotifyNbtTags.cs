@@ -54,7 +54,7 @@ namespace NbtStudio
         public NbtTag Unwrap() => Tag;
 
         protected void RaiseChanged(INbtTag tag) => Changed?.Invoke(tag, EventArgs.Empty);
-        protected void RaiseChanged() => RaiseChanged(Tag);
+        protected void RaiseChanged() => RaiseChanged(this);
         protected void PrepareAction(INbtTag tag, UndoableAction action)
         {
             ActionPrepared?.Invoke(tag, action);

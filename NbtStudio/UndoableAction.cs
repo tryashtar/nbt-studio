@@ -11,6 +11,7 @@ namespace NbtStudio
         public readonly string Description;
         private Action DoAction;
         private Action UndoAction;
+        public bool IsDone { get; private set; } = false;
         public UndoableAction(string description, Action action, Action undo)
         {
             Description = description;
@@ -20,12 +21,20 @@ namespace NbtStudio
 
         public void Undo()
         {
-            UndoAction();
+            if (IsDone)
+            {
+                UndoAction();
+                IsDone = false;
+            }
         }
 
         public void Do()
         {
-            DoAction();
+            if (!IsDone)
+            {
+                DoAction();
+                IsDone = true;
+            }
         }
 
         public void Add(UndoableAction other)

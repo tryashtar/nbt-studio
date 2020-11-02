@@ -260,9 +260,9 @@ namespace NbtStudio
                 if (chunk.IsLoaded)
                     return chunk.Data.Tags;
             }
-            if (obj is NbtCompound compound)
+            if (obj is INbtCompound compound)
                 return compound.Tags;
-            if (obj is NbtList list)
+            if (obj is INbtList list)
                 return list;
             return Enumerable.Empty<object>();
         }

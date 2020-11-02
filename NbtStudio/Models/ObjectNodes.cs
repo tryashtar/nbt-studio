@@ -144,19 +144,29 @@ namespace NbtStudio
             Tree.PerformAction(action);
         }
 
+        private static readonly Dictionary<object, NotifyNode> ObjectCache = new Dictionary<object, NotifyNode>();
         public static NotifyNode Create(NbtTreeModel tree, object obj)
         {
-            if (obj is NbtTag tag)
-                return new NbtTagNode(tree, tag);
-            if (obj is NbtFile file)
-                return new NbtFileNode(tree, file);
-            if (obj is RegionFile region)
-                return new RegionFileNode(tree, region);
-            if (obj is Chunk chunk)
-                return new ChunkNode(tree, chunk);
-            if (obj is NbtFolder folder)
-                return new FolderNode(tree, folder);
-            throw new ArgumentException($"Can't create node from {obj.GetType()}");
+            if (ObjectCache.TryGetValue(obj, out var cached))
+                return cached;
+            NotifyNode result = null;
+            if (obj is INbtTag tag)
+                result = new NbtTagNode(tree, tag);
+            else if (obj is NbtFile file)
+                result = new NbtFileNode(tree, file);
+            else if (obj is RegionFile region)
+                result = new RegionFileNode(tree, region);
+            else if (obj is Chunk chunk)
+                result = new ChunkNode(tree, chunk);
+            else if (obj is NbtFolder folder)
+                result = new FolderNode(tree, folder);
+            if (result != null)
+            {
+                ObjectCache[obj] = result;
+                return result;
+            }
+            else
+                throw new ArgumentException($"Can't create node from {obj.GetType()}");
         }
 
         public virtual string Description => "unknown node";
@@ -230,9 +240,9 @@ namespace NbtStudio
     public class NbtTagNode : NotifyNode
     {
         public readonly NotifyNbtTag Tag;
-        public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, tag)
+        public NbtTagNode(NbtTreeModel tree, INbtTag tag) : base(tree, tag)
         {
-            Tag = NotifyNbtTag.CreateFrom(tag);
+            Tag = NotifyNbtTag.CreateFrom(tag.Unwrap());
             Tag.Changed += Tag_Changed;
             Tag.ActionPrepared += Tag_ActionPrepared;
         }
