@@ -374,6 +374,18 @@ namespace NbtStudio
             }
         }
 
+        public static IEnumerable<Tuple<int, int>> GetAvailableCoords(RegionFile region, int starting_x = 0, int starting_z = 0)
+        {
+            for (int x = starting_x; x < RegionFile.ChunkXDimension; x++)
+            {
+                for (int z = (x == starting_x ? starting_z : 0); z < RegionFile.ChunkZDimension; z++)
+                {
+                    if (region.GetChunk(x, z) == null)
+                        yield return Tuple.Create(x, z);
+                }
+            }
+        }
+
         public static string GetAutomaticName(INbtTag tag, INbtContainer parent)
         {
             if (parent is INbtList)
@@ -430,22 +442,14 @@ namespace NbtStudio
                 else if (tag.Parent?.TagType != null)
                     return $"{type} at index {tag.Index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
             }
-            return $"{type}";
-        }
-        public static string TagDescription(IEnumerable<INbtTag> tags)
-        {
-            if (!tags.Any())
-                return "0 tags";
-            if (!tags.Skip(1).Any())
-                return TagDescription(tags.Single());
-            return Util.Pluralize(tags.Count(), "tag");
+            return type;
         }
 
         public static string ChunkDescription(Chunk chunk)
         {
             if (chunk.Region == null)
                 return $"chunk at ({chunk.X}, {chunk.Z})";
-            return $"chunk at ({chunk.X}, {chunk.Z}) in {Path.GetFileName(chunk.Region.Path)}";
+            return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
         }
 
         private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };

@@ -332,7 +332,7 @@ namespace NbtStudio.UI
                 return;
             ViewModel.StartBatchOperation();
             var results = node.Paste(Clipboard.GetText());
-            ViewModel.FinishBatchOperation($"Paste {NbtTreeModel.Description(results)} into {node.Description}", true);
+            ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
         }
 
         private void Rename()
@@ -409,7 +409,7 @@ namespace NbtStudio.UI
                 if (item.CanDelete)
                     item.Delete();
             }
-            ViewModel.FinishBatchOperation($"Delete {NbtTreeModel.Description(selected_objects)}", false);
+            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(selected_objects)}", false);
 
             // Index == -1 checks whether this node has been removed from the tree
             if (selected_nodes.All(x => x.Index == -1))

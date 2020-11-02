@@ -28,6 +28,50 @@ namespace NbtStudio
 
     public static class NodeExtractions
     {
+        public static Dictionary<Type, Tuple<string, string>> NodeTypes = new Dictionary<Type, Tuple<string, string>>
+        {
+            { typeof(NbtTagNode), Tuple.Create("tag", "tags") },
+            { typeof(NbtFileNode), Tuple.Create("file", "files") },
+            { typeof(ChunkNode), Tuple.Create("chunk", "chunks") },
+            { typeof(RegionFileNode), Tuple.Create("region file", "region files") },
+            { typeof(FolderNode), Tuple.Create("folder", "folders") }
+        };
+
+        // user-friendly description of multiple nodes
+        // uses the node-specific description for single collections (like "byte tag named 'whatever'")
+        // otherwise builds a string like "4 tags, 3 files, 1 chunk, 2 unknown nodes"
+        public static string Description(IEnumerable<INode> nodes)
+        {
+            if (!nodes.Any()) // none
+                return "0 nodes";
+            if (!nodes.Skip(1).Any()) // exactly one
+                return nodes.Single().Description;
+            var results = new Dictionary<Type, int>();
+            int unknowns = 0;
+            foreach (var node in nodes)
+            {
+                var type = node.GetType();
+                if (NodeTypes.ContainsKey(type))
+                {
+                    if (results.ContainsKey(type))
+                        results[type]++;
+                    else
+                        results[type] = 1;
+                }
+                else
+                    unknowns++;
+            }
+            var strings = new List<string>();
+            foreach (var item in results)
+            {
+                var desc = NodeTypes[item.Key];
+                strings.Add(Util.Pluralize(item.Value, desc.Item1, desc.Item2));
+            }
+            if (unknowns > 0)
+                strings.Add(Util.Pluralize(unknowns, "unknown node"));
+            return String.Join(", ", strings);
+        }
+
         public static INbtTag GetNbtTag(this INode node)
         {
             if (node is NbtTagNode nbt)
@@ -170,6 +214,17 @@ namespace NbtStudio
                     yield return tag;
             }
         }
+
+        public static IEnumerable<INbtTag> Paste(INbtTag tag, string text)
+        {
+            if (tag is INbtContainer container)
+            {
+                var tags = ParseTags(text).ToList();
+                container.AddRange(tags);
+                return tags;
+            }
+            return Enumerable.Empty<INbtTag>();
+        }
     }
 
     public class NbtTagNode : NotifyNode
@@ -206,6 +261,11 @@ namespace NbtStudio
         public override bool CanRename => NbtNodeOperations.CanRename(Tag);
         public override bool CanSort => NbtNodeOperations.CanSort(Tag);
         public override void Sort() => NbtNodeOperations.Sort(Tag);
+        public override IEnumerable<INode> Paste(string data)
+        {
+            var tags = NbtNodeOperations.Paste(Tag, data);
+            return tags.Select(x => Create(Tree, x));
+        }
     }
 
     public class NbtFileNode : NotifyNode
@@ -243,6 +303,11 @@ namespace NbtStudio
         public override bool CanRename => false;
         public override bool CanSort => NbtNodeOperations.CanSort(File.RootTag);
         public override void Sort() => NbtNodeOperations.Sort(File.RootTag);
+        public override IEnumerable<INode> Paste(string data)
+        {
+            var tags = NbtNodeOperations.Paste(File.RootTag, data);
+            return tags.Select(x => Create(Tree, x));
+        }
     }
 
     public class ChunkNode : NotifyNode
@@ -286,6 +351,11 @@ namespace NbtStudio
         public override bool CanRename => true;
         public override bool CanSort => true;
         public override void Sort() => NbtNodeOperations.Sort(AccessChunkData());
+        public override IEnumerable<INode> Paste(string data)
+        {
+            var tags = NbtNodeOperations.Paste(AccessChunkData(), data);
+            return tags.Select(x => Create(Tree, x));
+        }
     }
 
     public class RegionFileNode : NotifyNode
@@ -309,6 +379,17 @@ namespace NbtStudio
         public override bool CanPaste => true;
         public override bool CanRename => false;
         public override bool CanSort => false;
+        public override IEnumerable<INode> Paste(string data)
+        {
+            var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
+            var available = NbtUtil.GetAvailableCoords(Region);
+            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.Item1, slot.Item2));
+            foreach (var chunk in chunks)
+            {
+                Region.AddChunk(chunk);
+            }
+            return chunks.Select(x => Create(Tree, x));
+        }
     }
 
     public class FolderNode : NotifyNode
