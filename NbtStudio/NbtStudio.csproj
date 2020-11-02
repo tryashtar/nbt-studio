@@ -74,7 +74,6 @@
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
-    <Compile Include="Models\Adapters.cs" />
     <Compile Include="RegionFile.cs" />
     <Compile Include="UI\ConvenienceTextBox.cs" />
     <Compile Include="UI\DualMenuItem.cs" />
@@ -155,7 +154,6 @@
     <Compile Include="UI\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Models\TreeModelNotify.cs" />
     <Compile Include="UI\ActionHistory.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -326,7 +326,7 @@ namespace NbtStudio.UI
             Paste(parent);
         }
 
-        private void Paste(NbtTreeModel.INode node)
+        private void Paste(INode node)
         {
             if (!node.CanPaste || !Clipboard.ContainsText())
                 return;
@@ -352,7 +352,7 @@ namespace NbtStudio.UI
             Edit(obj);
         }
 
-        private void Edit(NbtTreeModel.INode node)
+        private void Edit(INode node)
         {
             // batch operation to combine the rename and value change into one undo
             ViewModel.StartBatchOperation();
@@ -604,7 +604,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private bool CanMoveObjects(IEnumerable<NbtTreeModel.INode> nodes, NbtTreeModel.INode target, NodePosition position)
+        private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
             //var insert = NbtUtil.GetInsertionLocation(target, position);
             //if (insert.Item1 == null) return false;
@@ -612,7 +612,7 @@ namespace NbtStudio.UI
             return false;
         }
 
-        private void MoveObjects(IEnumerable<NbtTreeModel.INode> nodes, NbtTreeModel.INode target, NodePosition position)
+        private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
             //var insert = NbtUtil.GetInsertionLocation(target, position);
             //if (insert.Item1 == null) return;
