@@ -39,7 +39,7 @@ namespace NbtStudio
         public void Export(string path, NbtCompound root)
         {
             if (Snbt)
-                File.WriteAllText(path, root.Adapt().ToSnbt(expanded: !Minified));
+                File.WriteAllText(path, root.ToSnbt(expanded: !Minified));
             else
             {
                 var file = new fNbt.NbtFile();

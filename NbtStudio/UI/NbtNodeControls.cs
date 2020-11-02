@@ -114,7 +114,7 @@ namespace NbtStudio.UI
             string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
-            if (node.Tag is NbtTreeModel.SaveableNotifyNode saveable && !saveable.AllChangesSaved)
+            if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges)
                 prefix = "* ";
             if (name == null)
                 return Tuple.Create(prefix, value);
@@ -142,7 +142,7 @@ namespace NbtStudio.UI
         private static string PreviewValue(object obj)
         {
             if (obj is NbtFile file)
-                return NbtUtil.PreviewNbtValue(file.RootTag.Adapt());
+                return NbtUtil.PreviewNbtValue(file.RootTag);
             if (obj is NbtFolder folder)
             {
                 if (folder.HasScanned)
@@ -160,12 +160,12 @@ namespace NbtStudio.UI
             if (obj is Chunk chunk)
             {
                 if (chunk.IsLoaded)
-                    return NbtUtil.PreviewNbtValue(chunk.Data.Adapt());
+                    return NbtUtil.PreviewNbtValue(chunk.Data);
                 else
                     return "(open to load)";
             }
             if (obj is NbtTag tag)
-                return NbtUtil.PreviewNbtValue(tag.Adapt());
+                return NbtUtil.PreviewNbtValue(tag);
             return null;
         }
 

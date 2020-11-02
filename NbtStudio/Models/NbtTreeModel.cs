@@ -19,7 +19,7 @@ namespace NbtStudio
         public event EventHandler<TreePathEventArgs> StructureChanged;
         public event EventHandler Changed;
 
-        public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => !x.AllChangesSaved);
+        public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.GetSaveable().HasUnsavedChanges);
         private readonly IEnumerable<object> Roots;
         private readonly NbtTreeView View;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
@@ -43,14 +43,14 @@ namespace NbtStudio
                 return View.SelectedNodes.Select(x => Wrap(x.Tag));
             }
         }
-        public IEnumerable<ISaveableNode> OpenedFiles
+        public IEnumerable<INode> OpenedFiles
         {
             get
             {
                 foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFolder || x.Tag is ISaveable))
                 {
                     if (item.Tag is ISaveable saveable)
-                        yield return (ISaveableNode)Wrap(saveable);
+                        yield return Wrap(saveable);
                 }
             }
         }
@@ -97,11 +97,6 @@ namespace NbtStudio
             if (node == null) return;
             var path = View.GetPath(node);
 
-            foreach (var item in path.FullPath)
-            {
-                if (item is ISaveableNode saveable)
-                    saveable.MarkUnsaved();
-            }
             Changed?.Invoke(this, EventArgs.Empty);
 
             var real_children = GetChildren(path).ToList();

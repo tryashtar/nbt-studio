@@ -270,7 +270,7 @@ namespace NbtStudio.SNBT
                     sb.Append(Environment.NewLine);
                     for (int i = 0; i < tag.Count; i++)
                     {
-                        AddSnbt(tag[i], sb, indent_string, indent_level + 1, false);
+                        AddSnbt(((INbtContainer)tag)[i], sb, indent_string, indent_level + 1, false);
                         if (i < tag.Count - 1)
                             sb.Append(VALUE_SEPARATOR);
                         sb.Append(Environment.NewLine);

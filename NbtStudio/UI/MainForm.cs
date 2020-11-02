@@ -265,7 +265,7 @@ namespace NbtStudio.UI
                 }
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (file is INbtFile nbtfile)
+                    if (file is NbtFile nbtfile)
                     {
                         var export = new ExportWindow(nbtfile.ExportSettings);
                         if (export.ShowDialog() == DialogResult.OK)
@@ -387,7 +387,7 @@ namespace NbtStudio.UI
 
         private void EditSnbt()
         {
-            var obj = ViewModel?.SelectedObject as NbtTreeModel.INbtNode;
+            var obj = ViewModel?.SelectedObject as INbtTag;
             if (obj == null) return;
             ViewModel.StartBatchOperation();
             EditSnbtWindow.ModifyTag(obj, EditPurpose.EditValue);
@@ -442,7 +442,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = ViewModel?.SelectedObject as NbtTreeModel.INbtContainerNode;
+            var parent = ViewModel?.SelectedObject as INbtContainer;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
@@ -451,7 +451,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = ViewModel?.SelectedObject as IRegion;
+            var parent = ViewModel?.SelectedObject as RegionFile;
             if (parent == null) return;
             var chunk = EditChunkWindow.CreateChunk(parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk != null)
@@ -460,7 +460,7 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedObject as INbtContainerNode;
+            var parent = ViewModel?.SelectedObject as INbtContainer;
             if (parent == null) return;
             AddTag(parent, type);
         }
@@ -525,9 +525,9 @@ namespace NbtStudio.UI
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
             var obj = ViewModel?.SelectedObject;
-            var nbt = obj as INbtNode;
-            var container = obj as INbtContainerNode;
-            var region = obj as IRegion;
+            var nbt = obj as INbtTag;
+            var container = obj as INbtContainer;
+            var region = obj as RegionFile;
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
@@ -642,7 +642,7 @@ namespace NbtStudio.UI
                     else
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
                 }
-                if (obj is INbtFile file)
+                if (obj is NbtFile file)
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());

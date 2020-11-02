@@ -33,7 +33,16 @@ namespace NbtStudio
             if (node is NbtFileNode file)
                 return file.File.RootTag;
             if (node is ChunkNode chunk)
-                return chunk.Data;
+                return chunk.Chunk.Data;
+            return null;
+        }
+
+        public static ISaveable GetSaveable(this INode node)
+        {
+            if (node is NbtFileNode file)
+                return file.File;
+            if (node is RegionFileNode region)
+                return region.Region;
             return null;
         }
 
@@ -127,14 +136,74 @@ namespace NbtStudio
             Tag.ActionPrepared += Tag_ActionPrepared;
         }
 
+        private void Tag_Changed(object sender, EventArgs e)
+        {
+            Notify((NotifyNbtTag)sender);
+        }
+
         private void Tag_ActionPrepared(object sender, UndoableAction action)
         {
             PerformAction(action);
         }
+    }
 
-        private void Tag_Changed(object sender, EventArgs e)
+    public class NbtFileNode : NotifyNode
+    {
+        public readonly NbtFile File;
+        public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
+        {
+            File = file;
+            File.RootTag.Changed += RootTag_Changed;
+            File.RootTag.ActionPrepared += RootTag_ActionPrepared;
+        }
+
+        private void RootTag_Changed(object sender, EventArgs e)
         {
             Notify((NotifyNbtTag)sender);
+        }
+
+        private void RootTag_ActionPrepared(object sender, UndoableAction action)
+        {
+            PerformAction(action);
+        }
+    }
+
+    public class ChunkNode : NotifyNode
+    {
+        public readonly Chunk Chunk;
+        public ChunkNode(NbtTreeModel tree, Chunk chunk) : base(tree, chunk)
+        {
+            Chunk = chunk;
+            Chunk.Data.Changed += RootTag_Changed;
+            Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
+        }
+
+        private void RootTag_Changed(object sender, EventArgs e)
+        {
+            Notify((NotifyNbtTag)sender);
+        }
+
+        private void RootTag_ActionPrepared(object sender, UndoableAction action)
+        {
+            PerformAction(action);
+        }
+    }
+
+    public class RegionFileNode : NotifyNode
+    {
+        public readonly RegionFile Region;
+        public RegionFileNode(NbtTreeModel tree, RegionFile region) : base(tree, region)
+        {
+            Region = region;
+        }
+    }
+
+    public class FolderNode : NotifyNode
+    {
+        public readonly NbtFolder Folder;
+        public FolderNode(NbtTreeModel tree, NbtFolder folder) : base(tree, folder)
+        {
+            Folder = folder;
         }
     }
 }

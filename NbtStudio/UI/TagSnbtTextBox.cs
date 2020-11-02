@@ -86,7 +86,7 @@ namespace NbtStudio.UI
             CheckTag(out var tag); // continue to minify even if the required type is not met
             if (tag != null)
             {
-                this.Text = tag.Adapt().ToSnbt(expanded: !minified);
+                this.Text = tag.ToSnbt(expanded: !minified);
                 return true;
             }
             return false;

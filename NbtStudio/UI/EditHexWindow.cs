@@ -71,10 +71,10 @@ namespace NbtStudio.UI
 
             if (bypass_window)
             {
-                tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), parent);
+                tag.Name = NbtUtil.GetAutomaticName(tag, parent);
                 return tag;
             }
-            var window = new EditHexWindow(tag.Adapt(), parent, has_name, EditPurpose.Create);
+            var window = new EditHexWindow(tag, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? tag : null;
         }
 

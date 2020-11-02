@@ -69,12 +69,12 @@ namespace NbtStudio.UI
 
             if (bypass_window)
             {
-                tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), parent);
+                tag.Name = NbtUtil.GetAutomaticName(tag, parent);
                 return tag;
             }
             else if (has_name || has_value)
             {
-                var window = new EditTagWindow(tag.Adapt(), parent, has_name, has_value, EditPurpose.Create);
+                var window = new EditTagWindow(tag, parent, has_name, has_value, EditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? tag : null;
             }
             else
