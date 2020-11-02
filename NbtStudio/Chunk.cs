@@ -44,7 +44,6 @@ namespace NbtStudio
             RawData = data;
             Data = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(data);
             Data.Changed += (s, e) => HasUnsavedChanges = true;
-            Data.ActionPrepared += (s, e) => e.Do();
         }
 
         public byte[] SaveBytes()

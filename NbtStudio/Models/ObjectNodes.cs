@@ -369,17 +369,28 @@ namespace NbtStudio
     public class ChunkNode : NotifyNode
     {
         public Chunk Chunk => (Chunk)SourceObject;
+        private bool HasSetupEvents = false;
         public ChunkNode(NbtTreeModel tree, Chunk chunk) : base(tree, chunk)
-        { }
+        {
+            if (Chunk.IsLoaded)
+                SetupEvents();
+        }
+
+        private void SetupEvents()
+        {
+            if (!HasSetupEvents)
+            {
+                Chunk.Data.Changed += RootTag_Changed;
+                Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
+                HasSetupEvents = true;
+            }
+        }
 
         public NotifyNbtCompound AccessChunkData()
         {
             if (!Chunk.IsLoaded)
-            {
                 Chunk.Load();
-                Chunk.Data.Changed += RootTag_Changed;
-                Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
-            }
+            SetupEvents();
             return Chunk.Data;
         }
 
