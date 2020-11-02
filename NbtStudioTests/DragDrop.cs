@@ -23,14 +23,13 @@ namespace NbtStudioTests
                 new NbtByte("f", 5),
                 new NbtByte("g", 6),
             };
-            var adapted = compound.AdaptCompound();
-            var tags = adapted.Tags.ToList();
+            var tags = compound.Tags.ToList();
             var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
             var correct_order = new List<INbtTag> { /**/ tags[1], tags[3], tags[5], /**/ tags[0], tags[2], tags[4], tags[6] };
 
-            NbtUtil.TransformInsert(moving, adapted, 0);
+            NbtUtil.TransformInsert(moving, compound, 0);
 
-            Assert.IsTrue(adapted.Tags.SequenceEqual(correct_order));
+            Assert.IsTrue(compound.Tags.SequenceEqual(correct_order));
         }
 
         [TestMethod]
@@ -46,14 +45,13 @@ namespace NbtStudioTests
                 new NbtByte("f", 5),
                 new NbtByte("g", 6),
             };
-            var adapted = compound.AdaptCompound();
-            var tags = adapted.Tags.ToList();
+            var tags = compound.Tags.ToList();
             var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
             var correct_order = new List<INbtTag> { tags[0], tags[2], /**/ tags[1], tags[3], tags[5], /**/ tags[4], tags[6] };
 
-            NbtUtil.TransformInsert(moving, adapted, 3);
+            NbtUtil.TransformInsert(moving, compound, 3);
 
-            Assert.IsTrue(adapted.Tags.SequenceEqual(correct_order));
+            Assert.IsTrue(compound.Tags.SequenceEqual(correct_order));
         }
 
         [TestMethod]
@@ -69,14 +67,13 @@ namespace NbtStudioTests
                 new NbtByte("f", 5),
                 new NbtByte("g", 6),
             };
-            var adapted = compound.AdaptCompound();
-            var tags = adapted.Tags.ToList();
+            var tags = compound.Tags.ToList();
             var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
             var correct_order = new List<INbtTag> { tags[0], tags[2], tags[4], /**/ tags[1], tags[3], tags[5], /**/ tags[6] };
 
-            NbtUtil.TransformInsert(moving, adapted, 6);
+            NbtUtil.TransformInsert(moving, compound, 6);
 
-            Assert.IsTrue(adapted.Tags.SequenceEqual(correct_order));
+            Assert.IsTrue(compound.Tags.SequenceEqual(correct_order));
         }
     }
 }

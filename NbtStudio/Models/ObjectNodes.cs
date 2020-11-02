@@ -254,7 +254,8 @@ namespace NbtStudio
 
         private void Tag_ActionPrepared(object sender, UndoableAction action)
         {
-            PerformAction(action);
+            if (sender == Tag)
+                PerformAction(action);
         }
 
         public override string Description => Tag.TagDescription();
@@ -295,7 +296,8 @@ namespace NbtStudio
 
         private void RootTag_ActionPrepared(object sender, UndoableAction action)
         {
-            PerformAction(action);
+            if (sender == File.RootTag)
+                PerformAction(action);
         }
 
         public override string Description => Path.GetFileName(File.Path);
@@ -344,7 +346,8 @@ namespace NbtStudio
 
         private void RootTag_ActionPrepared(object sender, UndoableAction action)
         {
-            PerformAction(action);
+            if (sender == Chunk.Data)
+                PerformAction(action);
         }
 
         public override string Description => NbtUtil.ChunkDescription(Chunk);

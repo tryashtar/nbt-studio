@@ -99,35 +99,45 @@ namespace NbtStudio
             return Tag.GetHashCode();
         }
 
+        private static readonly Dictionary<NbtTag, NotifyNbtTag> NotifyCache = new Dictionary<NbtTag, NotifyNbtTag>();
         public static NotifyNbtTag CreateFrom(NbtTag tag)
         {
             if (tag == null)
                 return null;
+            if (NotifyCache.TryGetValue(tag, out var cached))
+                return cached;
+            NotifyNbtTag result = null;
             if (tag is NbtByte b)
-                return new NotifyNbtByte(b);
-            if (tag is NbtShort s)
-                return new NotifyNbtShort(s);
-            if (tag is NbtInt i)
-                return new NotifyNbtInt(i);
-            if (tag is NbtLong l)
-                return new NotifyNbtLong(l);
-            if (tag is NbtFloat f)
-                return new NotifyNbtFloat(f);
-            if (tag is NbtDouble d)
-                return new NotifyNbtDouble(d);
-            if (tag is NbtString str)
-                return new NotifyNbtString(str);
-            if (tag is NbtByteArray ba)
-                return new NotifyNbtByteArray(ba);
-            if (tag is NbtIntArray ia)
-                return new NotifyNbtIntArray(ia);
-            if (tag is NbtLongArray la)
-                return new NotifyNbtLongArray(la);
-            if (tag is NbtCompound compound)
-                return new NotifyNbtCompound(compound);
-            if (tag is NbtList list)
-                return new NotifyNbtList(list);
-            throw new ArgumentException($"Can't wrap {tag.TagType}");
+                result = new NotifyNbtByte(b);
+            else if (tag is NbtShort s)
+                result = new NotifyNbtShort(s);
+            else if (tag is NbtInt i)
+                result = new NotifyNbtInt(i);
+            else if (tag is NbtLong l)
+                result = new NotifyNbtLong(l);
+            else if (tag is NbtFloat f)
+                result = new NotifyNbtFloat(f);
+            else if (tag is NbtDouble d)
+                result = new NotifyNbtDouble(d);
+            else if (tag is NbtString str)
+                result = new NotifyNbtString(str);
+            else if (tag is NbtByteArray ba)
+                result = new NotifyNbtByteArray(ba);
+            else if (tag is NbtIntArray ia)
+                result = new NotifyNbtIntArray(ia);
+            else if (tag is NbtLongArray la)
+                result = new NotifyNbtLongArray(la);
+            else if (tag is NbtCompound compound)
+                result = new NotifyNbtCompound(compound);
+            else if (tag is NbtList list)
+                result = new NotifyNbtList(list);
+            if (result != null)
+            {
+                NotifyCache[tag] = result;
+                return result;
+            }
+            else
+                throw new ArgumentException($"Can't wrap {tag.TagType}");
         }
 
         public NotifyNbtTag Wrap(NbtTag tag) => CreateFrom(tag);
