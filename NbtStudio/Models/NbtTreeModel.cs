@@ -185,7 +185,7 @@ namespace NbtStudio
             }
         }
 
-        public void PerformAction(UndoableAction action)
+        public void SaveAction(UndoableAction action)
         {
             RedoStack.Clear();
             if (BatchNumber == 0)
@@ -198,7 +198,6 @@ namespace NbtStudio
             else
                 Console.WriteLine($"Added action to batch: \"{action.Description}\". Batch has {UndoBatch.Count} items");
 #endif
-            action.Do();
             Changed?.Invoke(this, EventArgs.Empty);
         }
 

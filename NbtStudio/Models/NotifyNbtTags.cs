@@ -46,7 +46,7 @@ namespace NbtStudio
     public abstract class NotifyNbtTag : INbtTag
     {
         protected readonly NbtTag Tag;
-        public event EventHandler<UndoableAction> ActionPrepared;
+        public event EventHandler<UndoableAction> ActionPerformed;
         public event EventHandler Changed;
         public NotifyNbtTag(NbtTag tag)
         {
@@ -65,13 +65,15 @@ namespace NbtStudio
                 tag = (NotifyNbtTag)tag.Parent;
             }
         }
-        private void PrepareAction(INbtTag tag, UndoableAction action) => ActionPrepared?.Invoke(tag, action);
-        protected void PrepareAction(string description, Action action, Action undo)
+        private void NotifyAction(INbtTag tag, UndoableAction action) => ActionPerformed?.Invoke(tag, action);
+        protected void PerformAction(string description, Action action, Action undo)
         {
+            var undoable = new UndoableAction(description, action, undo);
+            undoable.Do();
             var tag = this;
             while (tag != null)
             {
-                tag.PrepareAction(this, new UndoableAction(description, action, undo));
+                tag.NotifyAction(this, undoable);
                 tag = (NotifyNbtTag)tag.Parent;
             }
         }
@@ -83,7 +85,7 @@ namespace NbtStudio
             {
                 var current = Tag.Name;
                 if (current == value) return;
-                PrepareAction($"Rename {Tag.TagDescription()} to '{value}'",
+                PerformAction($"Rename {Tag.TagDescription()} to '{value}'",
                     () => { Tag.Name = value; RaiseChanged(); },
                     () => { Tag.Name = current; RaiseChanged(); });
             }
@@ -156,7 +158,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -174,7 +176,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -192,7 +194,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -210,7 +212,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -228,7 +230,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -246,7 +248,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -264,7 +266,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -282,7 +284,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -300,7 +302,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -318,7 +320,7 @@ namespace NbtStudio
             {
                 var current_value = Tag.Value;
                 if (current_value == value) return;
-                PrepareAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
+                PerformAction($"Change value of {Tag.TagDescription()} from {current_value} to {value}",
                     () => { Tag.Value = value; RaiseChanged(); },
                     () => { Tag.Value = current_value; RaiseChanged(); });
             }
@@ -345,26 +347,27 @@ namespace NbtStudio
         // modifications
         public void Add(NbtTag tag)
         {
-            PrepareAction($"Add {tag.TagDescription()} to {Tag.TagDescription()}",
+            PerformAction($"Add {tag.TagDescription()} to {Tag.TagDescription()}",
                 () => { Tag.Add(tag); RaiseChanged(); },
                 () => { Tag.Remove(tag); RaiseChanged(); });
         }
         public void AddRange(IEnumerable<NbtTag> tags)
         {
-            PrepareAction($"Add {NbtUtil.TagDescription(tags)} to {Tag.TagDescription()}",
-                () => { Tag.AddRange(tags); RaiseChanged(); },
-                () => { foreach (var tag in tags.ToList()) { Tag.Remove(tag); } RaiseChanged(); });
+            var list = tags.ToList();
+            PerformAction($"Add {NbtUtil.TagDescription(tags)} to {Tag.TagDescription()}",
+                () => { Tag.AddRange(list); RaiseChanged(); },
+                () => { foreach (var tag in list) { Tag.Remove(tag); } RaiseChanged(); });
         }
         public void Insert(int index, NbtTag tag)
         {
-            PrepareAction($"Insert {tag.TagDescription()} into {Tag.TagDescription()} at position {index}",
+            PerformAction($"Insert {tag.TagDescription()} into {Tag.TagDescription()} at position {index}",
                 () => { Tag.Insert(index, tag); RaiseChanged(); },
                 () => { Tag.Remove(tag); RaiseChanged(); });
         }
         public void Clear()
         {
             var tags = ((IEnumerable<NbtTag>)Tag).ToList();
-            PrepareAction($"Clear all tags from {Tag.TagDescription()}",
+            PerformAction($"Clear all tags from {Tag.TagDescription()}",
                 () => { Tag.Clear(); RaiseChanged(); },
                 () => { Tag.AddRange(tags); RaiseChanged(); });
         }
@@ -373,7 +376,7 @@ namespace NbtStudio
             int index = Tag.IndexOf(tag);
             if (index != -1)
             {
-                PrepareAction($"Remove {tag.TagDescription()} from {Tag.TagDescription()}",
+                PerformAction($"Remove {tag.TagDescription()} from {Tag.TagDescription()}",
                     () => { Tag.Remove(tag); RaiseChanged(); },
                     () => { Tag.Insert(index, tag); RaiseChanged(); });
                 return true;
@@ -404,26 +407,27 @@ namespace NbtStudio
         // modifications
         public void Add(NbtTag tag)
         {
-            PrepareAction($"Add {tag.TagDescription()} to {Tag.TagDescription()}",
+            PerformAction($"Add {tag.TagDescription()} to {Tag.TagDescription()}",
                 () => { Tag.Add(tag); RaiseChanged(); },
                 () => { Tag.Remove(tag); RaiseChanged(); });
         }
         public void AddRange(IEnumerable<NbtTag> tags)
         {
-            PrepareAction($"Add {NbtUtil.TagDescription(tags)} to {Tag.TagDescription()}",
-                () => { Tag.AddRange(tags); RaiseChanged(); },
-                () => { foreach (var tag in tags.ToList()) { Tag.Remove(tag); } RaiseChanged(); });
+            var list = tags.ToList();
+            PerformAction($"Add {NbtUtil.TagDescription(tags)} to {Tag.TagDescription()}",
+                () => { Tag.AddRange(list); RaiseChanged(); },
+                () => { foreach (var tag in list) { Tag.Remove(tag); } RaiseChanged(); });
         }
         public void Insert(int index, NbtTag tag)
         {
-            PrepareAction($"Insert {tag.TagDescription()} into {Tag.TagDescription()} at position {index}",
+            PerformAction($"Insert {tag.TagDescription()} into {Tag.TagDescription()} at position {index}",
                 () => { Tag.Insert(index, tag); RaiseChanged(); },
                 () => { Tag.Remove(tag); RaiseChanged(); });
         }
         public void Clear()
         {
             var tags = ((IEnumerable<NbtTag>)Tag).ToList();
-            PrepareAction($"Clear all tags from {Tag.TagDescription()}",
+            PerformAction($"Clear all tags from {Tag.TagDescription()}",
                 () => { Tag.Clear(); RaiseChanged(); },
                 () => { Tag.AddRange(tags); RaiseChanged(); });
         }
@@ -432,7 +436,7 @@ namespace NbtStudio
             int index = Tag.IndexOf(tag);
             if (index != -1)
             {
-                PrepareAction($"Remove {tag.TagDescription()} from {Tag.TagDescription()}",
+                PerformAction($"Remove {tag.TagDescription()} from {Tag.TagDescription()}",
                     () => { Tag.Remove(tag); RaiseChanged(); },
                     () => { Tag.Insert(index, tag); RaiseChanged(); });
                 return true;

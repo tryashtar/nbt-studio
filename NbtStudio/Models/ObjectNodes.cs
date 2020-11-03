@@ -160,9 +160,9 @@ namespace NbtStudio
         {
             Tree.Remove(SourceObject);
         }
-        protected void PerformAction(UndoableAction action)
+        protected void NoticeAction(UndoableAction action)
         {
-            Tree.PerformAction(action);
+            Tree.SaveAction(action);
         }
 
         private static readonly Dictionary<object, NotifyNode> ObjectCache = new Dictionary<object, NotifyNode>();
@@ -309,7 +309,7 @@ namespace NbtStudio
         public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, NotifyNbtTag.CreateFrom(tag))
         {
             Tag.Changed += Tag_Changed;
-            Tag.ActionPrepared += Tag_ActionPrepared;
+            Tag.ActionPerformed += Tag_ActionPerformed;
         }
 
         private void Tag_Changed(object sender, EventArgs e)
@@ -317,10 +317,10 @@ namespace NbtStudio
             Notify((NotifyNbtTag)sender);
         }
 
-        private void Tag_ActionPrepared(object sender, UndoableAction action)
+        private void Tag_ActionPerformed(object sender, UndoableAction action)
         {
             if (sender == Tag)
-                PerformAction(action);
+                NoticeAction(action);
         }
 
         public override string Description => Tag.TagDescription();
@@ -357,7 +357,7 @@ namespace NbtStudio
         public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
         {
             File.RootTag.Changed += RootTag_Changed;
-            File.RootTag.ActionPrepared += RootTag_ActionPrepared;
+            File.RootTag.ActionPerformed += RootTag_ActionPrepared;
         }
 
         private void RootTag_Changed(object sender, EventArgs e)
@@ -368,7 +368,7 @@ namespace NbtStudio
         private void RootTag_ActionPrepared(object sender, UndoableAction action)
         {
             if (sender == File.RootTag)
-                PerformAction(action);
+                NoticeAction(action);
         }
 
         public override string Description => Path.GetFileName(File.Path);
@@ -416,7 +416,7 @@ namespace NbtStudio
             if (!HasSetupEvents)
             {
                 Chunk.Data.Changed += RootTag_Changed;
-                Chunk.Data.ActionPrepared += RootTag_ActionPrepared;
+                Chunk.Data.ActionPerformed += RootTag_ActionPrepared;
                 HasSetupEvents = true;
             }
         }
@@ -436,7 +436,7 @@ namespace NbtStudio
         private void RootTag_ActionPrepared(object sender, UndoableAction action)
         {
             if (sender == Chunk.Data)
-                PerformAction(action);
+                NoticeAction(action);
         }
 
         public override string Description => NbtUtil.ChunkDescription(Chunk);
@@ -448,10 +448,14 @@ namespace NbtStudio
         {
             var region = Chunk.Region;
             if (region != null)
-                PerformAction(new UndoableAction($"Remove {NbtUtil.ChunkDescription(Chunk)}",
+            {
+                var action = new UndoableAction($"Remove {NbtUtil.ChunkDescription(Chunk)}",
                     () => { region.RemoveChunk(Chunk.X, Chunk.Z); base.Delete(); },
                     () => { region.AddChunk(Chunk); }
-                ));
+                );
+                action.Do();
+                NoticeAction(action);
+            }
         }
         public override bool CanEdit => true;
         public override bool CanPaste => true;
