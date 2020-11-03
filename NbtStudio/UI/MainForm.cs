@@ -344,7 +344,7 @@ namespace NbtStudio.UI
             if (chunk != null)
                 EditChunk(chunk);
             else if (tag != null)
-                Rename(tag);
+                RenameTag(tag);
         }
 
         private void Edit()
@@ -364,7 +364,7 @@ namespace NbtStudio.UI
             if (chunk != null)
                 EditChunk(chunk);
             else if (tag != null)
-                Rename(tag);
+                EditTag(tag);
             ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
         }
 
@@ -381,7 +381,7 @@ namespace NbtStudio.UI
             EditChunkWindow.MoveChunk(chunk);
         }
 
-        private void Rename(INbtTag tag)
+        private void RenameTag(INbtTag tag)
         {
             // likewise
             ViewModel.StartBatchOperation();
