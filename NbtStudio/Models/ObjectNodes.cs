@@ -407,6 +407,8 @@ namespace NbtStudio
         {
             if (Chunk.IsLoaded)
                 SetupEvents();
+            else
+                Chunk.OnLoaded += (s, e) => SetupEvents();
         }
 
         private void SetupEvents()
@@ -423,7 +425,6 @@ namespace NbtStudio
         {
             if (!Chunk.IsLoaded)
                 Chunk.Load();
-            SetupEvents();
             return Chunk.Data;
         }
 

@@ -3,6 +3,7 @@ using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace NbtStudio.UI
@@ -37,18 +38,11 @@ namespace NbtStudio.UI
             if (bypass_window)
             {
                 // find first available slot
-                for (int x = 0; x < RegionFile.ChunkXDimension; x++)
-                {
-                    for (int z = 0; z < RegionFile.ChunkZDimension; z++)
-                    {
-                        if (parent.GetChunk(x, z) == null)
-                        {
-                            chunk.Move(x, z);
-                            return chunk;
-                        }
-                    }
-                }
-                return null;
+                var available = NbtUtil.GetAvailableCoords(parent).FirstOrDefault();
+                if (available == null)
+                    return null;
+                chunk.Move(available.Item1, available.Item2);
+                return chunk;
             }
             else
             {

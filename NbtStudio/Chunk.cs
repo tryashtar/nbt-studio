@@ -20,6 +20,7 @@ namespace NbtStudio
         private readonly int Size;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
+        public event EventHandler OnLoaded;
         public bool IsCorrupt { get; private set; } = false;
         internal Chunk(RegionFile region, int x, int z, int offset, int size)
         {
@@ -87,6 +88,7 @@ namespace NbtStudio
                 IsCorrupt = true;
                 Remove();
             }
+            OnLoaded?.Invoke(this, EventArgs.Empty);
         }
 
         public void Remove()
