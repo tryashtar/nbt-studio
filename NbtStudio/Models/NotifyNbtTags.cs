@@ -14,11 +14,13 @@ namespace NbtStudio
     {
         public static void AddTo(this INbtTag tag, INbtContainer container)
         {
+            Remove(tag);
             container.Add(tag.Unwrap());
         }
 
         public static void InsertInto(this INbtTag tag, INbtContainer container, int index)
         {
+            Remove(tag);
             container.Insert(index, tag.Unwrap());
         }
 

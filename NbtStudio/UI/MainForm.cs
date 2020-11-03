@@ -341,10 +341,10 @@ namespace NbtStudio.UI
             if (obj == null || !obj.CanRename) return;
             var tag = obj.GetNbtTag();
             var chunk = obj.GetChunk();
-            if (tag != null)
-                Rename(tag);
-            else if (chunk != null)
+            if (chunk != null)
                 EditChunk(chunk);
+            else if (tag != null)
+                Rename(tag);
         }
 
         private void Edit()
@@ -361,10 +361,10 @@ namespace NbtStudio.UI
             if (!node.CanEdit) return;
             var tag = node.GetNbtTag();
             var chunk = node.GetChunk();
-            if (tag != null)
-                EditTag(tag);
-            else if (chunk != null)
+            if (chunk != null)
                 EditChunk(chunk);
+            else if (tag != null)
+                Rename(tag);
             ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
         }
 
