@@ -421,7 +421,8 @@ namespace NbtStudio.UI
         private void Delete(IEnumerable<INode> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
-            var files = nodes.Filter(x => x.GetSaveable());
+            var file_nodes = nodes.Where(x => x.GetHasPath() != null);
+            var files = nodes.Filter(x => x.GetHasPath());
             if (files.Any())
             {
                 DialogResult result;
@@ -430,14 +431,14 @@ namespace NbtStudio.UI
                     var file = files.Single();
                     if (file.Path == null)
                         result = MessageBox.Show(
-                            $"Are you sure you want to remove this file?",
+                            $"Are you sure you want to remove this item?",
                             $"Really delete this unsaved file?",
                             MessageBoxButtons.YesNo);
                     else
                         result = MessageBox.Show(
-                            $"Are you sure you want to delete this file?\n\n" +
+                            $"Are you sure you want to delete this item?\n\n" +
                             $"It will be sent to the recycle bin. This cannot be undone.",
-                            $"Really delete {Path.GetFileName(file.Path)}?",
+                            $"Really delete {file_nodes.Single().Description}?",
                             MessageBoxButtons.YesNo);
                 }
                 else
@@ -446,14 +447,14 @@ namespace NbtStudio.UI
                     var saved = files.Where(x => x.Path != null);
                     if (!saved.Any())
                         result = MessageBox.Show(
-                            $"Are you sure you want to remove {Util.Pluralize(files.Count(), "file")}?",
-                            $"Really delete these unsaved files?",
+                            $"Are you sure you want to remove {NodeExtractions.Description(file_nodes)}?",
+                            $"Really delete these items?",
                             MessageBoxButtons.YesNo);
                     else
                         result = MessageBox.Show(
-                            $"Are you sure you want to delete {Util.Pluralize(files.Count(), "file")}?\n\n" +
-                            $"{Util.Pluralize(saved.Count(), "file")} will be send to the recycle bin. This cannot be undone.",
-                            $"Really delete these files?",
+                            $"Are you sure you want to delete {NodeExtractions.Description(file_nodes)}?\n\n" +
+                            $"{Util.Pluralize(saved.Count(), "item")} will be send to the recycle bin. This cannot be undone.",
+                            $"Really delete these items?",
                             MessageBoxButtons.YesNo);
                 }
                 if (result != DialogResult.Yes)

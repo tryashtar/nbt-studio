@@ -101,6 +101,13 @@ namespace NbtStudio
             return null;
         }
 
+        public static IHavePath GetHasPath(this INode node)
+        {
+            if (node is FolderNode folder)
+                return folder.Folder;
+            return GetSaveable(node);
+        }
+
         public static NbtFile GetNbtFile(this INode node)
         {
             if (node is NbtFileNode file)
@@ -269,6 +276,33 @@ namespace NbtStudio
         }
     }
 
+    public static class FileNodeOperations
+    {
+        public static bool DeleteFile(IHavePath item)
+        {
+            if (item.Path == null)
+                return true;
+            try
+            {
+                FileSystem.DeleteFile(item.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+            }
+            catch { return false; }
+            return true;
+        }
+
+        public static bool DeleteFolder(IHavePath item)
+        {
+            if (item.Path == null)
+                return true;
+            try
+            {
+                FileSystem.DeleteDirectory(item.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+            }
+            catch { return false; }
+            return true;
+        }
+    }
+
     public class NbtTagNode : NotifyNode
     {
         public NotifyNbtTag Tag => (NotifyNbtTag)SourceObject;
@@ -344,9 +378,8 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            if (File.Path != null)
-                FileSystem.DeleteFile(File.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
-            base.Delete();
+            if (FileNodeOperations.DeleteFile(File))
+                base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => NbtNodeOperations.CanPaste(File.RootTag);
@@ -458,11 +491,9 @@ namespace NbtStudio
         public override void Delete()
         {
             if (Region.Path != null)
-            {
                 Region.Dispose();
-                FileSystem.DeleteFile(Region.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
-            }
-            base.Delete();
+            if (FileNodeOperations.DeleteFile(Region))
+                base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => true;
@@ -504,9 +535,8 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            if (Folder.Path != null)
-                Directory.Delete(Folder.Path, true);
-            base.Delete();
+            if (FileNodeOperations.DeleteFolder(Folder))
+                base.Delete();
         }
         public override bool CanEdit => false;
         public override bool CanPaste => true;
