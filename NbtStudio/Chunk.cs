@@ -8,57 +8,56 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public interface IChunk
+    public class Chunk
     {
-        IRegion Region { get; }
-        int X { get; }
-        int Z { get; }
-        bool IsLoaded { get; }
-        bool IsCorrupt { get; }
-        void Load();
-        void Remove();
-        void AddTo(IRegion region);
-        void Move(int x, int z);
-    }
-
-    public class Chunk : IChunk
-    {
-        public IRegion Region { get; internal set; }
+        public RegionFile Region { get; internal set; }
         public int X { get; private set; }
         public int Z { get; private set; }
-        public NbtCompound Data { get; private set; }
+        public NotifyNbtCompound Data { get; private set; }
+        private NbtCompound RawData;
+        public bool HasUnsavedChanges { get; private set; } = false;
         private readonly int Offset;
-        private readonly Stream Stream;
+        private readonly int Size;
         private NbtCompression Compression;
         public bool IsLoaded => Data != null;
         public bool IsCorrupt { get; private set; } = false;
-        internal Chunk(IRegion region, int x, int z, int offset, Stream stream)
+        internal Chunk(RegionFile region, int x, int z, int offset, int size)
         {
             Region = region;
             X = x;
             Z = z;
             Offset = offset;
-            Stream = stream;
+            Size = size;
         }
 
-        public static Chunk EmptyChunk(NbtCompound data)
+        public static Chunk EmptyChunk(NbtCompound data, int x = -1, int z = -1)
         {
-            var stream = new MemoryStream();
-            var file = new fNbt.NbtFile();
-            file.SaveToStream(stream, NbtCompression.None);
-            var chunk = new Chunk(null, -1, -1, 0, stream);
-            chunk.Data = data ?? file.RootTag;
+            var chunk = new Chunk(null, x, z, 0, 0);
+            chunk.SetData(data ?? new NbtCompound(""));
             chunk.Compression = NbtCompression.ZLib;
+            chunk.HasUnsavedChanges = true;
             return chunk;
+        }
+
+        private void SetData(NbtCompound data)
+        {
+            RawData = data;
+            Data = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(data);
+            Data.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
         public byte[] SaveBytes()
         {
             if (!IsLoaded)
-                Load();
+            {
+                Region.Stream.Seek(Offset, SeekOrigin.Begin);
+                byte[] result = new byte[Size];
+                Region.Stream.Read(result, 0, Size);
+                return result;
+            }
             if (IsCorrupt)
                 return new byte[0];
-            var file = new fNbt.NbtFile(Data);
+            var file = new fNbt.NbtFile(RawData);
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
             Array.Copy(bytes, 0, with_header, 5, bytes.Length);
@@ -68,19 +67,20 @@ namespace NbtStudio
                 with_header[4] = 1;
             else if (Compression == NbtCompression.ZLib)
                 with_header[4] = 2;
+            HasUnsavedChanges = false;
             return with_header;
         }
 
         public void Load()
         {
             if (IsCorrupt) return;
-            Stream.Seek(Offset + 5, SeekOrigin.Begin);
+            Region.Stream.Seek(Offset + 5, SeekOrigin.Begin);
             var file = new fNbt.NbtFile();
             try
             {
-                file.LoadFromStream(Stream, NbtCompression.AutoDetect);
+                file.LoadFromStream(Region.Stream, NbtCompression.AutoDetect);
                 Compression = file.FileCompression;
-                Data = file.RootTag;
+                SetData(file.RootTag);
             }
             catch
             {
@@ -95,7 +95,7 @@ namespace NbtStudio
                 Region.RemoveChunk(X, Z);
         }
 
-        public void AddTo(IRegion region)
+        public void AddTo(RegionFile region)
         {
             if (Region != null)
                 Region.RemoveChunk(X, Z);
@@ -106,7 +106,7 @@ namespace NbtStudio
         {
             var region = Region;
             if (region != null)
-                Region.RemoveChunk(X, Z);
+                region.RemoveChunk(X, Z);
             X = x;
             Z = z;
             if (region != null)

@@ -1,4 +1,4 @@
-﻿using Aga.Controls.Tree;
+using Aga.Controls.Tree;
 using fNbt;
 using NbtStudio.SNBT;
 using NbtStudio.UI;
@@ -328,23 +328,6 @@ namespace NbtStudio
             }
         }
 
-        public static Tuple<INbtContainer, int> GetInsertionLocation(INbtTag target, NodePosition position)
-        {
-            if (position == NodePosition.Inside)
-            {
-                var container = target as INbtContainer;
-                return Tuple.Create(container, container?.Count ?? 0);
-            }
-            else
-            {
-                var parent = target.Parent;
-                int index = target.Index;
-                if (position == NodePosition.After)
-                    index++;
-                return Tuple.Create(parent, index);
-            }
-        }
-
         public static void TransformAdd(INbtTag tag, INbtContainer destination) => TransformAdd(new[] { tag }, destination);
         public static void TransformAdd(IEnumerable<INbtTag> tags, INbtContainer destination) => TransformInsert(tags, destination, destination.Count);
         public static void TransformInsert(INbtTag tag, INbtContainer destination, int index) => TransformInsert(new[] { tag }, destination, index);
@@ -359,7 +342,7 @@ namespace NbtStudio
                     adding.Remove(tag);
                     continue;
                 }
-                if (tag.IsInside(destination) && original_index > tag.Index)
+                if (tag.IsInside(destination) && original_index > tag.GetIndex())
                     index--;
             }
             foreach (var tag in adding)
@@ -371,6 +354,18 @@ namespace NbtStudio
                 tag.Name = GetAutomaticName(tag, destination);
                 tag.InsertInto(destination, index);
                 index++;
+            }
+        }
+
+        public static IEnumerable<Tuple<int, int>> GetAvailableCoords(RegionFile region, int starting_x = 0, int starting_z = 0)
+        {
+            for (int x = starting_x; x < RegionFile.ChunkXDimension; x++)
+            {
+                for (int z = (x == starting_x ? starting_z : 0); z < RegionFile.ChunkZDimension; z++)
+                {
+                    if (region.GetChunk(x, z) == null)
+                        yield return Tuple.Create(x, z);
+                }
             }
         }
 
@@ -423,39 +418,30 @@ namespace NbtStudio
             string type = NbtUtil.TagTypeName(tag.TagType).ToLower();
             if (!String.IsNullOrEmpty(tag.Name))
                 return $"'{tag.Name}' {type}";
-            if (tag.Index != -1)
+            int index = tag.GetIndex();
+            if (index != -1)
             {
                 if (!String.IsNullOrEmpty(tag.Parent?.Name))
-                    return $"{type} at index {tag.Index} in '{tag.Parent.Name}'";
+                    return $"{type} at index {index} in '{tag.Parent.Name}'";
                 else if (tag.Parent?.TagType != null)
-                    return $"{type} at index {tag.Index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
+                    return $"{type} at index {index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
             }
-            return $"{type}";
+            return type;
         }
-        public static string TagDescription(this NbtTag tag) => TagDescription(tag.Adapt());
         public static string TagDescription(IEnumerable<INbtTag> tags)
         {
-            if (!tags.Any())
+            if (!tags.Any()) // none
                 return "0 tags";
-            if (!tags.Skip(1).Any())
-                return TagDescription(tags.Single());
+            if (Util.ExactlyOne(tags)) // exactly one
+                return TagDescription(tags.Single()); // more than one
             return Util.Pluralize(tags.Count(), "tag");
         }
-        public static string TagDescription(IEnumerable<NbtTag> tags) => TagDescription(tags.Select(x => x.Adapt()));
 
-        public static string ChunkDescription(IChunk chunk)
+        public static string ChunkDescription(Chunk chunk)
         {
             if (chunk.Region == null)
                 return $"chunk at ({chunk.X}, {chunk.Z})";
-            return $"chunk at ({chunk.X}, {chunk.Z}) in {Path.GetFileName(chunk.Region.Path)}";
-        }
-        public static string ChunkDescription(IEnumerable<IChunk> chunks)
-        {
-            if (!chunks.Any())
-                return "0 chunks";
-            if (!chunks.Skip(1).Any())
-                return ChunkDescription(chunks.Single());
-            return Util.Pluralize(chunks.Count(), "chunk");
+            return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
         }
 
         private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };

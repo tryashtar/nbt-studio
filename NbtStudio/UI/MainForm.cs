@@ -169,7 +169,7 @@ namespace NbtStudio.UI
                 else
                 {
                     var root = new NbtCompound();
-                    tag.Name = NbtUtil.GetAutomaticName(tag.Adapt(), root.AdaptCompound());
+                    tag.Name = NbtUtil.GetAutomaticName(tag, root);
                     root.Add(tag);
                     OpenFile(new NbtFile(root));
                 }
@@ -224,7 +224,7 @@ namespace NbtStudio.UI
             if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                Save(file);
+                Save(file.GetSaveable());
             }
         }
 
@@ -233,7 +233,7 @@ namespace NbtStudio.UI
             if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                SaveAs(file);
+                SaveAs(file.GetSaveable());
             }
         }
 
@@ -265,7 +265,7 @@ namespace NbtStudio.UI
                 }
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (file is INbtFile nbtfile)
+                    if (file is NbtFile nbtfile)
                     {
                         var export = new ExportWindow(nbtfile.ExportSettings);
                         if (export.ShowDialog() == DialogResult.OK)
@@ -277,7 +277,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void OpenInExplorer(ISaveable file)
+        private void OpenInExplorer(IHavePath file)
         {
             var info = new ProcessStartInfo { FileName = "explorer", Arguments = $"/select, \"{file.Path}\"" };
             Process.Start(info);
@@ -285,11 +285,11 @@ namespace NbtStudio.UI
 
         private void Sort()
         {
-            var tag = ViewModel?.SelectedNbt as INbtCompound;
-            if (tag == null) return;
+            var obj = ViewModel?.SelectedObject;
+            if (obj == null || !obj.CanSort) return;
             ViewModel.StartBatchOperation();
-            NbtUtil.Sort(tag, new NbtUtil.TagTypeSorter(), true);
-            ViewModel.FinishBatchOperation($"Sort {tag.TagDescription()}", true);
+            obj.Sort();
+            ViewModel.FinishBatchOperation($"Sort {obj.Description}", true);
         }
 
         private void Undo()
@@ -310,67 +310,73 @@ namespace NbtStudio.UI
 
         private void Copy()
         {
-            if (ViewModel == null)
-                return;
-            foreach (var item in ViewModel.SelectedChunks)
+            if (ViewModel == null) return;
+            var objs = ViewModel.SelectedObjects.Where(x => x.CanCopy);
+            if (objs.Any())
             {
-                if (!item.IsLoaded)
-                    item.Load();
+                string text = String.Join("\n", objs.Select(x => x.Copy()));
+                Clipboard.SetText(text);
             }
-            Copy(ViewModel.SelectedNbts);
         }
 
         private void Paste()
         {
-            var parent = ViewModel?.SelectedNbt as INbtContainer;
-            if (parent != null)
-                Paste(parent);
-            else
-            {
-                var region = ViewModel?.SelectedObject as IRegion;
-                if (region != null)
-                    PasteChunk(region);
-            }
+            var parent = ViewModel?.SelectedObject;
+            if (parent == null) return;
+            Paste(parent);
+        }
+
+        private void Paste(INode node)
+        {
+            if (!node.CanPaste || !Clipboard.ContainsText())
+                return;
+            ViewModel.StartBatchOperation();
+            var results = node.Paste(Clipboard.GetText());
+            ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
         }
 
         private void Rename()
         {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag != null)
+            var obj = ViewModel?.SelectedObject;
+            if (obj == null || !obj.CanRename) return;
+            var tag = obj.GetNbtTag();
+            var chunk = obj.GetChunk();
+            if (chunk != null)
+                EditChunk(chunk);
+            else if (tag != null)
                 Rename(tag);
-            else
-            {
-                var chunk = ViewModel?.SelectedObject as IChunk;
-                if (chunk != null)
-                    EditChunk(chunk);
-            }
         }
 
         private void Edit()
         {
-            var tag = ViewModel?.SelectedNbt;
-            if (tag != null)
-                Edit(tag);
-            else
-            {
-                var chunk = ViewModel?.SelectedObject as IChunk;
-                if (chunk != null)
-                    EditChunk(chunk);
-            }
+            var obj = ViewModel?.SelectedObject;
+            if (obj == null) return;
+            Edit(obj);
         }
 
-        private void Edit(INbtTag tag)
+        private void Edit(INode node)
         {
             // batch operation to combine the rename and value change into one undo
             ViewModel.StartBatchOperation();
+            if (!node.CanEdit) return;
+            var tag = node.GetNbtTag();
+            var chunk = node.GetChunk();
+            if (chunk != null)
+                EditChunk(chunk);
+            else if (tag != null)
+                Rename(tag);
+            ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
+        }
+
+        private void EditTag(INbtTag tag)
+        {
             if (ByteProviders.HasProvider(tag))
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
             else
                 EditTagWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()}", false);
         }
 
-        private void EditChunk(IChunk chunk)
+        private void EditChunk(Chunk chunk)
         {
             EditChunkWindow.MoveChunk(chunk);
         }
@@ -385,7 +391,7 @@ namespace NbtStudio.UI
 
         private void EditSnbt()
         {
-            var tag = ViewModel?.SelectedNbt;
+            var tag = ViewModel?.SelectedObject?.GetNbtTag();
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
@@ -394,38 +400,72 @@ namespace NbtStudio.UI
 
         private void Delete()
         {
-            var selected = NbtTree.SelectedNodes;
-            var nexts = selected.Select(x => x.NextNode).Where(x => x != null).ToList();
-            var prevs = selected.Select(x => x.PreviousNode).Where(x => x != null).ToList();
-            var parents = selected.Select(x => x.Parent).Where(x => x != null).ToList();
-            ViewModel.StartBatchOperation();
-            var nbts = ViewModel.SelectedNbts.Where(x => x.Parent != null).ToList(); // don't false-delete chunks
-            var chunks = ViewModel.SelectedChunks.ToList();
-            foreach (var item in nbts)
-            {
-                item.Remove();
-            }
-            foreach (var chunk in chunks)
-            {
-                chunk.Remove();
-            }
-            string description;
-            if (nbts.Count > 0 && chunks.Count > 0)
-                description = $"Delete {NbtUtil.TagDescription(nbts)} and {NbtUtil.ChunkDescription(chunks)}";
-            else if (nbts.Count > 0)
-                description = $"Delete {NbtUtil.TagDescription(nbts)}";
-            else if (chunks.Count > 0)
-                description = $"Delete {NbtUtil.ChunkDescription(chunks)}";
-            else
-                description = "Delete absolutely nothing";
-            ViewModel.FinishBatchOperation(description, false);
+            if (ViewModel == null) return;
+            var selected_nodes = NbtTree.SelectedNodes;
+            var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x != null).ToList();
+            var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x != null).ToList();
+            var parents = selected_nodes.Select(x => x.Parent).Where(x => x != null).ToList();
+
+            var selected_objects = ViewModel.SelectedObjects.ToList();
+            Delete(selected_objects);
+
             // Index == -1 checks whether this node has been removed from the tree
-            if (selected.All(x => x.Index == -1))
+            if (selected_nodes.All(x => x.Index == -1))
             {
                 var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
                 if (select_next != null)
                     select_next.IsSelected = true;
             }
+        }
+
+        private void Delete(IEnumerable<INode> nodes)
+        {
+            nodes = nodes.Where(x => x.CanDelete);
+            var file_nodes = nodes.Where(x => x.GetHasPath() != null);
+            var files = nodes.Filter(x => x.GetHasPath());
+            if (files.Any())
+            {
+                DialogResult result;
+                if (Util.ExactlyOne(files))
+                {
+                    var file = files.Single();
+                    if (file.Path == null)
+                        result = MessageBox.Show(
+                            $"Are you sure you want to remove this item?",
+                            $"Really delete this unsaved file?",
+                            MessageBoxButtons.YesNo);
+                    else
+                        result = MessageBox.Show(
+                            $"Are you sure you want to delete this item?\n\n" +
+                            $"It will be sent to the recycle bin. This cannot be undone.",
+                            $"Really delete {file_nodes.Single().Description}?",
+                            MessageBoxButtons.YesNo);
+                }
+                else
+                {
+                    var unsaved = files.Where(x => x.Path == null);
+                    var saved = files.Where(x => x.Path != null);
+                    if (!saved.Any())
+                        result = MessageBox.Show(
+                            $"Are you sure you want to remove {NodeExtractions.Description(file_nodes)}?",
+                            $"Really delete these items?",
+                            MessageBoxButtons.YesNo);
+                    else
+                        result = MessageBox.Show(
+                            $"Are you sure you want to delete {NodeExtractions.Description(file_nodes)}?\n\n" +
+                            $"{Util.Pluralize(saved.Count(), "item")} will be send to the recycle bin. This cannot be undone.",
+                            $"Really delete these items?",
+                            MessageBoxButtons.YesNo);
+                }
+                if (result != DialogResult.Yes)
+                    return;
+            }
+            ViewModel.StartBatchOperation();
+            foreach (var node in nodes)
+            {
+                node.Delete();
+            }
+            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(nodes)}", false);
         }
 
         private FindWindow FindWindow;
@@ -450,7 +490,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = ViewModel?.SelectedNbt as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
@@ -459,7 +499,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = ViewModel?.SelectedObject as IRegion;
+            var parent = ViewModel?.SelectedObject?.GetRegionFile();
             if (parent == null) return;
             var chunk = EditChunkWindow.CreateChunk(parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk != null)
@@ -468,7 +508,7 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedNbt as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
             if (parent == null) return;
             AddTag(parent, type);
         }
@@ -533,24 +573,26 @@ namespace NbtStudio.UI
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
             var obj = ViewModel?.SelectedObject;
-            var tag = ViewModel?.SelectedNbt;
-            var container = tag as INbtContainer;
+            var nbt = obj.GetNbtTag();
+            var container = nbt as INbtContainer;
+            var region = obj.GetRegionFile();
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
-                item.Value.Visible = !(obj is IRegion);
+                item.Value.Visible = region == null;
             }
-            ActionSort.Enabled = tag is INbtCompound;
-            ActionCut.Enabled = tag != null || obj is IChunk;
-            ActionCopy.Enabled = tag != null || obj is IChunk;
-            ActionPaste.Enabled = container != null || obj is IRegion; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
-            ActionDelete.Enabled = tag != null || obj is IChunk;
-            ActionRename.Enabled = tag != null || obj is IChunk;
-            ActionEdit.Enabled = tag != null || obj is IChunk;
-            ActionEditSnbt.Enabled = tag != null;
+            ActionSort.Enabled = obj != null && obj.CanSort;
+            ActionCut.Enabled = obj != null && obj.CanCopy && obj.CanDelete;
+            ActionCopy.Enabled = obj != null && obj.CanCopy;
+            ActionPaste.Enabled = obj != null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
+            ActionDelete.Enabled = obj != null && obj.CanDelete;
+            ActionRename.Enabled = obj != null && (obj.CanRename || obj.CanEdit);
+            ActionEdit.Enabled = obj != null && (obj.CanEdit || obj.CanRename);
+            ActionEditSnbt.Enabled = nbt != null;
             ActionAddSnbt.Enabled = container != null;
-            ActionAddSnbt.Visible = !(obj is IRegion);
-            ActionAddChunk.Visible = obj is IRegion;
+
+            ActionAddSnbt.Visible = region == null;
+            ActionAddChunk.Visible = region != null;
         }
 
         private void ViewModel_Changed(object sender, EventArgs e)
@@ -568,49 +610,9 @@ namespace NbtStudio.UI
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = ViewModel?.NbtFromClick(e);
-            if (tag != null && !(tag is INbtContainer))
+            var tag = ViewModel?.ObjectFromClick(e);
+            if (!e.Node.CanExpand && tag.CanEdit)
                 Edit(tag);
-        }
-
-        private void Copy(IEnumerable<INbtTag> objects)
-        {
-            Clipboard.SetText(String.Join("\n", objects.Select(x => x.ToSnbt(include_name: true))));
-        }
-
-        private static IEnumerable<NbtTag> ParseTags(string text)
-        {
-            var snbts = text.Split('\n');
-            foreach (var nbt in snbts)
-            {
-                if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
-                    yield return tag;
-            }
-        }
-
-        private void Paste(INbtContainer destination)
-        {
-            if (!Clipboard.ContainsText())
-                return;
-            var snbts = ParseTags(Clipboard.GetText());
-            ViewModel.StartBatchOperation();
-            foreach (var nbt in snbts)
-            {
-                NbtUtil.TransformAdd(nbt.Adapt(), destination);
-            }
-            ViewModel.FinishBatchOperation($"Paste {NbtUtil.TagDescription(snbts)} into {destination.TagDescription()}", true);
-        }
-
-        private void PasteChunk(IRegion region)
-        {
-            if (!Clipboard.ContainsText())
-                return;
-            var snbt = ParseTags(Clipboard.GetText()).FirstOrDefault() as NbtCompound;
-            if (snbt == null)
-                return;
-            var chunk = EditChunkWindow.CreateChunk(region, false, snbt);
-            if (chunk != null)
-                chunk.AddTo(region);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -624,10 +626,11 @@ namespace NbtStudio.UI
                 e.Effect = DragDropEffects.Copy;
             else
             {
-                var tags = ViewModel.NbtsFromDrag(e);
+                var tags = ViewModel.ObjectsFromDrag(e);
+                var drop = ViewModel.DropObject;
                 if (tags.Any()
-                    && ViewModel.DropTag != null
-                    && CanMoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition))
+                    && ViewModel.DropObject != null
+                    && CanMoveObjects(tags, drop, ViewModel.DropPosition))
                     e.Effect = e.AllowedEffect;
                 else
                     e.Effect = DragDropEffects.None;
@@ -643,26 +646,27 @@ namespace NbtStudio.UI
             }
             else
             {
-                var tags = ViewModel.NbtsFromDrag(e);
+                var tags = ViewModel.ObjectsFromDrag(e);
+                var drop = ViewModel.DropObject;
                 if (tags.Any())
-                    MoveTags(tags, ViewModel.DropTag, ViewModel.DropPosition);
+                    MoveObjects(tags, drop, ViewModel.DropPosition);
             }
         }
 
-        private bool CanMoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            var insert = NbtUtil.GetInsertionLocation(target, position);
+            var insert = ViewModel.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return false;
-            return NbtUtil.CanAddAll(tags, insert.Item1);
+            return insert.Item1.CanReceiveDrop(nodes);
         }
 
-        private void MoveTags(IEnumerable<INbtTag> tags, INbtTag target, NodePosition position)
+        private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            var insert = NbtUtil.GetInsertionLocation(target, position);
+            var insert = ViewModel.GetInsertionLocation(target, position);
             if (insert.Item1 == null) return;
             ViewModel.StartBatchOperation();
-            NbtUtil.TransformInsert(tags, insert.Item1, insert.Item2);
-            ViewModel.FinishBatchOperation($"Move {NbtUtil.TagDescription(tags)} into {insert.Item1.TagDescription()} at position {insert.Item2}", true);
+            insert.Item1.ReceiveDrop(nodes, insert.Item2);
+            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {insert.Item1.Description} at position {insert.Item2}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -677,8 +681,7 @@ namespace NbtStudio.UI
         {
             if (e.Button == MouseButtons.Right)
             {
-                var file = ViewModel.FileFromClick(e);
-                var nbt = ViewModel.NbtFromClick(e);
+                var obj = ViewModel.ObjectFromClick(e);
                 var menu = new ContextMenuStrip();
                 if (e.Node.CanExpand)
                 {
@@ -687,21 +690,23 @@ namespace NbtStudio.UI
                     else
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
                 }
-                if (file != null)
+                var saveable = obj.GetSaveable();
+                if (saveable != null)
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(file));
-                    menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(file));
-                    if (file.Path != null)
-                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(file));
+                    menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(saveable));
+                    menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(saveable));
+                    if (saveable.Path != null)
+                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(saveable));
                 }
-                if (nbt is INbtContainer container)
+                var container = obj.GetNbtTag() as INbtContainer;
+                if (container != null)
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());
                     var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
-                    bool single = !addable.Skip(1).Any();
+                    bool single = Util.ExactlyOne(addable);
                     Func<NbtTagType, string> display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
                     var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(x), (s, ea) => AddTag(container, x))).ToArray();
                     if (single)

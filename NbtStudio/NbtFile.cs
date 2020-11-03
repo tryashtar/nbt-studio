@@ -12,17 +12,19 @@ namespace NbtStudio
 {
     // represents a loadable and saveable NBT file
     // uses fNbt.NbtFile to do the work reading/writing binary data to disk, but can also read/write SNBT without using one
-    public class NbtFile : INbtFile
+    public class NbtFile : ISaveable
     {
         public string Path { get; private set; }
-        public NbtCompound RootTag { get; private set; }
+        private NbtCompound RootTagData;
+        public NotifyNbtCompound RootTag { get; private set; }
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
+        public bool HasUnsavedChanges { get; private set; } = false;
 
         private NbtFile(string path, NbtCompound root, ExportSettings settings)
         {
             Path = path;
-            RootTag = root;
+            SetRoot(root);
             ExportSettings = settings;
         }
 
@@ -33,12 +35,20 @@ namespace NbtStudio
         {
             if (root.Name == null)
                 root.Name = "";
-            RootTag = root;
+            SetRoot(root);
             Path = null;
             ExportSettings = null;
+            HasUnsavedChanges = true;
         }
 
-        private static bool LooksSuspicious(NbtTag tag)
+        private void SetRoot(NbtCompound root)
+        {
+            RootTagData = root;
+            RootTag = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(root);
+            RootTag.Changed += (s, e) => HasUnsavedChanges = true;
+        }
+
+        private static bool LooksSuspicious(INbtTag tag)
         {
             foreach (var ch in tag.Name)
             {
@@ -124,7 +134,8 @@ namespace NbtStudio
 
         public void Save()
         {
-            ExportSettings.Export(Path, RootTag);
+            ExportSettings.Export(Path, RootTagData);
+            HasUnsavedChanges = false;
         }
 
         public void SaveAs(string path)
@@ -148,14 +159,9 @@ namespace NbtStudio
 
     public interface ISaveable : IHavePath
     {
+        bool HasUnsavedChanges { get; }
         bool CanSave { get; }
         void Save();
         void SaveAs(string path);
-    }
-
-    public interface INbtFile : ISaveable
-    {
-        ExportSettings ExportSettings { get; }
-        void SaveAs(string path, ExportSettings settings);
     }
 }

@@ -50,7 +50,7 @@ namespace NbtStudio.UI
                 return Properties.Resources.region_image;
             if (obj is Chunk)
                 return Properties.Resources.chunk_image;
-            if (obj is NbtTag tag)
+            if (obj is INbtTag tag)
                 return NbtUtil.TagTypeImage(tag.TagType);
             return null;
         }
@@ -114,7 +114,7 @@ namespace NbtStudio.UI
             string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
-            if (node.Tag is ISaveable saveable && Parent.Model is NbtTreeModel nbtmodel && nbtmodel.HasUnsavedChanges(saveable))
+            if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges)
                 prefix = "* ";
             if (name == null)
                 return Tuple.Create(prefix, value);
@@ -134,7 +134,7 @@ namespace NbtStudio.UI
                 return Path.GetFileName(region.Path);
             if (obj is Chunk chunk)
                 return $"Chunk [{chunk.X}, {chunk.Z}]";
-            if (obj is NbtTag tag)
+            if (obj is INbtTag tag)
                 return tag.Name;
             return null;
         }
@@ -142,7 +142,7 @@ namespace NbtStudio.UI
         private static string PreviewValue(object obj)
         {
             if (obj is NbtFile file)
-                return NbtUtil.PreviewNbtValue(file.RootTag.Adapt());
+                return NbtUtil.PreviewNbtValue(file.RootTag);
             if (obj is NbtFolder folder)
             {
                 if (folder.HasScanned)
@@ -160,12 +160,12 @@ namespace NbtStudio.UI
             if (obj is Chunk chunk)
             {
                 if (chunk.IsLoaded)
-                    return NbtUtil.PreviewNbtValue(chunk.Data.Adapt());
+                    return NbtUtil.PreviewNbtValue(chunk.Data);
                 else
                     return "(open to load)";
             }
-            if (obj is NbtTag tag)
-                return NbtUtil.PreviewNbtValue(tag.Adapt());
+            if (obj is INbtTag tag)
+                return NbtUtil.PreviewNbtValue(tag);
             return null;
         }
 

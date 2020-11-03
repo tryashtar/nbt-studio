@@ -9,11 +9,11 @@ namespace NbtStudio.UI
 {
     public partial class EditChunkWindow : Form
     {
-        private readonly IChunk WorkingChunk;
-        private readonly IRegion ChunkRegion;
+        private readonly Chunk WorkingChunk;
+        private readonly RegionFile ChunkRegion;
         private readonly ChunkCoordsEditControls Manager;
 
-        private EditChunkWindow(IChunk chunk, IRegion region, ChunkEditPurpose purpose)
+        private EditChunkWindow(Chunk chunk, RegionFile region, ChunkEditPurpose purpose)
         {
             InitializeComponent();
 
@@ -27,14 +27,10 @@ namespace NbtStudio.UI
             else if (purpose == ChunkEditPurpose.Move)
                 this.Text = $"Move Chunk";
 
-            XBox.Maximum = RegionFile.ChunkXDimension - 1;
-            ZBox.Maximum = RegionFile.ChunkZDimension - 1;
-            XBox.Value = Math.Min(Math.Max(chunk.X, XBox.Minimum), XBox.Maximum);
-            ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
             XBox.Select();
         }
 
-        public static IChunk CreateChunk(IRegion parent, bool bypass_window = false, NbtCompound data = null)
+        public static Chunk CreateChunk(RegionFile parent, bool bypass_window = false, NbtCompound data = null)
         {
             var chunk = Chunk.EmptyChunk(data);
 
@@ -61,7 +57,7 @@ namespace NbtStudio.UI
             }
         }
 
-        public static bool MoveChunk(IChunk existing)
+        public static bool MoveChunk(Chunk existing)
         {
             var region = existing.Region;
             var window = new EditChunkWindow(existing, region, ChunkEditPurpose.Move);

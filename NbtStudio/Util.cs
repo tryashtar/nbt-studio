@@ -158,5 +158,10 @@ namespace NbtStudio
             }
             return longs;
         }
+
+        public static bool ExactlyOne<T>(IEnumerable<T> items)
+        {
+            return items.Any() && !items.Skip(1).Any();
+        }
     }
 }

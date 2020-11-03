@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NbtStudio.UI;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public partial class NbtTreeModel : ITreeModel
     {
@@ -18,133 +19,90 @@ namespace NbtStudio.UI
         public event EventHandler<TreePathEventArgs> StructureChanged;
         public event EventHandler Changed;
 
-        public bool HasAnyUnsavedChanges
-        {
-            get
-            {
-                return UnsavedChanges.Values.Any(x => x);
-            }
-        }
-        private readonly IEnumerable<object> Roots;
+        public bool HasAnyUnsavedChanges => OpenedFiles.Filter(x => x.GetSaveable()).Any(x => x.HasUnsavedChanges);
+        private readonly List<object> Roots;
         private readonly NbtTreeView View;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
         private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
 
-        public INotifyNode SelectedObject
+        public INode SelectedObject
         {
             get
             {
                 if (View.SelectedNode == null)
                     return null;
-                return NotifyWrap(this, View.SelectedNode.Tag);
+                return Wrap(View.SelectedNode.Tag);
             }
         }
-        public IEnumerable<INotifyNode> SelectedObjects
+        public IEnumerable<INode> SelectedObjects
         {
             get
             {
                 if (View.SelectedNodes == null)
-                    return Enumerable.Empty<INotifyNode>();
-                return View.SelectedNodes.Select(x => NotifyWrap(this, x.Tag));
+                    return Enumerable.Empty<INode>();
+                return View.SelectedNodes.Select(x => Wrap(x.Tag));
             }
         }
-        public INotifyNbt SelectedNbt
+        public IEnumerable<INode> OpenedFiles
         {
             get
             {
-                if (View.SelectedNode == null)
-                    return null;
-                return NotifyWrapNbt(this, View.SelectedNode.Tag, GetNbt(View.SelectedNode.Tag));
-            }
-        }
-        public IEnumerable<INotifyNbt> SelectedNbts
-        {
-            get
-            {
-                if (View.SelectedNodes == null)
-                    return Enumerable.Empty<INotifyNbt>();
-                return View.SelectedNodes.Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
-            }
-        }
-        public IEnumerable<NotifyChunk> SelectedChunks
-        {
-            get
-            {
-                if (View.SelectedNodes == null)
-                    return Enumerable.Empty<NotifyChunk>();
-                return View.SelectedNodes.Where(x => x.Tag is Chunk).Select(x => NotifyWrapChunk(this, (Chunk)x.Tag, (Chunk)x.Tag)).Where(x => x != null);
-            }
-        }
-        public IEnumerable<ISaveable> OpenedFiles
-        {
-            get
-            {
-                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFile || x.Tag is NbtFolder || x.Tag is RegionFile))
+                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFolder || x.Tag is ISaveable))
                 {
                     if (item.Tag is ISaveable saveable)
-                        yield return NotifyWrapSaveable(this, item.Tag, saveable);
+                        yield return Wrap(saveable);
                 }
             }
         }
 
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
-            Roots = roots;
+            Roots = roots.ToList();
             View = view;
             View.Model = this;
             if (Roots.Take(2).Count() == 1) // if there is one item, expand it
                 View.Root.Children.First().Expand();
-            foreach (var file in OpenedFiles)
-            {
-                UnsavedChanges[file] = file.Path == null;
-            }
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }
 
-        public IEnumerable<INotifyNbt> NbtsFromDrag(DragEventArgs e)
+        private INode Wrap(object obj) => NotifyNode.Create(this, obj);
+
+        public IEnumerable<INode> ObjectsFromDrag(DragEventArgs e)
         {
-            return View.NodesFromDrag(e).Select(x => NotifyWrapNbt(this, x.Tag, GetNbt(x.Tag))).Where(x => x != null);
+            return View.NodesFromDrag(e).Select(x => Wrap(x.Tag)).Where(x => x != null);
         }
-        public ISaveable FileFromClick(TreeNodeAdvMouseEventArgs e)
+        public INode ObjectFromClick(TreeNodeAdvMouseEventArgs e)
         {
-            if (e.Node.Tag is ISaveable saveable)
-                return NotifyWrapSaveable(this, e.Node.Tag, saveable);
-            return null;
+            return Wrap(e.Node.Tag);
         }
-        public INotifyNbt NbtFromClick(TreeNodeAdvMouseEventArgs e)
-        {
-            var nbt = GetNbt(e.Node.Tag);
-            if (nbt != null)
-                return NotifyWrapNbt(this, e.Node.Tag, nbt);
-            return null;
-        }
-        public INbtTag DropTag
+        public INode DropObject
         {
             get
             {
                 if (View.DropPosition.Node == null)
                     return null;
-                return NotifyWrapNbt(this, View.DropPosition.Node.Tag, GetNbt(View.DropPosition.Node.Tag));
+                return Wrap(View.DropPosition.Node.Tag);
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
 
         // an object changed, refresh the nodes through ITreeModel's API to ensure it matches the true object
-        private void Notify(object changed)
+        public void Notify(object changed)
         {
 #if DEBUG
             if (changed != null)
                 Console.WriteLine($"changed: {changed.GetType()}");
 #endif
             var node = FindNodeByObject(changed);
-            if (node == null) return;
+            if (node == null)
+            {
+#if DEBUG
+                Console.WriteLine($"could not find node on tree, not updating model");
+#endif
+                return;
+            }
             var path = View.GetPath(node);
 
-            foreach (var item in path.FullPath)
-            {
-                if (item is ISaveable saveable)
-                    MarkChanged(saveable);
-            }
             Changed?.Invoke(this, EventArgs.Empty);
 
             var real_children = GetChildren(path).ToList();
@@ -152,7 +110,7 @@ namespace NbtStudio.UI
             var remove = current_children.Except(real_children).ToArray();
             var add = real_children.Except(current_children).ToArray();
 
-            var parent_path = new TreePath(path.FullPath.Take(path.FullPath.Length - 1).ToArray());
+            var parent_path = ParentPath(path);
             NodesChanged?.Invoke(this, new TreeModelEventArgs(parent_path, new object[] { changed }));
             if (remove.Any())
                 NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, remove));
@@ -164,22 +122,32 @@ namespace NbtStudio.UI
             }
         }
 
-        private readonly Dictionary<ISaveable, bool> UnsavedChanges = new Dictionary<ISaveable, bool>();
-        private void NotifySaved(ISaveable saveable)
+        public void Remove(object removed)
         {
-            UnsavedChanges[saveable] = false;
+#if DEBUG
+            if (removed != null)
+                Console.WriteLine($"removed: {removed.GetType()}");
+#endif
+            var node = FindNodeByObject(removed);
+            if (node == null)
+            {
+#if DEBUG
+                Console.WriteLine($"could not find node on tree, not updating model");
+#endif
+                return;
+            }
+            TreePath path;
+            if (Roots.Remove(removed))
+                path = TreePath.Empty;
+            else
+                path = ParentPath(View.GetPath(node));
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, new[] { removed }));
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
-        private void MarkChanged(ISaveable saveable)
+        private static TreePath ParentPath(TreePath path)
         {
-            UnsavedChanges[saveable] = true;
-        }
-        public bool HasUnsavedChanges(ISaveable saveable)
-        {
-            if (UnsavedChanges.TryGetValue(saveable, out bool result))
-                return result;
-            return false;
+            return new TreePath(path.FullPath.Take(path.FullPath.Length - 1).ToArray());
         }
 
         private TreeNodeAdv FindNodeByObject(object obj)
@@ -199,7 +167,25 @@ namespace NbtStudio.UI
             return null;
         }
 
-        private void PushUndo(UndoableAction action)
+        public Tuple<INode, int> GetInsertionLocation(INode target, NodePosition position)
+        {
+            var obj = target.Object;
+            var path = View.GetPath(FindNodeByObject(obj));
+            var children = GetChildren(obj);
+            if (position == NodePosition.Inside)
+                return Tuple.Create(target, children.Count());
+            else
+            {
+                var parent = path.FullPath[path.FullPath.Length - 2];
+                var parent_children = GetChildren(parent).ToList();
+                int index = parent_children.IndexOf(obj);
+                if (position == NodePosition.After)
+                    index++;
+                return Tuple.Create(Wrap(parent), index);
+            }
+        }
+
+        public void PerformAction(UndoableAction action)
         {
             RedoStack.Clear();
             if (BatchNumber == 0)
@@ -212,6 +198,7 @@ namespace NbtStudio.UI
             else
                 Console.WriteLine($"Added action to batch: \"{action.Description}\". Batch has {UndoBatch.Count} items");
 #endif
+            action.Do();
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
@@ -325,9 +312,9 @@ namespace NbtStudio.UI
                 if (chunk.IsLoaded)
                     return chunk.Data.Tags;
             }
-            if (obj is NbtCompound compound)
+            if (obj is INbtCompound compound)
                 return compound.Tags;
-            if (obj is NbtList list)
+            if (obj is INbtList list)
                 return list;
             return Enumerable.Empty<object>();
         }
@@ -340,17 +327,6 @@ namespace NbtStudio.UI
                 return true;
             var children = GetChildren(obj);
             return children != null && children.Any();
-        }
-
-        private NbtTag GetNbt(object obj)
-        {
-            if (obj is NbtFile file)
-                return file.RootTag;
-            if (obj is Chunk chunk)
-                return chunk.Data;
-            if (obj is NbtTag tag)
-                return tag;
-            return null;
         }
     }
 }
