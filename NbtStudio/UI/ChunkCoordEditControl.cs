@@ -26,7 +26,7 @@ namespace NbtStudio.UI
             ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
             if (CheckCoordsInternal() != CoordCheckResult.Valid)
             {
-                var auto = NbtUtil.GetAvailableCoords(region);
+                var auto = region.GetAvailableCoords();
                 if (auto.Any())
                 {
                     var (x, y) = auto.First();

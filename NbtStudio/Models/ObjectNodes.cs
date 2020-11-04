@@ -512,7 +512,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(string data)
         {
             var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
-            var available = NbtUtil.GetAvailableCoords(Region);
+            var available = Region.GetAvailableCoords();
             var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.x, slot.z));
             foreach (var chunk in chunks)
             {

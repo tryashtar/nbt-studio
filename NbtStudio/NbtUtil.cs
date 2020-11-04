@@ -357,18 +357,6 @@ namespace NbtStudio
             }
         }
 
-        public static IEnumerable<(int x, int z)> GetAvailableCoords(RegionFile region, int starting_x = 0, int starting_z = 0)
-        {
-            for (int x = starting_x; x < RegionFile.ChunkXDimension; x++)
-            {
-                for (int z = (x == starting_x ? starting_z : 0); z < RegionFile.ChunkZDimension; z++)
-                {
-                    if (region.GetChunk(x, z) == null)
-                        yield return (x, z);
-                }
-            }
-        }
-
         public static string GetAutomaticName(INbtTag tag, INbtContainer parent)
         {
             if (parent is INbtList)

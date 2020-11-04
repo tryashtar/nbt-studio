@@ -80,6 +80,18 @@ namespace NbtStudio
             return Chunks[x, z];
         }
 
+        public IEnumerable<(int x, int z)> GetAvailableCoords(int starting_x = 0, int starting_z = 0)
+        {
+            for (int x = starting_x; x < ChunkXDimension; x++)
+            {
+                for (int z = (x == starting_x ? starting_z : 0); z < ChunkZDimension; z++)
+                {
+                    if (GetChunk(x, z) == null)
+                        yield return (x, z);
+                }
+            }
+        }
+
         public void RemoveChunk(int x, int z)
         {
             if (Chunks[x, z] != null)

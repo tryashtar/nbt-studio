@@ -38,7 +38,7 @@ namespace NbtStudio.UI
             if (bypass_window)
             {
                 // find first available slot
-                var available = NbtUtil.GetAvailableCoords(parent);
+                var available = parent.GetAvailableCoords();
                 if (!available.Any())
                     return null;
                 var (x, y) = available.First();
