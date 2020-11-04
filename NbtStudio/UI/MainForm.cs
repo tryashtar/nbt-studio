@@ -666,7 +666,7 @@ namespace NbtStudio.UI
             if (destination == null) return;
             ViewModel.StartBatchOperation();
             destination.ReceiveDrop(nodes, index);
-            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {destination} at position {index}", true);
+            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {destination.Description} at position {index}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

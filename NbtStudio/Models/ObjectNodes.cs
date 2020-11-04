@@ -278,25 +278,30 @@ namespace NbtStudio
 
     public static class FileNodeOperations
     {
-        public static bool DeleteFile(IHavePath item)
+        public static string Description(string path)
         {
-            if (item.Path == null)
+            return Path.GetFileName(path);
+        }
+
+        public static bool DeleteFile(string path)
+        {
+            if (path == null || !File.Exists(path))
                 return true;
             try
             {
-                FileSystem.DeleteFile(item.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                FileSystem.DeleteFile(path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
             }
             catch { return false; }
             return true;
         }
 
-        public static bool DeleteFolder(IHavePath item)
+        public static bool DeleteFolder(string path)
         {
-            if (item.Path == null)
+            if (path == null || !Directory.Exists(path))
                 return true;
             try
             {
-                FileSystem.DeleteDirectory(item.Path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                FileSystem.DeleteDirectory(path, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
             }
             catch { return false; }
             return true;
@@ -371,14 +376,14 @@ namespace NbtStudio
                 NoticeAction(action);
         }
 
-        public override string Description => Path.GetFileName(File.Path);
+        public override string Description => File.Path == null ? "unsaved file" : Path.GetFileName(File.Path);
 
         public override bool CanCopy => true;
         public override string Copy() => NbtNodeOperations.Copy(File.RootTag);
         public override bool CanDelete => true;
         public override void Delete()
         {
-            if (FileNodeOperations.DeleteFile(File))
+            if (FileNodeOperations.DeleteFile(File.Path))
                 base.Delete();
         }
         public override bool CanEdit => false;
@@ -489,7 +494,7 @@ namespace NbtStudio
             Notify(sender);
         }
 
-        public override string Description => Path.GetFileName(Region.Path);
+        public override string Description => Region.Path == null ? "unsaved region file" : Path.GetFileName(Region.Path);
 
         public override bool CanCopy => false;
         public override bool CanDelete => true;
@@ -497,7 +502,7 @@ namespace NbtStudio
         {
             if (Region.Path != null)
                 Region.Dispose();
-            if (FileNodeOperations.DeleteFile(Region))
+            if (FileNodeOperations.DeleteFile(Region.Path))
                 base.Delete();
         }
         public override bool CanEdit => false;
@@ -540,7 +545,7 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            if (FileNodeOperations.DeleteFolder(Folder))
+            if (FileNodeOperations.DeleteFolder(Folder.Path))
                 base.Delete();
         }
         public override bool CanEdit => false;
