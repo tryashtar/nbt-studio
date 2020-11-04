@@ -26,11 +26,12 @@ namespace NbtStudio.UI
             ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
             if (CheckCoordsInternal() != CoordCheckResult.Valid)
             {
-                var auto = NbtUtil.GetAvailableCoords(region).FirstOrDefault();
-                if (auto != null)
+                var auto = NbtUtil.GetAvailableCoords(region);
+                if (auto.Any())
                 {
-                    XBox.Value = auto.Item1;
-                    ZBox.Value = auto.Item2;
+                    var (x, y) = auto.First();
+                    XBox.Value = x;
+                    ZBox.Value = y;
                 }
             }
             XBox.TextChanged += Box_TextChanged;

@@ -38,10 +38,11 @@ namespace NbtStudio.UI
             if (bypass_window)
             {
                 // find first available slot
-                var available = NbtUtil.GetAvailableCoords(parent).FirstOrDefault();
-                if (available == null)
+                var available = NbtUtil.GetAvailableCoords(parent);
+                if (!available.Any())
                     return null;
-                chunk.Move(available.Item1, available.Item2);
+                var (x, y) = available.First();
+                chunk.Move(x, y);
                 return chunk;
             }
             else

@@ -167,13 +167,13 @@ namespace NbtStudio
             return null;
         }
 
-        public Tuple<INode, int> GetInsertionLocation(INode target, NodePosition position)
+        public (INode destination, int index) GetInsertionLocation(INode target, NodePosition position)
         {
             var obj = target.Object;
             var path = View.GetPath(FindNodeByObject(obj));
             var children = GetChildren(obj);
             if (position == NodePosition.Inside)
-                return Tuple.Create(target, children.Count());
+                return (target, children.Count());
             else
             {
                 var parent = path.FullPath[path.FullPath.Length - 2];
@@ -181,7 +181,7 @@ namespace NbtStudio
                 int index = parent_children.IndexOf(obj);
                 if (position == NodePosition.After)
                     index++;
-                return Tuple.Create(Wrap(parent), index);
+                return (Wrap(parent), index);
             }
         }
 

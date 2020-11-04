@@ -655,18 +655,18 @@ namespace NbtStudio.UI
 
         private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            var insert = ViewModel.GetInsertionLocation(target, position);
-            if (insert.Item1 == null) return false;
-            return insert.Item1.CanReceiveDrop(nodes);
+            var (destination, index) = ViewModel.GetInsertionLocation(target, position);
+            if (destination == null) return false;
+            return destination.CanReceiveDrop(nodes);
         }
 
         private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
-            var insert = ViewModel.GetInsertionLocation(target, position);
-            if (insert.Item1 == null) return;
+            var (destination, index) = ViewModel.GetInsertionLocation(target, position);
+            if (destination == null) return;
             ViewModel.StartBatchOperation();
-            insert.Item1.ReceiveDrop(nodes, insert.Item2);
-            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {insert.Item1.Description} at position {insert.Item2}", true);
+            destination.ReceiveDrop(nodes, index);
+            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {destination} at position {index}", true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -202,22 +202,22 @@ namespace NbtStudio
             }
         }
 
-        public static Tuple<string, string> MinMaxFor(NbtTagType type)
+        public static (string min, string max) MinMaxFor(NbtTagType type)
         {
             switch (type)
             {
                 case NbtTagType.Byte:
-                    return Tuple.Create(sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
+                    return (sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
                 case NbtTagType.Short:
-                    return Tuple.Create(short.MinValue.ToString(), short.MaxValue.ToString());
+                    return (short.MinValue.ToString(), short.MaxValue.ToString());
                 case NbtTagType.Int:
-                    return Tuple.Create(int.MinValue.ToString(), int.MaxValue.ToString());
+                    return (int.MinValue.ToString(), int.MaxValue.ToString());
                 case NbtTagType.Long:
-                    return Tuple.Create(long.MinValue.ToString(), long.MaxValue.ToString());
+                    return (long.MinValue.ToString(), long.MaxValue.ToString());
                 case NbtTagType.Float:
-                    return Tuple.Create(float.MinValue.ToString(), float.MaxValue.ToString());
+                    return (float.MinValue.ToString(), float.MaxValue.ToString());
                 case NbtTagType.Double:
-                    return Tuple.Create(double.MinValue.ToString(), double.MaxValue.ToString());
+                    return (double.MinValue.ToString(), double.MaxValue.ToString());
                 default:
                     throw new ArgumentException($"{type} isn't numeric, has no min and max");
             }
@@ -357,14 +357,14 @@ namespace NbtStudio
             }
         }
 
-        public static IEnumerable<Tuple<int, int>> GetAvailableCoords(RegionFile region, int starting_x = 0, int starting_z = 0)
+        public static IEnumerable<(int x, int z)> GetAvailableCoords(RegionFile region, int starting_x = 0, int starting_z = 0)
         {
             for (int x = starting_x; x < RegionFile.ChunkXDimension; x++)
             {
                 for (int z = (x == starting_x ? starting_z : 0); z < RegionFile.ChunkZDimension; z++)
                 {
                     if (region.GetChunk(x, z) == null)
-                        yield return Tuple.Create(x, z);
+                        yield return (x, z);
                 }
             }
         }

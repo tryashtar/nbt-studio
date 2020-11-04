@@ -44,8 +44,8 @@ namespace NbtStudio.UI
                 ShowTooltip("Invalid Format", $"The value is formatted incorrectly for a {NbtUtil.TagTypeName(NbtTag.TagType).ToLower()}", TimeSpan.FromSeconds(2));
             else if (result == ValueCheckResult.InvalidOutOfRange)
             {
-                var minmax = NbtUtil.MinMaxFor(NbtTag.TagType);
-                ShowTooltip("Out of Range", $"The value for {NbtUtil.TagTypeName(NbtTag.TagType).ToLower()}s must be between {minmax.Item1} and {minmax.Item2}", TimeSpan.FromSeconds(4));
+                var (min, max) = NbtUtil.MinMaxFor(NbtTag.TagType);
+                ShowTooltip("Out of Range", $"The value for {NbtUtil.TagTypeName(NbtTag.TagType).ToLower()}s must be between {min} and {max}", TimeSpan.FromSeconds(4));
             }
             else if (result == ValueCheckResult.InvalidUnknown)
                 ShowTooltip("Unknown Error", "There was an unknown error attempting to parse the value", TimeSpan.FromSeconds(2));

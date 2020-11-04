@@ -60,20 +60,17 @@ namespace NbtStudio.UI
     {
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
-            var halves = GetText(node);
-            if (halves != null)
+            var (name, value) = GetText(node);
+            var size = MeasureSizeF(node, context);
+            PointF point = new PointF(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
+            DrawSelection(node, context);
+            var boldfont = new Font(context.Font, FontStyle.Bold);
+            if (name != null)
             {
-                var size = MeasureSizeF(node, context);
-                PointF point = new PointF(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
-                DrawSelection(node, context);
-                var boldfont = new Font(context.Font, FontStyle.Bold);
-                if (halves.Item1 != null)
-                {
-                    context.Graphics.DrawString(halves.Item1, boldfont, new SolidBrush(Parent.ForeColor), point);
-                    point.X += context.Graphics.MeasureString(halves.Item1, boldfont).Width;
-                }
-                context.Graphics.DrawString(halves.Item2, context.Font, new SolidBrush(Parent.ForeColor), point);
+                context.Graphics.DrawString(name, boldfont, new SolidBrush(Parent.ForeColor), point);
+                point.X += context.Graphics.MeasureString(name, boldfont).Width;
             }
+            context.Graphics.DrawString(value, context.Font, new SolidBrush(Parent.ForeColor), point);
         }
 
         public static void DrawSelection(TreeNodeAdv node, DrawContext context)
@@ -94,22 +91,20 @@ namespace NbtStudio.UI
 
         private SizeF MeasureSizeF(TreeNodeAdv node, DrawContext context)
         {
-            var halves = GetText(node);
-            if (halves == null)
-                return Size.Empty;
+            var (name, value) = GetText(node);
             var boldfont = new Font(context.Font, FontStyle.Bold);
-            SizeF s1 = halves.Item1 == null ? SizeF.Empty : context.Graphics.MeasureString(halves.Item1, boldfont);
-            SizeF s2 = context.Graphics.MeasureString(halves.Item2, context.Font);
+            SizeF s1 = name == null ? SizeF.Empty : context.Graphics.MeasureString(name, boldfont);
+            SizeF s2 = context.Graphics.MeasureString(value, context.Font);
             return new SizeF(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
-        private Tuple<string, string> GetText(TreeNodeAdv node)
+        private (string name, string value) GetText(TreeNodeAdv node)
         {
-            var text = PreviewNameAndValue(node);
-            return Tuple.Create(Flatten(text.Item1), Flatten(text.Item2));
+            var (name, value) = PreviewNameAndValue(node);
+            return (Flatten(name), Flatten(value));
         }
 
-        private Tuple<string, string> PreviewNameAndValue(TreeNodeAdv node)
+        private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
         {
             string prefix = null;
             string name = PreviewName(node.Tag);
@@ -117,8 +112,8 @@ namespace NbtStudio.UI
             if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges)
                 prefix = "* ";
             if (name == null)
-                return Tuple.Create(prefix, value);
-            return Tuple.Create(prefix + name + ": ", value);
+                return (prefix, value);
+            return (prefix + name + ": ", value);
         }
 
         public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag);

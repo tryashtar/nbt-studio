@@ -32,13 +32,13 @@ namespace NbtStudio
 
     public static class NodeExtractions
     {
-        public static Dictionary<Type, Tuple<string, string>> NodeTypes = new Dictionary<Type, Tuple<string, string>>
+        public static Dictionary<Type, (string singular, string plural)> NodeTypes = new Dictionary<Type, (string, string)>
         {
-            { typeof(NbtTagNode), Tuple.Create("tag", "tags") },
-            { typeof(NbtFileNode), Tuple.Create("file", "files") },
-            { typeof(ChunkNode), Tuple.Create("chunk", "chunks") },
-            { typeof(RegionFileNode), Tuple.Create("region file", "region files") },
-            { typeof(FolderNode), Tuple.Create("folder", "folders") }
+            { typeof(NbtTagNode), ("tag", "tags") },
+            { typeof(NbtFileNode), ("file", "files") },
+            { typeof(ChunkNode), ("chunk", "chunks") },
+            { typeof(RegionFileNode), ("region file", "region files") },
+            { typeof(FolderNode), ("folder", "folders") }
         };
 
         // user-friendly description of multiple nodes
@@ -68,8 +68,8 @@ namespace NbtStudio
             var strings = new List<string>();
             foreach (var item in results)
             {
-                var desc = NodeTypes[item.Key];
-                strings.Add(Util.Pluralize(item.Value, desc.Item1, desc.Item2));
+                var (singular, plural) = NodeTypes[item.Key];
+                strings.Add(Util.Pluralize(item.Value, singular, plural));
             }
             if (unknowns > 0)
                 strings.Add(Util.Pluralize(unknowns, "unknown node"));
@@ -508,7 +508,7 @@ namespace NbtStudio
         {
             var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
             var available = NbtUtil.GetAvailableCoords(Region);
-            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.Item1, slot.Item2));
+            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.x, slot.z));
             foreach (var chunk in chunks)
             {
                 Region.AddChunk(chunk);
