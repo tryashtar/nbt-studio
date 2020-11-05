@@ -681,7 +681,6 @@ namespace NbtStudio.UI
         {
             if (e.Button == MouseButtons.Right)
             {
-                var obj = ViewModel.ObjectFromClick(e);
                 var menu = new ContextMenuStrip();
                 if (e.Node.CanExpand)
                 {
@@ -690,6 +689,7 @@ namespace NbtStudio.UI
                     else
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
                 }
+                var obj = ViewModel.ObjectFromClick(e);
                 var saveable = obj.GetSaveable();
                 if (saveable != null)
                 {
@@ -697,9 +697,10 @@ namespace NbtStudio.UI
                         menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("&Save File", Properties.Resources.action_save_image, (s, ea) => Save(saveable));
                     menu.Items.Add("Save File &As", Properties.Resources.action_save_image, (s, ea) => SaveAs(saveable));
-                    if (saveable.Path != null)
-                        menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(saveable));
                 }
+                var path = obj.GetHasPath();
+                if (path?.Path != null)
+                    menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(path));
                 var container = obj.GetNbtTag() as INbtContainer;
                 if (container != null)
                 {
@@ -707,7 +708,7 @@ namespace NbtStudio.UI
                         menu.Items.Add(new ToolStripSeparator());
                     var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
                     bool single = Util.ExactlyOne(addable);
-                    Func<NbtTagType, string> display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
+                    var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
                     var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(x), (s, ea) => AddTag(container, x))).ToArray();
                     if (single)
                         menu.Items.AddRange(items);
