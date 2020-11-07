@@ -304,8 +304,13 @@ namespace NbtStudio.UI
 
         private void Cut()
         {
-            Copy();
-            Delete();
+            if (ViewModel == null) return;
+            var objs = ViewModel.SelectedObjects.Where(x => x.CanCut).ToList();
+            if (objs.Any())
+            {
+                string text = String.Join("\n", objs.Select(x => x.Cut()));
+                Clipboard.SetText(text);
+            }
         }
 
         private void Copy()
@@ -582,7 +587,7 @@ namespace NbtStudio.UI
                 item.Value.Visible = region == null;
             }
             ActionSort.Enabled = obj != null && obj.CanSort;
-            ActionCut.Enabled = obj != null && obj.CanCopy && obj.CanDelete;
+            ActionCut.Enabled = obj != null && obj.CanCopy;
             ActionCopy.Enabled = obj != null && obj.CanCopy;
             ActionPaste.Enabled = obj != null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
             ActionDelete.Enabled = obj != null && obj.CanDelete;

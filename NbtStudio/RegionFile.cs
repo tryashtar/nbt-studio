@@ -14,6 +14,7 @@ namespace NbtStudio
         public const int ChunkZDimension = 32;
         public int ChunkCount { get; private set; }
         public event EventHandler ChunksChanged;
+        public event EventHandler OnSaved;
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
@@ -191,6 +192,7 @@ namespace NbtStudio
             }
             HasChunkChanges = false;
             Stream = File.OpenRead(Path);
+            OnSaved?.Invoke(this, EventArgs.Empty);
         }
 
         private bool CanWriteChunk(Chunk chunk)

@@ -16,6 +16,7 @@ namespace NbtStudio
     {
         public string Path { get; private set; }
         private NbtCompound RootTagData;
+        public event EventHandler OnSaved;
         public NotifyNbtCompound RootTag { get; private set; }
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
@@ -136,6 +137,7 @@ namespace NbtStudio
         {
             ExportSettings.Export(Path, RootTagData);
             HasUnsavedChanges = false;
+            OnSaved?.Invoke(this, EventArgs.Empty);
         }
 
         public void SaveAs(string path)
@@ -159,6 +161,7 @@ namespace NbtStudio
 
     public interface ISaveable : IHavePath
     {
+        event EventHandler OnSaved;
         bool HasUnsavedChanges { get; }
         bool CanSave { get; }
         void Save();

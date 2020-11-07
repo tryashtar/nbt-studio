@@ -22,6 +22,8 @@ namespace NbtStudio
         void Sort();
         bool CanCopy { get; }
         string Copy();
+        bool CanCut { get; }
+        string Cut();
         bool CanPaste { get; }
         IEnumerable<INode> Paste(string data);
         bool CanRename { get; }
@@ -200,6 +202,8 @@ namespace NbtStudio
         public virtual void Sort() { }
         public virtual bool CanCopy => false;
         public virtual string Copy() => null;
+        public virtual bool CanCut => CanDelete && CanCopy;
+        public virtual string Cut() { string copy = Copy(); Delete(); return copy; }
         public virtual bool CanPaste => false;
         public virtual IEnumerable<INode> Paste(string data) => Enumerable.Empty<INode>();
         public virtual bool CanRename => false;
@@ -361,8 +365,14 @@ namespace NbtStudio
         public NbtFile File => (NbtFile)SourceObject;
         public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
         {
+            File.OnSaved += File_OnSaved;
             File.RootTag.Changed += RootTag_Changed;
             File.RootTag.ActionPerformed += RootTag_ActionPrepared;
+        }
+
+        private void File_OnSaved(object sender, EventArgs e)
+        {
+            Notify();
         }
 
         private void RootTag_Changed(object sender, EventArgs e)
@@ -486,7 +496,13 @@ namespace NbtStudio
         public RegionFileNode(NbtTreeModel tree, RegionFile region) : base(tree, region)
         {
             Region = region;
+            Region.OnSaved += Region_OnSaved;
             Region.ChunksChanged += Region_ChunksChanged;
+        }
+
+        private void Region_OnSaved(object sender, EventArgs e)
+        {
+            Notify();
         }
 
         private void Region_ChunksChanged(object sender, EventArgs e)
