@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class RegionFile : ISaveable, IDisposable
+    public class RegionFile : ISaveable
     {
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
@@ -18,7 +18,6 @@ namespace NbtStudio
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
-        internal FileStream Stream { get; private set; }
         public string Path { get; private set; }
         public bool HasChunkChanges { get; private set; } = false;
         public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
@@ -26,38 +25,45 @@ namespace NbtStudio
         {
             Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             Path = path;
-            Stream = File.OpenRead(path);
-            Locations = Util.ReadBytes(Stream, 4096);
-            Timestamps = Util.ReadBytes(Stream, 4096);
-            ChunkCount = 0;
-            for (int z = 0; z < Chunks.GetLength(1); z++)
+            var stream = GetStream();
+            try
             {
-                for (int x = 0; x < Chunks.GetLength(0); x++)
+                Locations = Util.ReadBytes(stream, 4096);
+                Timestamps = Util.ReadBytes(stream, 4096);
+                ChunkCount = 0;
+                for (int z = 0; z < Chunks.GetLength(1); z++)
                 {
-                    int offset = ChunkOffset(x, z);
-                    int size = ChunkSize(x, z);
-                    if (offset > 0 && offset < 8192)
-                        throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
-                    if (offset > Stream.Length)
-                        throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {Stream.Length} long");
-                    if (size > 0)
+                    for (int x = 0; x < Chunks.GetLength(0); x++)
                     {
-                        ChunkCount++;
-                        Chunks[x, z] = new Chunk(this, x, z, offset, size);
-                        if (ChunkCount == 1)
-                            Chunks[x, z].Load(); // load the first one to check if this is really a region file
+                        int offset = ChunkOffset(x, z);
+                        int size = ChunkSize(x, z);
+                        if (offset > 0 && offset < 8192)
+                            throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
+                        if (offset > stream.Length)
+                            throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {stream.Length} long");
+                        if (size > 0)
+                        {
+                            ChunkCount++;
+                            Chunks[x, z] = new Chunk(this, x, z, offset, size);
+                            if (ChunkCount == 1)
+                                Chunks[x, z].Load(); // load the first one to check if this is really a region file
+                        }
                     }
                 }
+                if (ChunkCount == 0)
+                    throw new FormatException($"Region doesn't contain any chunks");
             }
-            if (ChunkCount == 0)
-                throw new FormatException($"Region doesn't contain any chunks");
+            catch
+            {
+                stream.Dispose();
+                throw;
+            }
         }
 
         private RegionFile()
         {
             Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             Path = null;
-            Stream = null;
             Locations = new byte[4096];
             Timestamps = new byte[4096];
             ChunkCount = 0;
@@ -72,6 +78,11 @@ namespace NbtStudio
             try
             { return new RegionFile(path); }
             catch { return null; }
+        }
+
+        internal FileStream GetStream()
+        {
+            return File.OpenRead(Path);
         }
 
         public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
@@ -110,17 +121,16 @@ namespace NbtStudio
             if (Chunks[chunk.X, chunk.Z] != null)
                 throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
             if (chunk.Region != null)
+            {
+                if (!chunk.IsLoaded)
+                    chunk.Load();
                 chunk.Region.RemoveChunk(chunk.X, chunk.Z);
+            }
             Chunks[chunk.X, chunk.Z] = chunk;
             chunk.Region = this;
             ChunkCount++;
             HasChunkChanges = true;
             ChunksChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void Dispose()
-        {
-            Stream?.Dispose();
         }
 
         private static int ChunkDataLocation(int x, int z)
@@ -180,7 +190,6 @@ namespace NbtStudio
                     current_offset = (int)Math.Ceiling((decimal)current_offset / 4096) * 4096;
                 }
             }
-            Stream?.Dispose();
             using (var writer = File.OpenWrite(Path))
             {
                 writer.Write(Locations, 0, Locations.Length);
@@ -191,7 +200,6 @@ namespace NbtStudio
                 }
             }
             HasChunkChanges = false;
-            Stream = File.OpenRead(Path);
             OnSaved?.Invoke(this, EventArgs.Empty);
         }
 

@@ -61,9 +61,11 @@ namespace NbtStudio
             }
             if (!IsLoaded)
             {
-                Region.Stream.Seek(Offset, SeekOrigin.Begin);
+                var stream = Region.GetStream();
+                stream.Seek(Offset, SeekOrigin.Begin);
                 byte[] result = new byte[Size];
-                Region.Stream.Read(result, 0, Size);
+                stream.Read(result, 0, Size);
+                stream.Dispose();
                 return result;
             }
             if (IsCorrupt)
@@ -85,8 +87,9 @@ namespace NbtStudio
         public void Load()
         {
             if (IsCorrupt || IsExternal) return;
-            Region.Stream.Seek(Offset + 4, SeekOrigin.Begin);
-            int compression = Region.Stream.ReadByte();
+            var stream = Region.GetStream();
+            stream.Seek(Offset + 4, SeekOrigin.Begin);
+            int compression = stream.ReadByte();
             if (compression == -1)
             {
                 IsCorrupt = true;
@@ -104,7 +107,7 @@ namespace NbtStudio
                     var file = new fNbt.NbtFile();
                     try
                     {
-                        file.LoadFromStream(Region.Stream, NbtCompression.AutoDetect);
+                        file.LoadFromStream(stream, NbtCompression.AutoDetect);
                         Compression = file.FileCompression;
                         SetData(file.RootTag);
                     }
@@ -115,6 +118,7 @@ namespace NbtStudio
                     }
                 }
             }
+            stream.Dispose();
             OnLoaded?.Invoke(this, EventArgs.Empty);
         }
 
@@ -126,8 +130,6 @@ namespace NbtStudio
 
         public void AddTo(RegionFile region)
         {
-            if (Region != null)
-                Region.RemoveChunk(X, Z);
             region.AddChunk(this);
         }
 

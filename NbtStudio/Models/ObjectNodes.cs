@@ -567,8 +567,6 @@ namespace NbtStudio
         public override bool CanDelete => true;
         public override void Delete()
         {
-            if (Region.Path != null)
-                Region.Dispose();
             if (FileNodeOperations.DeleteFile(Region.Path))
                 base.Delete();
         }
