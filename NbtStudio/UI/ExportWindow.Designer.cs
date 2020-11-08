@@ -32,16 +32,16 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.RadioSnbt = new System.Windows.Forms.RadioButton();
             this.RadioNbt = new System.Windows.Forms.RadioButton();
-            this.CheckGzip = new System.Windows.Forms.CheckBox();
             this.CheckMinify = new System.Windows.Forms.CheckBox();
             this.CheckLittleEndian = new System.Windows.Forms.CheckBox();
+            this.CompressionBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // ButtonCancel
             // 
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonCancel.Location = new System.Drawing.Point(75, 71);
+            this.ButtonCancel.Location = new System.Drawing.Point(110, 71);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
             this.ButtonCancel.TabIndex = 11;
@@ -51,7 +51,7 @@
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(156, 71);
+            this.ButtonOk.Location = new System.Drawing.Point(191, 71);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
             this.ButtonOk.TabIndex = 10;
@@ -82,16 +82,6 @@
             this.RadioNbt.UseVisualStyleBackColor = true;
             this.RadioNbt.CheckedChanged += new System.EventHandler(this.RadioNbt_CheckedChanged);
             // 
-            // CheckGzip
-            // 
-            this.CheckGzip.AutoSize = true;
-            this.CheckGzip.Location = new System.Drawing.Point(75, 12);
-            this.CheckGzip.Name = "CheckGzip";
-            this.CheckGzip.Size = new System.Drawing.Size(70, 17);
-            this.CheckGzip.TabIndex = 14;
-            this.CheckGzip.Text = "G-Zipped";
-            this.CheckGzip.UseVisualStyleBackColor = true;
-            // 
             // CheckMinify
             // 
             this.CheckMinify.AutoSize = true;
@@ -105,12 +95,21 @@
             // CheckLittleEndian
             // 
             this.CheckLittleEndian.AutoSize = true;
-            this.CheckLittleEndian.Location = new System.Drawing.Point(151, 12);
+            this.CheckLittleEndian.Location = new System.Drawing.Point(75, 12);
             this.CheckLittleEndian.Name = "CheckLittleEndian";
             this.CheckLittleEndian.Size = new System.Drawing.Size(84, 17);
             this.CheckLittleEndian.TabIndex = 16;
             this.CheckLittleEndian.Text = "Little-Endian";
             this.CheckLittleEndian.UseVisualStyleBackColor = true;
+            // 
+            // CompressionBox
+            // 
+            this.CompressionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CompressionBox.FormattingEnabled = true;
+            this.CompressionBox.Location = new System.Drawing.Point(163, 10);
+            this.CompressionBox.Name = "CompressionBox";
+            this.CompressionBox.Size = new System.Drawing.Size(103, 21);
+            this.CompressionBox.TabIndex = 17;
             // 
             // ExportWindow
             // 
@@ -118,10 +117,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(243, 106);
+            this.ClientSize = new System.Drawing.Size(278, 106);
+            this.Controls.Add(this.CompressionBox);
             this.Controls.Add(this.CheckLittleEndian);
             this.Controls.Add(this.CheckMinify);
-            this.Controls.Add(this.CheckGzip);
             this.Controls.Add(this.RadioNbt);
             this.Controls.Add(this.RadioSnbt);
             this.Controls.Add(this.ButtonCancel);
@@ -143,8 +142,8 @@
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.RadioButton RadioSnbt;
         private System.Windows.Forms.RadioButton RadioNbt;
-        private System.Windows.Forms.CheckBox CheckGzip;
         private System.Windows.Forms.CheckBox CheckMinify;
         private System.Windows.Forms.CheckBox CheckLittleEndian;
+        private System.Windows.Forms.ComboBox CompressionBox;
     }
 }

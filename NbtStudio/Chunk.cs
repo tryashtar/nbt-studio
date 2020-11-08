@@ -22,6 +22,8 @@ namespace NbtStudio
         public bool IsLoaded => Data != null;
         public event EventHandler OnLoaded;
         public bool IsCorrupt { get; private set; } = false;
+        public bool IsExternal { get; private set; } = false;
+        private byte ExternalCompression;
         internal Chunk(RegionFile region, int x, int z, int offset, int size)
         {
             Region = region;
@@ -49,6 +51,14 @@ namespace NbtStudio
 
         public byte[] SaveBytes()
         {
+            if (IsExternal)
+            {
+                var data = new byte[Size + 5];
+                var size = Util.GetBytes(1);
+                Array.Copy(size, data, 4);
+                data[4] = ExternalCompression;
+                return data;
+            }
             if (!IsLoaded)
             {
                 Region.Stream.Seek(Offset, SeekOrigin.Begin);
@@ -74,19 +84,36 @@ namespace NbtStudio
 
         public void Load()
         {
-            if (IsCorrupt) return;
-            Region.Stream.Seek(Offset + 5, SeekOrigin.Begin);
-            var file = new fNbt.NbtFile();
-            try
-            {
-                file.LoadFromStream(Region.Stream, NbtCompression.AutoDetect);
-                Compression = file.FileCompression;
-                SetData(file.RootTag);
-            }
-            catch
+            if (IsCorrupt || IsExternal) return;
+            Region.Stream.Seek(Offset + 4, SeekOrigin.Begin);
+            int compression = Region.Stream.ReadByte();
+            if (compression == -1)
             {
                 IsCorrupt = true;
                 Remove();
+            }
+            else
+            {
+                if ((compression & (1 << 7)) != 0)
+                {
+                    IsExternal = true;
+                    ExternalCompression = (byte)compression;
+                }
+                else
+                {
+                    var file = new fNbt.NbtFile();
+                    try
+                    {
+                        file.LoadFromStream(Region.Stream, NbtCompression.AutoDetect);
+                        Compression = file.FileCompression;
+                        SetData(file.RootTag);
+                    }
+                    catch
+                    {
+                        IsCorrupt = true;
+                        Remove();
+                    }
+                }
             }
             OnLoaded?.Invoke(this, EventArgs.Empty);
         }

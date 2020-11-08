@@ -163,6 +163,8 @@ namespace NbtStudio.UI
             {
                 if (chunk.IsLoaded)
                     return NbtUtil.PreviewNbtValue(chunk.Data);
+                else if (chunk.IsExternal)
+                    return "(saved externally)";
                 else
                     return "(open to load)";
             }

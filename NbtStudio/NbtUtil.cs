@@ -432,7 +432,7 @@ namespace NbtStudio
             return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
         }
 
-        private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcstructure", "schematic" };
+        private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcc", "mcstructure", "schematic" };
         public static string SaveFilter()
         {
             return "NBT Files|" + String.Join("; ", NbtExtensions.Select(x => "*." + x)) + "|All Files|*";

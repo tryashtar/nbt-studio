@@ -498,9 +498,9 @@ namespace NbtStudio
 
         public override string Description => NbtUtil.ChunkDescription(Chunk);
 
-        public override bool CanCopy => true;
+        public override bool CanCopy => !Chunk.IsExternal;
         public override DataObject Copy() => NbtNodeOperations.Copy(AccessChunkData());
-        public override bool CanDelete => true;
+        public override bool CanDelete => !Chunk.IsExternal;
         public override void Delete()
         {
             var region = Chunk.Region;
@@ -514,10 +514,10 @@ namespace NbtStudio
                 NoticeAction(action);
             }
         }
-        public override bool CanEdit => true;
-        public override bool CanPaste => true;
-        public override bool CanRename => true;
-        public override bool CanSort => true;
+        public override bool CanEdit => !Chunk.IsExternal;
+        public override bool CanPaste => !Chunk.IsExternal;
+        public override bool CanRename => !Chunk.IsExternal;
+        public override bool CanSort => !Chunk.IsExternal;
         public override void Sort() => NbtNodeOperations.Sort(AccessChunkData());
         public override IEnumerable<INode> Paste(IDataObject data)
         {

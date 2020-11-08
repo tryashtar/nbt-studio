@@ -323,7 +323,7 @@ namespace NbtStudio
         private bool HasChildren(object obj)
         {
             if (obj is Chunk chunk && !chunk.IsLoaded)
-                return true;
+                return !chunk.IsExternal;
             if (obj is NbtFolder folder && !folder.HasScanned)
                 return true;
             var children = GetChildren(obj);

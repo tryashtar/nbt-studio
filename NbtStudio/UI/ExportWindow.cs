@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using NbtStudio;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace NbtStudio.UI
@@ -12,11 +13,15 @@ namespace NbtStudio.UI
         {
             InitializeComponent();
             this.Icon = Properties.Resources.action_save_icon;
+            CompressionBox.Items.Add(new CompressionDisplay("Uncompressed", NbtCompression.None));
+            CompressionBox.Items.Add(new CompressionDisplay("G-Zip", NbtCompression.GZip));
+            CompressionBox.Items.Add(new CompressionDisplay("ZLib", NbtCompression.ZLib));
+            CompressionBox.SelectedIndex = 0;
             if (template != null)
             {
                 Header = template.Header;
                 RadioSnbt.Checked = template.Snbt;
-                CheckGzip.Checked = template.Compression == NbtCompression.GZip;
+                CompressionBox.SelectedItem = CompressionBox.Items.Cast<CompressionDisplay>().FirstOrDefault(x => x.Compression == template.Compression);
                 CheckMinify.Checked = template.Minified;
                 CheckLittleEndian.Checked = !template.BigEndian;
             }
@@ -30,7 +35,7 @@ namespace NbtStudio.UI
             if (RadioSnbt.Checked)
                 return ExportSettings.AsSnbt(CheckMinify.Checked);
             else
-                return ExportSettings.AsNbt(CheckGzip.Checked ? NbtCompression.GZip : NbtCompression.None, !CheckLittleEndian.Checked, Header);
+                return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, Header);
         }
 
         private void Apply()
@@ -51,9 +56,25 @@ namespace NbtStudio.UI
 
         private void SetEnables()
         {
-            CheckGzip.Enabled = RadioNbt.Checked;
+            CompressionBox.Enabled = RadioNbt.Checked;
             CheckLittleEndian.Enabled = RadioNbt.Checked;
             CheckMinify.Enabled = RadioSnbt.Checked;
+        }
+
+        private class CompressionDisplay
+        {
+            public readonly string Name;
+            public readonly NbtCompression Compression;
+            public CompressionDisplay(string name, NbtCompression compression)
+            {
+                Name = name;
+                Compression = compression;
+            }
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
     }
 }
