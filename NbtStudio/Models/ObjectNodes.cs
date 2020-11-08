@@ -5,10 +5,12 @@ using NbtStudio.SNBT;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NbtStudio
 {
@@ -21,11 +23,11 @@ namespace NbtStudio
         bool CanSort { get; }
         void Sort();
         bool CanCopy { get; }
-        string Copy();
+        DataObject Copy();
         bool CanCut { get; }
-        string Cut();
+        DataObject Cut();
         bool CanPaste { get; }
-        IEnumerable<INode> Paste(string data);
+        IEnumerable<INode> Paste(IDataObject data);
         bool CanRename { get; }
         bool CanEdit { get; }
         bool CanReceiveDrop(IEnumerable<INode> nodes);
@@ -201,11 +203,11 @@ namespace NbtStudio
         public virtual bool CanSort => false;
         public virtual void Sort() { }
         public virtual bool CanCopy => false;
-        public virtual string Copy() => null;
+        public virtual DataObject Copy() => null;
         public virtual bool CanCut => CanDelete && CanCopy;
-        public virtual string Cut() { string copy = Copy(); Delete(); return copy; }
+        public virtual DataObject Cut() { var copy = Copy(); Delete(); return copy; }
         public virtual bool CanPaste => false;
-        public virtual IEnumerable<INode> Paste(string data) => Enumerable.Empty<INode>();
+        public virtual IEnumerable<INode> Paste(IDataObject data) => Enumerable.Empty<INode>();
         public virtual bool CanRename => false;
         public virtual bool CanEdit => false;
         public virtual bool CanReceiveDrop(IEnumerable<INode> nodes) => false;
@@ -214,9 +216,11 @@ namespace NbtStudio
 
     public static class NbtNodeOperations
     {
-        public static string Copy(INbtTag tag)
+        public static DataObject Copy(INbtTag tag)
         {
-            return tag.ToSnbt(include_name: true);
+            var data = new DataObject();
+            data.SetText(tag.ToSnbt(include_name: true));
+            return data;
         }
 
         public static bool CanEdit(INbtTag tag)
@@ -245,8 +249,11 @@ namespace NbtStudio
                 NbtUtil.Sort(compound, new NbtUtil.TagTypeSorter(), true);
         }
 
-        public static IEnumerable<NbtTag> ParseTags(string text)
+        public static IEnumerable<NbtTag> ParseTags(IDataObject data)
         {
+            var text = (string)data.GetData(typeof(string));
+            if (text == null)
+                yield break;
             var snbts = text.Split('\n');
             foreach (var nbt in snbts)
             {
@@ -255,11 +262,11 @@ namespace NbtStudio
             }
         }
 
-        public static IEnumerable<INbtTag> Paste(INbtTag tag, string text)
+        public static IEnumerable<INbtTag> Paste(INbtTag tag, IDataObject data)
         {
             if (tag is INbtContainer container)
             {
-                var tags = ParseTags(text).ToList();
+                var tags = ParseTags(data).ToList();
                 NbtUtil.TransformAdd(tags, container);
                 return tags;
             }
@@ -335,7 +342,7 @@ namespace NbtStudio
         public override string Description => Tag.TagDescription();
 
         public override bool CanCopy => true;
-        public override string Copy() => NbtNodeOperations.Copy(Tag);
+        public override DataObject Copy() => NbtNodeOperations.Copy(Tag);
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -347,7 +354,7 @@ namespace NbtStudio
         public override bool CanRename => NbtNodeOperations.CanRename(Tag);
         public override bool CanSort => NbtNodeOperations.CanSort(Tag);
         public override void Sort() => NbtNodeOperations.Sort(Tag);
-        public override IEnumerable<INode> Paste(string data)
+        public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(Tag, data);
             return tags.Select(x => Create(Tree, x));
@@ -389,7 +396,13 @@ namespace NbtStudio
         public override string Description => File.Path == null ? "unsaved file" : Path.GetFileName(File.Path);
 
         public override bool CanCopy => true;
-        public override string Copy() => NbtNodeOperations.Copy(File.RootTag);
+        public override DataObject Copy()
+        {
+            var data = NbtNodeOperations.Copy(File.RootTag);
+            if (File.Path != null)
+                data.SetFileDropList(new StringCollection { File.Path });
+            return data;
+        }
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -401,7 +414,7 @@ namespace NbtStudio
         public override bool CanRename => false;
         public override bool CanSort => NbtNodeOperations.CanSort(File.RootTag);
         public override void Sort() => NbtNodeOperations.Sort(File.RootTag);
-        public override IEnumerable<INode> Paste(string data)
+        public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(File.RootTag, data);
             return tags.Select(x => Create(Tree, x));
@@ -457,7 +470,7 @@ namespace NbtStudio
         public override string Description => NbtUtil.ChunkDescription(Chunk);
 
         public override bool CanCopy => true;
-        public override string Copy() => NbtNodeOperations.Copy(AccessChunkData());
+        public override DataObject Copy() => NbtNodeOperations.Copy(AccessChunkData());
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -477,7 +490,7 @@ namespace NbtStudio
         public override bool CanRename => true;
         public override bool CanSort => true;
         public override void Sort() => NbtNodeOperations.Sort(AccessChunkData());
-        public override IEnumerable<INode> Paste(string data)
+        public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(AccessChunkData(), data);
             return tags.Select(x => Create(Tree, x));
@@ -512,7 +525,14 @@ namespace NbtStudio
 
         public override string Description => Region.Path == null ? "unsaved region file" : Path.GetFileName(Region.Path);
 
-        public override bool CanCopy => false;
+        public override bool CanCopy => Region.Path != null;
+        public override DataObject Copy()
+        {
+            var data = new DataObject();
+            if (Region.Path != null)
+                data.SetFileDropList(new StringCollection { Region.Path });
+            return data;
+        }
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -525,7 +545,7 @@ namespace NbtStudio
         public override bool CanPaste => true;
         public override bool CanRename => false;
         public override bool CanSort => false;
-        public override IEnumerable<INode> Paste(string data)
+        public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
             var available = Region.GetAvailableCoords();

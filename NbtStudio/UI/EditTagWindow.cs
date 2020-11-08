@@ -48,7 +48,7 @@ namespace NbtStudio.UI
                 ValueBox.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
             }
 
-            if (SettingName && purpose != EditPurpose.EditValue)
+            if (SettingName && (!SettingValue || purpose != EditPurpose.EditValue))
             {
                 NameBox.Select();
                 NameBox.SelectAll();

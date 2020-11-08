@@ -2,11 +2,13 @@
 using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NbtStudio
 {
@@ -162,6 +164,46 @@ namespace NbtStudio
         public static bool ExactlyOne<T>(IEnumerable<T> items)
         {
             return items.Any() && !items.Skip(1).Any();
+        }
+
+        public static DataObject Merge(DataObject obj1, DataObject obj2)
+        {
+            var data = new DataObject();
+
+            var text1 = obj1.GetText();
+            var text2 = obj2.GetText();
+            var text_result = Merge(text1, text2);
+            if (text_result != null)
+                data.SetText(text_result);
+
+            var file1 = obj1.GetFileDropList();
+            var file2 = obj2.GetFileDropList();
+            var file_result = Merge(file1, file2);
+            if (file_result != null)
+                data.SetFileDropList(file_result);
+
+            return data;
+        }
+
+        private static string Merge(string str1, string str2)
+        {
+            if (str1 == null)
+                return str2;
+            if (str2 == null)
+                return str1;
+            return str1 + "\n" + str2;
+        }
+
+        private static StringCollection Merge(StringCollection col1, StringCollection col2)
+        {
+            if (col1 == null)
+                return col2;
+            if (col2 == null)
+                return col1;
+            var result = new StringCollection();
+            result.AddRange(col1.Cast<string>().ToArray());
+            result.AddRange(col2.Cast<string>().ToArray());
+            return result;
         }
     }
 }

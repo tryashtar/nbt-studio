@@ -308,8 +308,8 @@ namespace NbtStudio.UI
             var objs = ViewModel.SelectedObjects.Where(x => x.CanCut).ToList();
             if (objs.Any())
             {
-                string text = String.Join("\n", objs.Select(x => x.Cut()));
-                Clipboard.SetText(text);
+                var data = objs.Select(x => x.Cut()).Aggregate((x, y) => Util.Merge(x, y));
+                Clipboard.SetDataObject(data);
             }
         }
 
@@ -319,8 +319,8 @@ namespace NbtStudio.UI
             var objs = ViewModel.SelectedObjects.Where(x => x.CanCopy);
             if (objs.Any())
             {
-                string text = String.Join("\n", objs.Select(x => x.Copy()));
-                Clipboard.SetText(text);
+                var data = objs.Select(x => x.Copy()).Aggregate((x, y) => Util.Merge(x, y));
+                Clipboard.SetDataObject(data);
             }
         }
 
@@ -336,7 +336,7 @@ namespace NbtStudio.UI
             if (!node.CanPaste || !Clipboard.ContainsText())
                 return;
             ViewModel.StartBatchOperation();
-            var results = node.Paste(Clipboard.GetText());
+            var results = node.Paste(Clipboard.GetDataObject());
             ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
         }
 
