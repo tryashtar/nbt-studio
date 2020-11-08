@@ -432,14 +432,33 @@ namespace NbtStudio
             return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
         }
 
-        private static readonly string[] NbtExtensions = new[] { "nbt", "snbt", "dat", "mca", "mcr", "mcc", "mcstructure", "schematic" };
-        public static string SaveFilter()
+        private static readonly Dictionary<string, string> NbtExtensions = new Dictionary<string, string>
         {
-            return "NBT Files|" + String.Join("; ", NbtExtensions.Select(x => "*." + x)) + "|All Files|*";
+            { "nbt", "NBT files" },
+            { "snbt", "SNBT files" },
+            { "dat", "DAT files" },
+            { "mca", "Anvil Region files" },
+            { "mcr", "Legacy Region files" },
+            { "mcc", "External Chunk files" },
+            { "mcstructure", "Bedrock Structure files" },
+            { "schematic", "MCEdit Schematic files" }
+        };
+        private static string AllFiles => "All Files|*";
+        private static string AllNbtFiles => $"All NBT Files|{String.Join("; ", NbtExtensions.Keys.Select(x => "*." + x))}";
+        private static string IndividualNbtFiles() => String.Join("|", NbtExtensions.Select(x => $"{x.Value}|*.{x.Key}"));
+        private static string IndividualNbtFiles<T>(Func<KeyValuePair<string, string>, T> order) => String.Join("|", NbtExtensions.OrderBy(order).Select(x => $"{x.Value}|*.{x.Key}"));
+        public static string SaveFilter(string first_extension)
+        {
+            if (first_extension == null)
+                return $"{IndividualNbtFiles()}|{AllNbtFiles}|{AllFiles}";
+            if (!NbtExtensions.ContainsKey(first_extension.Substring(1)))
+                return $"{AllFiles}|{IndividualNbtFiles()}|{AllNbtFiles}";
+            string individual = IndividualNbtFiles(x => "." + x.Key != first_extension); // OrderBy puts false before true
+            return $"{individual}|{AllNbtFiles}|{AllFiles}";
         }
         public static string OpenFilter()
         {
-            return "All Files|*|NBT Files|" + String.Join("; ", NbtExtensions.Select(x => "*." + x));
+            return $"{AllFiles}|{AllNbtFiles}|{IndividualNbtFiles()}";
         }
 
         public static Image TagTypeImage(NbtTagType type)

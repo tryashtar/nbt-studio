@@ -263,7 +263,7 @@ namespace NbtStudio.UI
                 Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
                 RestoreDirectory = true,
                 FileName = file.Path,
-                Filter = NbtUtil.SaveFilter()
+                Filter = NbtUtil.SaveFilter(Path.GetExtension(file.Path))
             })
             {
                 if (file.Path != null)
@@ -275,7 +275,7 @@ namespace NbtStudio.UI
                 {
                     if (file is NbtFile nbtfile)
                     {
-                        var export = new ExportWindow(nbtfile.ExportSettings);
+                        var export = new ExportWindow(nbtfile.ExportSettings, dialog.FileName);
                         if (export.ShowDialog() == DialogResult.OK)
                             nbtfile.SaveAs(dialog.FileName, export.GetSettings());
                     }

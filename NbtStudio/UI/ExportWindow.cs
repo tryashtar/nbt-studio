@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using NbtStudio;
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -9,7 +10,7 @@ namespace NbtStudio.UI
     public partial class ExportWindow : Form
     {
         private readonly byte[] Header;
-        public ExportWindow(ExportSettings template)
+        public ExportWindow(ExportSettings template, string destination_path)
         {
             InitializeComponent();
             this.Icon = Properties.Resources.action_save_icon;
@@ -26,7 +27,11 @@ namespace NbtStudio.UI
                 CheckLittleEndian.Checked = !template.BigEndian;
             }
             else
+            {
                 Header = new byte[0];
+                RadioSnbt.Checked = Path.GetExtension(destination_path) == ".snbt";
+                CheckLittleEndian.Checked = Path.GetExtension(destination_path) == ".mcstructure";
+            }
             SetEnables();
         }
 
