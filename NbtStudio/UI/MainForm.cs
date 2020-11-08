@@ -133,6 +133,8 @@ namespace NbtStudio.UI
 
             Tools.Items.Add(new ToolStripSeparator());
             ActionFind.AddTo(Tools, MenuSearch);
+
+            NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -762,6 +764,7 @@ namespace NbtStudio.UI
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Properties.Settings.Default.TreeZoom = (int)NbtTree.Font.Size;
             Properties.Settings.Default.Save();
         }
 

@@ -21,7 +21,13 @@ namespace NbtStudio.UI
             this.RowHeight = 20;
             this.SelectionMode = TreeSelectionMode.Multi;
             this.Collapsing += NbtTreeView_Collapsing;
+            this.FontChanged += NbtTreeView_FontChanged;
             this.LoadOnDemand = true;
+        }
+
+        private void NbtTreeView_FontChanged(object sender, EventArgs e)
+        {
+            this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
@@ -29,8 +35,7 @@ namespace NbtStudio.UI
             if (Control.ModifierKeys == Keys.Control)
             {
                 float delta = (e.Delta > 0 ? 2f : -2f);
-                this.Font = new Font(this.Font.FontFamily, Math.Max(4, Math.Min(100, this.Font.Size + delta)));
-                this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
+                this.Font = new Font(this.Font.FontFamily, Math.Max(3, Math.Min(99, this.Font.Size + delta)));
             }
             else
                 base.OnMouseWheel(e);

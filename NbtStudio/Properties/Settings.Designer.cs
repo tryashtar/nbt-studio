@@ -45,5 +45,17 @@ namespace NbtStudio.Properties {
                 this["FindRegex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        public int TreeZoom {
+            get {
+                return ((int)(this["TreeZoom"]));
+            }
+            set {
+                this["TreeZoom"] = value;
+            }
+        }
     }
 }
