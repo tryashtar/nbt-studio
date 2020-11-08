@@ -24,6 +24,18 @@ namespace NbtStudio.UI
             this.LoadOnDemand = true;
         }
 
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            if (Control.ModifierKeys == Keys.Control)
+            {
+                float delta = (e.Delta > 0 ? 2f : -2f);
+                this.Font = new Font(this.Font.FontFamily, Math.Max(4, Math.Min(100, this.Font.Size + delta)));
+                this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
+            }
+            else
+                base.OnMouseWheel(e);
+        }
+
         private void NbtTreeView_Collapsing(object sender, TreeViewAdvEventArgs e)
         {
             this.Collapsing -= NbtTreeView_Collapsing;

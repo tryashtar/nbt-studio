@@ -4,6 +4,7 @@ using fNbt;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,10 @@ namespace NbtStudio.UI
                 rectangle.Height = (int)(image.Height * ratio);
                 rectangle.X = context.Bounds.X + (context.Bounds.Width - rectangle.Width) / 2;
                 rectangle.Y = context.Bounds.Y + (context.Bounds.Height - rectangle.Height) / 2;
+                if (context.Bounds.Width < image.Width || context.Bounds.Height < image.Height)
+                    context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                else
+                    context.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
                 context.Graphics.DrawImage(image, rectangle);
             }
         }
@@ -32,7 +37,8 @@ namespace NbtStudio.UI
         public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
         {
             var image = GetIcon(node);
-            return image == null ? Size.Empty : image.Size;
+            int height = node.Tree.RowHeight - 4;
+            return image == null ? Size.Empty : new Size((int)(((float)height / image.Height) * image.Width), height);
         }
 
         private Image GetIcon(TreeNodeAdv node)
