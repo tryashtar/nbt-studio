@@ -636,7 +636,7 @@ namespace NbtStudio
             bool move = drop.HasFlag(DragDropEffects.Move);
             foreach (var item in files)
             {
-                var destination = Path.Combine(Folder.Path, Path.GetFileName(item));
+                var destination = Util.GetUniqueFilename(Path.Combine(Folder.Path, Path.GetFileName(item)));
                 if (move)
                 {
                     if (Directory.Exists(item))

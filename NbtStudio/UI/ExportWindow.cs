@@ -9,7 +9,7 @@ namespace NbtStudio.UI
 {
     public partial class ExportWindow : Form
     {
-        private readonly byte[] Header;
+        private bool BedrockHeader;
         public ExportWindow(ExportSettings template, string destination_path)
         {
             InitializeComponent();
@@ -20,7 +20,7 @@ namespace NbtStudio.UI
             CompressionBox.SelectedIndex = 0;
             if (template != null)
             {
-                Header = template.Header;
+                BedrockHeader = template.BedrockHeader;
                 RadioSnbt.Checked = template.Snbt;
                 CompressionBox.SelectedItem = CompressionBox.Items.Cast<CompressionDisplay>().FirstOrDefault(x => x.Compression == template.Compression);
                 CheckMinify.Checked = template.Minified;
@@ -28,7 +28,6 @@ namespace NbtStudio.UI
             }
             else
             {
-                Header = new byte[0];
                 RadioSnbt.Checked = Path.GetExtension(destination_path) == ".snbt";
                 CheckLittleEndian.Checked = Path.GetExtension(destination_path) == ".mcstructure";
             }
@@ -40,7 +39,7 @@ namespace NbtStudio.UI
             if (RadioSnbt.Checked)
                 return ExportSettings.AsSnbt(CheckMinify.Checked);
             else
-                return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, Header);
+                return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, BedrockHeader);
         }
 
         private void Apply()

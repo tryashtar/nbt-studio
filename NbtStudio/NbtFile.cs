@@ -79,7 +79,7 @@ namespace NbtStudio
             if (attempt3 != null && !attempt3.RootTag.Tags.Any(LooksSuspicious))
                 return attempt3;
             // bedrock level.dat files
-            var attempt4 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, header_size: 8);
+            var attempt4 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, bedrock_header: true);
             if (attempt4 != null && !attempt4.RootTag.Tags.Any(LooksSuspicious))
                 return attempt4;
             return attempt1 ?? attempt2 ?? attempt3 ?? attempt4;
@@ -111,22 +111,25 @@ namespace NbtStudio
             }
         }
 
-        public static NbtFile TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, int header_size = 0)
+        public static NbtFile TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
         {
             try
             {
                 var file = new fNbt.NbtFile();
                 file.BigEndian = big_endian;
-                var header = new byte[header_size];
                 using (var reader = File.OpenRead(path))
                 {
-                    reader.Read(header, 0, header_size);
+                    if (bedrock_header)
+                    {
+                        var header = new byte[8];
+                        reader.Read(header, 0, header.Length);
+                    }
                     file.LoadFromStream(reader, compression);
                 }
                 if (file.RootTag == null)
                     return null;
 
-                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, header));
+                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, bedrock_header));
             }
             catch
             {

@@ -15,25 +15,25 @@ namespace NbtStudio
         public readonly bool Minified;
         public readonly NbtCompression Compression;
         public readonly bool BigEndian;
-        public readonly byte[] Header;
+        public readonly bool BedrockHeader;
 
-        private ExportSettings(bool snbt, bool minified, NbtCompression compression, bool big_endian, byte[] header)
+        private ExportSettings(bool snbt, bool minified, NbtCompression compression, bool big_endian, bool bedrock_header)
         {
             Snbt = snbt;
             Minified = minified;
             Compression = compression;
             BigEndian = big_endian;
-            Header = header;
+            BedrockHeader = bedrock_header;
         }
 
         public static ExportSettings AsSnbt(bool minified)
         {
-            return new ExportSettings(true, minified, NbtCompression.None, false, new byte[0]);
+            return new ExportSettings(true, minified, NbtCompression.None, false, false);
         }
 
-        public static ExportSettings AsNbt(NbtCompression compression, bool big_endian, byte[] header)
+        public static ExportSettings AsNbt(NbtCompression compression, bool big_endian, bool bedrock_header)
         {
-            return new ExportSettings(false, false, compression, big_endian, header);
+            return new ExportSettings(false, false, compression, big_endian, bedrock_header);
         }
 
         public void Export(string path, NbtCompound root)
@@ -47,8 +47,15 @@ namespace NbtStudio
                 file.RootTag = root;
                 using (var writer = File.OpenWrite(path))
                 {
-                    writer.Write(Header, 0, Header.Length);
-                    file.SaveToStream(writer, Compression);
+                    if (BedrockHeader)
+                        writer.Seek(8, SeekOrigin.Begin);
+                    long size = file.SaveToStream(writer, Compression);
+                    if (BedrockHeader)
+                    {
+                        writer.Seek(0, SeekOrigin.Begin);
+                        writer.Write(new byte[] { 8, 0, 0, 0 }, 0, 4);
+                        writer.Write(Util.GetBytes((int)size, little_endian: !BigEndian), 0, 4);
+                    }
                 }
             }
         }

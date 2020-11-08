@@ -608,7 +608,8 @@ namespace NbtStudio.UI
 
         private void ShowException(string caption, Exception exception)
         {
-            MessageBox.Show(Util.ExceptionMessage(exception), caption);
+            if (!(exception is OperationCanceledException))
+                MessageBox.Show(Util.ExceptionMessage(exception), caption);
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)

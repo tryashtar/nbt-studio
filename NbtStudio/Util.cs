@@ -87,11 +87,10 @@ namespace NbtStudio
             return bytes;
         }
 
-        // always big endian
-        public static byte[] GetBytes(int value)
+        public static byte[] GetBytes(int value, bool little_endian = false)
         {
             byte[] result = BitConverter.GetBytes(value);
-            if (BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian != little_endian)
                 Array.Reverse(result);
             return result;
         }
@@ -230,6 +229,26 @@ namespace NbtStudio
             if (exception.InnerException != null)
                 message += "\n" + ExceptionMessage(exception.InnerException);
             return message;
+        }
+
+        public static string GetUniqueFilename(string full_path)
+        {
+            if (!Path.IsPathRooted(full_path))
+                full_path = Path.GetFullPath(full_path);
+            if (File.Exists(full_path))
+            {
+                string filename = Path.GetFileName(full_path);
+                string path = full_path.Substring(0, full_path.Length - filename.Length);
+                string no_extension = Path.GetFileNameWithoutExtension(full_path);
+                string ext = Path.GetExtension(full_path);
+                int n = 1;
+                do
+                {
+                    full_path = Path.Combine(path, String.Format("{0} ({1}){2}", no_extension, (n++), ext));
+                }
+                while (File.Exists(full_path));
+            }
+            return full_path;
         }
     }
 }
