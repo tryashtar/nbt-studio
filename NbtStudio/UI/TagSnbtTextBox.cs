@@ -45,6 +45,11 @@ namespace NbtStudio.UI
             ShowTooltip(result.Title, result.Description, TimeSpan.FromSeconds(3));
         }
 
+        public void SetFromTag(INbtTag tag)
+        {
+            this.Text = tag.ToSnbt(expanded: true);
+        }
+
         public string GetValueText()
         {
             return this.Text.Trim().Replace("\r", "");

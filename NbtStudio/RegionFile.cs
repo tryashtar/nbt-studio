@@ -19,6 +19,7 @@ namespace NbtStudio
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
         public string Path { get; private set; }
+        public bool IsFolder => false;
         public bool HasChunkChanges { get; private set; } = false;
         public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
         public RegionFile(string path)
@@ -212,6 +213,15 @@ namespace NbtStudio
         {
             Path = path;
             Save();
+        }
+
+        public void Move(string path)
+        {
+            if (Path != null)
+            {
+                File.Move(Path, path);
+                Path = path;
+            }
         }
     }
 }

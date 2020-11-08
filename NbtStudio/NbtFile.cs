@@ -15,6 +15,7 @@ namespace NbtStudio
     public class NbtFile : ISaveable
     {
         public string Path { get; private set; }
+        public bool IsFolder => false;
         private NbtCompound RootTagData;
         public event EventHandler OnSaved;
         public NotifyNbtCompound RootTag { get; private set; }
@@ -152,11 +153,22 @@ namespace NbtStudio
             ExportSettings = settings;
             Save();
         }
+
+        public void Move(string path)
+        {
+            if (Path != null)
+            {
+                File.Move(Path, path);
+                Path = path;
+            }
+        }
     }
 
     public interface IHavePath
     {
         string Path { get; }
+        bool IsFolder { get; }
+        void Move(string path);
     }
 
     public interface ISaveable : IHavePath

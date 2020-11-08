@@ -438,9 +438,9 @@ namespace NbtStudio
             if (FileNodeOperations.DeleteFile(File.Path))
                 base.Delete();
         }
-        public override bool CanEdit => false;
+        public override bool CanEdit => File.Path != null;
         public override bool CanPaste => NbtNodeOperations.CanPaste(File.RootTag);
-        public override bool CanRename => false;
+        public override bool CanRename => File.Path != null;
         public override bool CanSort => NbtNodeOperations.CanSort(File.RootTag);
         public override void Sort() => NbtNodeOperations.Sort(File.RootTag);
         public override IEnumerable<INode> Paste(IDataObject data)
@@ -570,9 +570,9 @@ namespace NbtStudio
             if (FileNodeOperations.DeleteFile(Region.Path))
                 base.Delete();
         }
-        public override bool CanEdit => false;
+        public override bool CanEdit => Region.Path != null;
         public override bool CanPaste => true;
-        public override bool CanRename => false;
+        public override bool CanRename => Region.Path != null;
         public override bool CanSort => false;
         public override IEnumerable<INode> Paste(IDataObject data)
         {
@@ -622,7 +622,7 @@ namespace NbtStudio
             if (FileNodeOperations.DeleteFolder(Folder.Path))
                 base.Delete();
         }
-        public override bool CanEdit => false;
+        public override bool CanEdit => true;
         public override bool CanPaste => true;
         public override IEnumerable<INode> Paste(IDataObject data)
         {
@@ -655,7 +655,7 @@ namespace NbtStudio
             Folder.Scan();
             return Folder.Files.Where(x => files.Contains(x.Path)).Select(Wrap);
         }
-        public override bool CanRename => false;
+        public override bool CanRename => true;
         public override bool CanSort => false;
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x.GetSaveable() != null || x is FolderNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)

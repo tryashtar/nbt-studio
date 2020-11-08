@@ -55,6 +55,7 @@ namespace NbtStudio.UI
         {
             NbtTag = tag;
             NbtParent = parent;
+            this.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
         }
 
         public string GetValueText()

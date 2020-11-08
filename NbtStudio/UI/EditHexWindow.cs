@@ -50,10 +50,7 @@ namespace NbtStudio.UI
             if (purpose == EditPurpose.Create)
                 this.Text = $"Create {tagname} Tag";
             else if (purpose == EditPurpose.EditValue || purpose == EditPurpose.Rename)
-            {
                 this.Text = $"Edit {tagname} Tag";
-                NameBox.Text = tag.Name;
-            }
 
             if (SettingName && purpose != EditPurpose.EditValue)
             {

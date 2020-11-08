@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
@@ -42,11 +42,7 @@ namespace NbtStudio.UI
             if (purpose == EditPurpose.Create)
                 this.Text = $"Create {NbtUtil.TagTypeName(tag.TagType)} Tag";
             else if (purpose == EditPurpose.EditValue || purpose == EditPurpose.Rename)
-            {
                 this.Text = $"Edit {NbtUtil.TagTypeName(tag.TagType)} Tag";
-                NameBox.Text = tag.Name;
-                ValueBox.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
-            }
 
             if (SettingName && (!SettingValue || purpose != EditPurpose.EditValue))
             {

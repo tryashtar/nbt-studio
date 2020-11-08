@@ -20,7 +20,7 @@ namespace NbtStudio.UI
 
         private void TagNameTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetColor(CheckNameInternal());
+            SetColor(CheckNameInternal(out _));
         }
 
         private void SetColor(NameCheckResult result)
@@ -54,6 +54,7 @@ namespace NbtStudio.UI
         {
             NbtTag = tag;
             NbtParent = parent;
+            this.Text = tag?.Name;
         }
 
         public string GetName()
@@ -61,11 +62,11 @@ namespace NbtStudio.UI
             return this.Text.Trim();
         }
 
-        private NameCheckResult CheckNameInternal()
+        private NameCheckResult CheckNameInternal(out string name)
         {
+            name = GetName();
             if (NbtParent == null)
                 return NameCheckResult.Valid;
-            var name = GetName();
             if (NbtParent is INbtList)
                 return name == "" ? NameCheckResult.Valid : NameCheckResult.InvalidHasName;
             if (NbtParent is INbtCompound compound)
@@ -78,9 +79,10 @@ namespace NbtStudio.UI
             return NameCheckResult.Valid;
         }
 
-        public bool CheckName()
+        public bool CheckName() => CheckName(out _);
+        public bool CheckName(out string name)
         {
-            var result = CheckNameInternal();
+            var result = CheckNameInternal(out name);
             bool valid = result == NameCheckResult.Valid;
             SetColor(result);
             if (!valid)

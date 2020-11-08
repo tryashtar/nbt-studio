@@ -11,6 +11,7 @@ namespace NbtStudio
     public class NbtFolder : IHavePath
     {
         public string Path { get; private set; }
+        public bool IsFolder => true;
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
         public event EventHandler ContentsChanged;
@@ -91,6 +92,12 @@ namespace NbtStudio
             if (Directory.Exists(path))
                 return new NbtFolder(path, true);
             return OpenFile(path);
+        }
+
+        public void Move(string path)
+        {
+            Directory.Move(Path, path);
+            Path = path;
         }
     }
 }

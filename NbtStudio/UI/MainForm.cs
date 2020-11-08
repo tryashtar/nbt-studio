@@ -310,26 +310,25 @@ namespace NbtStudio.UI
             ViewModel.Redo();
         }
 
-        private void Cut()
+        private void CopyLike(Func<INode, bool> check, Func<INode, DataObject> perform)
         {
             if (ViewModel == null) return;
-            var objs = ViewModel.SelectedObjects.Where(x => x.CanCut).ToList();
+            var objs = ViewModel.SelectedObjects.Where(check).ToList();
             if (objs.Any())
             {
-                var data = objs.Select(x => x.Cut()).Aggregate((x, y) => Util.Merge(x, y));
+                var data = objs.Select(perform).Aggregate((x, y) => Util.Merge(x, y));
                 Clipboard.SetDataObject(data);
             }
         }
 
+        private void Cut()
+        {
+            CopyLike(x => x.CanCut, x => x.Cut());
+        }
+
         private void Copy()
         {
-            if (ViewModel == null) return;
-            var objs = ViewModel.SelectedObjects.Where(x => x.CanCopy);
-            if (objs.Any())
-            {
-                var data = objs.Select(x => x.Copy()).Aggregate((x, y) => Util.Merge(x, y));
-                Clipboard.SetDataObject(data);
-            }
+            CopyLike(x => x.CanCopy, x => x.Copy());
         }
 
         private void Paste()
@@ -343,29 +342,20 @@ namespace NbtStudio.UI
         {
             if (!node.CanPaste)
                 return;
-            ViewModel.StartBatchOperation();
             IEnumerable<INode> results = Enumerable.Empty<INode>();
+            ViewModel.StartBatchOperation();
             try
-            {
-                results = node.Paste(Clipboard.GetDataObject());
-            }
+            { results = node.Paste(Clipboard.GetDataObject()); }
             catch (Exception ex)
-            {
-                ShowException("Error while pasting", ex);
-            }
+            { ShowException("Error while pasting", ex); }
             ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
         }
 
         private void Rename()
         {
             var obj = ViewModel?.SelectedObject;
-            if (obj == null || !obj.CanRename) return;
-            var tag = obj.GetNbtTag();
-            var chunk = obj.GetChunk();
-            if (chunk != null)
-                EditChunk(chunk);
-            else if (tag != null)
-                RenameTag(tag);
+            if (obj == null) return;
+            Rename(obj);
         }
 
         private void Edit()
@@ -375,18 +365,37 @@ namespace NbtStudio.UI
             Edit(obj);
         }
 
-        private void Edit(INode node)
+        private void EditLike(INode node, Predicate<INode> check, Action<INbtTag> when_tag)
         {
+            if (!check(node)) return;
+            var chunk = node.GetChunk();
+            var path = node.GetHasPath();
+            var tag = node.GetNbtTag();
             // batch operation to combine the rename and value change into one undo
             ViewModel.StartBatchOperation();
-            if (!node.CanEdit) return;
-            var tag = node.GetNbtTag();
-            var chunk = node.GetChunk();
+            if (path != null)
+                RenameFile(path);
             if (chunk != null)
                 EditChunk(chunk);
             else if (tag != null)
-                EditTag(tag);
+                when_tag(tag);
             ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
+        }
+
+        private void Rename(INode node)
+        {
+            EditLike(node, x => x.CanRename, RenameTag);
+        }
+
+        private void Edit(INode node)
+        {
+            EditLike(node, x => x.CanEdit, EditTag);
+        }
+
+        private void RenameFile(IHavePath item)
+        {
+            if (item.Path != null)
+                RenameFileWindow.RenameFile(item);
         }
 
         private void EditTag(INbtTag tag)

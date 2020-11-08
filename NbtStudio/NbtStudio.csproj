@@ -103,6 +103,12 @@
     <Compile Include="UI\EditChunkWindow.Designer.cs">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\RenameFileWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\RenameFileWindow.Designer.cs">
+      <DependentUpon>RenameFileWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\FindWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,6 +137,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\ChunkCoordEditControl.cs" />
+    <Compile Include="UI\FileNameTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\TagSnbtTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -175,6 +184,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\EditChunkWindow.resx">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\RenameFileWindow.resx">
+      <DependentUpon>RenameFileWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\FindWindow.resx">
       <DependentUpon>FindWindow.cs</DependentUpon>

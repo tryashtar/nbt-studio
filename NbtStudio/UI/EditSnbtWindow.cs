@@ -50,10 +50,7 @@ namespace NbtStudio.UI
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
             if (tag != null)
-            {
-                NameBox.Text = tag.Name;
-                InputBox.Text = tag.ToSnbt(expanded: true);
-            }
+                InputBox.SetFromTag(tag);
             if (required == null)
             {
                 this.Icon = Properties.Resources.action_add_snbt_icon;
@@ -120,10 +117,10 @@ namespace NbtStudio.UI
         private bool TryModify()
         {
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
-            if (SettingName && !NameBox.CheckName())
+            string name = null;
+            if (SettingName && !NameBox.CheckName(out name))
                 return false;
-            NbtTag tag = null;
-            if (!InputBox.CheckTag(out tag))
+            if (!InputBox.CheckTag(out NbtTag tag))
                 return false;
 
             if (WorkingTag == null)
@@ -133,6 +130,7 @@ namespace NbtStudio.UI
             if (SettingName)
             {
                 NameBox.SetTags(WorkingTag, TagParent);
+                NameBox.Text = name;
                 NameBox.ApplyName();
             }
             return true;
