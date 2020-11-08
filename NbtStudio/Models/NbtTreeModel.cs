@@ -286,12 +286,14 @@ namespace NbtStudio
 
         private IEnumerable<object> GetChildren(object obj)
         {
+            Wrap(obj); // hack fix for folders not notifying tree when contents change
             if (obj is NbtFolder folder)
             {
                 if (!folder.HasScanned)
                 {
                     folder.Scan();
                     Changed?.Invoke(this, EventArgs.Empty);
+                    return null; // hack fix for double folder contents caused by above hack fix
                 }
                 return folder.Subfolders.Concat<object>(folder.Files);
             }

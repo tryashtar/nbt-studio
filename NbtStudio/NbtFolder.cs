@@ -13,35 +13,71 @@ namespace NbtStudio
         public string Path { get; private set; }
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
-        public IReadOnlyCollection<NbtFolder> Subfolders => _Subfolders.AsReadOnly();
-        public IReadOnlyCollection<ISaveable> Files => _Files.AsReadOnly();
-        private readonly List<NbtFolder> _Subfolders = new List<NbtFolder>();
-        private readonly List<ISaveable> _Files = new List<ISaveable>();
+        public event EventHandler ContentsChanged;
+        public IReadOnlyCollection<NbtFolder> Subfolders => SubfolderDict.Values;
+        public IReadOnlyCollection<ISaveable> Files => FileDict.Values;
+        private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
+        private readonly Dictionary<string, ISaveable> FileDict = new Dictionary<string, ISaveable>();
+        private readonly FileSystemWatcher Watcher;
 
         public NbtFolder(string path, bool recursive)
         {
             Path = path;
             Recursive = recursive;
+            Watcher = new FileSystemWatcher(path);
+            Watcher.EnableRaisingEvents = true;
+            Watcher.Created += Watcher_ChangesDetected;
+            Watcher.Changed += Watcher_ChangesDetected;
+            Watcher.Deleted += Watcher_ChangesDetected;
+            Watcher.Renamed += Watcher_ChangesDetected;
+        }
+
+        private void Watcher_ChangesDetected(object sender, FileSystemEventArgs e)
+        {
+            Scan();
         }
 
         public void Scan()
         {
             HasScanned = true;
-            _Files.Clear();
-            _Subfolders.Clear();
-            foreach (var item in Directory.GetFiles(Path))
+            string[] files;
+            if (Directory.Exists(Path))
+                files = Directory.GetFiles(Path);
+            else
+                files = new string[0];
+            foreach (var path in files)
             {
-                var file = OpenFile(item);
-                if (file != null)
-                    _Files.Add(file);
+                if (!FileDict.ContainsKey(path))
+                {
+                    var file = OpenFile(path);
+                    if (file != null)
+                        FileDict.Add(path, file);
+                }
+            }
+            foreach (var key in FileDict.Keys.ToList())
+            {
+                if (!files.Contains(key))
+                    FileDict.Remove(key);
             }
             if (Recursive)
             {
-                foreach (var item in Directory.GetDirectories(Path, "*", SearchOption.TopDirectoryOnly))
+                string[] folders;
+                if (Directory.Exists(Path))
+                    folders = Directory.GetDirectories(Path, "*", SearchOption.TopDirectoryOnly);
+                else
+                    folders = new string[0];
+                foreach (var path in folders)
                 {
-                    _Subfolders.Add(new NbtFolder(item, true));
+                    if (!SubfolderDict.ContainsKey(path))
+                        SubfolderDict.Add(path, new NbtFolder(path, true));
+                }
+                foreach (var key in SubfolderDict.Keys.ToList())
+                {
+                    if (!folders.Contains(key))
+                        SubfolderDict.Remove(key);
                 }
             }
+            ContentsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public static ISaveable OpenFile(string path)

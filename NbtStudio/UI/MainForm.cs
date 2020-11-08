@@ -159,23 +159,29 @@ namespace NbtStudio.UI
 
         private void NewPaste()
         {
-            if (!Clipboard.ContainsText())
-                return;
-            var text = Clipboard.GetText();
-            if (SnbtParser.TryParse(text, named: false, out var tag) || SnbtParser.TryParse(text, named: true, out tag))
+            if (Clipboard.ContainsFileDropList())
             {
-                if (tag is NbtCompound compound)
-                    OpenFile(new NbtFile(compound));
-                else
-                {
-                    var root = new NbtCompound();
-                    tag.Name = NbtUtil.GetAutomaticName(tag, root);
-                    root.Add(tag);
-                    OpenFile(new NbtFile(root));
-                }
+                var files = Clipboard.GetFileDropList();
+                OpenFiles(files.Cast<string>());
             }
-            else
-                MessageBox.Show("Failed to parse SNBT from clipboard.", "Clipboard Error");
+            else if (Clipboard.ContainsText())
+            {
+                var text = Clipboard.GetText();
+                if (SnbtParser.TryParse(text, named: false, out var tag) || SnbtParser.TryParse(text, named: true, out tag))
+                {
+                    if (tag is NbtCompound compound)
+                        OpenFile(new NbtFile(compound));
+                    else
+                    {
+                        var root = new NbtCompound();
+                        tag.Name = NbtUtil.GetAutomaticName(tag, root);
+                        root.Add(tag);
+                        OpenFile(new NbtFile(root));
+                    }
+                }
+                else
+                    MessageBox.Show("Failed to parse SNBT from clipboard.", "Clipboard Error");
+            }
         }
 
         private void OpenFile()
@@ -333,10 +339,18 @@ namespace NbtStudio.UI
 
         private void Paste(INode node)
         {
-            if (!node.CanPaste || !Clipboard.ContainsText())
+            if (!node.CanPaste)
                 return;
             ViewModel.StartBatchOperation();
-            var results = node.Paste(Clipboard.GetDataObject());
+            IEnumerable<INode> results = Enumerable.Empty<INode>();
+            try
+            {
+                results = node.Paste(Clipboard.GetDataObject());
+            }
+            catch (Exception ex)
+            {
+                ShowException("Error while pasting", ex);
+            }
             ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
         }
 
@@ -466,10 +480,16 @@ namespace NbtStudio.UI
                     return;
             }
             ViewModel.StartBatchOperation();
+            var errors = new List<Exception>();
             foreach (var node in nodes)
             {
-                node.Delete();
+                try
+                { node.Delete(); }
+                catch (Exception ex)
+                { errors.Add(ex); }
             }
+            if (errors.Any())
+                ShowException("Error while deleting", new AggregateException(errors));
             ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(nodes)}", false);
         }
 
@@ -575,8 +595,15 @@ namespace NbtStudio.UI
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
         }
 
+        private void ShowException(string caption, Exception exception)
+        {
+            MessageBox.Show(Util.ExceptionMessage(exception), caption);
+        }
+
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
         {
+            if (InvokeRequired) // only run on UI thread
+                return;
             var obj = ViewModel?.SelectedObject;
             var nbt = obj.GetNbtTag();
             var container = nbt as INbtContainer;
@@ -602,6 +629,8 @@ namespace NbtStudio.UI
 
         private void ViewModel_Changed(object sender, EventArgs e)
         {
+            if (InvokeRequired) // only run on UI thread
+                return;
             ActionSave.Enabled = ViewModel?.HasAnyUnsavedChanges ?? false;
             ActionSaveAs.Enabled = ViewModel != null;
             bool multiple_files = ViewModel != null && ViewModel.OpenedFiles.Skip(1).Any();
@@ -706,6 +735,9 @@ namespace NbtStudio.UI
                 var path = obj.GetHasPath();
                 if (path?.Path != null)
                     menu.Items.Add("&Open in Explorer", Properties.Resources.action_open_file_image, (s, ea) => OpenInExplorer(path));
+                var folder = obj.GetNbtFolder();
+                if (folder != null)
+                    menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => folder.Scan());
                 var container = obj.GetNbtTag() as INbtContainer;
                 if (container != null)
                 {
@@ -764,7 +796,7 @@ namespace NbtStudio.UI
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)
         {
-            ActionNewClipboard.Enabled = Clipboard.ContainsText();
+            ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
 
             // remove duplicates of recent files and limit to 20 most recent
             var distinct = Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Distinct();

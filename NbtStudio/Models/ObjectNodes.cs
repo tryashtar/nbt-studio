@@ -143,7 +143,7 @@ namespace NbtStudio
 
     public abstract class NotifyNode : INode
     {
-        protected readonly NbtTreeModel Tree;
+        private readonly NbtTreeModel Tree;
         protected readonly object SourceObject;
         public object Object => SourceObject;
         protected NotifyNode(NbtTreeModel tree, object source)
@@ -168,6 +168,7 @@ namespace NbtStudio
         {
             Tree.SaveAction(action);
         }
+        protected NotifyNode Wrap(object obj) => Create(Tree, obj);
 
         private static readonly Dictionary<object, NotifyNode> ObjectCache = new Dictionary<object, NotifyNode>();
         public static NotifyNode Create(NbtTreeModel tree, object obj)
@@ -317,6 +318,28 @@ namespace NbtStudio
             catch { return false; }
             return true;
         }
+
+        public static DataObject Copy(string path)
+        {
+            var data = new DataObject();
+            if (path != null)
+            {
+                data.SetFileDropList(new StringCollection { path });
+                data.SetData("Preferred DropEffect", new MemoryStream(BitConverter.GetBytes((int)DragDropEffects.Copy)));
+            }
+            return data;
+        }
+
+        public static DataObject Cut(string path)
+        {
+            var data = new DataObject();
+            if (path != null)
+            {
+                data.SetFileDropList(new StringCollection { path });
+                data.SetData("Preferred DropEffect", new MemoryStream(BitConverter.GetBytes((int)DragDropEffects.Move)));
+            }
+            return data;
+        }
     }
 
     public class NbtTagNode : NotifyNode
@@ -357,7 +380,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(Tag, data);
-            return tags.Select(x => Create(Tree, x));
+            return tags.Select(Wrap);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(Tag, nodes.Filter(x => x.GetNbtTag()));
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
@@ -398,10 +421,16 @@ namespace NbtStudio
         public override bool CanCopy => true;
         public override DataObject Copy()
         {
-            var data = NbtNodeOperations.Copy(File.RootTag);
-            if (File.Path != null)
-                data.SetFileDropList(new StringCollection { File.Path });
-            return data;
+            var data1 = NbtNodeOperations.Copy(File.RootTag);
+            var data2 = FileNodeOperations.Copy(File.Path);
+            return Util.Merge(data1, data2);
+        }
+        public override bool CanCut => true;
+        public override DataObject Cut()
+        {
+            var data1 = NbtNodeOperations.Copy(File.RootTag);
+            var data2 = FileNodeOperations.Cut(File.Path);
+            return Util.Merge(data1, data2);
         }
         public override bool CanDelete => true;
         public override void Delete()
@@ -417,7 +446,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(File.RootTag, data);
-            return tags.Select(x => Create(Tree, x));
+            return tags.Select(Wrap);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(File.RootTag, nodes.Filter(x => x.GetNbtTag()));
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
@@ -493,7 +522,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(AccessChunkData(), data);
-            return tags.Select(x => Create(Tree, x));
+            return tags.Select(Wrap);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
@@ -533,6 +562,8 @@ namespace NbtStudio
                 data.SetFileDropList(new StringCollection { Region.Path });
             return data;
         }
+        public override bool CanCut => Region.Path != null;
+        public override DataObject Cut() => FileNodeOperations.Cut(Region.Path);
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -554,7 +585,7 @@ namespace NbtStudio
             {
                 Region.AddChunk(chunk);
             }
-            return chunks.Select(x => Create(Tree, x));
+            return chunks.Select(Wrap);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is ChunkNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
@@ -573,11 +604,20 @@ namespace NbtStudio
         public FolderNode(NbtTreeModel tree, NbtFolder folder) : base(tree, folder)
         {
             Folder = folder;
+            Folder.ContentsChanged += Folder_ContentsChanged;
+        }
+
+        private void Folder_ContentsChanged(object sender, EventArgs e)
+        {
+            Notify();
         }
 
         public override string Description => Path.GetFileName(Folder.Path);
 
         public override bool CanCopy => true;
+        public override DataObject Copy() => FileNodeOperations.Copy(Folder.Path);
+        public override bool CanCut => true;
+        public override DataObject Cut() => FileNodeOperations.Cut(Folder.Path);
         public override bool CanDelete => true;
         public override void Delete()
         {
@@ -586,7 +626,58 @@ namespace NbtStudio
         }
         public override bool CanEdit => false;
         public override bool CanPaste => true;
+        public override IEnumerable<INode> Paste(IDataObject data)
+        {
+            var files = (string[])data.GetData("FileDrop");
+            var drop_effect = (MemoryStream)data.GetData("Preferred DropEffect");
+            if (files == null || drop_effect == null)
+                return Enumerable.Empty<INode>();
+            var bytes = new byte[4];
+            drop_effect.Read(bytes, 0, bytes.Length);
+            var drop = (DragDropEffects)BitConverter.ToInt32(bytes, 0);
+            bool move = drop.HasFlag(DragDropEffects.Move);
+            foreach (var item in files)
+            {
+                var destination = Path.Combine(Folder.Path, Path.GetFileName(item));
+                if (move)
+                {
+                    if (Directory.Exists(item))
+                        FileSystem.MoveDirectory(item, destination, UIOption.AllDialogs);
+                    else if (File.Exists(item))
+                        FileSystem.MoveFile(item, destination, UIOption.AllDialogs);
+                }
+                else
+                {
+                    if (Directory.Exists(item))
+                        FileSystem.CopyDirectory(item, destination, UIOption.AllDialogs);
+                    else if (File.Exists(item))
+                        FileSystem.CopyFile(item, destination, UIOption.AllDialogs);
+                }
+            }
+            Folder.Scan();
+            return Folder.Files.Where(x => files.Contains(x.Path)).Select(Wrap);
+        }
         public override bool CanRename => false;
         public override bool CanSort => false;
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x.GetSaveable() != null || x is FolderNode);
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var files = nodes.Filter(x => x.GetSaveable());
+            var folders = nodes.Filter(x => x.GetNbtFolder());
+            foreach (var file in files)
+            {
+                if (file.Path != null)
+                {
+                    var destination = Path.Combine(Folder.Path, Path.GetFileName(file.Path));
+                    FileSystem.MoveFile(file.Path, destination, UIOption.AllDialogs);
+                }
+            }
+            foreach (var folder in folders)
+            {
+                var destination = Path.Combine(Folder.Path, Path.GetFileName(folder.Path));
+                FileSystem.MoveDirectory(folder.Path, destination, UIOption.AllDialogs);
+            }
+            Folder.Scan();
+        }
     }
 }

@@ -115,7 +115,8 @@ namespace NbtStudio.UI
             string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
-            if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges)
+            if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges ||
+                node.Tag is Chunk chunk && chunk.HasUnsavedChanges)
                 prefix = "* ";
             if (name == null)
                 return (prefix, value);
