@@ -47,7 +47,7 @@ namespace NbtStudio.UI
 
         public void SetFromTag(INbtTag tag)
         {
-            this.Text = tag.ToSnbt(expanded: true);
+            this.Text = tag.ToSnbt(SnbtOptions.DefaultExpanded);
         }
 
         public string GetValueText()
@@ -91,7 +91,10 @@ namespace NbtStudio.UI
             CheckTag(out var tag); // continue to minify even if the required type is not met
             if (tag != null)
             {
-                this.Text = tag.ToSnbt(expanded: !minified);
+                var options = SnbtOptions.Default;
+                if (!minified)
+                    options = options.Expanded();
+                this.Text = tag.ToSnbt(options);
                 return true;
             }
             return false;

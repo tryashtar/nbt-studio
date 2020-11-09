@@ -102,7 +102,7 @@ namespace NbtStudio
                         return null;
                     compound.Name = "";
                     var file = new fNbt.NbtFile(compound);
-                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n")));
+                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
                 }
             }
             catch

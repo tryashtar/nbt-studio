@@ -220,7 +220,7 @@ namespace NbtStudio
         public static DataObject Copy(INbtTag tag)
         {
             var data = new DataObject();
-            data.SetText(tag.ToSnbt(include_name: true));
+            data.SetText(tag.ToSnbt(SnbtOptions.Default, include_name: true));
             return data;
         }
 

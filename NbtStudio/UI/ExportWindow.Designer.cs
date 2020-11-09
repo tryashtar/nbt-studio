@@ -35,6 +35,7 @@
             this.CheckMinify = new System.Windows.Forms.CheckBox();
             this.CheckLittleEndian = new System.Windows.Forms.CheckBox();
             this.CompressionBox = new System.Windows.Forms.ComboBox();
+            this.CheckJson = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ButtonCancel
@@ -111,6 +112,16 @@
             this.CompressionBox.Size = new System.Drawing.Size(103, 21);
             this.CompressionBox.TabIndex = 17;
             // 
+            // CheckJson
+            // 
+            this.CheckJson.AutoSize = true;
+            this.CheckJson.Location = new System.Drawing.Point(131, 36);
+            this.CheckJson.Name = "CheckJson";
+            this.CheckJson.Size = new System.Drawing.Size(54, 17);
+            this.CheckJson.TabIndex = 18;
+            this.CheckJson.Text = "JSON";
+            this.CheckJson.UseVisualStyleBackColor = true;
+            // 
             // ExportWindow
             // 
             this.AcceptButton = this.ButtonOk;
@@ -118,6 +129,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonCancel;
             this.ClientSize = new System.Drawing.Size(278, 106);
+            this.Controls.Add(this.CheckJson);
             this.Controls.Add(this.CompressionBox);
             this.Controls.Add(this.CheckLittleEndian);
             this.Controls.Add(this.CheckMinify);
@@ -145,5 +157,6 @@
         private System.Windows.Forms.CheckBox CheckMinify;
         private System.Windows.Forms.CheckBox CheckLittleEndian;
         private System.Windows.Forms.ComboBox CompressionBox;
+        private System.Windows.Forms.CheckBox CheckJson;
     }
 }

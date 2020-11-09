@@ -239,7 +239,7 @@ namespace NbtStudio
                 return $"[{Util.Pluralize(int_array.Value.Length, "int")}]";
             else if (tag is INbtLongArray long_array)
                 return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
-            return tag.ToSnbt(expanded: false, delimit: false);
+            return tag.ToSnbt(SnbtOptions.Preview);
         }
 
         public static string TagTypeName(NbtTagType type)

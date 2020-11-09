@@ -13,33 +13,43 @@ namespace NbtStudio
     {
         public readonly bool Snbt;
         public readonly bool Minified;
+        public readonly bool Json;
         public readonly NbtCompression Compression;
         public readonly bool BigEndian;
         public readonly bool BedrockHeader;
 
-        private ExportSettings(bool snbt, bool minified, NbtCompression compression, bool big_endian, bool bedrock_header)
+        private ExportSettings(bool snbt, bool minified, bool json, NbtCompression compression, bool big_endian, bool bedrock_header)
         {
             Snbt = snbt;
             Minified = minified;
+            Json = json;
             Compression = compression;
             BigEndian = big_endian;
             BedrockHeader = bedrock_header;
         }
 
-        public static ExportSettings AsSnbt(bool minified)
+        public static ExportSettings AsSnbt(bool minified, bool json)
         {
-            return new ExportSettings(true, minified, NbtCompression.None, false, false);
+            return new ExportSettings(true, minified, json, NbtCompression.None, false, false);
         }
 
         public static ExportSettings AsNbt(NbtCompression compression, bool big_endian, bool bedrock_header)
         {
-            return new ExportSettings(false, false, compression, big_endian, bedrock_header);
+            return new ExportSettings(false, false, false, compression, big_endian, bedrock_header);
+        }
+
+        private SnbtOptions CreateOptions()
+        {
+            var options = Json ? SnbtOptions.JsonLike : SnbtOptions.Default;
+            if (!Minified)
+                options = options.Expanded();
+            return options;
         }
 
         public void Export(string path, NbtCompound root)
         {
             if (Snbt)
-                File.WriteAllText(path, root.ToSnbt(expanded: !Minified));
+                File.WriteAllText(path, root.ToSnbt(CreateOptions()));
             else
             {
                 var file = new fNbt.NbtFile();

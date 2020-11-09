@@ -24,12 +24,15 @@ namespace NbtStudio.UI
                 RadioSnbt.Checked = template.Snbt;
                 CompressionBox.SelectedItem = CompressionBox.Items.Cast<CompressionDisplay>().FirstOrDefault(x => x.Compression == template.Compression);
                 CheckMinify.Checked = template.Minified;
+                CheckJson.Checked = template.Json;
                 CheckLittleEndian.Checked = !template.BigEndian;
             }
             else
             {
-                RadioSnbt.Checked = Path.GetExtension(destination_path) == ".snbt";
-                CheckLittleEndian.Checked = Path.GetExtension(destination_path) == ".mcstructure";
+                string extension = Path.GetExtension(destination_path);
+                RadioSnbt.Checked = extension == ".snbt" || extension == ".json";
+                CheckLittleEndian.Checked = extension == ".mcstructure";
+                CheckJson.Checked = extension == ".json";
             }
             SetEnables();
         }
@@ -37,7 +40,7 @@ namespace NbtStudio.UI
         public ExportSettings GetSettings()
         {
             if (RadioSnbt.Checked)
-                return ExportSettings.AsSnbt(CheckMinify.Checked);
+                return ExportSettings.AsSnbt(CheckMinify.Checked, CheckJson.Checked);
             else
                 return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, BedrockHeader);
         }
@@ -63,6 +66,7 @@ namespace NbtStudio.UI
             CompressionBox.Enabled = RadioNbt.Checked;
             CheckLittleEndian.Enabled = RadioNbt.Checked;
             CheckMinify.Enabled = RadioSnbt.Checked;
+            CheckJson.Enabled = RadioSnbt.Checked;
         }
 
         private class CompressionDisplay
