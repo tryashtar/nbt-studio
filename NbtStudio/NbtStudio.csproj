@@ -73,6 +73,7 @@
     <Compile Include="ExportSettings.cs" />
     <Compile Include="Models\NotifyNbtTags.cs" />
     <Compile Include="Models\ObjectNodes.cs" />
+    <Compile Include="Models\UndoHistory.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtFile.cs" />
     <Compile Include="NbtFolder.cs" />
