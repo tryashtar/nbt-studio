@@ -46,7 +46,7 @@ namespace NbtStudio
         {
             get
             {
-                foreach (var item in View.BreadthFirstSearch(x => x.Tag is NbtFolder || x.Tag is ISaveable))
+                foreach (var item in View.BreadthFirstSearch(x => (x.Tag is NbtFolder folder && folder.HasScanned) || x.Tag is ISaveable))
                 {
                     if (item.Tag is ISaveable saveable)
                         yield return Wrap(saveable);
@@ -59,7 +59,7 @@ namespace NbtStudio
             Roots = roots.ToList();
             View = view;
             View.Model = this;
-            if (Roots.Take(2).Count() == 1) // if there is one item, expand it
+            if (Util.ExactlyOne(Roots)) // if there is one item, expand it
                 View.Root.Children.First().Expand();
         }
         public NbtTreeModel(object root, NbtTreeView view) : this(new[] { root }, view) { }

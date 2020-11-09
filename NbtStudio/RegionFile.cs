@@ -54,10 +54,9 @@ namespace NbtStudio
                 if (ChunkCount == 0)
                     throw new FormatException($"Region doesn't contain any chunks");
             }
-            catch
+            finally
             {
                 stream.Dispose();
-                throw;
             }
         }
 

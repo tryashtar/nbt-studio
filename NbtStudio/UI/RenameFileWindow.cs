@@ -18,6 +18,7 @@ namespace NbtStudio.UI
             OriginalItem = file;
             this.Icon = Properties.Resources.action_rename_icon;
             NameBox.SetItem(file);
+            NameBox.SelectAll();
         }
 
         public static bool RenameFile(IHavePath file)
