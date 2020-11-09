@@ -19,10 +19,10 @@ namespace NbtStudioTests
                 new NbtDouble("double", double.NaN),
                 new NbtFloat("float", float.NaN),
             };
-            string snbt1 = compound1.ToSnbt();
+            string snbt1 = compound1.ToSnbt(SnbtOptions.Default);
 
             var compound2 = SnbtParser.Parse(snbt1, named: false);
-            string snbt2 = compound2.ToSnbt();
+            string snbt2 = compound2.ToSnbt(SnbtOptions.Default);
 
             Assert.AreEqual(snbt1, snbt2);
         }
@@ -37,10 +37,10 @@ namespace NbtStudioTests
                 new NbtFloat("float_plus", float.PositiveInfinity),
                 new NbtFloat("float_minus", float.NegativeInfinity),
             };
-            string snbt1 = compound1.ToSnbt();
+            string snbt1 = compound1.ToSnbt(SnbtOptions.Default);
 
             var compound2 = SnbtParser.Parse(snbt1, named: false);
-            string snbt2 = compound2.ToSnbt();
+            string snbt2 = compound2.ToSnbt(SnbtOptions.Default);
 
             Assert.AreEqual(snbt1, snbt2);
         }
@@ -58,10 +58,10 @@ namespace NbtStudioTests
                 new NbtString("name with 'single quotes'", "value with \"double quotes\""),
                 new NbtString("name with\nnewline", "value with\nnewline"),
             };
-            string snbt1 = compound1.ToSnbt();
+            string snbt1 = compound1.ToSnbt(SnbtOptions.Default);
 
             var compound2 = SnbtParser.Parse(snbt1, named: false);
-            string snbt2 = compound2.ToSnbt();
+            string snbt2 = compound2.ToSnbt(SnbtOptions.Default);
 
             Assert.AreEqual(snbt1, snbt2);
         }
