@@ -3,6 +3,7 @@ using Aga.Controls.Tree.NodeControls;
 using fNbt;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -140,117 +141,81 @@ namespace NbtStudio.UI
             }
         }
 
-        private IEnumerable<TreeNodeAdv> AllChildren(TreeNodeAdv start)
+        private ReadOnlyCollection<TreeNodeAdv> ForceChildren(TreeNodeAdv node)
         {
-            if (!start.IsExpandedOnce)
+            if (!node.IsExpandedOnce)
             {
-                start.IsExpanded = true;
-                start.IsExpanded = false;
+                node.IsExpanded = true;
+                node.IsExpanded = false;
             }
-            foreach (var item in start.Children)
-            {
-                yield return item;
-                foreach (var sub in AllChildren(item))
-                {
-                    yield return sub;
-                }
-            }
+            return node.Children;
         }
 
-        private IEnumerable<TreeNodeAdv> AllChildrenReversed(TreeNodeAdv start)
+        public TreeNodeAdv NextNode(TreeNodeAdv node)
         {
-            if (!start.IsExpandedOnce)
+            var children = ForceChildren(node);
+            if (children.Count > 0)
+                return children.First();
+            TreeNodeAdv next = null;
+            while (next == null && node != null)
             {
-                start.IsExpanded = true;
-                start.IsExpanded = false;
+                next = node.NextNode;
+                if (next == null)
+                    node = node.Parent;
             }
-            foreach (var item in start.Children.Reverse())
-            {
-                foreach (var sub in AllChildrenReversed(item))
-                {
-                    yield return sub;
-                }
-                yield return item;
-            }
+            return next;
         }
 
-        private IEnumerable<TreeNodeAdv> AllSuccessors(TreeNodeAdv start)
+        public TreeNodeAdv PreviousNode(TreeNodeAdv node)
         {
-            foreach (var item in SucceedingNodes(start))
+            var prev = node.PreviousNode;
+            if (prev == null)
+                return node.Parent;
+            while (prev != null)
             {
-                yield return item;
-                foreach (var sub in AllChildren(item))
-                {
-                    yield return sub;
-                }
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> AllPredecessors(TreeNodeAdv start)
-        {
-            foreach (var item in PrecedingNodes(start))
-            {
-                foreach (var sub in AllChildrenReversed(item))
-                {
-                    yield return sub;
-                }
-                yield return item;
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> SearchForward(TreeNodeAdv start)
-        {
-            foreach (var item in AllChildren(start))
-            {
-                yield return item;
-            }
-            foreach (var item in AllSuccessors(start))
-            {
-                yield return item;
-            }
-            foreach (var item in Ancestors(start))
-            {
-                foreach (var sub in AllSuccessors(item))
-                {
-                    yield return sub;
-                }
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> SearchBackward(TreeNodeAdv start)
-        {
-            foreach (var item in AllPredecessors(start))
-            {
-                yield return item;
-            }
-            foreach (var item in Ancestors(start))
-            {
-                yield return item;
-                foreach (var sub in AllPredecessors(item))
-                {
-                    yield return sub;
-                }
-            }
-        }
-
-        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction)
-        {
-            var search = direction == SearchDirection.Forward ? SearchForward(start) : SearchBackward(start);
-            foreach (var item in search)
-            {
-                if (predicate(item))
-                    return item;
+                var children = ForceChildren(prev);
+                if (children.Count == 0)
+                    return prev;
+                prev = children[children.Count - 1];
             }
             return null;
         }
 
-        public IEnumerable<TreeNodeAdv> Search(Predicate<TreeNodeAdv> predicate)
+        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction)
         {
-            foreach (var item in SearchForward(Root))
+            if (direction == SearchDirection.Forward)
+                return SearchFromForward(start, predicate);
+            else
+                return SearchFromBackward(start, predicate);
+        }
+
+        public TreeNodeAdv SearchFromForward(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate)
+        {
+            do
             {
-                if (predicate(item))
-                    yield return item;
-            }
+                start = NextNode(start);
+            } while (start != null && !predicate(start));
+            return start;
+        }
+
+        public TreeNodeAdv SearchFromBackward(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate)
+        {
+            do
+            {
+                start = PreviousNode(start);
+            } while (start != null && !predicate(start));
+            return start;
+        }
+
+        public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate)
+        {
+            var start = Root;
+            do
+            {
+                start = NextNode(start);
+                if (start != null && predicate(start))
+                    yield return start;
+            } while (start != null);
         }
 
         public TreeNodeAdv FinalNode
