@@ -353,16 +353,22 @@ namespace NbtStudio.UI
 
         private void Rename()
         {
-            var obj = ViewModel?.SelectedObject;
-            if (obj == null) return;
-            Rename(obj);
+            if (ViewModel == null) return;
+            var items = ViewModel.SelectedObjects;
+            if (Util.ExactlyOne(items))
+                Rename(items.Single());
+            else
+                BulkEditWindow.BulkRename(items.Filter(x => x.GetNbtTag()));
         }
 
         private void Edit()
         {
-            var obj = ViewModel?.SelectedObject;
-            if (obj == null) return;
-            Edit(obj);
+            if (ViewModel == null) return;
+            var items = ViewModel.SelectedObjects;
+            if (Util.ExactlyOne(items))
+                Edit(items.Single());
+            else
+                BulkEditWindow.BulkEdit(items.Filter(x => x.GetNbtTag()));
         }
 
         private void EditLike(INode node, Predicate<INode> check, Action<INbtTag> when_tag)
@@ -599,6 +605,14 @@ namespace NbtStudio.UI
             }
         }
 
+        private void OpenRecentFile()
+        {
+            UpdateRecentFiles();
+            var files = Properties.Settings.Default.RecentFiles;
+            if (files.Count >= 1)
+                OpenFiles(Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Take(1));
+        }
+
         private bool ConfirmIfUnsaved(string message)
         {
             if (ViewModel == null || !ViewModel.HasAnyUnsavedChanges)
@@ -617,6 +631,7 @@ namespace NbtStudio.UI
             if (InvokeRequired) // only run on UI thread
                 return;
             var obj = ViewModel?.SelectedObject;
+            var objs = ViewModel?.SelectedObjects;
             var nbt = obj.GetNbtTag();
             var container = nbt as INbtContainer;
             var region = obj.GetRegionFile();
@@ -626,12 +641,12 @@ namespace NbtStudio.UI
                 item.Value.Visible = region == null;
             }
             ActionSort.Enabled = obj != null && obj.CanSort;
-            ActionCut.Enabled = obj != null && obj.CanCopy;
-            ActionCopy.Enabled = obj != null && obj.CanCopy;
+            ActionCut.Enabled = obj != null && objs.Any(x => x.CanCut);
+            ActionCopy.Enabled = obj != null && objs.Any(x => x.CanCopy);
             ActionPaste.Enabled = obj != null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
-            ActionDelete.Enabled = obj != null && obj.CanDelete;
-            ActionRename.Enabled = obj != null && (obj.CanRename || obj.CanEdit);
-            ActionEdit.Enabled = obj != null && (obj.CanEdit || obj.CanRename);
+            ActionDelete.Enabled = obj != null && objs.Any(x => x.CanDelete);
+            ActionRename.Enabled = obj != null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
+            ActionEdit.Enabled = obj != null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
             ActionEditSnbt.Enabled = nbt != null;
             ActionAddSnbt.Enabled = container != null;
 
@@ -807,10 +822,8 @@ namespace NbtStudio.UI
             DropDownRedoHistory.Enabled = redo_history.Any();
         }
 
-        private void MenuFile_DropDownOpening(object sender, EventArgs e)
+        private void UpdateRecentFiles()
         {
-            ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
-
             // remove duplicates of recent files and limit to 20 most recent
             var distinct = Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Distinct();
             var recents = distinct.Take(20).ToList();
@@ -830,6 +843,12 @@ namespace NbtStudio.UI
 
             Properties.Settings.Default.RecentFiles.Clear();
             Properties.Settings.Default.RecentFiles.AddRange(recents.AsEnumerable().Reverse().ToArray());
+        }
+
+        private void MenuFile_DropDownOpening(object sender, EventArgs e)
+        {
+            ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
+            UpdateRecentFiles();
         }
 
         private ToolStripMenuItem RecentEntry(string path)
@@ -857,6 +876,11 @@ namespace NbtStudio.UI
             if (keyData == Keys.Enter)
             {
                 Edit();
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.Shift | Keys.T))
+            {
+                OpenRecentFile();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
