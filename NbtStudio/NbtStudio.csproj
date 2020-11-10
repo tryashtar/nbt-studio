@@ -69,63 +69,63 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ByteProviders.cs" />
-    <Compile Include="Chunk.cs" />
-    <Compile Include="ExportSettings.cs" />
+    <Compile Include="NbtObjects\Chunk.cs" />
+    <Compile Include="Models\ExportSettings.cs" />
     <Compile Include="Models\NotifyNbtTags.cs" />
     <Compile Include="Models\ObjectNodes.cs" />
     <Compile Include="Models\UndoHistory.cs" />
     <Compile Include="NbtUtil.cs" />
-    <Compile Include="NbtFile.cs" />
-    <Compile Include="NbtFolder.cs" />
-    <Compile Include="RegionFile.cs" />
-    <Compile Include="UI\ConvenienceTextBox.cs" />
-    <Compile Include="UI\DualMenuItem.cs" />
-    <Compile Include="UI\EditSnbtWindow.cs">
+    <Compile Include="NbtObjects\NbtFile.cs" />
+    <Compile Include="NbtObjects\NbtFolder.cs" />
+    <Compile Include="NbtObjects\RegionFile.cs" />
+    <Compile Include="UI\Controls\ConvenienceControls.cs" />
+    <Compile Include="UI\Controls\DualMenuItem.cs" />
+    <Compile Include="UI\Windows\EditSnbtWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\EditSnbtWindow.Designer.cs">
+    <Compile Include="UI\Windows\EditSnbtWindow.Designer.cs">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\EditHexWindow.cs">
+    <Compile Include="UI\Windows\EditHexWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\EditHexWindow.Designer.cs">
+    <Compile Include="UI\Windows\EditHexWindow.Designer.cs">
       <DependentUpon>EditHexWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\AboutWindow.cs">
+    <Compile Include="UI\Windows\AboutWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\AboutWindow.Designer.cs">
+    <Compile Include="UI\Windows\AboutWindow.Designer.cs">
       <DependentUpon>AboutWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\EditChunkWindow.cs">
+    <Compile Include="UI\Windows\EditChunkWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\EditChunkWindow.Designer.cs">
+    <Compile Include="UI\Windows\EditChunkWindow.Designer.cs">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\RenameFileWindow.cs">
+    <Compile Include="UI\Windows\RenameFileWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\RenameFileWindow.Designer.cs">
+    <Compile Include="UI\Windows\RenameFileWindow.Designer.cs">
       <DependentUpon>RenameFileWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\FindWindow.cs">
+    <Compile Include="UI\Windows\FindWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\FindWindow.Designer.cs">
+    <Compile Include="UI\Windows\FindWindow.Designer.cs">
       <DependentUpon>FindWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\EditTagWindow.cs">
+    <Compile Include="UI\Windows\EditTagWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\EditTagWindow.Designer.cs">
+    <Compile Include="UI\Windows\EditTagWindow.Designer.cs">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\ExportWindow.cs">
+    <Compile Include="UI\Windows\ExportWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\ExportWindow.Designer.cs">
+    <Compile Include="UI\Windows\ExportWindow.Designer.cs">
       <DependentUpon>ExportWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\MainForm.cs">
@@ -134,23 +134,23 @@
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\RegexTextBox.cs">
+    <Compile Include="UI\Controls\TextBoxes\RegexTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\ChunkCoordEditControl.cs" />
-    <Compile Include="UI\FileNameTextBox.cs">
+    <Compile Include="UI\Controls\ChunkCoordEditControl.cs" />
+    <Compile Include="UI\Controls\TextBoxes\FileNameTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\TagSnbtTextBox.cs">
+    <Compile Include="UI\Controls\TextBoxes\TagSnbtTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\TagValueTextBox.cs">
+    <Compile Include="UI\Controls\TextBoxes\TagValueTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\TagNameTextBox.cs">
+    <Compile Include="UI\Controls\TextBoxes\TagNameTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\NbtNodeControls.cs">
+    <Compile Include="UI\Controls\NbtNodeControls.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\NbtTreeModel.cs" />
@@ -163,39 +163,39 @@
     </Compile>
     <Compile Include="SNBT\SnbtMaker.cs" />
     <Compile Include="SNBT\SnbtParser.cs" />
-    <Compile Include="UI\NbtTreeView.cs">
+    <Compile Include="UI\Controls\NbtTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\ActionHistory.cs">
+    <Compile Include="UI\Controls\ActionHistory.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\ActionHistory.Designer.cs">
+    <Compile Include="UI\Controls\ActionHistory.Designer.cs">
       <DependentUpon>ActionHistory.cs</DependentUpon>
     </Compile>
-    <Compile Include="UndoableAction.cs" />
+    <Compile Include="Models\UndoableAction.cs" />
     <Compile Include="Util.cs" />
-    <EmbeddedResource Include="UI\EditSnbtWindow.resx">
+    <EmbeddedResource Include="UI\Windows\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\EditHexWindow.resx">
+    <EmbeddedResource Include="UI\Windows\EditHexWindow.resx">
       <DependentUpon>EditHexWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\AboutWindow.resx">
+    <EmbeddedResource Include="UI\Windows\AboutWindow.resx">
       <DependentUpon>AboutWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\EditChunkWindow.resx">
+    <EmbeddedResource Include="UI\Windows\EditChunkWindow.resx">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\RenameFileWindow.resx">
+    <EmbeddedResource Include="UI\Windows\RenameFileWindow.resx">
       <DependentUpon>RenameFileWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\FindWindow.resx">
+    <EmbeddedResource Include="UI\Windows\FindWindow.resx">
       <DependentUpon>FindWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\EditTagWindow.resx">
+    <EmbeddedResource Include="UI\Windows\EditTagWindow.resx">
       <DependentUpon>EditTagWindow.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\ExportWindow.resx">
+    <EmbeddedResource Include="UI\Windows\ExportWindow.resx">
       <DependentUpon>ExportWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm.resx">
@@ -206,7 +206,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\ActionHistory.resx">
+    <EmbeddedResource Include="UI\Controls\ActionHistory.resx">
       <DependentUpon>ActionHistory.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />

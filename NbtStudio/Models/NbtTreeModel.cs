@@ -16,7 +16,9 @@ namespace NbtStudio
         public event EventHandler<TreeModelEventArgs> NodesChanged;
         public event EventHandler<TreeModelEventArgs> NodesInserted;
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
+#pragma warning disable 67
         public event EventHandler<TreePathEventArgs> StructureChanged;
+#pragma warning restore 67
         public event EventHandler Changed;
 
         public bool HasAnyUnsavedChanges => OpenedFiles.Filter(x => x.GetSaveable()).Any(x => x.HasUnsavedChanges);
