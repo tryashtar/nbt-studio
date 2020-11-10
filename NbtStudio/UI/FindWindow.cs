@@ -58,7 +58,7 @@ namespace NbtStudio.UI
         public void SearchAll()
         {
             if (!ValidateRegex()) return;
-            var results = SearchingView.SearchAll(Matches);
+            var results = SearchingView.Search(Matches);
             if (results.Any())
             {
                 SearchingView.ClearSelection();
