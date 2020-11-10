@@ -43,7 +43,7 @@ namespace NbtStudio.UI
             if (RegexCheck.Checked)
             {
                 NameBox.CheckRegex(out var name_search);
-                NameBox.CheckRegex(out var value_search);
+                ValueBox.CheckRegex(out var value_search);
                 return x => MatchesRegex(x, name_search, value_search);
             }
             else
