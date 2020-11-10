@@ -93,6 +93,34 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get value from {tag.TagType}");
         }
 
+        public static void ResetValue(INbtTag tag)
+        {
+            if (tag is INbtByte tag_byte)
+                tag_byte.Value = 0;
+            else if (tag is INbtShort tag_short)
+                tag_short.Value = 0;
+            else if (tag is INbtInt tag_int)
+                tag_int.Value = 0;
+            else if (tag is INbtLong tag_long)
+                tag_long.Value = 0;
+            else if (tag is INbtFloat tag_float)
+                tag_float.Value = 0;
+            else if (tag is INbtDouble tag_double)
+                tag_double.Value = 0;
+            else if (tag is INbtString tag_string)
+                tag_string.Value = String.Empty;
+            else if (tag is INbtByteArray tag_ba)
+                tag_ba.Value = new byte[0];
+            else if (tag is INbtIntArray tag_ia)
+                tag_ia.Value = new int[0];
+            else if (tag is INbtLongArray tag_la)
+                tag_la.Value = new long[0];
+            else if (tag is INbtCompound tag_compound)
+                tag_compound.Clear();
+            else if (tag is INbtList tag_list)
+                tag_list.Clear();
+        }
+
         public static void SetValue(INbtTag tag, object value)
         {
             if (tag is INbtByte tag_byte && value is byte b)
@@ -461,70 +489,52 @@ namespace NbtStudio
             return $"{AllFiles}|{AllNbtFiles}|{IndividualNbtFiles()}";
         }
 
+        private static readonly Dictionary<NbtTagType, Image> FasterImageCache = new Dictionary<NbtTagType, Image>
+        {
+            { NbtTagType.Byte, Properties.Resources.tag_byte_image },
+            { NbtTagType.Short, Properties.Resources.tag_short_image },
+            { NbtTagType.Int, Properties.Resources.tag_int_image },
+            { NbtTagType.Long, Properties.Resources.tag_long_image },
+            { NbtTagType.Float, Properties.Resources.tag_float_image },
+            { NbtTagType.Double, Properties.Resources.tag_double_image },
+            { NbtTagType.String, Properties.Resources.tag_string_image },
+            { NbtTagType.ByteArray, Properties.Resources.tag_byte_array_image },
+            { NbtTagType.IntArray, Properties.Resources.tag_int_array_image },
+            { NbtTagType.LongArray, Properties.Resources.tag_long_array_image },
+            { NbtTagType.Compound, Properties.Resources.tag_compound_image },
+            { NbtTagType.List, Properties.Resources.tag_list_image }
+        };
+
+        private static readonly Dictionary<NbtTagType, Icon> FasterIconCache = new Dictionary<NbtTagType, Icon>
+        {
+            { NbtTagType.Byte, Properties.Resources.tag_byte_icon },
+            { NbtTagType.Short, Properties.Resources.tag_short_icon },
+            { NbtTagType.Int, Properties.Resources.tag_int_icon },
+            { NbtTagType.Long, Properties.Resources.tag_long_icon },
+            { NbtTagType.Float, Properties.Resources.tag_float_icon },
+            { NbtTagType.Double, Properties.Resources.tag_double_icon },
+            { NbtTagType.String, Properties.Resources.tag_string_icon },
+            { NbtTagType.ByteArray, Properties.Resources.tag_byte_array_icon },
+            { NbtTagType.IntArray, Properties.Resources.tag_int_array_icon },
+            { NbtTagType.LongArray, Properties.Resources.tag_long_array_icon },
+            { NbtTagType.Compound, Properties.Resources.tag_compound_icon },
+            { NbtTagType.List, Properties.Resources.tag_list_icon }
+        };
+
+
         public static Image TagTypeImage(NbtTagType type)
         {
-            switch (type)
-            {
-                case NbtTagType.Byte:
-                    return Properties.Resources.tag_byte_image;
-                case NbtTagType.Short:
-                    return Properties.Resources.tag_short_image;
-                case NbtTagType.Int:
-                    return Properties.Resources.tag_int_image;
-                case NbtTagType.Long:
-                    return Properties.Resources.tag_long_image;
-                case NbtTagType.Float:
-                    return Properties.Resources.tag_float_image;
-                case NbtTagType.Double:
-                    return Properties.Resources.tag_double_image;
-                case NbtTagType.ByteArray:
-                    return Properties.Resources.tag_byte_array_image;
-                case NbtTagType.String:
-                    return Properties.Resources.tag_string_image;
-                case NbtTagType.List:
-                    return Properties.Resources.tag_list_image;
-                case NbtTagType.Compound:
-                    return Properties.Resources.tag_compound_image;
-                case NbtTagType.IntArray:
-                    return Properties.Resources.tag_int_array_image;
-                case NbtTagType.LongArray:
-                    return Properties.Resources.tag_long_array_image;
-                default:
-                    return null;
-            }
+            if (FasterImageCache.TryGetValue(type, out var result))
+                return result;
+            return null;
         }
 
         public static Icon TagTypeIcon(NbtTagType type)
         {
-            switch (type)
-            {
-                case NbtTagType.Byte:
-                    return Properties.Resources.tag_byte_icon;
-                case NbtTagType.Short:
-                    return Properties.Resources.tag_short_icon;
-                case NbtTagType.Int:
-                    return Properties.Resources.tag_int_icon;
-                case NbtTagType.Long:
-                    return Properties.Resources.tag_long_icon;
-                case NbtTagType.Float:
-                    return Properties.Resources.tag_float_icon;
-                case NbtTagType.Double:
-                    return Properties.Resources.tag_double_icon;
-                case NbtTagType.ByteArray:
-                    return Properties.Resources.tag_byte_array_icon;
-                case NbtTagType.String:
-                    return Properties.Resources.tag_string_icon;
-                case NbtTagType.List:
-                    return Properties.Resources.tag_list_icon;
-                case NbtTagType.Compound:
-                    return Properties.Resources.tag_compound_icon;
-                case NbtTagType.IntArray:
-                    return Properties.Resources.tag_int_array_icon;
-                case NbtTagType.LongArray:
-                    return Properties.Resources.tag_long_array_icon;
-                default:
-                    return null;
-            }
+            if (FasterIconCache.TryGetValue(type, out var result))
+                return result;
+            return null;
+
         }
     }
 }

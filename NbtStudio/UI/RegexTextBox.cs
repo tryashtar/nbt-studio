@@ -61,22 +61,34 @@ namespace NbtStudio.UI
             }
         }
 
-        public bool IsMatch(string input)
+        public static bool IsMatch(string input, string search)
         {
-            if (this.Text == "")
+            if (search == "")
                 return true;
             if (input == null)
                 return false;
+            return input.IndexOf(search, StringComparison.OrdinalIgnoreCase) != -1;
+        }
+
+        public static bool IsMatchRegex(string input, Regex search)
+        {
+            if (search == null)
+                return false;
+            if (input == null)
+                return false;
+            return search.IsMatch(input);
+        }
+
+        public bool IsMatch(string input)
+        {
             if (RegexMode)
             {
                 if (LastRegex == null)
                     CheckRegexInternal(out LastRegex);
-                if (LastRegex == null)
-                    return false;
-                return LastRegex.IsMatch(input);
+                return IsMatchRegex(input, LastRegex);
             }
             else
-                return input.IndexOf(this.Text, StringComparison.OrdinalIgnoreCase) != -1;
+                return IsMatch(input, this.Text);
         }
 
         public Regex ReparseRegex()
