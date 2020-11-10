@@ -110,7 +110,8 @@ namespace NbtStudio.UI
         private void Progress_ProgressChanged(object sender, TreeSearchReport e)
         {
             int value = (int)(e.Percentage * 100);
-            ProgressBar.Value = Math.Max(0, Math.Min(100, value));
+            ProgressBar.Value = Math.Max(1, Math.Min(100, value));
+            ProgressBar.Value--; // fix animation
         }
 
         public void Search(SearchDirection direction)

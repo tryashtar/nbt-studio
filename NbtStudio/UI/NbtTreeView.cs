@@ -189,26 +189,27 @@ namespace NbtStudio.UI
         public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, bool wrap)
         {
             if (direction == SearchDirection.Forward)
-                return SearchFromNext(start, predicate, NextNode, progress, wrap ? Root.Children.First() : null);
+                return SearchFromNext(start, predicate, NextNode, progress, new TreeSearchReport(), wrap ? Root.Children.First() : null);
             else
-                return SearchFromNext(start, predicate, PreviousNode, progress, wrap ? FinalNode : null);
+                return SearchFromNext(start, predicate, PreviousNode, progress, new TreeSearchReport(), wrap ? FinalNode : null);
         }
 
-        private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, TreeNodeAdv wrap_start)
+        private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, TreeSearchReport report, TreeNodeAdv wrap_start)
         {
             var start = node;
-            var report = new TreeSearchReport();
             report.TotalNodes = this.AllNodes.Count();
             do
             {
                 node = next(node);
                 report.NodesSearched++;
-                if (report.NodesSearched % 100 == 0)
+                if (report.NodesSearched % 200 == 0)
+                {
                     report.TotalNodes = this.AllNodes.Count();
-                progress.Report(report);
+                    progress.Report(report);
+                }
             } while (node != null && !predicate(node));
             if (node == null && wrap_start != null) // search again from new starting point, until reaching original starting point
-                return SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, null);
+                return SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, report, null);
             return node;
         }
 
@@ -223,9 +224,11 @@ namespace NbtStudio.UI
                 if (node != null && predicate(node))
                     yield return node;
                 report.NodesSearched++;
-                if (report.NodesSearched % 100 == 0)
+                if (report.NodesSearched % 200 == 0)
+                {
                     report.TotalNodes = this.AllNodes.Count();
-                progress.Report(report);
+                    progress.Report(report);
+                }
             } while (node != null);
         }
 
