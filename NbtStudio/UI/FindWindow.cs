@@ -24,11 +24,34 @@ namespace NbtStudio.UI
             this.Icon = Properties.Resources.action_search_icon;
         }
 
-        private bool Matches(TreeNodeAdv adv)
+        private static bool Matches(TreeNodeAdv adv, string name_search, string value_search)
         {
             string name = NbtText.PreviewName(adv);
             string value = NbtText.PreviewValue(adv);
-            return NameBox.IsMatch(name) && ValueBox.IsMatch(value);
+            return RegexTextBox.IsMatch(name, name_search) && RegexTextBox.IsMatch(value, value_search);
+        }
+
+        private static bool MatchesRegex(TreeNodeAdv adv, Regex name_search, Regex value_search)
+        {
+            string name = NbtText.PreviewName(adv);
+            string value = NbtText.PreviewValue(adv);
+            return RegexTextBox.IsMatchRegex(name, name_search) && RegexTextBox.IsMatchRegex(value, value_search);
+        }
+
+        private Predicate<TreeNodeAdv> GetPredicate()
+        {
+            if (RegexCheck.Checked)
+            {
+                NameBox.CheckRegex(out var name_search);
+                NameBox.CheckRegex(out var value_search);
+                return x => MatchesRegex(x, name_search, value_search);
+            }
+            else
+            {
+                string name_search = NameBox.Text;
+                string value_search = ValueBox.Text;
+                return x => Matches(x, name_search, value_search);
+            }
         }
 
         public void Search(SearchDirection direction)
@@ -36,16 +59,17 @@ namespace NbtStudio.UI
             if (!ValidateRegex()) return;
             var backup = direction == SearchDirection.Forward ? SearchingView.Root : SearchingView.FinalNode;
             var start = SearchingView.SelectedNode ?? LastFound ?? backup;
-            var find = SearchingView.SearchFrom(start, Matches, direction);
+            var predicate = GetPredicate();
+            var find = SearchingView.SearchFrom(start, predicate, direction);
             if (find == SearchingView.Root)
                 find = null;
             if (find == null)
             {
                 // wrap around and look again, but only up until the original starting point
-                if (backup != start && backup != SearchingView.Root && Matches(backup))
+                if (backup != start && backup != SearchingView.Root && predicate(backup))
                     find = backup;
                 else
-                    find = SearchingView.SearchFrom(backup, x => x != start && Matches(x), direction);
+                    find = SearchingView.SearchFrom(backup, x => x != start && predicate(x), direction);
             }
             if (find != null)
             {
@@ -58,7 +82,8 @@ namespace NbtStudio.UI
         public void SearchAll()
         {
             if (!ValidateRegex()) return;
-            var results = SearchingView.SearchAll(Matches);
+            var predicate = GetPredicate();
+            var results = SearchingView.SearchAll(predicate);
             if (results.Any())
             {
                 SearchingView.ClearSelection();
