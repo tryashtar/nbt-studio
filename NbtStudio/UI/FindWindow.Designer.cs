@@ -36,6 +36,7 @@
             this.ValueLabel = new System.Windows.Forms.Label();
             this.ValueBox = new NbtStudio.UI.RegexTextBox();
             this.ButtonFindAll = new System.Windows.Forms.Button();
+            this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // ButtonFindNext
@@ -43,7 +44,7 @@
             this.ButtonFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonFindNext.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonFindNext.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonFindNext.Location = new System.Drawing.Point(191, 82);
+            this.ButtonFindNext.Location = new System.Drawing.Point(191, 91);
             this.ButtonFindNext.Name = "ButtonFindNext";
             this.ButtonFindNext.Size = new System.Drawing.Size(75, 23);
             this.ButtonFindNext.TabIndex = 4;
@@ -56,7 +57,7 @@
             this.ButtonFindPrev.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonFindPrev.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonFindPrev.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonFindPrev.Location = new System.Drawing.Point(77, 82);
+            this.ButtonFindPrev.Location = new System.Drawing.Point(77, 91);
             this.ButtonFindPrev.Name = "ButtonFindPrev";
             this.ButtonFindPrev.Size = new System.Drawing.Size(108, 23);
             this.ButtonFindPrev.TabIndex = 3;
@@ -68,7 +69,7 @@
             // 
             this.RegexCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.RegexCheck.AutoSize = true;
-            this.RegexCheck.Location = new System.Drawing.Point(12, 84);
+            this.RegexCheck.Location = new System.Drawing.Point(12, 93);
             this.RegexCheck.Name = "RegexCheck";
             this.RegexCheck.Size = new System.Drawing.Size(57, 17);
             this.RegexCheck.TabIndex = 2;
@@ -131,13 +132,22 @@
             this.ButtonFindAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonFindAll.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonFindAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonFindAll.Location = new System.Drawing.Point(272, 82);
+            this.ButtonFindAll.Location = new System.Drawing.Point(272, 91);
             this.ButtonFindAll.Name = "ButtonFindAll";
             this.ButtonFindAll.Size = new System.Drawing.Size(75, 23);
             this.ButtonFindAll.TabIndex = 10;
             this.ButtonFindAll.Text = "Find All";
             this.ButtonFindAll.UseVisualStyleBackColor = true;
             this.ButtonFindAll.Click += new System.EventHandler(this.ButtonFindAll_Click);
+            // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Location = new System.Drawing.Point(11, 71);
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(336, 14);
+            this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.ProgressBar.TabIndex = 11;
+            this.ProgressBar.Visible = false;
             // 
             // FindWindow
             // 
@@ -146,7 +156,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(360, 113);
+            this.ClientSize = new System.Drawing.Size(360, 122);
+            this.Controls.Add(this.ProgressBar);
             this.Controls.Add(this.ButtonFindAll);
             this.Controls.Add(this.ValueBox);
             this.Controls.Add(this.ValueLabel);
@@ -178,5 +189,6 @@
         private System.Windows.Forms.Label ValueLabel;
         private RegexTextBox ValueBox;
         private System.Windows.Forms.Button ButtonFindAll;
+        private System.Windows.Forms.ProgressBar ProgressBar;
     }
 }

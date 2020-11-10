@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace NbtStudio.UI
 {
@@ -54,46 +55,72 @@ namespace NbtStudio.UI
             }
         }
 
-        public void Search(SearchDirection direction)
+        private IEnumerable<TreeNodeAdv> DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
-            if (!ValidateRegex()) return;
+            if (!ValidateRegex()) return null;
             var backup = direction == SearchDirection.Forward ? SearchingView.Root : SearchingView.FinalNode;
             var start = SearchingView.SelectedNode ?? LastFound ?? backup;
             var predicate = GetPredicate();
-            var find = SearchingView.SearchFrom(start, predicate, direction);
+            var find = SearchingView.SearchFrom(start, predicate, direction, progress, true);
             if (find == SearchingView.Root)
                 find = null;
             if (find == null)
-            {
-                // wrap around and look again, but only up until the original starting point
-                if (backup != start && backup != SearchingView.Root && predicate(backup))
-                    find = backup;
-                else
-                    find = SearchingView.SearchFrom(backup, x => x != start && predicate(x), direction);
-            }
-            if (find != null)
+                return null;
+            else
             {
                 LastFound = find;
-                SearchingView.SelectedNode = find;
-                SearchingView.EnsureVisible(find);
+                return new[] { find };
             }
+        }
+
+        private IEnumerable<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
+        {
+            if (!ValidateRegex()) return null;
+            var predicate = GetPredicate();
+            return SearchingView.SearchAll(predicate, progress).ToList();
+        }
+
+        private Task<IEnumerable<TreeNodeAdv>> ActiveSearch;
+        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, IEnumerable<TreeNodeAdv>> function)
+        {
+            if (ActiveSearch != null && !ActiveSearch.IsCompleted)
+                return;
+            var progress = new Progress<TreeSearchReport>();
+            progress.ProgressChanged += Progress_ProgressChanged;
+            ActiveSearch = new Task<IEnumerable<TreeNodeAdv>>(() => function(progress));
+            ActiveSearch.Start();
+            ProgressBar.Visible = true;
+            ProgressBar.Value = 0;
+            ActiveSearch.ContinueWith(x =>
+            {
+                ProgressBar.Visible = false;
+                if (x.Result != null && x.Result.Any())
+                {
+                    SearchingView.ClearSelection();
+                    LastFound = x.Result.Last();
+                    foreach (var item in x.Result)
+                    {
+                        SearchingView.EnsureVisible(item);
+                        item.IsSelected = true;
+                    }
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void Progress_ProgressChanged(object sender, TreeSearchReport e)
+        {
+            int value = (int)(e.Percentage * 100);
+            ProgressBar.Value = Math.Max(0, Math.Min(100, value));
+        }
+
+        public void Search(SearchDirection direction)
+        {
+            StartActiveSearch(x => DoSearch(direction, x));
         }
 
         public void SearchAll()
         {
-            if (!ValidateRegex()) return;
-            var predicate = GetPredicate();
-            var results = SearchingView.SearchAll(predicate);
-            if (results.Any())
-            {
-                SearchingView.ClearSelection();
-                LastFound = results.Last();
-                foreach (var item in results)
-                {
-                    SearchingView.EnsureVisible(item);
-                    item.IsSelected = true;
-                }
-            }
+            StartActiveSearch(DoSearchAll);
         }
 
         private bool ValidateRegex()
@@ -147,11 +174,15 @@ namespace NbtStudio.UI
         {
             CenterToParent();
             RegexCheck.Checked = Properties.Settings.Default.FindRegex;
+            NameBox.Text = Properties.Settings.Default.FindName;
+            ValueBox.Text = Properties.Settings.Default.FindValue;
         }
 
         private void FindWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.FindRegex = RegexCheck.Checked;
+            Properties.Settings.Default.FindName = NameBox.Text;
+            Properties.Settings.Default.FindValue = ValueBox.Text;
         }
 
         private void RegexCheck_CheckedChanged(object sender, EventArgs e)

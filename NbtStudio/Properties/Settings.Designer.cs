@@ -57,5 +57,29 @@ namespace NbtStudio.Properties {
                 this["TreeZoom"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FindName {
+            get {
+                return ((string)(this["FindName"]));
+            }
+            set {
+                this["FindName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FindValue {
+            get {
+                return ((string)(this["FindValue"]));
+            }
+            set {
+                this["FindValue"] = value;
+            }
+        }
     }
 }

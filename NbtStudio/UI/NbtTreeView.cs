@@ -186,41 +186,47 @@ namespace NbtStudio.UI
             return null;
         }
 
-        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction)
+        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, bool wrap)
         {
             if (direction == SearchDirection.Forward)
-                return SearchFromForward(start, predicate);
+                return SearchFromNext(start, predicate, NextNode, progress, wrap ? Root.Children.First() : null);
             else
-                return SearchFromBackward(start, predicate);
+                return SearchFromNext(start, predicate, PreviousNode, progress, wrap ? FinalNode : null);
         }
 
-        public TreeNodeAdv SearchFromForward(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate)
+        private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, TreeNodeAdv wrap_start)
         {
+            var start = node;
+            var report = new TreeSearchReport();
+            report.TotalNodes = this.AllNodes.Count();
             do
             {
-                start = NextNode(start);
-            } while (start != null && !predicate(start));
-            return start;
+                node = next(node);
+                report.NodesSearched++;
+                if (report.NodesSearched % 100 == 0)
+                    report.TotalNodes = this.AllNodes.Count();
+                progress.Report(report);
+            } while (node != null && !predicate(node));
+            if (node == null && wrap_start != null) // search again from new starting point, until reaching original starting point
+                return SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, null);
+            return node;
         }
 
-        public TreeNodeAdv SearchFromBackward(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate)
+        public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate, IProgress<TreeSearchReport> progress)
         {
+            var report = new TreeSearchReport();
+            report.TotalNodes = this.AllNodes.Count();
+            var node = Root;
             do
             {
-                start = PreviousNode(start);
-            } while (start != null && !predicate(start));
-            return start;
-        }
-
-        public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate)
-        {
-            var start = Root;
-            do
-            {
-                start = NextNode(start);
-                if (start != null && predicate(start))
-                    yield return start;
-            } while (start != null);
+                node = NextNode(node);
+                if (node != null && predicate(node))
+                    yield return node;
+                report.NodesSearched++;
+                if (report.NodesSearched % 100 == 0)
+                    report.TotalNodes = this.AllNodes.Count();
+                progress.Report(report);
+            } while (node != null);
         }
 
         public TreeNodeAdv FinalNode
@@ -309,5 +315,12 @@ namespace NbtStudio.UI
     {
         Forward,
         Backward
+    }
+
+    public class TreeSearchReport
+    {
+        public int NodesSearched;
+        public int TotalNodes;
+        public decimal Percentage => (decimal)NodesSearched / TotalNodes;
     }
 }
