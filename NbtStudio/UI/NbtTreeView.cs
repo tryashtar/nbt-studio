@@ -208,9 +208,17 @@ namespace NbtStudio.UI
                     progress.Report(report);
                 }
             } while (node != null && !predicate(node));
-            if (node == null && wrap_start != null) // search again from new starting point, until reaching original starting point
-                return SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, report, null);
-            return node;
+            if (node != null)
+                return node;
+            if (wrap_start == null)
+                return null;
+
+            // search again from new starting point, until reaching original starting point
+            node = SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, report, null);
+            if (node == start)
+                return null;
+            else
+                return node;
         }
 
         public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate, IProgress<TreeSearchReport> progress)
