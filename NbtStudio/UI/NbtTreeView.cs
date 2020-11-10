@@ -153,9 +153,12 @@ namespace NbtStudio.UI
 
         public TreeNodeAdv NextNode(TreeNodeAdv node)
         {
-            var children = ForceChildren(node);
-            if (children.Count > 0)
-                return children.First();
+            if (!node.IsLeaf)
+            {
+                var children = ForceChildren(node);
+                if (children.Count > 0)
+                    return children.First();
+            }
             TreeNodeAdv next = null;
             while (next == null && node != null)
             {
@@ -173,6 +176,8 @@ namespace NbtStudio.UI
                 return node.Parent;
             while (prev != null)
             {
+                if (prev.IsLeaf)
+                    return prev;
                 var children = ForceChildren(prev);
                 if (children.Count == 0)
                     return prev;
