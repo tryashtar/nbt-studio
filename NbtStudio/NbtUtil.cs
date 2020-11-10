@@ -93,6 +93,34 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get value from {tag.TagType}");
         }
 
+        public static void ResetValue(INbtTag tag)
+        {
+            if (tag is INbtByte tag_byte)
+                tag_byte.Value = 0;
+            else if (tag is INbtShort tag_short)
+                tag_short.Value = 0;
+            else if (tag is INbtInt tag_int)
+                tag_int.Value = 0;
+            else if (tag is INbtLong tag_long)
+                tag_long.Value = 0;
+            else if (tag is INbtFloat tag_float)
+                tag_float.Value = 0;
+            else if (tag is INbtDouble tag_double)
+                tag_double.Value = 0;
+            else if (tag is INbtString tag_string)
+                tag_string.Value = String.Empty;
+            else if (tag is INbtByteArray tag_ba)
+                tag_ba.Value = new byte[0];
+            else if (tag is INbtIntArray tag_ia)
+                tag_ia.Value = new int[0];
+            else if (tag is INbtLongArray tag_la)
+                tag_la.Value = new long[0];
+            else if (tag is INbtCompound tag_compound)
+                tag_compound.Clear();
+            else if (tag is INbtList tag_list)
+                tag_list.Clear();
+        }
+
         public static void SetValue(INbtTag tag, object value)
         {
             if (tag is INbtByte tag_byte && value is byte b)
