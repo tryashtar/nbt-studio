@@ -145,8 +145,8 @@ namespace NbtStudio.UI
         {
             if (!node.IsExpandedOnce)
             {
-                node.IsExpanded = true;
-                node.IsExpanded = false;
+                node.ExpandAll();
+                node.CollapseAll();
             }
             return node.Children;
         }
