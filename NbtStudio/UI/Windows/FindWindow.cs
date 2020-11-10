@@ -58,12 +58,9 @@ namespace NbtStudio.UI
         private IEnumerable<TreeNodeAdv> DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
-            var backup = direction == SearchDirection.Forward ? SearchingView.Root : SearchingView.FinalNode;
-            var start = SearchingView.SelectedNode ?? LastFound ?? backup;
+            var start = SearchingView.SelectedNode ?? LastFound;
             var predicate = GetPredicate();
             var find = SearchingView.SearchFrom(start, predicate, direction, progress, true);
-            if (find == SearchingView.Root)
-                find = null;
             if (find == null)
                 return null;
             else

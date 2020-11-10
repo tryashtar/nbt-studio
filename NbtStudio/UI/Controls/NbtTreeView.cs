@@ -143,7 +143,7 @@ namespace NbtStudio.UI
 
         private ReadOnlyCollection<TreeNodeAdv> ForceChildren(TreeNodeAdv node)
         {
-            if (!node.IsExpandedOnce)
+            if (!node.IsExpandedOnce && node.Children.Count == 0)
             {
                 node.ExpandAll();
                 node.CollapseAll();
@@ -153,12 +153,9 @@ namespace NbtStudio.UI
 
         public TreeNodeAdv NextNode(TreeNodeAdv node)
         {
-            if (!node.IsLeaf)
-            {
-                var children = ForceChildren(node);
-                if (children.Count > 0)
-                    return children.First();
-            }
+            var children = ForceChildren(node);
+            if (children.Count > 0)
+                return children.First();
             TreeNodeAdv next = null;
             while (next == null && node != null)
             {
@@ -176,8 +173,6 @@ namespace NbtStudio.UI
                 return node.Parent;
             while (prev != null)
             {
-                if (prev.IsLeaf)
-                    return prev;
                 var children = ForceChildren(prev);
                 if (children.Count == 0)
                     return prev;
@@ -189,16 +184,30 @@ namespace NbtStudio.UI
         public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, bool wrap)
         {
             if (direction == SearchDirection.Forward)
-                return SearchFromNext(start, predicate, NextNode, progress, new TreeSearchReport(), wrap ? Root.Children.First() : null);
+            {
+                var first = Root.Children.First();
+                if (start == null)
+                    start = first;
+                else
+                    start = NextNode(start);
+                return SearchFromNext(start, predicate, NextNode, progress, new TreeSearchReport(), wrap ? first : null);
+            }
             else
-                return SearchFromNext(start, predicate, PreviousNode, progress, new TreeSearchReport(), wrap ? FinalNode : null);
+            {
+                var last = FinalNode;
+                if (start == null)
+                    start = last;
+                else
+                    start = PreviousNode(start);
+                return SearchFromNext(start, predicate, PreviousNode, progress, new TreeSearchReport(), wrap ? last : null);
+            }
         }
 
         private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, TreeSearchReport report, TreeNodeAdv wrap_start)
         {
             var start = node;
             report.TotalNodes = this.AllNodes.Count();
-            do
+            while (node != null && !predicate(node))
             {
                 node = next(node);
                 report.NodesSearched++;
@@ -207,8 +216,8 @@ namespace NbtStudio.UI
                     report.TotalNodes = this.AllNodes.Count();
                     progress.Report(report);
                 }
-            } while (node != null && !predicate(node));
-            if (node != null)
+            }
+            if (node != null && node != Root)
                 return node;
             if (wrap_start == null)
                 return null;
@@ -225,8 +234,8 @@ namespace NbtStudio.UI
         {
             var report = new TreeSearchReport();
             report.TotalNodes = this.AllNodes.Count();
-            var node = Root;
-            do
+            var node = Root.Children.First();
+            while (node != null)
             {
                 node = NextNode(node);
                 if (node != null && predicate(node))
@@ -237,7 +246,7 @@ namespace NbtStudio.UI
                     report.TotalNodes = this.AllNodes.Count();
                     progress.Report(report);
                 }
-            } while (node != null);
+            }
         }
 
         public TreeNodeAdv FinalNode
@@ -247,42 +256,11 @@ namespace NbtStudio.UI
                 var current = Root;
                 while (true)
                 {
-                    if (!current.IsExpandedOnce)
-                    {
-                        current.IsExpanded = true;
-                        current.IsExpanded = false;
-                    }
-                    if (current.Children.Count == 0)
+                    var children = ForceChildren(current);
+                    if (children.Count == 0)
                         return current;
                     current = current.Children.Last();
                 }
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> SucceedingNodes(TreeNodeAdv start)
-        {
-            while (start.NextNode != null)
-            {
-                start = start.NextNode;
-                yield return start;
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> PrecedingNodes(TreeNodeAdv start)
-        {
-            while (start.PreviousNode != null)
-            {
-                start = start.PreviousNode;
-                yield return start;
-            }
-        }
-
-        private IEnumerable<TreeNodeAdv> Ancestors(TreeNodeAdv bottom)
-        {
-            while (bottom.Parent != null)
-            {
-                bottom = bottom.Parent;
-                yield return bottom;
             }
         }
 
