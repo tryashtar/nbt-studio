@@ -101,6 +101,7 @@
             this.NameBox.RegexMode = false;
             this.NameBox.Size = new System.Drawing.Size(274, 21);
             this.NameBox.TabIndex = 0;
+            this.NameBox.TextChanged += new System.EventHandler(this.NameBox_TextChanged);
             // 
             // ValueLabel
             // 
@@ -126,6 +127,7 @@
             this.ValueBox.RegexMode = false;
             this.ValueBox.Size = new System.Drawing.Size(274, 21);
             this.ValueBox.TabIndex = 1;
+            this.ValueBox.TextChanged += new System.EventHandler(this.ValueBox_TextChanged);
             // 
             // ButtonFindAll
             // 

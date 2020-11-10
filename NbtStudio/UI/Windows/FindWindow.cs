@@ -14,8 +14,6 @@ namespace NbtStudio.UI
     {
         private TreeNodeAdv LastFound;
         private readonly NbtTreeView SearchingView;
-        public string SearchName => NameBox.Text;
-        public string SearchValue => ValueBox.Text;
 
         public FindWindow(NbtTreeView view)
         {
@@ -23,6 +21,7 @@ namespace NbtStudio.UI
 
             SearchingView = view;
             this.Icon = Properties.Resources.action_search_icon;
+            UpdateButtons();
         }
 
         private static bool Matches(TreeNodeAdv adv, string name_search, string value_search)
@@ -97,9 +96,10 @@ namespace NbtStudio.UI
                     LastFound = x.Result.Last();
                     foreach (var item in x.Result)
                     {
-                        SearchingView.EnsureVisible(item);
+                        FastEnsureVisible(item);
                         item.IsSelected = true;
                     }
+                    SearchingView.ScrollTo(LastFound);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
@@ -109,6 +109,15 @@ namespace NbtStudio.UI
             int value = (int)(e.Percentage * 100);
             ProgressBar.Value = Math.Max(1, Math.Min(100, value));
             ProgressBar.Value--; // fix animation
+        }
+
+        private void FastEnsureVisible(TreeNodeAdv node)
+        {
+            while (node != null)
+            {
+                node = node.Parent;
+                node?.Expand();
+            }
         }
 
         public void Search(SearchDirection direction)
@@ -150,7 +159,7 @@ namespace NbtStudio.UI
                 Search(SearchDirection.Backward);
                 return true;
             }
-            if (keyData == (Keys.Control | Keys.Enter))
+            if (keyData == (Keys.Control | Keys.Enter) && ButtonFindAll.Enabled)
             {
                 SearchAll();
                 return true;
@@ -187,6 +196,21 @@ namespace NbtStudio.UI
         {
             NameBox.RegexMode = RegexCheck.Checked;
             ValueBox.RegexMode = RegexCheck.Checked;
+        }
+
+        private void NameBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateButtons();
+        }
+
+        private void ValueBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateButtons();
+        }
+
+        private void UpdateButtons()
+        {
+            ButtonFindAll.Enabled = NameBox.Text != "" || ValueBox.Text != "";
         }
     }
 }
