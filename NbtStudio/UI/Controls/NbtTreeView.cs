@@ -143,7 +143,7 @@ namespace NbtStudio.UI
 
         private ReadOnlyCollection<TreeNodeAdv> ForceChildren(TreeNodeAdv node)
         {
-            if (!node.IsExpandedOnce && node.Children.Count == 0)
+            if (!node.IsExpandedOnce && !node.IsLeaf && node.Children.Count == 0)
             {
                 node.ExpandAll();
                 node.CollapseAll();
