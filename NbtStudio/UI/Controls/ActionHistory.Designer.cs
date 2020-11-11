@@ -40,7 +40,6 @@
             this.ActionList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ActionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.ActionList.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ActionList.FormattingEnabled = true;
             this.ActionList.ItemHeight = 15;
             this.ActionList.Location = new System.Drawing.Point(0, 0);
             this.ActionList.Name = "ActionList";

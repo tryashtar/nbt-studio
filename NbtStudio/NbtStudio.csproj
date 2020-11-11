@@ -104,6 +104,12 @@
     <Compile Include="UI\Windows\EditChunkWindow.Designer.cs">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Windows\BulkEditWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Windows\BulkEditWindow.Designer.cs">
+      <DependentUpon>BulkEditWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\RenameFileWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -185,6 +191,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Windows\EditChunkWindow.resx">
       <DependentUpon>EditChunkWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Windows\BulkEditWindow.resx">
+      <DependentUpon>BulkEditWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Windows\RenameFileWindow.resx">
       <DependentUpon>RenameFileWindow.cs</DependentUpon>

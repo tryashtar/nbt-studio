@@ -108,6 +108,18 @@ namespace NbtStudio.UI
             return null;
         }
 
+        public bool CheckRegexQuiet(out Regex regex)
+        {
+            if (!RegexMode)
+            {
+                regex = null;
+                return true;
+            }
+            var error = CheckRegexInternal(out regex);
+            SetColor(error);
+            return error == null;
+        }
+
         public bool CheckRegex(out Regex regex)
         {
             if (!RegexMode)

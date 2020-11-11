@@ -400,6 +400,7 @@ namespace NbtStudio
 
         // tag wrapping
         public INbtTag this[int index] => Wrap(Tag[index]);
+        public INbtTag this[string name] => Wrap(Tag[name]);
         public IEnumerable<INbtTag> Tags => ((IEnumerable<NbtTag>)Tag).Select(Wrap);
         public IEnumerator<INbtTag> GetEnumerator() => Tags.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

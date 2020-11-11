@@ -141,6 +141,19 @@ namespace NbtStudio.UI
             }
         }
 
+        public IEnumerable<TreeNodeAdv> AllChildren(TreeNodeAdv node)
+        {
+            var children = ForceChildren(node);
+            foreach (var child in children)
+            {
+                yield return child;
+                foreach (var grandchild in AllChildren(child))
+                {
+                    yield return grandchild;
+                }
+            }
+        }
+
         private ReadOnlyCollection<TreeNodeAdv> ForceChildren(TreeNodeAdv node)
         {
             if (!node.IsExpandedOnce && !node.IsLeaf && node.Children.Count == 0)

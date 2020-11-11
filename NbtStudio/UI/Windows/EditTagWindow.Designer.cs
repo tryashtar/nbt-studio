@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new TagNameTextBox();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ValueLabel = new System.Windows.Forms.Label();
-            this.ValueBox = new TagValueTextBox();
+            this.ValueBox = new NbtStudio.UI.TagValueTextBox();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.MainTable.SuspendLayout();
@@ -48,7 +48,7 @@
             this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
-            this.NameLabel.TabIndex = 0;
+            this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Name:";
             // 
             // NameBox
@@ -60,7 +60,7 @@
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 1;
+            this.NameBox.TabIndex = 2;
             // 
             // ButtonCancel
             // 
@@ -94,7 +94,7 @@
             this.ValueLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.ValueLabel.Name = "ValueLabel";
             this.ValueLabel.Size = new System.Drawing.Size(41, 15);
-            this.ValueLabel.TabIndex = 4;
+            this.ValueLabel.TabIndex = 3;
             this.ValueLabel.Text = "Value:";
             // 
             // ValueBox
@@ -107,7 +107,7 @@
             this.ValueBox.Name = "ValueBox";
             this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ValueBox.Size = new System.Drawing.Size(209, 21);
-            this.ValueBox.TabIndex = 5;
+            this.ValueBox.TabIndex = 4;
             // 
             // MainTable
             // 
@@ -130,7 +130,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.MainTable.Size = new System.Drawing.Size(463, 185);
-            this.MainTable.TabIndex = 8;
+            this.MainTable.TabIndex = 0;
             // 
             // ButtonsPanel
             // 
@@ -141,7 +141,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(283, 141);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
-            this.ButtonsPanel.TabIndex = 8;
+            this.ButtonsPanel.TabIndex = 5;
             // 
             // EditTagWindow
             // 

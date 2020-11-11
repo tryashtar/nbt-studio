@@ -56,7 +56,7 @@
             this.NameLabel.Location = new System.Drawing.Point(95, 12);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(106, 24);
-            this.NameLabel.TabIndex = 1;
+            this.NameLabel.TabIndex = 0;
             this.NameLabel.TabStop = true;
             this.NameLabel.Text = "NBT Studio";
             this.NameLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.NameLabel_LinkClicked);
@@ -68,7 +68,7 @@
             this.InfoLabel.Location = new System.Drawing.Point(95, 46);
             this.InfoLabel.Name = "InfoLabel";
             this.InfoLabel.Size = new System.Drawing.Size(161, 96);
-            this.InfoLabel.TabIndex = 2;
+            this.InfoLabel.TabIndex = 1;
             this.InfoLabel.Text = "Copyright © 2020 tryashtar\r\n\r\nBased on:\r\n\r\n\r\nIcons created by:";
             // 
             // NbtExplorerLabel
@@ -80,7 +80,7 @@
             this.NbtExplorerLabel.Location = new System.Drawing.Point(96, 96);
             this.NbtExplorerLabel.Name = "NbtExplorerLabel";
             this.NbtExplorerLabel.Size = new System.Drawing.Size(167, 17);
-            this.NbtExplorerLabel.TabIndex = 3;
+            this.NbtExplorerLabel.TabIndex = 2;
             this.NbtExplorerLabel.TabStop = true;
             this.NbtExplorerLabel.Text = "NBTExplorer by jaquadro";
             this.NbtExplorerLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.NbtExplorerLabel_LinkClicked);
@@ -94,7 +94,7 @@
             this.GenericIconLabel.Location = new System.Drawing.Point(96, 142);
             this.GenericIconLabel.Name = "GenericIconLabel";
             this.GenericIconLabel.Size = new System.Drawing.Size(140, 17);
-            this.GenericIconLabel.TabIndex = 4;
+            this.GenericIconLabel.TabIndex = 3;
             this.GenericIconLabel.TabStop = true;
             this.GenericIconLabel.Text = "Yusuke Kamiyamane";
             this.GenericIconLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.GenericIconLabel_LinkClicked);
@@ -108,7 +108,7 @@
             this.NbtIconLabel.Location = new System.Drawing.Point(96, 159);
             this.NbtIconLabel.Name = "NbtIconLabel";
             this.NbtIconLabel.Size = new System.Drawing.Size(62, 17);
-            this.NbtIconLabel.TabIndex = 5;
+            this.NbtIconLabel.TabIndex = 4;
             this.NbtIconLabel.TabStop = true;
             this.NbtIconLabel.Text = "AmberW";
             this.NbtIconLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.NbtIconLabel_LinkClicked);
