@@ -37,9 +37,9 @@
             this.CurrentColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.NewColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RegexCheck = new System.Windows.Forms.CheckBox();
+            this.ReplaceBox = new System.Windows.Forms.TextBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
             this.FindBox = new NbtStudio.UI.RegexTextBox();
-            this.ReplaceBox = new System.Windows.Forms.TextBox();
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -119,6 +119,7 @@
             // ActionList
             // 
             this.ActionList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ActionList.CheckBoxes = true;
             this.ActionList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.CurrentColumn,
             this.NewColumn});
@@ -131,11 +132,13 @@
             this.ActionList.Margin = new System.Windows.Forms.Padding(5, 10, 10, 10);
             this.ActionList.MultiSelect = false;
             this.ActionList.Name = "ActionList";
+            this.ActionList.ShowItemToolTips = true;
             this.ActionList.Size = new System.Drawing.Size(376, 180);
             this.ActionList.TabIndex = 10;
             this.ActionList.UseCompatibleStateImageBehavior = false;
             this.ActionList.View = System.Windows.Forms.View.Details;
             this.ActionList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.ActionList_ColumnWidthChanging);
+            this.ActionList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ActionList_ItemChecked);
             this.ActionList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.ActionList_ItemSelectionChanged);
             // 
             // CurrentColumn
@@ -161,6 +164,19 @@
             this.RegexCheck.UseVisualStyleBackColor = true;
             this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
             // 
+            // ReplaceBox
+            // 
+            this.ReplaceBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.ReplaceBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ReplaceBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ReplaceBox.Location = new System.Drawing.Point(77, 41);
+            this.ReplaceBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.ReplaceBox.Name = "ReplaceBox";
+            this.ReplaceBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ReplaceBox.Size = new System.Drawing.Size(209, 21);
+            this.ReplaceBox.TabIndex = 5;
+            this.ReplaceBox.TextChanged += new System.EventHandler(this.ReplaceBox_TextChanged);
+            // 
             // ButtonsPanel
             // 
             this.ButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -184,19 +200,6 @@
             this.FindBox.Size = new System.Drawing.Size(209, 21);
             this.FindBox.TabIndex = 1;
             this.FindBox.TextChanged += new System.EventHandler(this.FindBox_TextChanged);
-            // 
-            // ReplaceBox
-            // 
-            this.ReplaceBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.ReplaceBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ReplaceBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ReplaceBox.Location = new System.Drawing.Point(77, 41);
-            this.ReplaceBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.ReplaceBox.Name = "ReplaceBox";
-            this.ReplaceBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ReplaceBox.Size = new System.Drawing.Size(209, 21);
-            this.ReplaceBox.TabIndex = 5;
-            this.ReplaceBox.TextChanged += new System.EventHandler(this.ReplaceBox_TextChanged);
             // 
             // BulkEditWindow
             // 

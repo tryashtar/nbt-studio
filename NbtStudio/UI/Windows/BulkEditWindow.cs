@@ -17,11 +17,12 @@ namespace NbtStudio.UI
         private BulkEditWindow(List<INbtTag> tags, BulkEditPurpose purpose)
         {
             InitializeComponent();
-            SetColumnSizes();
 
             WorkingTags = tags;
             Purpose = purpose;
             ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
+            SetMinimumSize();
+            SetColumnSizes();
 
             if (purpose == BulkEditPurpose.Rename)
             {
@@ -41,7 +42,7 @@ namespace NbtStudio.UI
 
         private ListViewItem CreateListItem(INbtTag tag, string str)
         {
-            return new ListViewItem(new[] { str, "" }) { Tag = tag };
+            return new ListViewItem(new[] { str, "" }) { Tag = tag, Checked = true };
         }
 
         private string TagPreview(INbtTag tag)
@@ -87,6 +88,8 @@ namespace NbtStudio.UI
             var transformer = GetTransformer();
             foreach (ListViewItem item in ActionList.Items)
             {
+                if (!item.Checked)
+                    continue;
                 string current = item.SubItems[0].Text;
                 string transformed = transformer(current);
                 if (current == transformed || transformed == "")
@@ -103,10 +106,23 @@ namespace NbtStudio.UI
             return true;
         }
 
+        private void SetMinimumSize()
+        {
+            int width = 0;
+            var graphics = ActionList.CreateGraphics();
+            foreach (ListViewItem item in ActionList.Items)
+            {
+                var size = graphics.MeasureString(item.Text, item.Font);
+                int item_width = (int)(size.Width * 2);
+                width = Math.Max(width, item_width);
+            }
+            ActionList.MinimumSize = new Size(width, 0);
+        }
+
         private void SetColumnSizes()
         {
-            CurrentColumn.Width = ActionList.Width / 2;
-            NewColumn.Width = ActionList.Width / 2;
+            CurrentColumn.Width = ActionList.Width * 9 / 20;
+            NewColumn.Width = ActionList.Width * 9 / 20;
         }
 
         private Func<string, string> GetTransformer()
@@ -153,19 +169,24 @@ namespace NbtStudio.UI
             var transformer = GetTransformer();
             foreach (ListViewItem item in ActionList.Items)
             {
-                string current = item.SubItems[0].Text;
-                string transformed = transformer(current);
-                if (current == transformed || transformed == "")
-                {
-                    item.SubItems[1].Text = "";
-                    item.BackColor = default;
-                }
-                else
-                {
-                    item.SubItems[1].Text = transformed;
-                    var tag = (INbtTag)item.Tag;
-                    item.BackColor = IsValidFor(tag, transformed, out _) ? default : Color.Pink;
-                }
+                UpdateSinglePreview(item, transformer);
+            }
+        }
+
+        private void UpdateSinglePreview(ListViewItem item, Func<string, string> transformer)
+        {
+            string current = item.SubItems[0].Text;
+            string transformed = transformer(current);
+            if (current == transformed || transformed == "" || !item.Checked)
+            {
+                item.SubItems[1].Text = "";
+                item.BackColor = default;
+            }
+            else
+            {
+                item.SubItems[1].Text = transformed;
+                var tag = (INbtTag)item.Tag;
+                item.BackColor = IsValidFor(tag, transformed, out _) ? default : Color.Pink;
             }
         }
 
@@ -182,7 +203,7 @@ namespace NbtStudio.UI
 
         private void ActionList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
         {
-            e.NewWidth = ActionList.Width / 2;
+            e.NewWidth = ActionList.Width * 9 / 20;
             e.Cancel = true;
         }
 
@@ -231,6 +252,11 @@ namespace NbtStudio.UI
         private void ReplaceBox_TextChanged(object sender, EventArgs e)
         {
             UpdatePreview();
+        }
+
+        private void ActionList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            UpdateSinglePreview(e.Item, GetTransformer());
         }
     }
 

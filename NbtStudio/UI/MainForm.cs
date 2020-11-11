@@ -358,7 +358,7 @@ namespace NbtStudio.UI
             if (Util.ExactlyOne(items))
                 Rename(items.Single());
             else
-                BulkEditWindow.BulkRename(items.Filter(x => x.GetNbtTag()));
+                BulkRename(items.Filter(x => x.GetNbtTag()));
         }
 
         private void Edit()
@@ -368,7 +368,21 @@ namespace NbtStudio.UI
             if (Util.ExactlyOne(items))
                 Edit(items.Single());
             else
-                BulkEditWindow.BulkEdit(items.Filter(x => x.GetNbtTag()));
+                BulkEdit(items.Filter(x => x.GetNbtTag()));
+        }
+
+        private void BulkRename(IEnumerable<INbtTag> tags)
+        {
+            ViewModel.StartBatchOperation();
+            BulkEditWindow.BulkRename(tags);
+            ViewModel.FinishBatchOperation($"Bulk rename {NbtUtil.TagDescription(tags)}", false);
+        }
+
+        private void BulkEdit(IEnumerable<INbtTag> tags)
+        {
+            ViewModel.StartBatchOperation();
+            BulkEditWindow.BulkEdit(tags);
+            ViewModel.FinishBatchOperation($"Bulk edit {NbtUtil.TagDescription(tags)}", false);
         }
 
         private void EditLike(INode node, Predicate<INode> check, Action<INbtTag> when_tag)
