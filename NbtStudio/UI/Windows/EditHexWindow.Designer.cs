@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new TagNameTextBox();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.HexBox = new Be.Windows.Forms.HexBox();
@@ -57,7 +57,7 @@
             this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
-            this.NameLabel.TabIndex = 0;
+            this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Name:";
             // 
             // NameBox
@@ -69,17 +69,17 @@
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 1;
+            this.NameBox.TabIndex = 2;
             // 
             // ButtonCancel
             // 
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonCancel.Location = new System.Drawing.Point(549, 10);
+            this.ButtonCancel.Location = new System.Drawing.Point(623, 10);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 4;
+            this.ButtonCancel.TabIndex = 6;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
@@ -87,10 +87,10 @@
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonOk.Location = new System.Drawing.Point(628, 10);
+            this.ButtonOk.Location = new System.Drawing.Point(542, 10);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 3;
+            this.ButtonOk.TabIndex = 5;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -130,7 +130,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.Size = new System.Drawing.Size(712, 311);
-            this.MainTable.TabIndex = 14;
+            this.MainTable.TabIndex = 0;
             // 
             // TabView
             // 
@@ -212,7 +212,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(0, 311);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(712, 42);
-            this.ButtonsPanel.TabIndex = 9;
+            this.ButtonsPanel.TabIndex = 4;
             // 
             // EditHexWindow
             // 

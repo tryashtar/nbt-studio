@@ -42,7 +42,7 @@
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(260, 21);
-            this.NameBox.TabIndex = 1;
+            this.NameBox.TabIndex = 0;
             // 
             // ButtonCancel
             // 
@@ -52,7 +52,7 @@
             this.ButtonCancel.Location = new System.Drawing.Point(199, 51);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 7;
+            this.ButtonCancel.TabIndex = 2;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
@@ -63,7 +63,7 @@
             this.ButtonOk.Location = new System.Drawing.Point(118, 51);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 6;
+            this.ButtonOk.TabIndex = 1;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);

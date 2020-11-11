@@ -37,9 +37,9 @@
             this.CurrentColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.NewColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RegexCheck = new System.Windows.Forms.CheckBox();
+            this.FindBox = new NbtStudio.UI.RegexTextBox();
             this.ReplaceBox = new System.Windows.Forms.TextBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.FindBox = new NbtStudio.UI.RegexTextBox();
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -52,7 +52,7 @@
             this.FindLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.FindLabel.Name = "FindLabel";
             this.FindLabel.Size = new System.Drawing.Size(34, 15);
-            this.FindLabel.TabIndex = 0;
+            this.FindLabel.TabIndex = 1;
             this.FindLabel.Text = "Find:";
             // 
             // ButtonCancel
@@ -63,7 +63,7 @@
             this.ButtonCancel.Location = new System.Drawing.Point(93, 9);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 7;
+            this.ButtonCancel.TabIndex = 9;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
@@ -74,7 +74,7 @@
             this.ButtonOk.Location = new System.Drawing.Point(12, 9);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 6;
+            this.ButtonOk.TabIndex = 8;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -87,7 +87,7 @@
             this.ReplaceLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.ReplaceLabel.Name = "ReplaceLabel";
             this.ReplaceLabel.Size = new System.Drawing.Size(56, 15);
-            this.ReplaceLabel.TabIndex = 4;
+            this.ReplaceLabel.TabIndex = 3;
             this.ReplaceLabel.Text = "Replace:";
             // 
             // MainTable
@@ -114,7 +114,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.MainTable.Size = new System.Drawing.Size(463, 341);
-            this.MainTable.TabIndex = 8;
+            this.MainTable.TabIndex = 0;
             // 
             // ActionList
             // 
@@ -134,7 +134,7 @@
             this.ActionList.Name = "ActionList";
             this.ActionList.ShowItemToolTips = true;
             this.ActionList.Size = new System.Drawing.Size(376, 180);
-            this.ActionList.TabIndex = 10;
+            this.ActionList.TabIndex = 5;
             this.ActionList.UseCompatibleStateImageBehavior = false;
             this.ActionList.View = System.Windows.Forms.View.Details;
             this.ActionList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.ActionList_ColumnWidthChanging);
@@ -159,34 +159,10 @@
             this.RegexCheck.Margin = new System.Windows.Forms.Padding(10, 0, 5, 10);
             this.RegexCheck.Name = "RegexCheck";
             this.RegexCheck.Size = new System.Drawing.Size(57, 17);
-            this.RegexCheck.TabIndex = 9;
+            this.RegexCheck.TabIndex = 6;
             this.RegexCheck.Text = "Regex";
             this.RegexCheck.UseVisualStyleBackColor = true;
             this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
-            // 
-            // ReplaceBox
-            // 
-            this.ReplaceBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.ReplaceBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ReplaceBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ReplaceBox.Location = new System.Drawing.Point(77, 41);
-            this.ReplaceBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.ReplaceBox.Name = "ReplaceBox";
-            this.ReplaceBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ReplaceBox.Size = new System.Drawing.Size(209, 21);
-            this.ReplaceBox.TabIndex = 5;
-            this.ReplaceBox.TextChanged += new System.EventHandler(this.ReplaceBox_TextChanged);
-            // 
-            // ButtonsPanel
-            // 
-            this.ButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonsPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ButtonsPanel.Controls.Add(this.ButtonOk);
-            this.ButtonsPanel.Controls.Add(this.ButtonCancel);
-            this.ButtonsPanel.Location = new System.Drawing.Point(283, 297);
-            this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
-            this.ButtonsPanel.TabIndex = 8;
             // 
             // FindBox
             // 
@@ -198,8 +174,32 @@
             this.FindBox.Name = "FindBox";
             this.FindBox.RegexMode = false;
             this.FindBox.Size = new System.Drawing.Size(209, 21);
-            this.FindBox.TabIndex = 1;
+            this.FindBox.TabIndex = 2;
             this.FindBox.TextChanged += new System.EventHandler(this.FindBox_TextChanged);
+            // 
+            // ReplaceBox
+            // 
+            this.ReplaceBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.ReplaceBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ReplaceBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ReplaceBox.Location = new System.Drawing.Point(77, 41);
+            this.ReplaceBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.ReplaceBox.Name = "ReplaceBox";
+            this.ReplaceBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ReplaceBox.Size = new System.Drawing.Size(209, 21);
+            this.ReplaceBox.TabIndex = 4;
+            this.ReplaceBox.TextChanged += new System.EventHandler(this.ReplaceBox_TextChanged);
+            // 
+            // ButtonsPanel
+            // 
+            this.ButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonsPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ButtonsPanel.Controls.Add(this.ButtonOk);
+            this.ButtonsPanel.Controls.Add(this.ButtonCancel);
+            this.ButtonsPanel.Location = new System.Drawing.Point(283, 297);
+            this.ButtonsPanel.Name = "ButtonsPanel";
+            this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
+            this.ButtonsPanel.TabIndex = 7;
             // 
             // BulkEditWindow
             // 
@@ -217,7 +217,7 @@
             this.Name = "BulkEditWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Edit Tags";
+            this.Text = "Edit Tags...";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BulkEditWindow_FormClosed);
             this.Load += new System.EventHandler(this.BulkEditWindow_Load);
             this.MainTable.ResumeLayout(false);

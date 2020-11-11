@@ -42,20 +42,20 @@
             // 
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonCancel.Location = new System.Drawing.Point(110, 71);
+            this.ButtonCancel.Location = new System.Drawing.Point(191, 71);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 11;
+            this.ButtonCancel.TabIndex = 7;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(191, 71);
+            this.ButtonOk.Location = new System.Drawing.Point(110, 71);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 10;
+            this.ButtonOk.TabIndex = 6;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -66,19 +66,17 @@
             this.RadioSnbt.Location = new System.Drawing.Point(12, 35);
             this.RadioSnbt.Name = "RadioSnbt";
             this.RadioSnbt.Size = new System.Drawing.Size(54, 17);
-            this.RadioSnbt.TabIndex = 12;
+            this.RadioSnbt.TabIndex = 3;
             this.RadioSnbt.Text = "SNBT";
             this.RadioSnbt.UseVisualStyleBackColor = true;
             // 
             // RadioNbt
             // 
             this.RadioNbt.AutoSize = true;
-            this.RadioNbt.Checked = true;
             this.RadioNbt.Location = new System.Drawing.Point(12, 12);
             this.RadioNbt.Name = "RadioNbt";
             this.RadioNbt.Size = new System.Drawing.Size(47, 17);
-            this.RadioNbt.TabIndex = 13;
-            this.RadioNbt.TabStop = true;
+            this.RadioNbt.TabIndex = 0;
             this.RadioNbt.Text = "NBT";
             this.RadioNbt.UseVisualStyleBackColor = true;
             this.RadioNbt.CheckedChanged += new System.EventHandler(this.RadioNbt_CheckedChanged);
@@ -89,7 +87,7 @@
             this.CheckMinify.Location = new System.Drawing.Point(75, 36);
             this.CheckMinify.Name = "CheckMinify";
             this.CheckMinify.Size = new System.Drawing.Size(53, 17);
-            this.CheckMinify.TabIndex = 15;
+            this.CheckMinify.TabIndex = 4;
             this.CheckMinify.Text = "Minify";
             this.CheckMinify.UseVisualStyleBackColor = true;
             // 
@@ -99,7 +97,7 @@
             this.CheckLittleEndian.Location = new System.Drawing.Point(75, 12);
             this.CheckLittleEndian.Name = "CheckLittleEndian";
             this.CheckLittleEndian.Size = new System.Drawing.Size(84, 17);
-            this.CheckLittleEndian.TabIndex = 16;
+            this.CheckLittleEndian.TabIndex = 1;
             this.CheckLittleEndian.Text = "Little-Endian";
             this.CheckLittleEndian.UseVisualStyleBackColor = true;
             // 
@@ -110,7 +108,7 @@
             this.CompressionBox.Location = new System.Drawing.Point(163, 10);
             this.CompressionBox.Name = "CompressionBox";
             this.CompressionBox.Size = new System.Drawing.Size(103, 21);
-            this.CompressionBox.TabIndex = 17;
+            this.CompressionBox.TabIndex = 2;
             // 
             // CheckJson
             // 
@@ -118,7 +116,7 @@
             this.CheckJson.Location = new System.Drawing.Point(131, 36);
             this.CheckJson.Name = "CheckJson";
             this.CheckJson.Size = new System.Drawing.Size(54, 17);
-            this.CheckJson.TabIndex = 18;
+            this.CheckJson.TabIndex = 5;
             this.CheckJson.Text = "JSON";
             this.CheckJson.UseVisualStyleBackColor = true;
             // 

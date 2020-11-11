@@ -32,8 +32,8 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.MinifyCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.InputBox = new TagSnbtTextBox();
-            this.NameBox = new TagNameTextBox();
+            this.InputBox = new NbtStudio.UI.TagSnbtTextBox();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.NameLabel = new System.Windows.Forms.Label();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.ButtonsPanel.SuspendLayout();
@@ -44,20 +44,20 @@
             // 
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonCancel.Location = new System.Drawing.Point(119, 9);
+            this.ButtonCancel.Location = new System.Drawing.Point(198, 9);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 4;
+            this.ButtonCancel.TabIndex = 7;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(200, 9);
+            this.ButtonOk.Location = new System.Drawing.Point(117, 9);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 5;
+            this.ButtonOk.TabIndex = 6;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -70,7 +70,7 @@
             this.MinifyCheck.Margin = new System.Windows.Forms.Padding(10);
             this.MinifyCheck.Name = "MinifyCheck";
             this.MinifyCheck.Size = new System.Drawing.Size(53, 17);
-            this.MinifyCheck.TabIndex = 3;
+            this.MinifyCheck.TabIndex = 5;
             this.MinifyCheck.Text = "Minify";
             this.MinifyCheck.UseVisualStyleBackColor = true;
             this.MinifyCheck.Visible = false;
@@ -86,7 +86,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(0, 80);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(284, 41);
-            this.ButtonsPanel.TabIndex = 13;
+            this.ButtonsPanel.TabIndex = 4;
             // 
             // InputBox
             // 
@@ -101,7 +101,7 @@
             this.InputBox.Name = "InputBox";
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.InputBox.Size = new System.Drawing.Size(264, 26);
-            this.InputBox.TabIndex = 2;
+            this.InputBox.TabIndex = 3;
             this.InputBox.WordWrap = false;
             // 
             // NameBox
@@ -113,7 +113,7 @@
             this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.NameBox.Name = "NameBox";
             this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 1;
+            this.NameBox.TabIndex = 2;
             // 
             // NameLabel
             // 
@@ -123,7 +123,7 @@
             this.NameLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
-            this.NameLabel.TabIndex = 0;
+            this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Name:";
             // 
             // MainTable
@@ -142,7 +142,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.MainTable.Size = new System.Drawing.Size(284, 80);
-            this.MainTable.TabIndex = 13;
+            this.MainTable.TabIndex = 0;
             // 
             // EditSnbtWindow
             // 

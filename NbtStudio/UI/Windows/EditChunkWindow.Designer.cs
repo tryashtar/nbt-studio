@@ -50,7 +50,7 @@
             this.XLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.XLabel.Name = "XLabel";
             this.XLabel.Size = new System.Drawing.Size(29, 24);
-            this.XLabel.TabIndex = 0;
+            this.XLabel.TabIndex = 1;
             this.XLabel.Text = "X:";
             // 
             // ButtonCancel
@@ -85,7 +85,7 @@
             this.ZLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
             this.ZLabel.Name = "ZLabel";
             this.ZLabel.Size = new System.Drawing.Size(27, 24);
-            this.ZLabel.TabIndex = 4;
+            this.ZLabel.TabIndex = 3;
             this.ZLabel.Text = "Z:";
             // 
             // MainTable
@@ -109,7 +109,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.MainTable.Size = new System.Drawing.Size(463, 185);
-            this.MainTable.TabIndex = 8;
+            this.MainTable.TabIndex = 0;
             // 
             // ZBox
             // 
@@ -118,7 +118,7 @@
             this.ZBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.ZBox.Name = "ZBox";
             this.ZBox.Size = new System.Drawing.Size(127, 29);
-            this.ZBox.TabIndex = 5;
+            this.ZBox.TabIndex = 4;
             // 
             // ButtonsPanel
             // 
@@ -129,7 +129,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(283, 141);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
-            this.ButtonsPanel.TabIndex = 8;
+            this.ButtonsPanel.TabIndex = 5;
             // 
             // XBox
             // 
@@ -138,7 +138,7 @@
             this.XBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.XBox.Name = "XBox";
             this.XBox.Size = new System.Drawing.Size(127, 29);
-            this.XBox.TabIndex = 1;
+            this.XBox.TabIndex = 2;
             // 
             // EditChunkWindow
             // 
