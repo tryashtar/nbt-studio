@@ -11,6 +11,7 @@ namespace NbtStudio.UI
 {
     public partial class BulkEditWindow : Form
     {
+        private readonly BulkEditPurpose Purpose;
         private readonly List<INbtTag> WorkingTags;
 
         private BulkEditWindow(List<INbtTag> tags, BulkEditPurpose purpose)
@@ -19,18 +20,22 @@ namespace NbtStudio.UI
             SetColumnSizes();
 
             WorkingTags = tags;
-            ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x, purpose))).ToArray());
+            Purpose = purpose;
+            ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
 
-            // FindBox.Text=Properties.Settings... (likewise in close)
             if (purpose == BulkEditPurpose.Rename)
             {
                 this.Text = $"Rename {Util.Pluralize(tags.Count, "tag")}";
                 this.Icon = Properties.Resources.action_rename_icon;
+                CurrentColumn.Text = "Current Name";
+                NewColumn.Text = "New Name";
             }
             else
             {
                 this.Text = $"Edit {Util.Pluralize(tags.Count, "tag")}";
                 this.Icon = Properties.Resources.action_edit_icon;
+                CurrentColumn.Text = "Current Value";
+                NewColumn.Text = "New Value";
             }
         }
 
@@ -39,9 +44,9 @@ namespace NbtStudio.UI
             return new ListViewItem(new[] { str, "" }) { Tag = tag };
         }
 
-        private string TagPreview(INbtTag tag, BulkEditPurpose purpose)
+        private string TagPreview(INbtTag tag)
         {
-            if (purpose == BulkEditPurpose.Rename)
+            if (Purpose == BulkEditPurpose.Rename)
                 return tag.Name;
             else
                 return NbtUtil.PreviewNbtValue(tag);
@@ -78,7 +83,23 @@ namespace NbtStudio.UI
 
         private bool TryModify()
         {
-            // check conditions first, tags must not be modified at ALL until we can be sure it's safe
+            if (!FindBox.CheckRegex(out _)) return false;
+            var transformer = GetTransformer();
+            foreach (ListViewItem item in ActionList.Items)
+            {
+                string current = item.SubItems[0].Text;
+                string transformed = transformer(current);
+                if (current == transformed || transformed == "")
+                    continue;
+                var tag = (INbtTag)item.Tag;
+                if (IsValidFor(tag, transformed, out var result))
+                {
+                    if (Purpose == BulkEditPurpose.Rename)
+                        tag.Name = transformed;
+                    else
+                        NbtUtil.SetValue(tag, result);
+                }
+            }
             return true;
         }
 
@@ -92,6 +113,8 @@ namespace NbtStudio.UI
         {
             string find_text = FindBox.Text;
             string replace_text = ReplaceBox.Text;
+            if (find_text == "" && replace_text == "")
+                return x => x;
             if (RegexCheck.Checked)
             {
                 FindBox.CheckRegexQuiet(out var find);
@@ -104,13 +127,24 @@ namespace NbtStudio.UI
             else
             {
                 if (find_text == "")
-                {
-                    if (replace_text == "")
-                        return x => x;
-                    else
-                        return x => replace_text;
-                }
-                return x => Regex.Replace(x, Regex.Escape(find_text), replace_text.Replace("$", "$$"), RegexOptions.IgnoreCase);
+                    return x => replace_text;
+                return x => x.FastReplace(find_text, replace_text, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        private bool IsValidFor(INbtTag tag, string value, out object result)
+        {
+            result = null;
+            if (Purpose == BulkEditPurpose.Rename)
+            {
+                var existing = ((INbtCompound)tag.Parent)[value];
+                return existing == null || existing == tag;
+            }
+            else
+            {
+                try { result = NbtUtil.ParseValue(value, tag.TagType); }
+                catch { return false; }
+                return true;
             }
         }
 
@@ -121,10 +155,17 @@ namespace NbtStudio.UI
             {
                 string current = item.SubItems[0].Text;
                 string transformed = transformer(current);
-                if (current == transformed)
+                if (current == transformed || transformed == "")
+                {
                     item.SubItems[1].Text = "";
+                    item.BackColor = default;
+                }
                 else
+                {
                     item.SubItems[1].Text = transformed;
+                    var tag = (INbtTag)item.Tag;
+                    item.BackColor = IsValidFor(tag, transformed, out _) ? default : Color.Pink;
+                }
             }
         }
 

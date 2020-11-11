@@ -250,5 +250,37 @@ namespace NbtStudio
             }
             return full_path;
         }
+
+        public static string FastReplace(this string str, string find, string replace, StringComparison comparison)
+        {
+            if (str == null)
+                throw new ArgumentNullException(nameof(str));
+            if (str.Length == 0)
+                return str;
+            if (find == null)
+                throw new ArgumentNullException(nameof(find));
+            if (find.Length == 0)
+                throw new ArgumentException(nameof(find));
+
+            var result = new StringBuilder(str.Length);
+            bool empty_replacement = string.IsNullOrEmpty(replace);
+
+            int found;
+            int search = 0;
+            while ((found = str.IndexOf(find, search, comparison)) != -1)
+            {
+                int chars = found - search;
+                if (chars != 0)
+                    result.Append(str, search, chars);
+                if (!empty_replacement)
+                    result.Append(replace);
+                search = found + find.Length;
+                if (search == str.Length)
+                    return result.ToString();
+            }
+
+            result.Append(str, search, str.Length - search);
+            return result.ToString();
+        }
     }
 }
