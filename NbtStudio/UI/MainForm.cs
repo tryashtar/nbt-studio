@@ -752,6 +752,14 @@ namespace NbtStudio.UI
 #endif
         }
 
+        private void SetAllSelected(IEnumerable<TreeNodeAdv> nodes, bool selected)
+        {
+            foreach (var node in nodes)
+            {
+                node.IsSelected = selected;
+            }
+        }
+
         private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -763,6 +771,11 @@ namespace NbtStudio.UI
                         menu.Items.Add("&Collapse", null, (s, ea) => e.Node.Collapse());
                     else
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
+                    var children = NbtTree.AllChildren(e.Node);
+                    if (children.All(x => x.IsSelected))
+                        menu.Items.Add("R&emove Children from Selection", null, (s, ea) => SetAllSelected(children, false));
+                    else
+                        menu.Items.Add("A&dd Children to Selection", null, (s, ea) => SetAllSelected(children, true));
                 }
                 var obj = ViewModel.ObjectFromClick(e);
                 var saveable = obj.GetSaveable();
