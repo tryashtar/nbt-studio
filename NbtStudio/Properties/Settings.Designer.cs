@@ -81,5 +81,29 @@ namespace NbtStudio.Properties {
                 this["FindValue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FindText {
+            get {
+                return ((string)(this["FindText"]));
+            }
+            set {
+                this["FindText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ReplaceText {
+            get {
+                return ((string)(this["ReplaceText"]));
+            }
+            set {
+                this["ReplaceText"] = value;
+            }
+        }
     }
 }

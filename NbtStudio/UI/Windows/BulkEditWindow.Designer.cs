@@ -33,11 +33,13 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ReplaceLabel = new System.Windows.Forms.Label();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-            this.ActionList = new System.Windows.Forms.ListBox();
+            this.ActionList = new System.Windows.Forms.ListView();
+            this.CurrentColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.NewColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RegexCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.FindBox = new NbtStudio.UI.TagNameTextBox();
-            this.ReplaceBox = new NbtStudio.UI.TagValueTextBox();
+            this.FindBox = new NbtStudio.UI.RegexTextBox();
+            this.ReplaceBox = new System.Windows.Forms.TextBox();
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -117,15 +119,34 @@
             // ActionList
             // 
             this.ActionList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ActionList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.CurrentColumn,
+            this.NewColumn});
             this.ActionList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ActionList.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ActionList.ItemHeight = 15;
+            this.ActionList.GridLines = true;
+            this.ActionList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.ActionList.HideSelection = false;
             this.ActionList.Location = new System.Drawing.Point(77, 72);
             this.ActionList.Margin = new System.Windows.Forms.Padding(5, 10, 10, 10);
+            this.ActionList.MultiSelect = false;
             this.ActionList.Name = "ActionList";
-            this.ActionList.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.ActionList.Size = new System.Drawing.Size(376, 180);
             this.ActionList.TabIndex = 10;
+            this.ActionList.UseCompatibleStateImageBehavior = false;
+            this.ActionList.View = System.Windows.Forms.View.Details;
+            this.ActionList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.ActionList_ColumnWidthChanging);
+            this.ActionList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.ActionList_ItemSelectionChanged);
+            // 
+            // CurrentColumn
+            // 
+            this.CurrentColumn.Text = "Old Name";
+            this.CurrentColumn.Width = 50;
+            // 
+            // NewColumn
+            // 
+            this.NewColumn.Text = "New Name";
+            this.NewColumn.Width = 50;
             // 
             // RegexCheck
             // 
@@ -138,6 +159,7 @@
             this.RegexCheck.TabIndex = 9;
             this.RegexCheck.Text = "Regex";
             this.RegexCheck.UseVisualStyleBackColor = true;
+            this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
             // 
             // ButtonsPanel
             // 
@@ -158,8 +180,10 @@
             this.FindBox.Location = new System.Drawing.Point(77, 10);
             this.FindBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
             this.FindBox.Name = "FindBox";
+            this.FindBox.RegexMode = false;
             this.FindBox.Size = new System.Drawing.Size(209, 21);
             this.FindBox.TabIndex = 1;
+            this.FindBox.TextChanged += new System.EventHandler(this.FindBox_TextChanged);
             // 
             // ReplaceBox
             // 
@@ -172,6 +196,7 @@
             this.ReplaceBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ReplaceBox.Size = new System.Drawing.Size(209, 21);
             this.ReplaceBox.TabIndex = 5;
+            this.ReplaceBox.TextChanged += new System.EventHandler(this.ReplaceBox_TextChanged);
             // 
             // BulkEditWindow
             // 
@@ -190,6 +215,8 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit Tags";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BulkEditWindow_FormClosed);
+            this.Load += new System.EventHandler(this.BulkEditWindow_Load);
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
             this.ButtonsPanel.ResumeLayout(false);
@@ -200,14 +227,16 @@
 
         #endregion
         private System.Windows.Forms.Label FindLabel;
-        private TagNameTextBox FindBox;
+        private RegexTextBox FindBox;
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.Label ReplaceLabel;
-        private TagValueTextBox ReplaceBox;
+        private System.Windows.Forms.TextBox ReplaceBox;
         private System.Windows.Forms.TableLayoutPanel MainTable;
         private System.Windows.Forms.Panel ButtonsPanel;
         private System.Windows.Forms.CheckBox RegexCheck;
-        private System.Windows.Forms.ListBox ActionList;
+        private System.Windows.Forms.ListView ActionList;
+        private System.Windows.Forms.ColumnHeader CurrentColumn;
+        private System.Windows.Forms.ColumnHeader NewColumn;
     }
 }
