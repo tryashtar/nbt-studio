@@ -14,7 +14,7 @@ namespace NbtStudio.UI
     public partial class FindWindow : Form
     {
         private TreeNodeAdv LastFound;
-        private readonly NbtTreeView SearchingView;
+        private NbtTreeView SearchingView;
 
         public FindWindow(NbtTreeView view)
         {
@@ -61,14 +61,20 @@ namespace NbtStudio.UI
             var start = SearchingView.SelectedNode ?? LastFound;
             var predicate = GetPredicate();
             SearchingView.SuspendLayout();
-            var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
-            SearchingView.ResumeLayout();
-            if (find == null)
-                return null;
-            else
+            try
             {
-                LastFound = find;
-                return find;
+                var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
+                if (find == null)
+                    return null;
+                else
+                {
+                    LastFound = find;
+                    return find;
+                }
+            }
+            finally
+            {
+                SearchingView.ResumeLayout();
             }
         }
 
@@ -77,9 +83,15 @@ namespace NbtStudio.UI
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
             SearchingView.SuspendLayout();
-            var results = SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
-            SearchingView.ResumeLayout();
-            return results;
+            try
+            {
+                var results = SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
+                return results;
+            }
+            finally
+            {
+                SearchingView.ResumeLayout();
+            }
         }
 
         private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
@@ -225,6 +237,19 @@ namespace NbtStudio.UI
         private void UpdateButtons()
         {
             ButtonFindAll.Enabled = NameBox.Text != "" || ValueBox.Text != "";
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            LastFound = null;
+            SearchingView = null;
+            CancelSource.Cancel();
+            ActiveSearch = null;
+            base.Dispose(disposing);
         }
     }
 }
