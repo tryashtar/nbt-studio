@@ -67,9 +67,9 @@
   <ItemGroup>
     <Compile Include="Models\ByteProviders.cs" />
     <Compile Include="Models\ModelNodes.cs" />
+    <Compile Include="Models\NodeOperations.cs" />
     <Compile Include="NbtObjects\Chunk.cs" />
     <Compile Include="Models\ExportSettings.cs" />
-    <Compile Include="Models\ObjectNodes.cs" />
     <Compile Include="Models\UndoHistory.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtObjects\NbtFile.cs" />

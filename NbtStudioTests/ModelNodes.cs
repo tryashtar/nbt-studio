@@ -23,7 +23,7 @@ namespace NbtStudioTests
                     new NbtString("grandchild", "")
                 }
             };
-            var root = new NbtTagNode2(null, null, compound);
+            var root = new NbtTagNode(null, null, compound);
             AssertChildStructure(root);
         }
 
@@ -39,7 +39,7 @@ namespace NbtStudioTests
                     new NbtString("grandchild", "")
                 }
             };
-            var root = new NbtTagNode2(null, null, compound);
+            var root = new NbtTagNode(null, null, compound);
             Assert.AreEqual(root.Children.Count(), 3);
             compound.Add(new NbtInt("more1"));
             compound.Add(new NbtInt("more2"));
@@ -49,7 +49,7 @@ namespace NbtStudioTests
             Assert.AreEqual(root.Children.Count(), 5);
         }
 
-        private void AssertChildStructure(ModelNode node)
+        private void AssertChildStructure(INode node)
         {
             var children = node.Children;
             foreach (var child in children)

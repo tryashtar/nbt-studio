@@ -8,18 +8,19 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NbtStudio
 {
     public static class NodeRegistry
     {
-        private static readonly Dictionary<Type, Func<NbtTreeModel, ModelNode, object, ModelNode>> RegisteredConverters = new Dictionary<Type, Func<NbtTreeModel, ModelNode, object, ModelNode>>();
-        public static void Register<T>(Func<NbtTreeModel, ModelNode, T, ModelNode> converter)
+        private static readonly Dictionary<Type, Func<NbtTreeModel, INode, object, INode>> RegisteredConverters = new Dictionary<Type, Func<NbtTreeModel, INode, object, INode>>();
+        public static void Register<T>(Func<NbtTreeModel, INode, T, INode> converter)
         {
             RegisteredConverters[typeof(T)] = (tree, parent, item) => converter(tree, parent, (T)item);
         }
 
-        public static ModelNode CreateNode(NbtTreeModel tree, ModelNode parent, object item)
+        public static INode CreateNode(NbtTreeModel tree, INode parent, object item)
         {
             foreach (var converter in RegisteredConverters)
             {
@@ -28,20 +29,45 @@ namespace NbtStudio
             }
             throw new InvalidOperationException($"No registered converter for {item.GetType()}");
         }
+
+        public static INode CreateRootNode(NbtTreeModel tree, object item) => CreateNode(tree, null, item);
     }
 
-    public abstract class ModelNode
+    public interface INode
+    {
+        INode Parent { get; }
+        TreePath Path { get; }
+        IEnumerable<INode> Children { get; }
+        bool HasChildren { get; }
+        string Description { get; }
+        bool CanDelete { get; }
+        void Delete();
+        bool CanSort { get; }
+        void Sort();
+        bool CanCopy { get; }
+        DataObject Copy();
+        bool CanCut { get; }
+        DataObject Cut();
+        bool CanPaste { get; }
+        IEnumerable<INode> Paste(IDataObject data);
+        bool CanRename { get; }
+        bool CanEdit { get; }
+        bool CanReceiveDrop(IEnumerable<INode> nodes);
+        void ReceiveDrop(IEnumerable<INode> nodes, int index);
+    }
+
+    public abstract class ModelNode : INode
     {
         protected readonly NbtTreeModel Tree;
-        public ModelNode Parent { get; private set; }
-        private OrderedDictionary<object, ModelNode> ChildNodes;
-        public IEnumerable<ModelNode> Children
+        public INode Parent { get; private set; }
+        private OrderedDictionary<object, INode> ChildNodes;
+        public IEnumerable<INode> Children
         {
             get
             {
                 if (ChildNodes == null)
                 {
-                    ChildNodes = new OrderedDictionary<object, ModelNode>();
+                    ChildNodes = new OrderedDictionary<object, INode>();
                     var children = GetChildren();
                     foreach (var item in children)
                     {
@@ -56,7 +82,7 @@ namespace NbtStudio
             get
             {
                 var path = new List<object>();
-                var item = this;
+                INode item = this;
                 while (item != null)
                 {
                     path.Add(item);
@@ -67,7 +93,7 @@ namespace NbtStudio
             }
         }
 
-        public ModelNode(NbtTreeModel tree, ModelNode parent)
+        public ModelNode(NbtTreeModel tree, INode parent)
         {
             Tree = tree;
             Parent = parent;
@@ -85,7 +111,7 @@ namespace NbtStudio
             if (remove.Any())
             {
                 int[] indices = new int[remove.Length];
-                ModelNode[] nodes = new ModelNode[remove.Length];
+                INode[] nodes = new INode[remove.Length];
                 for (int i = 0; i < remove.Length; i++)
                 {
                     var item = remove[i];
@@ -103,7 +129,7 @@ namespace NbtStudio
             if (add.Any())
             {
                 int[] indices = new int[add.Length];
-                ModelNode[] nodes = new ModelNode[add.Length];
+                INode[] nodes = new INode[add.Length];
                 for (int i = 0; i < add.Length; i++)
                 {
                     var item = add[i];
@@ -117,12 +143,28 @@ namespace NbtStudio
             }
             Tree.NotifyNodeChanged(this);
         }
+
+        public virtual string Description => "unknown node";
+        public virtual bool CanDelete => false;
+        public virtual void Delete() { }
+        public virtual bool CanSort => false;
+        public virtual void Sort() { }
+        public virtual bool CanCopy => false;
+        public virtual DataObject Copy() => null;
+        public virtual bool CanCut => CanDelete && CanCopy;
+        public virtual DataObject Cut() { var copy = Copy(); Delete(); return copy; }
+        public virtual bool CanPaste => false;
+        public virtual IEnumerable<INode> Paste(IDataObject data) => Enumerable.Empty<INode>();
+        public virtual bool CanRename => false;
+        public virtual bool CanEdit => false;
+        public virtual bool CanReceiveDrop(IEnumerable<INode> nodes) => false;
+        public virtual void ReceiveDrop(IEnumerable<INode> nodes, int index) { }
     }
 
-    public class NbtTagNode2 : ModelNode
+    public class NbtTagNode : ModelNode
     {
-        private readonly NbtTag Tag;
-        public NbtTagNode2(NbtTreeModel tree, ModelNode parent, NbtTag tag) : base(tree, parent)
+        public readonly NbtTag Tag;
+        public NbtTagNode(NbtTreeModel tree, INode parent, NbtTag tag) : base(tree, parent)
         {
             Tag = tag;
             Tag.Changed += Tag_Changed;
@@ -133,9 +175,9 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        static NbtTagNode2()
+        static NbtTagNode()
         {
-            NodeRegistry.Register<NbtTag>((tree, parent, tag) => new NbtTagNode2(tree, parent, tag));
+            NodeRegistry.Register<NbtTag>((tree, parent, tag) => new NbtTagNode(tree, parent, tag));
         }
 
         protected override IEnumerable<object> GetChildren()
@@ -143,6 +185,33 @@ namespace NbtStudio
             if (Tag is NbtContainerTag container)
                 return container;
             return Enumerable.Empty<object>();
+        }
+
+        public override string Description => Tag.TagDescription();
+
+        public override bool CanCopy => true;
+        public override DataObject Copy() => NbtNodeOperations.Copy(Tag);
+        public override bool CanDelete => true;
+        public override void Delete()
+        {
+            Tag.Remove();
+            base.Delete();
+        }
+        public override bool CanEdit => NbtNodeOperations.CanEdit(Tag);
+        public override bool CanPaste => NbtNodeOperations.CanPaste(Tag);
+        public override bool CanRename => NbtNodeOperations.CanRename(Tag);
+        public override bool CanSort => NbtNodeOperations.CanSort(Tag);
+        public override void Sort() => NbtNodeOperations.Sort(Tag);
+        public override IEnumerable<INode> Paste(IDataObject data)
+        {
+            var tags = NbtNodeOperations.Paste(Tag, data);
+            return tags.Select(Wrap);
+        }
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(Tag, nodes.Filter(x => x.GetNbtTag()));
+        public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
+        {
+            var tags = nodes.Filter(x => x.GetNbtTag());
+            NbtNodeOperations.ReceiveDrop(Tag, tags, index);
         }
     }
 }
