@@ -42,9 +42,6 @@
     <StartupObject>NbtStudio.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
-      <HintPath>..\packages\TreeViewAdv.1.7.0.0\lib\net\Aga.Controls.dll</HintPath>
-    </Reference>
     <Reference Include="Costura, Version=4.1.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.4.1.0\lib\net40\Costura.dll</HintPath>
     </Reference>
@@ -240,6 +237,10 @@
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
       <Project>{4488498d-976d-4da3-bf72-109531af0488}</Project>
       <Name>fNbt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
+      <Project>{e73bb233-d88b-44a7-a98f-d71ee158381d}</Project>
+      <Name>Aga.Controls</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

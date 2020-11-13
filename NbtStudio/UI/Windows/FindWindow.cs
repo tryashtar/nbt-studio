@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace NbtStudio.UI
 {
@@ -59,7 +60,7 @@ namespace NbtStudio.UI
             if (!ValidateRegex()) return null;
             var start = SearchingView.SelectedNode ?? LastFound;
             var predicate = GetPredicate();
-            var find = SearchingView.SearchFrom(start, predicate, direction, progress, true);
+            var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
             if (find == null)
                 return null;
             else
@@ -73,9 +74,10 @@ namespace NbtStudio.UI
         {
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
-            return SearchingView.SearchAll(predicate, progress).ToList();
+            return SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
         }
 
+        private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
         private Task<IEnumerable<TreeNodeAdv>> ActiveSearch;
         private void StartActiveSearch(Func<IProgress<TreeSearchReport>, IEnumerable<TreeNodeAdv>> function)
         {
@@ -187,6 +189,7 @@ namespace NbtStudio.UI
 
         private void FindWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
+            CancelSource.Cancel();
             Properties.Settings.Default.FindRegex = RegexCheck.Checked;
             Properties.Settings.Default.FindName = NameBox.Text;
             Properties.Settings.Default.FindValue = ValueBox.Text;

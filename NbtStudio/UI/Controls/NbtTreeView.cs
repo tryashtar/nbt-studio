@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -194,7 +195,7 @@ namespace NbtStudio.UI
             return null;
         }
 
-        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, bool wrap)
+        public TreeNodeAdv SearchFrom(TreeNodeAdv start, Predicate<TreeNodeAdv> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, CancellationToken token, bool wrap)
         {
             if (direction == SearchDirection.Forward)
             {
@@ -203,7 +204,7 @@ namespace NbtStudio.UI
                     start = first;
                 else
                     start = NextNode(start);
-                return SearchFromNext(start, predicate, NextNode, progress, new TreeSearchReport(), wrap ? first : null);
+                return SearchFromNext(start, predicate, NextNode, progress, token, new TreeSearchReport(), wrap ? first : null);
             }
             else
             {
@@ -212,22 +213,23 @@ namespace NbtStudio.UI
                     start = last;
                 else
                     start = PreviousNode(start);
-                return SearchFromNext(start, predicate, PreviousNode, progress, new TreeSearchReport(), wrap ? last : null);
+                return SearchFromNext(start, predicate, PreviousNode, progress, token, new TreeSearchReport(), wrap ? last : null);
             }
         }
 
-        private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, TreeSearchReport report, TreeNodeAdv wrap_start)
+        private TreeNodeAdv SearchFromNext(TreeNodeAdv node, Predicate<TreeNodeAdv> predicate, Func<TreeNodeAdv, TreeNodeAdv> next, IProgress<TreeSearchReport> progress, CancellationToken token, TreeSearchReport report, TreeNodeAdv wrap_start)
         {
             var start = node;
-            report.TotalNodes = this.AllNodes.Count();
+            report.TotalNodes = this.Root.DescendantsCount;
             while (node != null && !predicate(node))
             {
                 node = next(node);
                 report.NodesSearched++;
                 if (report.NodesSearched % 200 == 0)
                 {
-                    report.TotalNodes = this.AllNodes.Count();
+                    report.TotalNodes = this.Root.DescendantsCount;
                     progress.Report(report);
+                    token.ThrowIfCancellationRequested();
                 }
             }
             if (node != null && node != Root)
@@ -236,17 +238,17 @@ namespace NbtStudio.UI
                 return null;
 
             // search again from new starting point, until reaching original starting point
-            node = SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, report, null);
+            node = SearchFromNext(wrap_start, x => x == start || predicate(x), next, progress, token, report, null);
             if (node == start)
                 return null;
             else
                 return node;
         }
 
-        public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate, IProgress<TreeSearchReport> progress)
+        public IEnumerable<TreeNodeAdv> SearchAll(Predicate<TreeNodeAdv> predicate, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
             var report = new TreeSearchReport();
-            report.TotalNodes = this.AllNodes.Count();
+            report.TotalNodes = this.Root.DescendantsCount;
             var node = Root.Children.First();
             while (node != null)
             {
@@ -256,8 +258,9 @@ namespace NbtStudio.UI
                 report.NodesSearched++;
                 if (report.NodesSearched % 200 == 0)
                 {
-                    report.TotalNodes = this.AllNodes.Count();
+                    report.TotalNodes = this.Root.DescendantsCount;
                     progress.Report(report);
+                    token.ThrowIfCancellationRequested();
                 }
             }
         }

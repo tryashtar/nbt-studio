@@ -607,15 +607,19 @@ namespace NbtStudio.UI
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
-            var files = paths.Distinct().Select(x => NbtFolder.OpenFileOrFolder(Path.GetFullPath(x))).ToList();
-            var bad = files.Where(x => x == null);
-            var good = files.Where(x => x != null);
+            var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
+            var bad = files.Where(x => x.item == null);
+            var good = files.Where(x => x.item != null);
             if (bad.Any())
-                MessageBox.Show($"{Util.Pluralize(bad.Count(), "file")} failed to load.", "Load Failure");
+            {
+                string message = $"{Util.Pluralize(bad.Count(), "file")} failed to load:\n\n";
+                message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
+                MessageBox.Show(message, "Load Failure");
+            }
             if (good.Any())
             {
-                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.Path).ToArray());
-                ViewModel = new NbtTreeModel(good, NbtTree);
+                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
+                ViewModel = new NbtTreeModel(good.Select(x => x.item), NbtTree);
             }
         }
 

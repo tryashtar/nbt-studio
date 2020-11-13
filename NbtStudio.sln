@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Be.Windows.Forms.HexBox", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbtStudioTests", "NbtStudioTests\NbtStudioTests.csproj", "{BEC093C5-83C4-484F-B630-4BFCA29CF01D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aga.Controls", "TreeViewAdv\Aga.Controls.csproj", "{E73BB233-D88B-44A7-A98F-D71EE158381D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BEC093C5-83C4-484F-B630-4BFCA29CF01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEC093C5-83C4-484F-B630-4BFCA29CF01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEC093C5-83C4-484F-B630-4BFCA29CF01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
