@@ -55,31 +55,36 @@ namespace NbtStudio.UI
             }
         }
 
-        private IEnumerable<TreeNodeAdv> DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
+        private TreeNodeAdv DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var start = SearchingView.SelectedNode ?? LastFound;
             var predicate = GetPredicate();
+            SearchingView.SuspendLayout();
             var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
+            SearchingView.ResumeLayout();
             if (find == null)
                 return null;
             else
             {
                 LastFound = find;
-                return new[] { find };
+                return find;
             }
         }
 
-        private IEnumerable<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
+        private List<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
-            return SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
+            SearchingView.SuspendLayout();
+            var results = SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
+            SearchingView.ResumeLayout();
+            return results;
         }
 
         private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
         private Task<IEnumerable<TreeNodeAdv>> ActiveSearch;
-        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, IEnumerable<TreeNodeAdv>> function)
+        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<TreeNodeAdv>> function)
         {
             if (ActiveSearch != null && !ActiveSearch.IsCompleted)
                 return;
@@ -124,7 +129,13 @@ namespace NbtStudio.UI
 
         public void Search(SearchDirection direction)
         {
-            StartActiveSearch(x => DoSearch(direction, x));
+            List<TreeNodeAdv> ItemOrNull(TreeNodeAdv item)
+            {
+                if (item == null)
+                    return null;
+                return new List<TreeNodeAdv> { item };
+            }
+            StartActiveSearch(x => ItemOrNull(DoSearch(direction, x)));
         }
 
         public void SearchAll()
