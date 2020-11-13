@@ -141,7 +141,7 @@ namespace NbtStudio
         }
     }
 
-    public abstract class NotifyNode : INode
+    public abstract class NotifyNode : INode, IDisposable
     {
         private readonly NbtTreeModel Tree;
         protected readonly object SourceObject;
@@ -150,6 +150,15 @@ namespace NbtStudio
         {
             Tree = tree;
             SourceObject = source;
+            Subscribe();
+        }
+
+        protected abstract void Subscribe();
+        protected abstract void Unsubscribe();
+
+        public virtual void Dispose()
+        {
+            Unsubscribe();
         }
 
         protected void Notify()
@@ -336,9 +345,23 @@ namespace NbtStudio
     {
         public NbtTag Tag => (NbtTag)SourceObject;
         public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, tag)
+        { }
+
+        protected override void Subscribe()
         {
-            Tag.Changed += (s, e) => Notify(e);
+            Tag.Changed += Tag_Changed;
             Tag.ActionPerformed += Tag_ActionPerformed;
+        }
+
+        protected override void Unsubscribe()
+        {
+            Tag.Changed -= Tag_Changed;
+            Tag.ActionPerformed -= Tag_ActionPerformed;
+        }
+
+        private void Tag_Changed(object sender, NbtTag e)
+        {
+            Notify(e);
         }
 
         private void Tag_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
@@ -379,10 +402,25 @@ namespace NbtStudio
     {
         public NbtFile File => (NbtFile)SourceObject;
         public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
+        { }
+
+        protected override void Subscribe()
         {
             File.OnSaved += File_OnSaved;
-            File.RootTag.Changed += (s, e) => Notify(e);
+            File.RootTag.Changed += RootTag_Changed;
             File.RootTag.ActionPerformed += RootTag_ActionPerformed;
+        }
+
+        protected override void Unsubscribe()
+        {
+            File.OnSaved -= File_OnSaved;
+            File.RootTag.Changed -= RootTag_Changed;
+            File.RootTag.ActionPerformed -= RootTag_ActionPerformed;
+        }
+
+        private void RootTag_Changed(object sender, NbtTag e)
+        {
+            Notify(e);
         }
 
         private void RootTag_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
@@ -444,18 +482,40 @@ namespace NbtStudio
         {
             if (Chunk.IsLoaded)
                 SetupEvents();
-            else
-                Chunk.OnLoaded += (s, e) => SetupEvents();
+        }
+
+        protected override void Subscribe()
+        {
+            if (!Chunk.IsLoaded)
+                Chunk.OnLoaded += Chunk_OnLoaded;
         }
 
         private void SetupEvents()
         {
             if (!HasSetupEvents)
             {
-                Chunk.Data.Changed += (s, e) => Notify(e);
+                Chunk.Data.Changed += Data_Changed;
                 Chunk.Data.ActionPerformed += Data_ActionPerformed;
                 HasSetupEvents = true;
             }
+        }
+
+        protected override void Unsubscribe()
+        {
+            Chunk.OnLoaded -= Chunk_OnLoaded;
+            Chunk.Data.Changed -= Data_Changed;
+            Chunk.Data.ActionPerformed -= Data_ActionPerformed;
+            HasSetupEvents = false;
+        }
+
+        private void Chunk_OnLoaded(object sender, EventArgs e)
+        {
+            SetupEvents();
+        }
+
+        private void Data_Changed(object sender, NbtTag e)
+        {
+            Notify(e);
         }
 
         private void Data_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
@@ -509,12 +569,20 @@ namespace NbtStudio
 
     public class RegionFileNode : NotifyNode
     {
-        public readonly RegionFile Region;
+        public RegionFile Region => (RegionFile)SourceObject;
         public RegionFileNode(NbtTreeModel tree, RegionFile region) : base(tree, region)
+        { }
+
+        protected override void Subscribe()
         {
-            Region = region;
             Region.OnSaved += Region_OnSaved;
             Region.ChunksChanged += Region_ChunksChanged;
+        }
+
+        protected override void Unsubscribe()
+        {
+            Region.OnSaved -= Region_OnSaved;
+            Region.ChunksChanged -= Region_ChunksChanged;
         }
 
         private void Region_OnSaved(object sender, EventArgs e)
@@ -573,11 +641,24 @@ namespace NbtStudio
 
     public class FolderNode : NotifyNode
     {
-        public readonly NbtFolder Folder;
+        public NbtFolder Folder => (NbtFolder)SourceObject;
         public FolderNode(NbtTreeModel tree, NbtFolder folder) : base(tree, folder)
+        {  }
+
+        public override void Dispose()
         {
-            Folder = folder;
+            base.Dispose();
+            Folder.Dispose();
+        }
+
+        protected override void Subscribe()
+        {
             Folder.ContentsChanged += Folder_ContentsChanged;
+        }
+
+        protected override void Unsubscribe()
+        {
+            Folder.ContentsChanged -= Folder_ContentsChanged;
         }
 
         private void Folder_ContentsChanged(object sender, EventArgs e)

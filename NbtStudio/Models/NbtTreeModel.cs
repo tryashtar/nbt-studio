@@ -137,6 +137,21 @@ namespace NbtStudio
             }
         }
 
+        public void NotifyNodesAdded(TreePath path, ModelNode[] nodes, int[] indices)
+        {
+            NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+        }
+
+        public void NotifyNodesRemoved(TreePath path, ModelNode[] nodes, int[] indices)
+        {
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+        }
+
+        public void NotifyNodeChanged(ModelNode node)
+        {
+            NodesChanged?.Invoke(this, new TreeModelEventArgs(node.Parent.Path, new object[] { node }));
+        }
+
         public void Remove(object removed)
         {
 #if DEBUG

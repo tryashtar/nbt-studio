@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class NbtFolder : IHavePath
+    public class NbtFolder : IHavePath, IDisposable
     {
         public string Path { get; private set; }
         public bool IsFolder => true;
@@ -86,6 +86,11 @@ namespace NbtStudio
         {
             Directory.Move(Path, path);
             Path = path;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }
