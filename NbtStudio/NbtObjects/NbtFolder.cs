@@ -19,23 +19,11 @@ namespace NbtStudio
         public IReadOnlyCollection<ISaveable> Files => FileDict.Values;
         private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
         private readonly Dictionary<string, ISaveable> FileDict = new Dictionary<string, ISaveable>();
-        private readonly FileSystemWatcher Watcher;
 
         public NbtFolder(string path, bool recursive)
         {
             Path = path;
             Recursive = recursive;
-            Watcher = new FileSystemWatcher(path);
-            Watcher.EnableRaisingEvents = true;
-            Watcher.Created += Watcher_ChangesDetected;
-            Watcher.Changed += Watcher_ChangesDetected;
-            Watcher.Deleted += Watcher_ChangesDetected;
-            Watcher.Renamed += Watcher_ChangesDetected;
-        }
-
-        private void Watcher_ChangesDetected(object sender, FileSystemEventArgs e)
-        {
-            Scan();
         }
 
         public void Scan()

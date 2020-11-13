@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using Microsoft.VisualBasic.FileIO;
 using NbtStudio;
 using NbtStudio.SNBT;
@@ -170,29 +170,19 @@ namespace NbtStudio
         }
         protected NotifyNode Wrap(object obj) => Create(Tree, obj);
 
-        private static readonly Dictionary<object, NotifyNode> ObjectCache = new Dictionary<object, NotifyNode>();
         public static NotifyNode Create(NbtTreeModel tree, object obj)
         {
-            if (ObjectCache.TryGetValue(obj, out var cached))
-                return cached;
-            NotifyNode result = null;
             if (obj is NbtTag tag)
-                result = new NbtTagNode(tree, tag);
+                return new NbtTagNode(tree, tag);
             else if (obj is NbtFile file)
-                result = new NbtFileNode(tree, file);
+                return new NbtFileNode(tree, file);
             else if (obj is RegionFile region)
-                result = new RegionFileNode(tree, region);
+                return new RegionFileNode(tree, region);
             else if (obj is Chunk chunk)
-                result = new ChunkNode(tree, chunk);
+                return new ChunkNode(tree, chunk);
             else if (obj is NbtFolder folder)
-                result = new FolderNode(tree, folder);
-            if (result != null)
-            {
-                ObjectCache[obj] = result;
-                return result;
-            }
-            else
-                throw new ArgumentException($"Can't create node from {obj.GetType()}");
+                return new FolderNode(tree, folder);
+            throw new ArgumentException($"Can't create node from {obj.GetType()}");
         }
 
         public virtual string Description => "unknown node";
