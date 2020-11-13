@@ -24,8 +24,8 @@ namespace NbtStudioTests
                 new NbtByte("g", 6),
             };
             var tags = compound.Tags.ToList();
-            var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
-            var correct_order = new List<INbtTag> { /**/ tags[1], tags[3], tags[5], /**/ tags[0], tags[2], tags[4], tags[6] };
+            var moving = new List<NbtTag> { tags[1], tags[3], tags[5] };
+            var correct_order = new List<NbtTag> { /**/ tags[1], tags[3], tags[5], /**/ tags[0], tags[2], tags[4], tags[6] };
 
             NbtUtil.TransformInsert(moving, compound, 0);
 
@@ -46,8 +46,8 @@ namespace NbtStudioTests
                 new NbtByte("g", 6),
             };
             var tags = compound.Tags.ToList();
-            var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
-            var correct_order = new List<INbtTag> { tags[0], tags[2], /**/ tags[1], tags[3], tags[5], /**/ tags[4], tags[6] };
+            var moving = new List<NbtTag> { tags[1], tags[3], tags[5] };
+            var correct_order = new List<NbtTag> { tags[0], tags[2], /**/ tags[1], tags[3], tags[5], /**/ tags[4], tags[6] };
 
             NbtUtil.TransformInsert(moving, compound, 3);
 
@@ -68,8 +68,8 @@ namespace NbtStudioTests
                 new NbtByte("g", 6),
             };
             var tags = compound.Tags.ToList();
-            var moving = new List<INbtTag> { tags[1], tags[3], tags[5] };
-            var correct_order = new List<INbtTag> { tags[0], tags[2], tags[4], /**/ tags[1], tags[3], tags[5], /**/ tags[6] };
+            var moving = new List<NbtTag> { tags[1], tags[3], tags[5] };
+            var correct_order = new List<NbtTag> { tags[0], tags[2], tags[4], /**/ tags[1], tags[3], tags[5], /**/ tags[6] };
 
             NbtUtil.TransformInsert(moving, compound, 6);
 

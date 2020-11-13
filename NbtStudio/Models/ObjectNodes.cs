@@ -85,7 +85,7 @@ namespace NbtStudio
             return nodes.Select(transformer).Where(x => x != null);
         }
 
-        public static INbtTag GetNbtTag(this INode node)
+        public static NbtTag GetNbtTag(this INode node)
         {
             if (node is NbtTagNode nbt)
                 return nbt.Tag;
@@ -176,8 +176,8 @@ namespace NbtStudio
             if (ObjectCache.TryGetValue(obj, out var cached))
                 return cached;
             NotifyNode result = null;
-            if (obj is INbtTag tag)
-                result = new NbtTagNode(tree, tag.Unwrap());
+            if (obj is NbtTag tag)
+                result = new NbtTagNode(tree, tag);
             else if (obj is NbtFile file)
                 result = new NbtFileNode(tree, file);
             else if (obj is RegionFile region)
@@ -217,36 +217,36 @@ namespace NbtStudio
 
     public static class NbtNodeOperations
     {
-        public static DataObject Copy(INbtTag tag)
+        public static DataObject Copy(NbtTag tag)
         {
             var data = new DataObject();
             data.SetText(tag.ToSnbt(SnbtOptions.Default, include_name: true));
             return data;
         }
 
-        public static bool CanEdit(INbtTag tag)
+        public static bool CanEdit(NbtTag tag)
         {
             return true;
         }
 
-        public static bool CanPaste(INbtTag tag)
+        public static bool CanPaste(NbtTag tag)
         {
-            return tag is INbtContainer;
+            return tag is NbtContainerTag;
         }
 
-        public static bool CanRename(INbtTag tag)
+        public static bool CanRename(NbtTag tag)
         {
-            return !(tag.Parent is INbtList);
+            return !(tag.Parent is NbtList);
         }
 
-        public static bool CanSort(INbtTag tag)
+        public static bool CanSort(NbtTag tag)
         {
-            return tag is INbtCompound;
+            return tag is NbtCompound;
         }
 
-        public static void Sort(INbtTag tag)
+        public static void Sort(NbtTag tag)
         {
-            if (tag is INbtCompound compound)
+            if (tag is NbtCompound compound)
                 NbtUtil.Sort(compound, new NbtUtil.TagTypeSorter(), true);
         }
 
@@ -263,27 +263,27 @@ namespace NbtStudio
             }
         }
 
-        public static IEnumerable<INbtTag> Paste(INbtTag tag, IDataObject data)
+        public static IEnumerable<NbtTag> Paste(NbtTag tag, IDataObject data)
         {
-            if (tag is INbtContainer container)
+            if (tag is NbtContainerTag container)
             {
                 var tags = ParseTags(data).ToList();
                 NbtUtil.TransformAdd(tags, container);
                 return tags;
             }
-            return Enumerable.Empty<INbtTag>();
+            return Enumerable.Empty<NbtTag>();
         }
 
-        public static bool CanReceiveDrop(INbtTag tag, IEnumerable<INbtTag> tags)
+        public static bool CanReceiveDrop(NbtTag tag, IEnumerable<NbtTag> tags)
         {
-            if (!(tag is INbtContainer container))
+            if (!(tag is NbtContainerTag container))
                 return false;
             return NbtUtil.CanAddAll(tags, container);
         }
 
-        public static void ReceiveDrop(INbtTag tag, IEnumerable<INbtTag> tags, int index)
+        public static void ReceiveDrop(NbtTag tag, IEnumerable<NbtTag> tags, int index)
         {
-            if (tag is INbtContainer container)
+            if (tag is NbtContainerTag container)
                 NbtUtil.TransformInsert(tags, container, index);
         }
     }
@@ -344,22 +344,17 @@ namespace NbtStudio
 
     public class NbtTagNode : NotifyNode
     {
-        public NotifyNbtTag Tag => (NotifyNbtTag)SourceObject;
-        public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, NotifyNbtTag.CreateFrom(tag))
+        public NbtTag Tag => (NbtTag)SourceObject;
+        public NbtTagNode(NbtTreeModel tree, NbtTag tag) : base(tree, tag)
         {
-            Tag.Changed += Tag_Changed;
+            Tag.Changed += (s, e) => Notify(e);
             Tag.ActionPerformed += Tag_ActionPerformed;
         }
 
-        private void Tag_Changed(object sender, EventArgs e)
+        private void Tag_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
         {
-            Notify((NotifyNbtTag)sender);
-        }
-
-        private void Tag_ActionPerformed(object sender, UndoableAction action)
-        {
-            if (sender == Tag)
-                NoticeAction(action);
+            if (Tag == e.tag)
+                NoticeAction(e.action);
         }
 
         public override string Description => Tag.TagDescription();
@@ -396,24 +391,19 @@ namespace NbtStudio
         public NbtFileNode(NbtTreeModel tree, NbtFile file) : base(tree, file)
         {
             File.OnSaved += File_OnSaved;
-            File.RootTag.Changed += RootTag_Changed;
-            File.RootTag.ActionPerformed += RootTag_ActionPrepared;
+            File.RootTag.Changed += (s, e) => Notify(e);
+            File.RootTag.ActionPerformed += RootTag_ActionPerformed;
+        }
+
+        private void RootTag_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
+        {
+            if (File.RootTag == e.tag)
+                NoticeAction(e.action);
         }
 
         private void File_OnSaved(object sender, EventArgs e)
         {
             Notify();
-        }
-
-        private void RootTag_Changed(object sender, EventArgs e)
-        {
-            Notify((NotifyNbtTag)sender);
-        }
-
-        private void RootTag_ActionPrepared(object sender, UndoableAction action)
-        {
-            if (sender == File.RootTag)
-                NoticeAction(action);
         }
 
         public override string Description => File.Path == null ? "unsaved file" : Path.GetFileName(File.Path);
@@ -472,28 +462,23 @@ namespace NbtStudio
         {
             if (!HasSetupEvents)
             {
-                Chunk.Data.Changed += RootTag_Changed;
-                Chunk.Data.ActionPerformed += RootTag_ActionPrepared;
+                Chunk.Data.Changed += (s, e) => Notify(e);
+                Chunk.Data.ActionPerformed += Data_ActionPerformed;
                 HasSetupEvents = true;
             }
         }
 
-        public NotifyNbtCompound AccessChunkData()
+        private void Data_ActionPerformed(object sender, (NbtTag tag, UndoableAction action) e)
+        {
+            if (Chunk.Data == e.tag)
+                NoticeAction(e.action);
+        }
+
+        public NbtCompound AccessChunkData()
         {
             if (!Chunk.IsLoaded)
                 Chunk.Load();
             return Chunk.Data;
-        }
-
-        private void RootTag_Changed(object sender, EventArgs e)
-        {
-            Notify((NotifyNbtTag)sender);
-        }
-
-        private void RootTag_ActionPrepared(object sender, UndoableAction action)
-        {
-            if (sender == Chunk.Data)
-                NoticeAction(action);
         }
 
         public override string Description => NbtUtil.ChunkDescription(Chunk);
@@ -506,7 +491,7 @@ namespace NbtStudio
             var region = Chunk.Region;
             if (region != null)
             {
-                var action = new UndoableAction($"Remove {NbtUtil.ChunkDescription(Chunk)}",
+                var action = new UndoableAction(new DescriptionHolder("Remove {0}", Chunk),
                     () => { region.RemoveChunk(Chunk.X, Chunk.Z); base.Delete(); },
                     () => { region.AddChunk(Chunk); }
                 );

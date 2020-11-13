@@ -11,8 +11,8 @@ namespace NbtStudio.UI
 {
     public class TagValueTextBox : ConvenienceTextBox
     {
-        private INbtTag NbtTag;
-        private INbtContainer NbtParent;
+        private NbtTag NbtTag;
+        private NbtContainerTag NbtParent;
         public TagValueTextBox()
         {
             this.TextChanged += TagValueTextBox_TextChanged;
@@ -51,7 +51,7 @@ namespace NbtStudio.UI
                 ShowTooltip("Unknown Error", "There was an unknown error attempting to parse the value", TimeSpan.FromSeconds(2));
         }
 
-        public void SetTags(INbtTag tag, INbtContainer parent)
+        public void SetTags(NbtTag tag, NbtContainerTag parent)
         {
             NbtTag = tag;
             NbtParent = parent;

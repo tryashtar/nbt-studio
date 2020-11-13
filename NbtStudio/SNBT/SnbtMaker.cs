@@ -89,32 +89,32 @@ namespace NbtStudio.SNBT
         // expanded: for compounds and lists of non-numeric type, creates pretty indented structure. for all tags, causes spaces between values
         // delimit: for numeric types, determines whether the suffix should be included. for strings, determines whether the value should be quoted
         // include_name: whether to put the tag's name (if it has one) in front of its value
-        public static string ToSnbt(this INbtTag tag, SnbtOptions options, bool include_name = false)
+        public static string ToSnbt(this NbtTag tag, SnbtOptions options, bool include_name = false)
         {
             string name = include_name ? GetNameBeforeValue(tag, options) : String.Empty;
-            if (tag is INbtByte b)
+            if (tag is NbtByte b)
                 return name + b.ToSnbt(options);
-            if (tag is INbtShort s)
+            if (tag is NbtShort s)
                 return name + s.ToSnbt(options);
-            if (tag is INbtInt i)
+            if (tag is NbtInt i)
                 return name + i.ToSnbt(options);
-            if (tag is INbtLong l)
+            if (tag is NbtLong l)
                 return name + l.ToSnbt(options);
-            if (tag is INbtFloat f)
+            if (tag is NbtFloat f)
                 return name + f.ToSnbt(options);
-            if (tag is INbtDouble d)
+            if (tag is NbtDouble d)
                 return name + d.ToSnbt(options);
-            if (tag is INbtString str)
+            if (tag is NbtString str)
                 return name + str.ToSnbt(options);
-            if (tag is INbtByteArray ba)
+            if (tag is NbtByteArray ba)
                 return name + ba.ToSnbt(options);
-            if (tag is INbtIntArray ia)
+            if (tag is NbtIntArray ia)
                 return name + ia.ToSnbt(options);
-            if (tag is INbtLongArray la)
+            if (tag is NbtLongArray la)
                 return name + la.ToSnbt(options);
-            if (tag is INbtList list)
+            if (tag is NbtList list)
                 return name + list.ToSnbt(options);
-            if (tag is INbtCompound compound)
+            if (tag is NbtCompound compound)
                 return name + compound.ToSnbt(options);
             throw new ArgumentException($"Can't convert tag of type {tag.TagType} to SNBT");
         }
@@ -124,11 +124,11 @@ namespace NbtStudio.SNBT
             return options.NumberSuffixes ? suffix.ToString() : String.Empty;
         }
 
-        public static string ToSnbt(this INbtByte tag, SnbtOptions options) => (sbyte)tag.Value + OptionalSuffix(options, BYTE_SUFFIX);
-        public static string ToSnbt(this INbtShort tag, SnbtOptions options) => tag.Value + OptionalSuffix(options, SHORT_SUFFIX);
-        public static string ToSnbt(this INbtInt tag, SnbtOptions options) => tag.Value.ToString();
-        public static string ToSnbt(this INbtLong tag, SnbtOptions options) => tag.Value + OptionalSuffix(options, LONG_SUFFIX);
-        public static string ToSnbt(this INbtFloat tag, SnbtOptions options)
+        public static string ToSnbt(this NbtByte tag, SnbtOptions options) => (sbyte)tag.Value + OptionalSuffix(options, BYTE_SUFFIX);
+        public static string ToSnbt(this NbtShort tag, SnbtOptions options) => tag.Value + OptionalSuffix(options, SHORT_SUFFIX);
+        public static string ToSnbt(this NbtInt tag, SnbtOptions options) => tag.Value.ToString();
+        public static string ToSnbt(this NbtLong tag, SnbtOptions options) => tag.Value + OptionalSuffix(options, LONG_SUFFIX);
+        public static string ToSnbt(this NbtFloat tag, SnbtOptions options)
         {
             string result;
             if (float.IsPositiveInfinity(tag.Value))
@@ -141,7 +141,7 @@ namespace NbtStudio.SNBT
                 result = Util.FloatToString(tag.Value);
             return result + OptionalSuffix(options, FLOAT_SUFFIX);
         }
-        public static string ToSnbt(this INbtDouble tag, SnbtOptions options)
+        public static string ToSnbt(this NbtDouble tag, SnbtOptions options)
         {
             string result;
             if (double.IsPositiveInfinity(tag.Value))
@@ -154,27 +154,27 @@ namespace NbtStudio.SNBT
                 result = Util.DoubleToString(tag.Value);
             return result + OptionalSuffix(options, DOUBLE_SUFFIX);
         }
-        public static string ToSnbt(this INbtString tag, SnbtOptions options)
+        public static string ToSnbt(this NbtString tag, SnbtOptions options)
         {
             return QuoteIfRequested(tag.Value, options.StringValueQuoting, options.EscapeNewlines);
         }
 
-        public static string ToSnbt(this INbtByteArray tag, SnbtOptions options)
+        public static string ToSnbt(this NbtByteArray tag, SnbtOptions options)
         {
             return ListToString("" + BYTE_ARRAY_PREFIX + ARRAY_DELIMITER, x => ((sbyte)x).ToString() + (options.NumberSuffixes ? BYTE_SUFFIX.ToString() : String.Empty), tag.Value, options);
         }
 
-        public static string ToSnbt(this INbtIntArray tag, SnbtOptions options)
+        public static string ToSnbt(this NbtIntArray tag, SnbtOptions options)
         {
             return ListToString("" + INT_ARRAY_PREFIX + ARRAY_DELIMITER, x => x.ToString(), tag.Value, options);
         }
 
-        public static string ToSnbt(this INbtLongArray tag, SnbtOptions options)
+        public static string ToSnbt(this NbtLongArray tag, SnbtOptions options)
         {
             return ListToString("" + LONG_ARRAY_PREFIX + ARRAY_DELIMITER, x => x.ToString() + (options.NumberSuffixes ? LONG_SUFFIX.ToString() : String.Empty), tag.Value, options);
         }
 
-        public static string ToSnbt(this INbtList tag, SnbtOptions options)
+        public static string ToSnbt(this NbtList tag, SnbtOptions options)
         {
             if (options.Minified)
                 return ListToString("", x => x.ToSnbt(options, include_name: false), tag, options);
@@ -186,7 +186,7 @@ namespace NbtStudio.SNBT
             }
         }
 
-        public static string ToSnbt(this INbtCompound tag, SnbtOptions options)
+        public static string ToSnbt(this NbtCompound tag, SnbtOptions options)
         {
             var sb = new StringBuilder();
             if (options.Minified)
@@ -226,12 +226,12 @@ namespace NbtStudio.SNBT
             return StringRegex.IsMatch(str) ? str : QuoteAndEscape(str, escape_newlines);
         }
 
-        private static string GetName(INbtTag tag, SnbtOptions options)
+        private static string GetName(NbtTag tag, SnbtOptions options)
         {
             return QuoteIfRequested(tag.Name, options.KeyQuoting, options.EscapeNewlines);
         }
 
-        private static string GetNameBeforeValue(INbtTag tag, SnbtOptions options)
+        private static string GetNameBeforeValue(NbtTag tag, SnbtOptions options)
         {
             if (tag.Name == null)
                 return String.Empty;
@@ -278,11 +278,11 @@ namespace NbtStudio.SNBT
 
         // add contents of tag to stringbuilder
         // used for aligning indents for multiline compounds and lists
-        private static void AddSnbt(INbtTag tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
+        private static void AddSnbt(NbtTag tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
         {
-            if (tag is INbtCompound compound)
+            if (tag is NbtCompound compound)
                 AddSnbtCompound(compound, options, sb, indent_string, indent_level, include_name);
-            else if (tag is INbtList list)
+            else if (tag is NbtList list)
                 AddSnbtList(list, options, sb, indent_string, indent_level, include_name);
             else
             {
@@ -291,7 +291,7 @@ namespace NbtStudio.SNBT
             }
         }
 
-        private static void AddSnbtCompound(INbtCompound tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
+        private static void AddSnbtCompound(NbtCompound tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
         {
             AddIndents(sb, indent_string, indent_level);
             if (include_name)
@@ -313,7 +313,7 @@ namespace NbtStudio.SNBT
             sb.Append('}');
         }
 
-        private static void AddSnbtList(INbtList tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
+        private static void AddSnbtList(NbtList tag, SnbtOptions options, StringBuilder sb, string indent_string, int indent_level, bool include_name)
         {
             AddIndents(sb, indent_string, indent_level);
             if (include_name)
@@ -329,7 +329,7 @@ namespace NbtStudio.SNBT
                     sb.Append(Environment.NewLine);
                     for (int i = 0; i < tag.Count; i++)
                     {
-                        AddSnbt(((INbtContainer)tag)[i], options, sb, indent_string, indent_level + 1, false);
+                        AddSnbt(((NbtContainerTag)tag)[i], options, sb, indent_string, indent_level + 1, false);
                         if (i < tag.Count - 1)
                             sb.Append(VALUE_SEPARATOR);
                         sb.Append(Environment.NewLine);

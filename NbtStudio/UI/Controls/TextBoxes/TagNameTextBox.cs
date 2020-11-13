@@ -11,8 +11,8 @@ namespace NbtStudio.UI
 {
     public class TagNameTextBox : ConvenienceTextBox
     {
-        private INbtTag NbtTag;
-        private INbtContainer NbtParent;
+        private NbtTag NbtTag;
+        private NbtContainerTag NbtParent;
         public TagNameTextBox()
         {
             this.TextChanged += TagNameTextBox_TextChanged;
@@ -50,7 +50,7 @@ namespace NbtStudio.UI
                 ShowTooltip("Duplicate Name", "The compound already contains a tag with this name", TimeSpan.FromSeconds(2));
         }
 
-        public void SetTags(INbtTag tag, INbtContainer parent)
+        public void SetTags(NbtTag tag, NbtContainerTag parent)
         {
             NbtTag = tag;
             NbtParent = parent;
@@ -67,9 +67,9 @@ namespace NbtStudio.UI
             name = GetName();
             if (NbtParent == null)
                 return NameCheckResult.Valid;
-            if (NbtParent is INbtList)
+            if (NbtParent is NbtList)
                 return name == "" ? NameCheckResult.Valid : NameCheckResult.InvalidHasName;
-            if (NbtParent is INbtCompound compound)
+            if (NbtParent is NbtCompound compound)
             {
                 if (name == "")
                     return NameCheckResult.InvalidMissingName;

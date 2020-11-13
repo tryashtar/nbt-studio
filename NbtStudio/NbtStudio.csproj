@@ -68,7 +68,6 @@
     <Compile Include="Models\ByteProviders.cs" />
     <Compile Include="NbtObjects\Chunk.cs" />
     <Compile Include="Models\ExportSettings.cs" />
-    <Compile Include="Models\NotifyNbtTags.cs" />
     <Compile Include="Models\ObjectNodes.cs" />
     <Compile Include="Models\UndoHistory.cs" />
     <Compile Include="NbtUtil.cs" />
@@ -175,7 +174,6 @@
     <Compile Include="UI\Controls\ActionHistory.Designer.cs">
       <DependentUpon>ActionHistory.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\UndoableAction.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\Windows\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>

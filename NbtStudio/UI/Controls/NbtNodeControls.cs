@@ -56,7 +56,7 @@ namespace NbtStudio.UI
                 return Properties.Resources.region_image;
             if (obj is Chunk)
                 return Properties.Resources.chunk_image;
-            if (obj is INbtTag tag)
+            if (obj is NbtTag tag)
                 return NbtUtil.TagTypeImage(tag.TagType);
             return null;
         }
@@ -136,7 +136,7 @@ namespace NbtStudio.UI
                 return Path.GetFileName(region.Path);
             if (obj is Chunk chunk)
                 return $"Chunk [{chunk.X}, {chunk.Z}]";
-            if (obj is INbtTag tag)
+            if (obj is NbtTag tag)
                 return tag.Name;
             return null;
         }
@@ -168,7 +168,7 @@ namespace NbtStudio.UI
                 else
                     return "(open to load)";
             }
-            if (obj is INbtTag tag)
+            if (obj is NbtTag tag)
                 return NbtUtil.PreviewNbtValue(tag);
             return null;
         }

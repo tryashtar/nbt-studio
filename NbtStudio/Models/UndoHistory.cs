@@ -1,4 +1,5 @@
-﻿using System;
+﻿using fNbt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,19 @@ namespace NbtStudio
 {
     public class UndoHistory
     {
+        private readonly Func<object, string> DescriptionGenerator;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
         private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
+
+        public UndoHistory(Func<object,string> description_generator)
+        {
+            DescriptionGenerator = description_generator;
+        }
+
+        public string GetDescription(DescriptionHolder holder)
+        {
+            return holder.Convert(DescriptionGenerator);
+        }
 
         public void SaveAction(UndoableAction action)
         {
@@ -20,9 +32,9 @@ namespace NbtStudio
                 UndoBatch.Add(action);
 #if DEBUG
             if (BatchNumber == 0)
-                Console.WriteLine($"Added action to main stack: \"{action.Description}\". Undo stack has {UndoStack.Count} items");
+                Console.WriteLine($"Added action to main stack: \"{GetDescription(action.Description)}\". Undo stack has {UndoStack.Count} items");
             else
-                Console.WriteLine($"Added action to batch: \"{action.Description}\". Batch has {UndoBatch.Count} items");
+                Console.WriteLine($"Added action to batch: \"{GetDescription(action.Description)}\". Batch has {UndoBatch.Count} items");
 #endif
         }
 
@@ -57,11 +69,11 @@ namespace NbtStudio
 
         public List<KeyValuePair<int, string>> GetUndoHistory()
         {
-            return UndoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, v.Description)).ToList();
+            return UndoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, GetDescription(v.Description))).ToList();
         }
         public List<KeyValuePair<int, string>> GetRedoHistory()
         {
-            return RedoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, v.Description)).ToList();
+            return RedoStack.Select((v, i) => new KeyValuePair<int, string>(i + 1, GetDescription(v.Description))).ToList();
         }
 
         private int BatchNumber = 0;
@@ -72,7 +84,7 @@ namespace NbtStudio
             BatchNumber++;
         }
 
-        public void FinishBatchOperation(string description, bool replace_single)
+        public void FinishBatchOperation(DescriptionHolder description, bool replace_single)
         {
             if (BatchNumber == 0)
                 return;

@@ -297,7 +297,7 @@ namespace NbtStudio.UI
             if (obj == null || !obj.CanSort) return;
             ViewModel.StartBatchOperation();
             obj.Sort();
-            ViewModel.FinishBatchOperation($"Sort {obj.Description}", true);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
         }
 
         private void Undo()
@@ -348,7 +348,7 @@ namespace NbtStudio.UI
             { results = node.Paste(Clipboard.GetDataObject()); }
             catch (Exception ex)
             { ShowException("Error while pasting", ex); }
-            ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Paste {0} into {1}", results, node), true);
         }
 
         private void Rename()
@@ -371,21 +371,21 @@ namespace NbtStudio.UI
                 BulkEdit(items.Filter(x => x.GetNbtTag()));
         }
 
-        private void BulkRename(IEnumerable<INbtTag> tags)
+        private void BulkRename(IEnumerable<NbtTag> tags)
         {
             ViewModel.StartBatchOperation();
             BulkEditWindow.BulkRename(tags);
-            ViewModel.FinishBatchOperation($"Bulk rename {NbtUtil.TagDescription(tags)}", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", tags), false);
         }
 
-        private void BulkEdit(IEnumerable<INbtTag> tags)
+        private void BulkEdit(IEnumerable<NbtTag> tags)
         {
             ViewModel.StartBatchOperation();
             BulkEditWindow.BulkEdit(tags);
-            ViewModel.FinishBatchOperation($"Bulk edit {NbtUtil.TagDescription(tags)}", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", tags), false);
         }
 
-        private void EditLike(INode node, Predicate<INode> check, Action<INbtTag> when_tag)
+        private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
         {
             if (!check(node)) return;
             var chunk = node.GetChunk();
@@ -399,7 +399,7 @@ namespace NbtStudio.UI
                 EditChunk(chunk);
             else if (tag != null)
                 when_tag(tag);
-            ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
 
         private void Rename(INode node)
@@ -418,7 +418,7 @@ namespace NbtStudio.UI
                 RenameFileWindow.RenameFile(item);
         }
 
-        private void EditTag(INbtTag tag)
+        private void EditTag(NbtTag tag)
         {
             if (ByteProviders.HasProvider(tag))
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
@@ -431,12 +431,12 @@ namespace NbtStudio.UI
             EditChunkWindow.MoveChunk(chunk);
         }
 
-        private void RenameTag(INbtTag tag)
+        private void RenameTag(NbtTag tag)
         {
             // likewise
             ViewModel.StartBatchOperation();
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
-            ViewModel.FinishBatchOperation($"Rename {tag.TagDescription()}", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Rename {0}", tag), false);
         }
 
         private void EditSnbt()
@@ -445,7 +445,7 @@ namespace NbtStudio.UI
             if (tag == null) return;
             ViewModel.StartBatchOperation();
             EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()} as SNBT", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Edit {0} as SNBT", tag), false);
         }
 
         private void Delete()
@@ -521,7 +521,7 @@ namespace NbtStudio.UI
             }
             if (errors.Any())
                 ShowException("Error while deleting", new AggregateException(errors));
-            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(nodes)}", false);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Delete {0}", nodes), false);
         }
 
         private FindWindow FindWindow;
@@ -546,7 +546,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as NbtContainerTag;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
@@ -564,12 +564,12 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
+            var parent = ViewModel?.SelectedObject?.GetNbtTag() as NbtContainerTag;
             if (parent == null) return;
             AddTag(parent, type);
         }
 
-        private void AddTag(INbtContainer container, NbtTagType type)
+        private void AddTag(NbtContainerTag container, NbtTagType type)
         {
             NbtTag tag;
             if (NbtUtil.IsArrayType(type))
@@ -651,7 +651,7 @@ namespace NbtStudio.UI
             var obj = ViewModel?.SelectedObject;
             var objs = ViewModel?.SelectedObjects;
             var nbt = obj.GetNbtTag();
-            var container = nbt as INbtContainer;
+            var container = nbt as NbtContainerTag;
             var region = obj.GetRegionFile();
             foreach (var item in CreateTagButtons)
             {
@@ -745,7 +745,7 @@ namespace NbtStudio.UI
             if (destination == null) return;
             ViewModel.StartBatchOperation();
             destination.ReceiveDrop(nodes, index);
-            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {destination.Description} at position {index}", true);
+            ViewModel.FinishBatchOperation(new DescriptionHolder("Move {0} into {1} at position {2}", nodes, destination, index), true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -796,7 +796,7 @@ namespace NbtStudio.UI
                 var folder = obj.GetNbtFolder();
                 if (folder != null)
                     menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => folder.Scan());
-                var container = obj.GetNbtTag() as INbtContainer;
+                var container = obj.GetNbtTag() as NbtContainerTag;
                 if (container != null)
                 {
                     if (menu.Items.Count > 0)

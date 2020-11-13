@@ -13,8 +13,7 @@ namespace NbtStudio
         public RegionFile Region { get; internal set; }
         public int X { get; private set; }
         public int Z { get; private set; }
-        public NotifyNbtCompound Data { get; private set; }
-        private NbtCompound RawData;
+        public NbtCompound Data { get; private set; }
         public bool HasUnsavedChanges { get; private set; } = false;
         private readonly int Offset;
         private readonly int Size;
@@ -44,8 +43,7 @@ namespace NbtStudio
 
         private void SetData(NbtCompound data)
         {
-            RawData = data;
-            Data = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(data);
+            Data = data;
             Data.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
@@ -70,7 +68,7 @@ namespace NbtStudio
             }
             if (IsCorrupt)
                 return new byte[0];
-            var file = new fNbt.NbtFile(RawData);
+            var file = new fNbt.NbtFile(Data);
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
             Array.Copy(bytes, 0, with_header, 5, bytes.Length);

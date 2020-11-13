@@ -24,7 +24,7 @@ namespace NbtStudio
         public bool HasAnyUnsavedChanges => OpenedFiles.Filter(x => x.GetSaveable()).Any(x => x.HasUnsavedChanges);
         private readonly List<object> Roots;
         private readonly NbtTreeView View;
-        private readonly UndoHistory UndoHistory = new UndoHistory();
+        private readonly UndoHistory UndoHistory;
 
         public INode SelectedObject
         {
@@ -58,6 +58,7 @@ namespace NbtStudio
 
         public NbtTreeModel(IEnumerable<object> roots, NbtTreeView view)
         {
+            UndoHistory = new UndoHistory(GetDescription);
             Roots = roots.ToList();
             View = view;
             View.Model = this;
@@ -86,6 +87,19 @@ namespace NbtStudio
             }
         }
         public NodePosition DropPosition => View.DropPosition.Position;
+
+        public string GetDescription(object obj)
+        {
+            if (obj is INode node)
+                return node.Description;
+            if (obj is IEnumerable<INode> nodes)
+                return NodeExtractions.Description(nodes);
+            if (obj is NbtTag tag)
+                return NbtUtil.TagDescription(tag);
+            if (obj is IEnumerable<NbtTag> tags)
+                return NbtUtil.TagDescription(tags);
+            return obj.ToString();
+        }
 
         // an object changed, refresh the nodes through ITreeModel's API to ensure it matches the true object
         public void Notify(object changed)
@@ -215,7 +229,7 @@ namespace NbtStudio
             UndoHistory.StartBatchOperation();
         }
 
-        public void FinishBatchOperation(string description, bool replace_single)
+        public void FinishBatchOperation(DescriptionHolder description, bool replace_single)
         {
             UndoHistory.FinishBatchOperation(description, replace_single);
             Changed?.Invoke(this, EventArgs.Empty);
@@ -264,9 +278,9 @@ namespace NbtStudio
                 if (chunk.IsLoaded)
                     return chunk.Data.Tags;
             }
-            if (obj is INbtCompound compound)
+            if (obj is NbtCompound compound)
                 return compound.Tags;
-            if (obj is INbtList list)
+            if (obj is NbtList list)
                 return list;
             return Enumerable.Empty<object>();
         }
