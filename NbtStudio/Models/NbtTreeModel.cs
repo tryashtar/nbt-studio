@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NbtStudio.UI;
+using System.Collections.ObjectModel;
 
 namespace NbtStudio
 {
@@ -22,6 +23,7 @@ namespace NbtStudio
         public event EventHandler Changed;
 
         private readonly List<INode> Roots;
+        public ReadOnlyCollection<INode> RootNodes => Roots.AsReadOnly();
         public readonly UndoHistory UndoHistory;
 
         public NbtTreeModel(IEnumerable<object> roots)
