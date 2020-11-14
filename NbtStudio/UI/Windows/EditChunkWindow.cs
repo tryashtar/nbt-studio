@@ -14,7 +14,7 @@ namespace NbtStudio.UI
         private readonly RegionFile ChunkRegion;
         private readonly ChunkCoordsEditControls Manager;
 
-        private EditChunkWindow(Chunk chunk, RegionFile region, ChunkEditPurpose purpose)
+        private EditChunkWindow(IconSource source, Chunk chunk, RegionFile region, ChunkEditPurpose purpose)
         {
             InitializeComponent();
 
@@ -22,7 +22,7 @@ namespace NbtStudio.UI
             ChunkRegion = region;
             Manager = new ChunkCoordsEditControls(chunk, region, XBox, ZBox);
 
-            this.Icon = Properties.Resources.chunk_icon;
+            this.Icon = source.Chunk.Icon;
             if (purpose == ChunkEditPurpose.Create)
                 this.Text = $"Create Chunk";
             else if (purpose == ChunkEditPurpose.Move)
@@ -31,7 +31,7 @@ namespace NbtStudio.UI
             XBox.Select();
         }
 
-        public static Chunk CreateChunk(RegionFile parent, bool bypass_window = false, NbtCompound data = null)
+        public static Chunk CreateChunk(IconSource source, RegionFile parent, bool bypass_window = false, NbtCompound data = null)
         {
             var chunk = Chunk.EmptyChunk(data);
 
@@ -47,15 +47,15 @@ namespace NbtStudio.UI
             }
             else
             {
-                var window = new EditChunkWindow(chunk, parent, ChunkEditPurpose.Create);
+                var window = new EditChunkWindow(source, chunk, parent, ChunkEditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? chunk : null;
             }
         }
 
-        public static bool MoveChunk(Chunk existing)
+        public static bool MoveChunk(IconSource source, Chunk existing)
         {
             var region = existing.Region;
-            var window = new EditChunkWindow(existing, region, ChunkEditPurpose.Move);
+            var window = new EditChunkWindow(source, existing, region, ChunkEditPurpose.Move);
             return window.ShowDialog() == DialogResult.OK; // window moves the chunk by itself
         }
 

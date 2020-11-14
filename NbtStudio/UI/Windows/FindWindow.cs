@@ -16,12 +16,12 @@ namespace NbtStudio.UI
         private TreeNodeAdv LastFound;
         private NbtTreeView SearchingView;
 
-        public FindWindow(NbtTreeView view)
+        public FindWindow(IconSource source, NbtTreeView view)
         {
             InitializeComponent();
 
             SearchingView = view;
-            this.Icon = Properties.Resources.action_search_icon;
+            this.Icon = source.Search.Icon;
             UpdateButtons();
         }
 

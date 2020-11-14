@@ -14,6 +14,7 @@ namespace NbtStudio.UI
 {
     public class NbtIcon : NodeControl
     {
+        public IconSource IconSource;
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
             NbtText.DrawSelection(node, context);
@@ -46,18 +47,20 @@ namespace NbtStudio.UI
             return GetImage(node.Tag);
         }
 
-        private static Image GetImage(object obj)
+        private Image GetImage(object obj)
         {
+            if (IconSource == null)
+                return null;
             if (obj is NbtFileNode)
-                return Properties.Resources.file_image;
+                return IconSource.File.Image;
             if (obj is FolderNode)
-                return Properties.Resources.folder_image;
+                return IconSource.Folder.Image;
             if (obj is RegionFileNode)
-                return Properties.Resources.region_image;
+                return IconSource.Region.Image;
             if (obj is ChunkNode)
-                return Properties.Resources.chunk_image;
+                return IconSource.Chunk.Image;
             if (obj is NbtTagNode tag)
-                return NbtUtil.TagTypeImage(tag.Tag.TagType);
+                return NbtUtil.TagTypeImage(IconSource, tag.Tag.TagType).Image;
             return null;
         }
     }

@@ -489,52 +489,33 @@ namespace NbtStudio
             return $"{AllFiles}|{AllNbtFiles}|{IndividualNbtFiles()}";
         }
 
-        private static readonly Dictionary<NbtTagType, Image> FasterImageCache = new Dictionary<NbtTagType, Image>
+        public static ImageIcon TagTypeImage(IconSource source, NbtTagType type)
         {
-            { NbtTagType.Byte, Properties.Resources.tag_byte_image },
-            { NbtTagType.Short, Properties.Resources.tag_short_image },
-            { NbtTagType.Int, Properties.Resources.tag_int_image },
-            { NbtTagType.Long, Properties.Resources.tag_long_image },
-            { NbtTagType.Float, Properties.Resources.tag_float_image },
-            { NbtTagType.Double, Properties.Resources.tag_double_image },
-            { NbtTagType.String, Properties.Resources.tag_string_image },
-            { NbtTagType.ByteArray, Properties.Resources.tag_byte_array_image },
-            { NbtTagType.IntArray, Properties.Resources.tag_int_array_image },
-            { NbtTagType.LongArray, Properties.Resources.tag_long_array_image },
-            { NbtTagType.Compound, Properties.Resources.tag_compound_image },
-            { NbtTagType.List, Properties.Resources.tag_list_image }
-        };
-
-        private static readonly Dictionary<NbtTagType, Icon> FasterIconCache = new Dictionary<NbtTagType, Icon>
-        {
-            { NbtTagType.Byte, Properties.Resources.tag_byte_icon },
-            { NbtTagType.Short, Properties.Resources.tag_short_icon },
-            { NbtTagType.Int, Properties.Resources.tag_int_icon },
-            { NbtTagType.Long, Properties.Resources.tag_long_icon },
-            { NbtTagType.Float, Properties.Resources.tag_float_icon },
-            { NbtTagType.Double, Properties.Resources.tag_double_icon },
-            { NbtTagType.String, Properties.Resources.tag_string_icon },
-            { NbtTagType.ByteArray, Properties.Resources.tag_byte_array_icon },
-            { NbtTagType.IntArray, Properties.Resources.tag_int_array_icon },
-            { NbtTagType.LongArray, Properties.Resources.tag_long_array_icon },
-            { NbtTagType.Compound, Properties.Resources.tag_compound_icon },
-            { NbtTagType.List, Properties.Resources.tag_list_icon }
-        };
-
-
-        public static Image TagTypeImage(NbtTagType type)
-        {
-            if (FasterImageCache.TryGetValue(type, out var result))
-                return result;
-            return null;
-        }
-
-        public static Icon TagTypeIcon(NbtTagType type)
-        {
-            if (FasterIconCache.TryGetValue(type, out var result))
-                return result;
-            return null;
-
+            if (type == NbtTagType.Byte)
+                return source.ByteTag;
+            if (type == NbtTagType.Short)
+                return source.ShortTag;
+            if (type == NbtTagType.Int)
+                return source.IntTag;
+            if (type == NbtTagType.Long)
+                return source.LongTag;
+            if (type == NbtTagType.Float)
+                return source.FloatTag;
+            if (type == NbtTagType.Double)
+                return source.DoubleTag;
+            if (type == NbtTagType.String)
+                return source.StringTag;
+            if (type == NbtTagType.ByteArray)
+                return source.ByteArrayTag;
+            if (type == NbtTagType.IntArray)
+                return source.IntArrayTag;
+            if (type == NbtTagType.LongArray)
+                return source.LongArrayTag;
+            if (type == NbtTagType.Compound)
+                return source.CompoundTag;
+            if (type == NbtTagType.List)
+                return source.ListTag;
+            return default;
         }
 
         public static void AddTo(this NbtTag tag, NbtContainerTag container)

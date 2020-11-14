@@ -105,5 +105,17 @@ namespace NbtStudio.Properties {
                 this["ReplaceText"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int IconSet {
+            get {
+                return ((int)(this["IconSet"]));
+            }
+            set {
+                this["IconSet"] = value;
+            }
+        }
     }
 }
