@@ -164,6 +164,7 @@ namespace NbtStudio.UI
             IconSource = source;
             ItemCollection.SetIconSource(source);
             NbtTree.SetIconSource(source);
+            NbtTree.Refresh();
             this.Icon = source.NbtStudio.Icon;
             Properties.Settings.Default.IconSet = IconSourceRegistry.GetID(source);
         }
