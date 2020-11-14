@@ -611,12 +611,6 @@
     <None Include="Resources\classic\classic_region_image.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\wooden-box_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\wooden-box_image.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\legacy\legacy_file_icon.ico" />
   </ItemGroup>
   <ItemGroup>
