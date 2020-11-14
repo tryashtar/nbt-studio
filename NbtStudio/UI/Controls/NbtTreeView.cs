@@ -27,6 +27,19 @@ namespace NbtStudio.UI
             this.LoadOnDemand = true;
         }
 
+        public INode SelectedINode => SelectedNode?.Tag as INode;
+        public IEnumerable<INode> SelectedINodes => this.SelectedNodes.Select(x => x.Tag).OfType<INode>();
+
+        public IEnumerable<INode> INodesFromDrag(DragEventArgs e)
+        {
+            return NodesFromDrag(e).Select(x => x.Tag).OfType<INode>();
+        }
+        public INode INodeFromClick(TreeNodeAdvMouseEventArgs e)
+        {
+            return e.Node.Tag as INode;
+        }
+        public INode DropINode => DropPosition.Node?.Tag as INode;
+
         private void NbtTreeView_FontChanged(object sender, EventArgs e)
         {
             this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
@@ -105,41 +118,6 @@ namespace NbtStudio.UI
             if (!e.Data.GetDataPresent(typeof(TreeNodeAdv[])))
                 return new TreeNodeAdv[0];
             return (TreeNodeAdv[])e.Data.GetData(typeof(TreeNodeAdv[]));
-        }
-
-        public IEnumerable<TreeNodeAdv> BreadthFirstSearch() => BreadthFirstSearch(x => true);
-        public IEnumerable<TreeNodeAdv> BreadthFirstSearch(Predicate<TreeNodeAdv> predicate)
-        {
-            var queue = new Queue<TreeNodeAdv>();
-            queue.Enqueue(Root);
-            while (queue.Any())
-            {
-                var item = queue.Dequeue();
-                if (item != Root && !predicate(item))
-                    continue;
-                yield return item;
-                foreach (var sub in item.Children)
-                {
-                    queue.Enqueue(sub);
-                }
-            }
-        }
-        public IEnumerable<TreeNodeAdv> DepthFirstSearch() => DepthFirstSearch(x => true);
-        public IEnumerable<TreeNodeAdv> DepthFirstSearch(Predicate<TreeNodeAdv> predicate)
-        {
-            var stack = new Stack<TreeNodeAdv>();
-            stack.Push(Root);
-            while (stack.Any())
-            {
-                var item = stack.Pop();
-                if (item != Root && !predicate(item))
-                    continue;
-                yield return item;
-                foreach (var sub in item.Children.Reverse())
-                {
-                    stack.Push(sub);
-                }
-            }
         }
 
         public IEnumerable<TreeNodeAdv> AllChildren(TreeNodeAdv node)

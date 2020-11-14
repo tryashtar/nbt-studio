@@ -98,6 +98,11 @@ namespace NbtStudio
             Tree.NotifyNodeChanged(this);
         }
 
+        protected void NoticeAction(UndoableAction action)
+        {
+            Tree.UndoHistory.SaveAction(action);
+        }
+
         protected IEnumerable<T> FindChildren<T>(IEnumerable<object> objects, Func<T, object> getter) where T : INode
         {
             return Children.OfType<T>().Where(x => objects.Contains(getter(x)));

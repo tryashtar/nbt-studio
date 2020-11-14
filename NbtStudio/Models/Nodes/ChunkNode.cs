@@ -51,12 +51,18 @@ namespace NbtStudio
         {
             if (!HasSetupEvents)
             {
-                Chunk.Data.Changed += Tag_Changed;
+                Chunk.Data.Changed += Data_Changed;
+                Chunk.Data.ActionPerformed += Data_ActionPerformed;
                 HasSetupEvents = true;
             }
         }
 
-        private void Tag_Changed(object sender, NbtTag e)
+        private void Data_ActionPerformed(object sender, UndoableAction e)
+        {
+            NoticeAction(e);
+        }
+
+        private void Data_Changed(object sender, NbtTag e)
         {
             RefreshChildren();
         }

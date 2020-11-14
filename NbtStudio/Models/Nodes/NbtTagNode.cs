@@ -16,6 +16,12 @@ namespace NbtStudio
         {
             Tag = tag;
             Tag.Changed += Tag_Changed;
+            Tag.ActionPerformed += Tag_ActionPerformed;
+        }
+
+        private void Tag_ActionPerformed(object sender, UndoableAction e)
+        {
+            NoticeAction(e);
         }
 
         private void Tag_Changed(object sender, NbtTag e)

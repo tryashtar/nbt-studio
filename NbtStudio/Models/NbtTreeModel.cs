@@ -30,6 +30,7 @@ namespace NbtStudio
             Roots = roots.Select(x => NodeRegistry.CreateRootNode(this, x)).ToList();
         }
         public NbtTreeModel(object root) : this(new[] { root }) { }
+        public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
 
         public static string GetDescription(object obj)
         {
@@ -44,19 +45,71 @@ namespace NbtStudio
             return obj.ToString();
         }
 
+        public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.HasUnsavedChanges);
+        public IEnumerable<ISaveable> OpenedFiles
+        {
+            get
+            {
+                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.GetSaveable() != null))
+                {
+                    var saveable = item.GetSaveable();
+                    if (saveable != null)
+                        yield return saveable;
+                }
+            }
+        }
+
+        public (INode destination, int index) GetInsertionLocation(INode target, NodePosition position)
+        {
+            if (position == NodePosition.Inside)
+                return (target, target.Children.Count());
+            else
+            {
+                var parent = target.Parent;
+                var siblings = parent.Children.ToList();
+                int index = siblings.IndexOf(target);
+                if (position == NodePosition.After)
+                    index++;
+                return (parent, index);
+            }
+        }
+
+        private IEnumerable<INode> BreadthFirstSearch(Predicate<INode> predicate)
+        {
+            var queue = new Queue<INode>();
+            foreach (var item in Roots)
+            {
+                queue.Enqueue(item);
+            }
+            while (queue.Any())
+            {
+                var item = queue.Dequeue();
+                if (!predicate(item))
+                    continue;
+                yield return item;
+                foreach (var sub in item.Children)
+                {
+                    queue.Enqueue(sub);
+                }
+            }
+        }
+
         public void NotifyNodesAdded(TreePath path, INode[] nodes, int[] indices)
         {
             NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NotifyNodesRemoved(TreePath path, INode[] nodes, int[] indices)
         {
             NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NotifyNodeChanged(INode node)
         {
             NodesChanged?.Invoke(this, new TreeModelEventArgs(node.Parent.Path, new object[] { node }));
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         IEnumerable ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);

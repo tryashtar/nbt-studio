@@ -15,10 +15,16 @@ namespace NbtStudio
         public NbtFileNode(NbtTreeModel tree, INode parent, NbtFile file) : base(tree, parent)
         {
             File = file;
-            File.RootTag.Changed += Tag_Changed;
+            File.RootTag.Changed += RootTag_Changed;
+            File.RootTag.ActionPerformed += RootTag_ActionPerformed;
         }
 
-        private void Tag_Changed(object sender, NbtTag e)
+        private void RootTag_ActionPerformed(object sender, UndoableAction e)
+        {
+            NoticeAction(e);
+        }
+
+        private void RootTag_Changed(object sender, NbtTag e)
         {
             RefreshChildren();
         }
