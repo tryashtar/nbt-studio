@@ -45,6 +45,21 @@ namespace NbtStudio.UI
             this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
         }
 
+        protected override void OnNodesInserted(TreeNodeAdv parent, TreeModelEventArgs e)
+        {
+            base.OnNodesInserted(parent, e);
+            parent.Expand();
+        }
+
+        protected override void OnModelChanged()
+        {
+            base.OnModelChanged();
+            foreach (var item in Root.Children)
+            {
+                item.Expand();
+            }
+        }
+
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             if (Control.ModifierKeys == Keys.Control)
