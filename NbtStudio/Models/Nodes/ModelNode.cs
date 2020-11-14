@@ -13,19 +13,21 @@ namespace NbtStudio
     {
         protected readonly NbtTreeModel Tree;
         public INode Parent { get; private set; }
+        private bool ChildrenReady = false;
         private OrderedDictionary<object, INode> ChildNodes;
         public IEnumerable<INode> Children
         {
             get
             {
-                if (ChildNodes == null)
+                if (!ChildrenReady)
                 {
                     ChildNodes = new OrderedDictionary<object, INode>();
-                    var children = GetChildren();
+                    var children = GetChildren().Where(x => x != null);
                     foreach (var item in children)
                     {
                         ChildNodes.Add(item, NodeRegistry.CreateNode(Tree, this, item));
                     }
+                    ChildrenReady = true;
                 }
                 return ChildNodes.Values;
             }
@@ -56,10 +58,10 @@ namespace NbtStudio
         protected abstract IEnumerable<object> GetChildren();
         protected void RefreshChildren()
         {
-            if (ChildNodes == null)
+            if (!ChildrenReady)
                 return;
             var path = Path;
-            var new_children = GetChildren().ToList();
+            var new_children = GetChildren().Where(x => x != null).ToList();
             var remove = ChildNodes.Keys.Except(new_children).ToArray();
             var add = new_children.Except(ChildNodes.Keys).ToArray();
             if (remove.Any())
