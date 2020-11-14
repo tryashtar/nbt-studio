@@ -67,11 +67,6 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        static ChunkNode()
-        {
-            NodeRegistry.Register<NbtFile>((tree, parent, file) => new NbtFileNode(tree, parent, file));
-        }
-
         protected override IEnumerable<object> GetChildren()
         {
             if (!Chunk.IsLoaded)

@@ -48,16 +48,16 @@ namespace NbtStudio.UI
 
         private static Image GetImage(object obj)
         {
-            if (obj is NbtFile)
+            if (obj is NbtFileNode)
                 return Properties.Resources.file_image;
-            if (obj is NbtFolder)
+            if (obj is FolderNode)
                 return Properties.Resources.folder_image;
-            if (obj is RegionFile)
+            if (obj is RegionFileNode)
                 return Properties.Resources.region_image;
-            if (obj is Chunk)
+            if (obj is ChunkNode)
                 return Properties.Resources.chunk_image;
-            if (obj is NbtTag tag)
-                return NbtUtil.TagTypeImage(tag.TagType);
+            if (obj is NbtTagNode tag)
+                return NbtUtil.TagTypeImage(tag.Tag.TagType);
             return null;
         }
     }
@@ -115,9 +115,13 @@ namespace NbtStudio.UI
             string prefix = null;
             string name = PreviewName(node.Tag);
             string value = PreviewValue(node.Tag);
-            if (node.Tag is ISaveable saveable && saveable.HasUnsavedChanges ||
-                node.Tag is Chunk chunk && chunk.HasUnsavedChanges)
-                prefix = "* ";
+            if (node.Tag is INode inode)
+            {
+                var saveable = inode.GetSaveable();
+                var chunk = inode.GetChunk();
+                if ((saveable != null && saveable.HasUnsavedChanges) || (chunk != null && chunk.HasUnsavedChanges))
+                    prefix = "* ";
+            }
             if (name == null)
                 return (prefix, value);
             return (prefix + name + ": ", value);
@@ -128,25 +132,26 @@ namespace NbtStudio.UI
 
         private static string PreviewName(object obj)
         {
-            if (obj is NbtFile file)
-                return Path.GetFileName(file.Path);
-            if (obj is NbtFolder folder)
-                return Path.GetFileName(folder.Path);
-            if (obj is RegionFile region)
-                return Path.GetFileName(region.Path);
-            if (obj is Chunk chunk)
-                return $"Chunk [{chunk.X}, {chunk.Z}]";
-            if (obj is NbtTag tag)
-                return tag.Name;
+            if (obj is NbtFileNode file)
+                return Path.GetFileName(file.File.Path);
+            if (obj is FolderNode folder)
+                return Path.GetFileName(folder.Folder.Path);
+            if (obj is RegionFileNode region)
+                return Path.GetFileName(region.Region.Path);
+            if (obj is ChunkNode chunk)
+                return $"Chunk [{chunk.Chunk.X}, {chunk.Chunk.Z}]";
+            if (obj is NbtTagNode tag)
+                return tag.Tag.Name;
             return null;
         }
 
         private static string PreviewValue(object obj)
         {
-            if (obj is NbtFile file)
-                return NbtUtil.PreviewNbtValue(file.RootTag);
-            if (obj is NbtFolder folder)
+            if (obj is NbtFileNode file)
+                return NbtUtil.PreviewNbtValue(file.File.RootTag);
+            if (obj is FolderNode folder_node)
             {
+                var folder = folder_node.Folder;
                 if (folder.HasScanned)
                 {
                     if (folder.Subfolders.Any())
@@ -157,10 +162,11 @@ namespace NbtStudio.UI
                 else
                     return "(open to load)";
             }
-            if (obj is RegionFile region)
-                return $"[{Util.Pluralize(region.ChunkCount, "chunk")}]";
-            if (obj is Chunk chunk)
+            if (obj is RegionFileNode region)
+                return $"[{Util.Pluralize(region.Region.ChunkCount, "chunk")}]";
+            if (obj is ChunkNode chunk_node)
             {
+                var chunk = chunk_node.Chunk;
                 if (chunk.IsLoaded)
                     return NbtUtil.PreviewNbtValue(chunk.Data);
                 else if (chunk.IsExternal)
@@ -168,8 +174,8 @@ namespace NbtStudio.UI
                 else
                     return "(open to load)";
             }
-            if (obj is NbtTag tag)
-                return NbtUtil.PreviewNbtValue(tag);
+            if (obj is NbtTagNode tag)
+                return NbtUtil.PreviewNbtValue(tag.Tag);
             return null;
         }
 

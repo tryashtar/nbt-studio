@@ -29,11 +29,6 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        static NbtFileNode()
-        {
-            NodeRegistry.Register<NbtFile>((tree, parent, file) => new NbtFileNode(tree, parent, file));
-        }
-
         protected override IEnumerable<object> GetChildren()
         {
             return File.RootTag;

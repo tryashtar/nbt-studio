@@ -24,11 +24,6 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        static RegionFileNode()
-        {
-            NodeRegistry.Register<RegionFile>((tree, parent, region) => new RegionFileNode(tree, parent, region));
-        }
-
         protected override IEnumerable<object> GetChildren()
         {
             return Region.AllChunks;

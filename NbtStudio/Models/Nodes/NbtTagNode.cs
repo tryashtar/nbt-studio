@@ -29,11 +29,6 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        static NbtTagNode()
-        {
-            NodeRegistry.Register<NbtTag>((tree, parent, tag) => new NbtTagNode(tree, parent, tag));
-        }
-
         protected override IEnumerable<object> GetChildren()
         {
             if (Tag is NbtContainerTag container)

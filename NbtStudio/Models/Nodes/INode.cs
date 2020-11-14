@@ -1,4 +1,5 @@
 ﻿using Aga.Controls.Tree;
+using fNbt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,15 @@ namespace NbtStudio
 
     public static class NodeRegistry
     {
+        static NodeRegistry()
+        {
+            Register<NbtTag>((tree, parent, tag) => new NbtTagNode(tree, parent, tag));
+            Register<NbtFile>((tree, parent, file) => new NbtFileNode(tree, parent, file));
+            Register<RegionFile>((tree, parent, region) => new RegionFileNode(tree, parent, region));
+            Register<Chunk>((tree, parent, chunk) => new ChunkNode(tree, parent, chunk));
+            Register<NbtFolder>((tree, parent, folder) => new FolderNode(tree, parent, folder));
+        }
+
         private static readonly Dictionary<Type, Func<NbtTreeModel, INode, object, INode>> RegisteredConverters = new Dictionary<Type, Func<NbtTreeModel, INode, object, INode>>();
         public static void Register<T>(Func<NbtTreeModel, INode, T, INode> converter)
         {

@@ -28,6 +28,7 @@ namespace NbtStudio.UI
                 if (_ViewModel != null)
                     _ViewModel.Changed -= ViewModel_Changed;
                 _ViewModel = value;
+                NbtTree.Model = _ViewModel;
                 _ViewModel.Changed += ViewModel_Changed;
                 ViewModel_Changed(this, EventArgs.Empty);
             }

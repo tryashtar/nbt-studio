@@ -108,7 +108,8 @@ namespace NbtStudio
 
         public void NotifyNodeChanged(INode node)
         {
-            NodesChanged?.Invoke(this, new TreeModelEventArgs(node.Parent.Path, new object[] { node }));
+            var path = node.Parent?.Path ?? new TreePath();
+            NodesChanged?.Invoke(this, new TreeModelEventArgs(path, new object[] { node }));
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
