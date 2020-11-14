@@ -9,12 +9,12 @@ namespace NbtStudio.UI
 {
     public partial class EditTagWindow : Form
     {
-        private readonly INbtTag WorkingTag;
-        private readonly INbtContainer TagParent;
+        private readonly NbtTag WorkingTag;
+        private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
         private readonly bool SettingValue;
 
-        private EditTagWindow(INbtTag tag, INbtContainer parent, bool set_name, bool set_value, EditPurpose purpose)
+        private EditTagWindow(NbtTag tag, NbtContainerTag parent, bool set_name, bool set_value, EditPurpose purpose)
         {
             InitializeComponent();
 
@@ -56,9 +56,9 @@ namespace NbtStudio.UI
             }
         }
 
-        public static NbtTag CreateTag(NbtTagType type, INbtContainer parent, bool bypass_window = false)
+        public static NbtTag CreateTag(NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
         {
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
             bool has_value = NbtUtil.IsValueType(type);
 
             var tag = NbtUtil.CreateTag(type);
@@ -77,12 +77,12 @@ namespace NbtStudio.UI
                 return tag; // no customization required, example: adding a compound to a list
         }
 
-        public static bool ModifyTag(INbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
             bool has_value = NbtUtil.IsValueType(existing.TagType);
 
             if (has_name || has_value)

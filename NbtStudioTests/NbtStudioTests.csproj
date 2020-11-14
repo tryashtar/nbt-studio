@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModelNodes.cs" />
     <Compile Include="Snbt.cs" />
     <Compile Include="DragDrop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,6 +65,10 @@
     <ProjectReference Include="..\NbtStudio\NbtStudio.csproj">
       <Project>{15c9ed53-e930-4ff3-ad1c-d92769464cb7}</Project>
       <Name>NbtStudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
+      <Project>{e73bb233-d88b-44a7-a98f-d71ee158381d}</Project>
+      <Name>Aga.Controls</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

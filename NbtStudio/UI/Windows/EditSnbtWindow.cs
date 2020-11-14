@@ -8,11 +8,11 @@ namespace NbtStudio.UI
 {
     public partial class EditSnbtWindow : Form
     {
-        private INbtTag WorkingTag;
-        private readonly INbtContainer TagParent;
+        private NbtTag WorkingTag;
+        private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
 
-        public EditSnbtWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
+        public EditSnbtWindow(NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
             InputBox.Size = new Size(0, 0);
@@ -73,19 +73,19 @@ namespace NbtStudio.UI
             }
         }
 
-        public static INbtTag CreateTag(INbtContainer parent)
+        public static NbtTag CreateTag(NbtContainerTag parent)
         {
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
             var window = new EditSnbtWindow(null, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? window.WorkingTag : null;
         }
 
-        public static bool ModifyTag(INbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
             var window = new EditSnbtWindow(existing, parent, has_name, purpose);
             return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
         }
@@ -103,7 +103,7 @@ namespace NbtStudio.UI
         {
             if (WorkingTag == null)
             {
-                if (TagParent is INbtList list)
+                if (TagParent is NbtList list)
                 {
                     if (list.Count == 0)
                         return null;

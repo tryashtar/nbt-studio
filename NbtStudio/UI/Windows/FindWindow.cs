@@ -14,7 +14,7 @@ namespace NbtStudio.UI
     public partial class FindWindow : Form
     {
         private TreeNodeAdv LastFound;
-        private readonly NbtTreeView SearchingView;
+        private NbtTreeView SearchingView;
 
         public FindWindow(NbtTreeView view)
         {
@@ -55,31 +55,48 @@ namespace NbtStudio.UI
             }
         }
 
-        private IEnumerable<TreeNodeAdv> DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
+        private TreeNodeAdv DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var start = SearchingView.SelectedNode ?? LastFound;
             var predicate = GetPredicate();
-            var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
-            if (find == null)
-                return null;
-            else
+            SearchingView.SuspendLayout();
+            try
             {
-                LastFound = find;
-                return new[] { find };
+                var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
+                if (find == null)
+                    return null;
+                else
+                {
+                    LastFound = find;
+                    return find;
+                }
+            }
+            finally
+            {
+                SearchingView.ResumeLayout();
             }
         }
 
-        private IEnumerable<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
+        private List<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
-            return SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
+            SearchingView.SuspendLayout();
+            try
+            {
+                var results = SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
+                return results;
+            }
+            finally
+            {
+                SearchingView.ResumeLayout();
+            }
         }
 
         private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
         private Task<IEnumerable<TreeNodeAdv>> ActiveSearch;
-        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, IEnumerable<TreeNodeAdv>> function)
+        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<TreeNodeAdv>> function)
         {
             if (ActiveSearch != null && !ActiveSearch.IsCompleted)
                 return;
@@ -124,7 +141,13 @@ namespace NbtStudio.UI
 
         public void Search(SearchDirection direction)
         {
-            StartActiveSearch(x => DoSearch(direction, x));
+            List<TreeNodeAdv> ItemOrNull(TreeNodeAdv item)
+            {
+                if (item == null)
+                    return null;
+                return new List<TreeNodeAdv> { item };
+            }
+            StartActiveSearch(x => ItemOrNull(DoSearch(direction, x)));
         }
 
         public void SearchAll()
@@ -214,6 +237,19 @@ namespace NbtStudio.UI
         private void UpdateButtons()
         {
             ButtonFindAll.Enabled = NameBox.Text != "" || ValueBox.Text != "";
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            LastFound = null;
+            SearchingView = null;
+            CancelSource.Cancel();
+            ActiveSearch = null;
+            base.Dispose(disposing);
         }
     }
 }

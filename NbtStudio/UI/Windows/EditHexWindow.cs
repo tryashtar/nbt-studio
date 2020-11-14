@@ -11,12 +11,12 @@ namespace NbtStudio.UI
 {
     public partial class EditHexWindow : Form
     {
-        private readonly INbtTag WorkingTag;
-        private readonly INbtContainer TagParent;
+        private readonly NbtTag WorkingTag;
+        private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
         private readonly IByteTransformer Provider;
 
-        private EditHexWindow(INbtTag tag, INbtContainer parent, bool set_name, EditPurpose purpose)
+        private EditHexWindow(NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
             TabView.Size = new Size(0, 0);
@@ -37,7 +37,7 @@ namespace NbtStudio.UI
             HexBox.SelectionForeColor = HexBox.ForeColor;
 
             string tagname;
-            if (tag is INbtList list)
+            if (tag is NbtList list)
             {
                 tagname = NbtUtil.TagTypeName(list.ListType) + " List";
                 this.Icon = NbtUtil.TagTypeIcon(list.ListType);
@@ -61,9 +61,9 @@ namespace NbtStudio.UI
                 HexBox.Select();
         }
 
-        public static NbtTag CreateTag(NbtTagType type, INbtContainer parent, bool bypass_window = false)
+        public static NbtTag CreateTag(NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
         {
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
             var tag = NbtUtil.CreateTag(type);
 
             if (bypass_window)
@@ -75,12 +75,12 @@ namespace NbtStudio.UI
             return window.ShowDialog() == DialogResult.OK ? tag : null;
         }
 
-        public static bool ModifyTag(INbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
-            bool has_name = parent is INbtCompound;
+            bool has_name = parent is NbtCompound;
 
             var window = new EditHexWindow(existing, parent, has_name, purpose);
             return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself

@@ -45,7 +45,7 @@ namespace NbtStudio.UI
             ShowTooltip(result.Title, result.Description, TimeSpan.FromSeconds(3));
         }
 
-        public void SetFromTag(INbtTag tag)
+        public void SetFromTag(NbtTag tag)
         {
             this.Text = tag.ToSnbt(SnbtOptions.DefaultExpanded);
         }

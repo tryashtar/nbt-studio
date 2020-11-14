@@ -16,9 +16,8 @@ namespace NbtStudio
     {
         public string Path { get; private set; }
         public bool IsFolder => false;
-        private NbtCompound RootTagData;
         public event EventHandler OnSaved;
-        public NotifyNbtCompound RootTag { get; private set; }
+        public NbtCompound RootTag { get; private set; }
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
         public bool HasUnsavedChanges { get; private set; } = false;
@@ -45,12 +44,11 @@ namespace NbtStudio
 
         private void SetRoot(NbtCompound root)
         {
-            RootTagData = root;
-            RootTag = (NotifyNbtCompound)NotifyNbtTag.CreateFrom(root);
+            RootTag = root;
             RootTag.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
-        private static bool LooksSuspicious(INbtTag tag)
+        private static bool LooksSuspicious(NbtTag tag)
         {
             foreach (var ch in tag.Name)
             {
@@ -139,7 +137,7 @@ namespace NbtStudio
 
         public void Save()
         {
-            ExportSettings.Export(Path, RootTagData);
+            ExportSettings.Export(Path, RootTag);
             HasUnsavedChanges = false;
             OnSaved?.Invoke(this, EventArgs.Empty);
         }

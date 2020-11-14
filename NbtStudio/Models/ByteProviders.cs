@@ -11,15 +11,15 @@ namespace NbtStudio
 {
     public static class ByteProviders
     {
-        public static IByteTransformer GetByteProvider(INbtTag tag)
+        public static IByteTransformer GetByteProvider(NbtTag tag)
         {
-            if (tag is INbtByteArray ba)
+            if (tag is NbtByteArray ba)
                 return new ByteArrayByteProvider(ba);
-            if (tag is INbtIntArray ia)
+            if (tag is NbtIntArray ia)
                 return new IntArrayByteProvider(ia);
-            if (tag is INbtLongArray la)
+            if (tag is NbtLongArray la)
                 return new LongArrayByteProvider(la);
-            if (tag is INbtList list)
+            if (tag is NbtList list)
             {
                 if (list.ListType == NbtTagType.Byte)
                     return new ByteListByteProvider(list);
@@ -33,11 +33,11 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get a byte provider from {tag.TagType}");
         }
 
-        public static bool HasProvider(INbtTag tag)
+        public static bool HasProvider(NbtTag tag)
         {
             if (NbtUtil.IsArrayType(tag.TagType))
                 return true;
-            if (tag is INbtList list)
+            if (tag is NbtList list)
             {
                 switch (list.ListType)
                 {
@@ -64,11 +64,11 @@ namespace NbtStudio
 
     public abstract class NbtByteProvider : IByteTransformer
     {
-        protected readonly INbtTag Tag;
+        protected readonly NbtTag Tag;
         private readonly List<byte> Bytes = new List<byte>();
         public IEnumerable<byte> CurrentBytes => Bytes.AsReadOnly();
         private bool HasChanged = false;
-        public NbtByteProvider(INbtTag tag)
+        public NbtByteProvider(NbtTag tag)
         {
             Tag = tag;
             Bytes.AddRange(GetBytesFromTag());
@@ -155,8 +155,8 @@ namespace NbtStudio
 
     public class ByteArrayByteProvider : NbtByteProvider
     {
-        protected new INbtByteArray Tag => (INbtByteArray)base.Tag;
-        public ByteArrayByteProvider(INbtByteArray tag) : base(tag) { }
+        protected new NbtByteArray Tag => (NbtByteArray)base.Tag;
+        public ByteArrayByteProvider(NbtByteArray tag) : base(tag) { }
         public override int BytesPerValue => sizeof(byte);
 
         protected override IEnumerable<byte> GetBytesFromTag()
@@ -172,8 +172,8 @@ namespace NbtStudio
 
     public class IntArrayByteProvider : NbtByteProvider
     {
-        protected new INbtIntArray Tag => (INbtIntArray)base.Tag;
-        public IntArrayByteProvider(INbtIntArray tag) : base(tag) { }
+        protected new NbtIntArray Tag => (NbtIntArray)base.Tag;
+        public IntArrayByteProvider(NbtIntArray tag) : base(tag) { }
         public override int BytesPerValue => sizeof(int);
 
         protected override IEnumerable<byte> GetBytesFromTag()
@@ -189,8 +189,8 @@ namespace NbtStudio
 
     public class LongArrayByteProvider : NbtByteProvider
     {
-        protected new INbtLongArray Tag => (INbtLongArray)base.Tag;
-        public LongArrayByteProvider(INbtLongArray tag) : base(tag) { }
+        protected new NbtLongArray Tag => (NbtLongArray)base.Tag;
+        public LongArrayByteProvider(NbtLongArray tag) : base(tag) { }
         public override int BytesPerValue => sizeof(long);
 
         protected override IEnumerable<byte> GetBytesFromTag()
@@ -206,18 +206,18 @@ namespace NbtStudio
 
     public abstract class NbtListByteProvider : NbtByteProvider
     {
-        protected new INbtList Tag => (INbtList)base.Tag;
-        public NbtListByteProvider(INbtList list) : base(list) { }
+        protected new NbtList Tag => (NbtList)base.Tag;
+        public NbtListByteProvider(NbtList list) : base(list) { }
     }
 
     public class ByteListByteProvider : NbtListByteProvider
     {
-        public ByteListByteProvider(INbtList list) : base(list) { }
+        public ByteListByteProvider(NbtList list) : base(list) { }
         public override int BytesPerValue => sizeof(byte);
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            return Tag.Cast<INbtByte>().Select(x => x.Value);
+            return Tag.Cast<NbtByte>().Select(x => x.Value);
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
@@ -229,12 +229,12 @@ namespace NbtStudio
 
     public class ShortListByteProvider : NbtListByteProvider
     {
-        public ShortListByteProvider(INbtList list) : base(list) { }
+        public ShortListByteProvider(NbtList list) : base(list) { }
         public override int BytesPerValue => sizeof(short);
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var shorts = Tag.Cast<INbtShort>().Select(x => x.Value);
+            var shorts = Tag.Cast<NbtShort>().Select(x => x.Value);
             return Util.ToByteArray(shorts.ToArray());
         }
 
@@ -248,12 +248,12 @@ namespace NbtStudio
 
     public class IntListByteProvider : NbtListByteProvider
     {
-        public IntListByteProvider(INbtList list) : base(list) { }
+        public IntListByteProvider(NbtList list) : base(list) { }
         public override int BytesPerValue => sizeof(int);
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var ints = Tag.Cast<INbtInt>().Select(x => x.Value);
+            var ints = Tag.Cast<NbtInt>().Select(x => x.Value);
             return Util.ToByteArray(ints.ToArray());
         }
 
@@ -267,12 +267,12 @@ namespace NbtStudio
 
     public class LongListByteProvider : NbtListByteProvider
     {
-        public LongListByteProvider(INbtList list) : base(list) { }
+        public LongListByteProvider(NbtList list) : base(list) { }
         public override int BytesPerValue => sizeof(long);
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var longs = Tag.Cast<INbtLong>().Select(x => x.Value);
+            var longs = Tag.Cast<NbtLong>().Select(x => x.Value);
             return Util.ToByteArray(longs.ToArray());
         }
 

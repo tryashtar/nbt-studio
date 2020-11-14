@@ -66,10 +66,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ByteProviders.cs" />
+    <Compile Include="Models\Nodes\FolderNode.cs" />
+    <Compile Include="Models\Nodes\NodeOperations.cs" />
+    <Compile Include="Models\Nodes\INode.cs" />
+    <Compile Include="Models\Nodes\ModelNode.cs" />
+    <Compile Include="Models\Nodes\NbtFileNode.cs" />
+    <Compile Include="Models\Nodes\ChunkNode.cs" />
+    <Compile Include="Models\Nodes\RegionFileNode.cs" />
+    <Compile Include="Models\Nodes\NbtTagNode.cs" />
     <Compile Include="NbtObjects\Chunk.cs" />
     <Compile Include="Models\ExportSettings.cs" />
-    <Compile Include="Models\NotifyNbtTags.cs" />
-    <Compile Include="Models\ObjectNodes.cs" />
     <Compile Include="Models\UndoHistory.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtObjects\NbtFile.cs" />
@@ -175,7 +181,6 @@
     <Compile Include="UI\Controls\ActionHistory.Designer.cs">
       <DependentUpon>ActionHistory.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\UndoableAction.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="UI\Windows\EditSnbtWindow.resx">
       <DependentUpon>EditSnbtWindow.cs</DependentUpon>

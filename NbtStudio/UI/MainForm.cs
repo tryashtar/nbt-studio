@@ -28,10 +28,12 @@ namespace NbtStudio.UI
                 if (_ViewModel != null)
                     _ViewModel.Changed -= ViewModel_Changed;
                 _ViewModel = value;
+                NbtTree.Model = _ViewModel;
                 _ViewModel.Changed += ViewModel_Changed;
                 ViewModel_Changed(this, EventArgs.Empty);
             }
         }
+        private UndoHistory UndoHistory => ViewModel.UndoHistory;
 
         private readonly Dictionary<NbtTagType, ToolStripButton> CreateTagButtons;
         private readonly string[] ClickedFiles;
@@ -134,6 +136,7 @@ namespace NbtStudio.UI
             Tools.Items.Add(new ToolStripSeparator());
             ActionFind.AddTo(Tools, MenuSearch);
 
+            ViewModel = new NbtTreeModel();
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
         }
 
@@ -207,7 +210,7 @@ namespace NbtStudio.UI
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
-            ViewModel = new NbtTreeModel(file, NbtTree);
+            ViewModel = new NbtTreeModel(file);
         }
 
         private void OpenFolder()
@@ -229,19 +232,17 @@ namespace NbtStudio.UI
 
         private void Save()
         {
-            if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                Save(file.GetSaveable());
+                Save(file);
             }
         }
 
         private void SaveAs()
         {
-            if (ViewModel == null) return;
             foreach (var file in ViewModel.OpenedFiles)
             {
-                SaveAs(file.GetSaveable());
+                SaveAs(file);
             }
         }
 
@@ -293,27 +294,26 @@ namespace NbtStudio.UI
 
         private void Sort()
         {
-            var obj = ViewModel?.SelectedObject;
+            var obj = NbtTree.SelectedINode;
             if (obj == null || !obj.CanSort) return;
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             obj.Sort();
-            ViewModel.FinishBatchOperation($"Sort {obj.Description}", true);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
         }
 
         private void Undo()
         {
-            ViewModel.Undo();
+            UndoHistory.Undo();
         }
 
         private void Redo()
         {
-            ViewModel.Redo();
+            UndoHistory.Redo();
         }
 
         private void CopyLike(Func<INode, bool> check, Func<INode, DataObject> perform)
         {
-            if (ViewModel == null) return;
-            var objs = ViewModel.SelectedObjects.Where(check).ToList();
+            var objs = NbtTree.SelectedINodes.Where(check).ToList();
             if (objs.Any())
             {
                 var data = objs.Select(perform).Aggregate((x, y) => Util.Merge(x, y));
@@ -333,7 +333,7 @@ namespace NbtStudio.UI
 
         private void Paste()
         {
-            var parent = ViewModel?.SelectedObject;
+            var parent = NbtTree.SelectedINode;
             if (parent == null) return;
             Paste(parent);
         }
@@ -343,18 +343,17 @@ namespace NbtStudio.UI
             if (!node.CanPaste)
                 return;
             IEnumerable<INode> results = Enumerable.Empty<INode>();
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             try
             { results = node.Paste(Clipboard.GetDataObject()); }
             catch (Exception ex)
             { ShowException("Error while pasting", ex); }
-            ViewModel.FinishBatchOperation($"Paste {NodeExtractions.Description(results)} into {node.Description}", true);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Paste {0} into {1}", results, node), true);
         }
 
         private void Rename()
         {
-            if (ViewModel == null) return;
-            var items = ViewModel.SelectedObjects;
+            var items = NbtTree.SelectedINodes;
             if (Util.ExactlyOne(items))
                 Rename(items.Single());
             else
@@ -363,43 +362,42 @@ namespace NbtStudio.UI
 
         private void Edit()
         {
-            if (ViewModel == null) return;
-            var items = ViewModel.SelectedObjects;
+            var items = NbtTree.SelectedINodes;
             if (Util.ExactlyOne(items))
                 Edit(items.Single());
             else
                 BulkEdit(items.Filter(x => x.GetNbtTag()));
         }
 
-        private void BulkRename(IEnumerable<INbtTag> tags)
+        private void BulkRename(IEnumerable<NbtTag> tags)
         {
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             BulkEditWindow.BulkRename(tags);
-            ViewModel.FinishBatchOperation($"Bulk rename {NbtUtil.TagDescription(tags)}", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", tags), false);
         }
 
-        private void BulkEdit(IEnumerable<INbtTag> tags)
+        private void BulkEdit(IEnumerable<NbtTag> tags)
         {
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             BulkEditWindow.BulkEdit(tags);
-            ViewModel.FinishBatchOperation($"Bulk edit {NbtUtil.TagDescription(tags)}", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", tags), false);
         }
 
-        private void EditLike(INode node, Predicate<INode> check, Action<INbtTag> when_tag)
+        private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
         {
             if (!check(node)) return;
             var chunk = node.GetChunk();
             var path = node.GetHasPath();
             var tag = node.GetNbtTag();
             // batch operation to combine the rename and value change into one undo
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             if (path != null)
                 RenameFile(path);
             if (chunk != null)
                 EditChunk(chunk);
             else if (tag != null)
                 when_tag(tag);
-            ViewModel.FinishBatchOperation($"Edit {node.Description}", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
 
         private void Rename(INode node)
@@ -418,7 +416,7 @@ namespace NbtStudio.UI
                 RenameFileWindow.RenameFile(item);
         }
 
-        private void EditTag(INbtTag tag)
+        private void EditTag(NbtTag tag)
         {
             if (ByteProviders.HasProvider(tag))
                 EditHexWindow.ModifyTag(tag, EditPurpose.EditValue);
@@ -431,32 +429,31 @@ namespace NbtStudio.UI
             EditChunkWindow.MoveChunk(chunk);
         }
 
-        private void RenameTag(INbtTag tag)
+        private void RenameTag(NbtTag tag)
         {
             // likewise
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             EditTagWindow.ModifyTag(tag, EditPurpose.Rename);
-            ViewModel.FinishBatchOperation($"Rename {tag.TagDescription()}", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Rename {0}", tag), false);
         }
 
         private void EditSnbt()
         {
-            var tag = ViewModel?.SelectedObject?.GetNbtTag();
+            var tag = NbtTree.SelectedINode?.GetNbtTag();
             if (tag == null) return;
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             EditSnbtWindow.ModifyTag(tag, EditPurpose.EditValue);
-            ViewModel.FinishBatchOperation($"Edit {tag.TagDescription()} as SNBT", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0} as SNBT", tag), false);
         }
 
         private void Delete()
         {
-            if (ViewModel == null) return;
             var selected_nodes = NbtTree.SelectedNodes;
             var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x != null).ToList();
             var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x != null).ToList();
             var parents = selected_nodes.Select(x => x.Parent).Where(x => x != null).ToList();
 
-            var selected_objects = ViewModel.SelectedObjects.ToList();
+            var selected_objects = NbtTree.SelectedINodes.ToList();
             Delete(selected_objects);
 
             // Index == -1 checks whether this node has been removed from the tree
@@ -497,12 +494,12 @@ namespace NbtStudio.UI
                     var saved = files.Where(x => x.Path != null);
                     if (!saved.Any())
                         result = MessageBox.Show(
-                            $"Are you sure you want to remove {NodeExtractions.Description(file_nodes)}?",
+                            $"Are you sure you want to remove {ExtractNodeOperations.Description(file_nodes)}?",
                             $"Really delete these items?",
                             MessageBoxButtons.YesNo);
                     else
                         result = MessageBox.Show(
-                            $"Are you sure you want to delete {NodeExtractions.Description(file_nodes)}?\n\n" +
+                            $"Are you sure you want to delete {ExtractNodeOperations.Description(file_nodes)}?\n\n" +
                             $"{Util.Pluralize(saved.Count(), "item")} will be send to the recycle bin. This cannot be undone.",
                             $"Really delete these items?",
                             MessageBoxButtons.YesNo);
@@ -510,7 +507,7 @@ namespace NbtStudio.UI
                 if (result != DialogResult.Yes)
                     return;
             }
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             var errors = new List<Exception>();
             foreach (var node in nodes)
             {
@@ -521,7 +518,7 @@ namespace NbtStudio.UI
             }
             if (errors.Any())
                 ShowException("Error while deleting", new AggregateException(errors));
-            ViewModel.FinishBatchOperation($"Delete {NodeExtractions.Description(nodes)}", false);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Delete {0}", nodes), false);
         }
 
         private FindWindow FindWindow;
@@ -546,7 +543,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
+            var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
             if (parent == null) return;
             var tag = EditSnbtWindow.CreateTag(parent);
             if (tag != null)
@@ -555,7 +552,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = ViewModel?.SelectedObject?.GetRegionFile();
+            var parent = NbtTree.SelectedINode?.GetRegionFile();
             if (parent == null) return;
             var chunk = EditChunkWindow.CreateChunk(parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk != null)
@@ -564,12 +561,12 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = ViewModel?.SelectedObject?.GetNbtTag() as INbtContainer;
+            var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
             if (parent == null) return;
             AddTag(parent, type);
         }
 
-        private void AddTag(INbtContainer container, NbtTagType type)
+        private void AddTag(NbtContainerTag container, NbtTagType type)
         {
             NbtTag tag;
             if (NbtUtil.IsArrayType(type))
@@ -600,7 +597,7 @@ namespace NbtStudio.UI
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
                 return;
             Properties.Settings.Default.RecentFiles.Add(path);
-            ViewModel = new NbtTreeModel(new NbtFolder(path, true), NbtTree);
+            ViewModel = new NbtTreeModel(new NbtFolder(path, true));
         }
 
         private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
@@ -619,7 +616,7 @@ namespace NbtStudio.UI
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                ViewModel = new NbtTreeModel(good.Select(x => x.item), NbtTree);
+                ViewModel = new NbtTreeModel(good.Select(x => x.item));
             }
         }
 
@@ -633,7 +630,7 @@ namespace NbtStudio.UI
 
         private bool ConfirmIfUnsaved(string message)
         {
-            if (ViewModel == null || !ViewModel.HasAnyUnsavedChanges)
+            if (!ViewModel.HasAnyUnsavedChanges)
                 return true;
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
         }
@@ -648,10 +645,10 @@ namespace NbtStudio.UI
         {
             if (InvokeRequired) // only run on UI thread
                 return;
-            var obj = ViewModel?.SelectedObject;
-            var objs = ViewModel?.SelectedObjects;
+            var obj = NbtTree.SelectedINode;
+            var objs = NbtTree.SelectedINodes;
             var nbt = obj.GetNbtTag();
-            var container = nbt as INbtContainer;
+            var container = nbt as NbtContainerTag;
             var region = obj.GetRegionFile();
             foreach (var item in CreateTagButtons)
             {
@@ -676,20 +673,20 @@ namespace NbtStudio.UI
         {
             if (InvokeRequired) // only run on UI thread
                 return;
-            ActionSave.Enabled = ViewModel?.HasAnyUnsavedChanges ?? false;
-            ActionSaveAs.Enabled = ViewModel != null;
-            bool multiple_files = ViewModel != null && ViewModel.OpenedFiles.Skip(1).Any();
+            ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
+            ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
+            bool multiple_files = ViewModel.OpenedFiles.Skip(1).Any();
             var save_image = multiple_files ? Properties.Resources.action_save_all_image : Properties.Resources.action_save_image;
             ActionSave.Image = save_image;
             ActionSaveAs.Image = save_image;
-            ActionUndo.Enabled = ViewModel?.CanUndo ?? false;
-            ActionRedo.Enabled = ViewModel?.CanRedo ?? false;
+            ActionUndo.Enabled = UndoHistory.CanUndo;
+            ActionRedo.Enabled = UndoHistory.CanRedo;
             NbtTree_SelectionChanged(sender, e);
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = ViewModel?.ObjectFromClick(e);
+            var tag = NbtTree.INodeFromClick(e);
             if (!e.Node.CanExpand && tag.CanEdit)
                 Edit(tag);
         }
@@ -705,11 +702,11 @@ namespace NbtStudio.UI
                 e.Effect = DragDropEffects.Copy;
             else
             {
-                var tags = ViewModel.ObjectsFromDrag(e);
-                var drop = ViewModel.DropObject;
+                var tags = NbtTree.INodesFromDrag(e);
+                var drop = NbtTree.DropINode;
                 if (tags.Any()
-                    && ViewModel.DropObject != null
-                    && CanMoveObjects(tags, drop, ViewModel.DropPosition))
+                    && NbtTree.DropINode != null
+                    && CanMoveObjects(tags, drop, NbtTree.DropPosition.Position))
                     e.Effect = e.AllowedEffect;
                 else
                     e.Effect = DragDropEffects.None;
@@ -725,10 +722,10 @@ namespace NbtStudio.UI
             }
             else
             {
-                var tags = ViewModel.ObjectsFromDrag(e);
-                var drop = ViewModel.DropObject;
+                var tags = NbtTree.INodesFromDrag(e);
+                var drop = NbtTree.DropINode;
                 if (tags.Any())
-                    MoveObjects(tags, drop, ViewModel.DropPosition);
+                    MoveObjects(tags, drop, NbtTree.DropPosition.Position);
             }
         }
 
@@ -743,9 +740,9 @@ namespace NbtStudio.UI
         {
             var (destination, index) = ViewModel.GetInsertionLocation(target, position);
             if (destination == null) return;
-            ViewModel.StartBatchOperation();
+            UndoHistory.StartBatchOperation();
             destination.ReceiveDrop(nodes, index);
-            ViewModel.FinishBatchOperation($"Move {NodeExtractions.Description(nodes)} into {destination.Description} at position {index}", true);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Move {0} into {1} at position {2}", nodes, destination, index), true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -781,7 +778,7 @@ namespace NbtStudio.UI
                     else
                         menu.Items.Add("A&dd Children to Selection", null, (s, ea) => SetAllSelected(children, true));
                 }
-                var obj = ViewModel.ObjectFromClick(e);
+                var obj = NbtTree.INodeFromClick(e);
                 var saveable = obj.GetSaveable();
                 if (saveable != null)
                 {
@@ -796,7 +793,7 @@ namespace NbtStudio.UI
                 var folder = obj.GetNbtFolder();
                 if (folder != null)
                     menu.Items.Add("&Refresh", Properties.Resources.action_refresh_image, (s, ea) => folder.Scan());
-                var container = obj.GetNbtTag() as INbtContainer;
+                var container = obj.GetNbtTag() as NbtContainerTag;
                 if (container != null)
                 {
                     if (menu.Items.Count > 0)
@@ -828,15 +825,14 @@ namespace NbtStudio.UI
         {
             DropDownUndoHistory.Enabled = false;
             DropDownRedoHistory.Enabled = false;
-            if (ViewModel == null) return;
 
-            var undo_history = ViewModel.GetUndoHistory();
-            var redo_history = ViewModel.GetRedoHistory();
+            var undo_history = UndoHistory.GetUndoHistory();
+            var redo_history = UndoHistory.GetRedoHistory();
 
             var undo_dropdown = new ToolStripDropDown();
             DropDownUndoHistory.DropDown = undo_dropdown;
             var undo_actions = new ActionHistory(undo_history,
-                x => { ViewModel.Undo(x + 1); MenuEdit.HideDropDown(); },
+                x => { UndoHistory.Undo(x + 1); MenuEdit.HideDropDown(); },
                 x => $"Undo {Util.Pluralize(x + 1, "action")}",
                 DropDownUndoHistory.Font);
             undo_dropdown.Items.Add(new ToolStripControlHost(undo_actions));
@@ -844,7 +840,7 @@ namespace NbtStudio.UI
             var redo_dropdown = new ToolStripDropDown();
             DropDownRedoHistory.DropDown = redo_dropdown;
             var redo_actions = new ActionHistory(redo_history,
-                x => { ViewModel.Redo(x + 1); MenuEdit.HideDropDown(); },
+                x => { UndoHistory.Redo(x + 1); MenuEdit.HideDropDown(); },
                 x => $"Redo {Util.Pluralize(x + 1, "action")}",
                 DropDownRedoHistory.Font);
             redo_dropdown.Items.Add(new ToolStripControlHost(redo_actions));

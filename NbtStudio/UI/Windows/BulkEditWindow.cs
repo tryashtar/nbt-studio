@@ -12,9 +12,9 @@ namespace NbtStudio.UI
     public partial class BulkEditWindow : Form
     {
         private readonly BulkEditPurpose Purpose;
-        private readonly List<INbtTag> WorkingTags;
+        private readonly List<NbtTag> WorkingTags;
 
-        private BulkEditWindow(List<INbtTag> tags, BulkEditPurpose purpose)
+        private BulkEditWindow(List<NbtTag> tags, BulkEditPurpose purpose)
         {
             InitializeComponent();
 
@@ -40,12 +40,12 @@ namespace NbtStudio.UI
             }
         }
 
-        private ListViewItem CreateListItem(INbtTag tag, string str)
+        private ListViewItem CreateListItem(NbtTag tag, string str)
         {
             return new ListViewItem(new[] { str, "" }) { Tag = tag, Checked = true };
         }
 
-        private string TagPreview(INbtTag tag)
+        private string TagPreview(NbtTag tag)
         {
             if (Purpose == BulkEditPurpose.Rename)
                 return tag.Name;
@@ -53,9 +53,9 @@ namespace NbtStudio.UI
                 return NbtUtil.PreviewNbtValue(tag);
         }
 
-        public static void BulkRename(IEnumerable<INbtTag> tags)
+        public static void BulkRename(IEnumerable<NbtTag> tags)
         {
-            var list = tags.Where(x => x.Parent is INbtCompound).ToList();
+            var list = tags.Where(x => x.Parent is NbtCompound).ToList();
             if (list.Any())
             {
                 var window = new BulkEditWindow(list, BulkEditPurpose.Rename);
@@ -63,7 +63,7 @@ namespace NbtStudio.UI
             }
         }
 
-        public static void BulkEdit(IEnumerable<INbtTag> tags)
+        public static void BulkEdit(IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => NbtUtil.IsValueType(x.TagType)).ToList();
             if (list.Any())
@@ -94,7 +94,7 @@ namespace NbtStudio.UI
                 string transformed = transformer(current);
                 if (current == transformed || transformed == "")
                     continue;
-                var tag = (INbtTag)item.Tag;
+                var tag = (NbtTag)item.Tag;
                 if (IsValidFor(tag, transformed, out var result))
                 {
                     if (Purpose == BulkEditPurpose.Rename)
@@ -148,12 +148,12 @@ namespace NbtStudio.UI
             }
         }
 
-        private bool IsValidFor(INbtTag tag, string value, out object result)
+        private bool IsValidFor(NbtTag tag, string value, out object result)
         {
             result = null;
             if (Purpose == BulkEditPurpose.Rename)
             {
-                var existing = ((INbtCompound)tag.Parent)[value];
+                var existing = ((NbtCompound)tag.Parent)[value];
                 return existing == null || existing == tag;
             }
             else
@@ -185,7 +185,7 @@ namespace NbtStudio.UI
             else
             {
                 item.SubItems[1].Text = transformed;
-                var tag = (INbtTag)item.Tag;
+                var tag = (NbtTag)item.Tag;
                 item.BackColor = IsValidFor(tag, transformed, out _) ? default : Color.Pink;
             }
         }
