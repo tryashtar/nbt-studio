@@ -12,7 +12,7 @@ namespace NbtStudio.UI
         private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
 
-        public EditSnbtWindow(NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
+        private EditSnbtWindow(IconSource source, NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
             InputBox.Size = new Size(0, 0);
@@ -55,12 +55,12 @@ namespace NbtStudio.UI
                 InputBox.SetFromTag(tag);
             if (required == null)
             {
-                this.Icon = Properties.Resources.action_add_snbt_icon;
+                this.Icon = source.AddSnbt.Icon;
                 this.Text = "Create Tag as SNBT";
             }
             else
             {
-                this.Icon = NbtUtil.TagTypeIcon(required.Value);
+                this.Icon = NbtUtil.TagTypeImage(source, required.Value).Icon;
                 this.Text = tag == null ? $"Create {NbtUtil.TagTypeName(required.Value)} Tag as SNBT" : $"Edit {NbtUtil.TagTypeName(required.Value)} Tag as SNBT";
             }
             if (SettingName && purpose != EditPurpose.EditValue)
@@ -75,20 +75,20 @@ namespace NbtStudio.UI
             }
         }
 
-        public static NbtTag CreateTag(NbtContainerTag parent)
+        public static NbtTag CreateTag(IconSource source, NbtContainerTag parent)
         {
             bool has_name = parent is NbtCompound;
-            var window = new EditSnbtWindow(null, parent, has_name, EditPurpose.Create);
+            var window = new EditSnbtWindow(source, null, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? window.WorkingTag : null;
         }
 
-        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
             bool has_name = parent is NbtCompound;
-            var window = new EditSnbtWindow(existing, parent, has_name, purpose);
+            var window = new EditSnbtWindow(source, existing, parent, has_name, purpose);
             return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
         }
 

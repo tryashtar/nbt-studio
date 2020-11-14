@@ -14,7 +14,7 @@ namespace NbtStudio.UI
         private readonly BulkEditPurpose Purpose;
         private readonly List<NbtTag> WorkingTags;
 
-        private BulkEditWindow(List<NbtTag> tags, BulkEditPurpose purpose)
+        private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
         {
             InitializeComponent();
 
@@ -27,14 +27,14 @@ namespace NbtStudio.UI
             if (purpose == BulkEditPurpose.Rename)
             {
                 this.Text = $"Rename {Util.Pluralize(tags.Count, "tag")}";
-                this.Icon = Properties.Resources.action_rename_icon;
+                this.Icon = source.Rename.Icon;
                 CurrentColumn.Text = "Current Name";
                 NewColumn.Text = "New Name";
             }
             else
             {
                 this.Text = $"Edit {Util.Pluralize(tags.Count, "tag")}";
-                this.Icon = Properties.Resources.action_edit_icon;
+                this.Icon = source.Edit.Icon;
                 CurrentColumn.Text = "Current Value";
                 NewColumn.Text = "New Value";
             }
@@ -53,22 +53,22 @@ namespace NbtStudio.UI
                 return NbtUtil.PreviewNbtValue(tag);
         }
 
-        public static void BulkRename(IEnumerable<NbtTag> tags)
+        public static void BulkRename(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => x.Parent is NbtCompound).ToList();
             if (list.Any())
             {
-                var window = new BulkEditWindow(list, BulkEditPurpose.Rename);
+                var window = new BulkEditWindow(source, list, BulkEditPurpose.Rename);
                 window.ShowDialog();
             }
         }
 
-        public static void BulkEdit(IEnumerable<NbtTag> tags)
+        public static void BulkEdit(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => NbtUtil.IsValueType(x.TagType)).ToList();
             if (list.Any())
             {
-                var window = new BulkEditWindow(list, BulkEditPurpose.EditValue);
+                var window = new BulkEditWindow(source, list, BulkEditPurpose.EditValue);
                 window.ShowDialog();
             }
         }

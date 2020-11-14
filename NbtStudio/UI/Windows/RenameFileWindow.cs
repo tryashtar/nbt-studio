@@ -11,19 +11,19 @@ namespace NbtStudio.UI
     {
         private readonly IHavePath OriginalItem;
 
-        private RenameFileWindow(IHavePath file)
+        private RenameFileWindow(IconSource source, IHavePath file)
         {
             InitializeComponent();
 
             OriginalItem = file;
-            this.Icon = Properties.Resources.action_rename_icon;
+            this.Icon = source.Rename.Icon;
             NameBox.SetItem(file);
             NameBox.SelectAll();
         }
 
-        public static bool RenameFile(IHavePath file)
+        public static bool RenameFile(IconSource source, IHavePath file)
         {
-            var window = new RenameFileWindow(file);
+            var window = new RenameFileWindow(source, file);
             return window.ShowDialog() == DialogResult.OK;
         }
 

@@ -10,10 +10,10 @@ namespace NbtStudio.UI
     public partial class ExportWindow : Form
     {
         private bool BedrockHeader;
-        public ExportWindow(ExportSettings template, string destination_path)
+        public ExportWindow(IconSource source, ExportSettings template, string destination_path)
         {
             InitializeComponent();
-            this.Icon = Properties.Resources.action_save_icon;
+            this.Icon = source.Save.Icon;
             CompressionBox.Items.Add(new CompressionDisplay("Uncompressed", NbtCompression.None));
             CompressionBox.Items.Add(new CompressionDisplay("G-Zip", NbtCompression.GZip));
             CompressionBox.Items.Add(new CompressionDisplay("ZLib", NbtCompression.ZLib));

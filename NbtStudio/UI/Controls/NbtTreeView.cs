@@ -16,15 +16,22 @@ namespace NbtStudio.UI
 {
     public class NbtTreeView : TreeViewAdv
     {
+        private readonly NbtIcon IconControl = new NbtIcon();
+        private readonly NbtText TextControl = new NbtText();
         public NbtTreeView()
         {
-            NodeControls.Add(new NbtIcon());
-            NodeControls.Add(new NbtText());
+            NodeControls.Add(IconControl);
+            NodeControls.Add(TextControl);
             this.RowHeight = 20;
             this.SelectionMode = TreeSelectionMode.Multi;
             this.Collapsing += NbtTreeView_Collapsing;
             this.FontChanged += NbtTreeView_FontChanged;
             this.LoadOnDemand = true;
+        }
+
+        public void SetIconSource(IconSource source)
+        {
+            IconControl.IconSource = source;
         }
 
         public INode SelectedINode => SelectedNode?.Tag as INode;

@@ -16,7 +16,7 @@ namespace NbtStudio.UI
         private readonly bool SettingName;
         private readonly IByteTransformer Provider;
 
-        private EditHexWindow(NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
+        private EditHexWindow(IconSource source, NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
         {
             InitializeComponent();
             TabView.Size = new Size(0, 0);
@@ -40,12 +40,12 @@ namespace NbtStudio.UI
             if (tag is NbtList list)
             {
                 tagname = NbtUtil.TagTypeName(list.ListType) + " List";
-                this.Icon = NbtUtil.TagTypeIcon(list.ListType);
+                this.Icon = NbtUtil.TagTypeImage(source, list.ListType).Icon;
             }
             else
             {
                 tagname = NbtUtil.TagTypeName(tag.TagType);
-                this.Icon = NbtUtil.TagTypeIcon(tag.TagType);
+                this.Icon = NbtUtil.TagTypeImage(source, tag.TagType).Icon;
             }
             if (purpose == EditPurpose.Create)
                 this.Text = $"Create {tagname} Tag";
@@ -61,7 +61,7 @@ namespace NbtStudio.UI
                 HexBox.Select();
         }
 
-        public static NbtTag CreateTag(NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
+        public static NbtTag CreateTag(IconSource source, NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
         {
             bool has_name = parent is NbtCompound;
             var tag = NbtUtil.CreateTag(type);
@@ -71,18 +71,18 @@ namespace NbtStudio.UI
                 tag.Name = NbtUtil.GetAutomaticName(tag, parent);
                 return tag;
             }
-            var window = new EditHexWindow(tag, parent, has_name, EditPurpose.Create);
+            var window = new EditHexWindow(source, tag, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? tag : null;
         }
 
-        public static bool ModifyTag(NbtTag existing, EditPurpose purpose)
+        public static bool ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
             var parent = existing.Parent;
             bool has_name = parent is NbtCompound;
 
-            var window = new EditHexWindow(existing, parent, has_name, purpose);
+            var window = new EditHexWindow(source, existing, parent, has_name, purpose);
             return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
         }
 
