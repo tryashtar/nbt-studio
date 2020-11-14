@@ -12,6 +12,7 @@ namespace NbtStudio
         private readonly Func<object, string> DescriptionGenerator;
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
         private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
+        public event EventHandler Changed;
 
         public UndoHistory(Func<object, string> description_generator)
         {
@@ -29,7 +30,10 @@ namespace NbtStudio
                 throw new ArgumentException($"Action {GetDescription(action.Description)} hasn't been done yet, we can't save it to the undo stack");
             RedoStack.Clear();
             if (BatchNumber == 0)
+            {
                 UndoStack.Push(action);
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
             else
                 UndoBatch.Add(action);
 #if DEBUG
@@ -51,6 +55,7 @@ namespace NbtStudio
                 Console.WriteLine($"Performed undo of action \"{action.Description}\". Undo stack has {UndoStack.Count} items. Redo stack has {RedoStack.Count} items");
 #endif
             }
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void Redo(int count = 1)
@@ -64,6 +69,7 @@ namespace NbtStudio
                 Console.WriteLine($"Performed redo of action \"{action.Description}\". Redo stack has {RedoStack.Count} items. Undo stack has {UndoStack.Count} items");
 #endif
             }
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public bool CanUndo => UndoStack.Any();
@@ -103,6 +109,7 @@ namespace NbtStudio
                 Console.WriteLine($"Merged {UndoBatch.Count} batch actions onto stack as action: \"{description}\". Stack has {UndoStack.Count} items");
 #endif
                 UndoBatch.Clear();
+                Changed?.Invoke(this, EventArgs.Empty);
             }
         }
     }

@@ -29,8 +29,15 @@ namespace NbtStudio
         public NbtTreeModel(IEnumerable<object> roots)
         {
             UndoHistory = new UndoHistory(GetDescription);
+            UndoHistory.Changed += UndoHistory_Changed;
             Roots = roots.Select(x => NodeRegistry.CreateRootNode(this, x)).ToList();
         }
+
+        private void UndoHistory_Changed(object sender, EventArgs e)
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
         public NbtTreeModel(object root) : this(new[] { root }) { }
         public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
 
