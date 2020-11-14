@@ -10,10 +10,12 @@ namespace NbtStudio
     public static class IconSourceRegistry
     {
         private static readonly Dictionary<int, IconSource> Sources = new Dictionary<int, IconSource>();
+        public static IEnumerable<KeyValuePair<int, IconSource>> RegisteredSources => Sources.AsEnumerable();
         static IconSourceRegistry()
         {
-            Sources[0] = NewIconSource.Instance;
-            Sources[1] = ClassicIconSource.Instance;
+            Sources[0] = AmberIconSource.Instance;
+            Sources[1] = YusukeIconSource.Instance;
+            Sources[2] = MixedIconSource.Instance;
         }
         public static int MaxID => Sources.Keys.Max();
 
@@ -48,6 +50,8 @@ namespace NbtStudio
 
     public abstract class IconSource
     {
+        public abstract string Name { get; }
+
         public abstract ImageIcon File { get; }
         public abstract ImageIcon Folder { get; }
         public abstract ImageIcon Region { get; }
@@ -177,16 +181,17 @@ namespace NbtStudio
 
     public class NullIconSource : SimpleIconSource
     {
+        public override string Name => "Null";
         public static NullIconSource Instance = new NullIconSource();
         private NullIconSource()
         { }
     }
 
-    // classic icons by Yusuke Kamiyamane
-    public class ClassicIconSource : SimpleIconSource
+    public class MixedIconSource : SimpleIconSource
     {
-        public static ClassicIconSource Instance = new ClassicIconSource();
-        private ClassicIconSource()
+        public override string Name => "Mixed";
+        public static MixedIconSource Instance = new MixedIconSource();
+        private MixedIconSource()
         {
             _File = new ImageIcon(Properties.Resources.classic_file_image, Properties.Resources.classic_file_icon);
             _Folder = new ImageIcon(Properties.Resources.classic_folder_image, Properties.Resources.classic_folder_icon);
@@ -231,11 +236,62 @@ namespace NbtStudio
         }
     }
 
-    // new icons by AmberW
-    public class NewIconSource : SimpleIconSource
+    // classic icons by Yusuke Kamiyamane
+    public class YusukeIconSource : SimpleIconSource
     {
-        public static NewIconSource Instance = new NewIconSource();
-        private NewIconSource()
+        public override string Name => "NBTExplorer";
+        public static YusukeIconSource Instance = new YusukeIconSource();
+        private YusukeIconSource()
+        {
+            _File = new ImageIcon(Properties.Resources.legacy_file_image, Properties.Resources.legacy_file_icon);
+            _Folder = new ImageIcon(Properties.Resources.legacy_folder_image, Properties.Resources.classic_folder_icon);
+            _Region = new ImageIcon(Properties.Resources.legacy_region_image, Properties.Resources.legacy_region_icon);
+            _Chunk = new ImageIcon(Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
+
+            _NewFile = new ImageIcon(Properties.Resources.classic_action_new_image, Properties.Resources.classic_action_new_icon);
+            _OpenFile = new ImageIcon(Properties.Resources.classic_action_open_file_image, Properties.Resources.classic_action_open_file_icon);
+            _OpenFolder = new ImageIcon(Properties.Resources.classic_action_open_folder_image, Properties.Resources.classic_action_open_folder_icon);
+            _Save = new ImageIcon(Properties.Resources.classic_action_save_image, Properties.Resources.classic_action_save_icon);
+            _SaveAll = new ImageIcon(Properties.Resources.classic_action_save_all_image, Properties.Resources.classic_action_save_all_icon);
+
+            _Sort = new ImageIcon(Properties.Resources.classic_action_sort_image, Properties.Resources.classic_action_sort_icon);
+            _Cut = new ImageIcon(Properties.Resources.classic_action_cut_image, Properties.Resources.classic_action_cut_icon);
+            _Copy = new ImageIcon(Properties.Resources.classic_action_copy_image, Properties.Resources.classic_action_copy_icon);
+            _Paste = new ImageIcon(Properties.Resources.classic_action_paste_image, Properties.Resources.classic_action_paste_icon);
+            _Rename = new ImageIcon(Properties.Resources.classic_action_rename_image, Properties.Resources.classic_action_rename_icon);
+            _Edit = new ImageIcon(Properties.Resources.classic_action_edit_image, Properties.Resources.classic_action_edit_icon);
+            _EditSnbt = new ImageIcon(Properties.Resources.classic_action_edit_snbt_image, Properties.Resources.classic_action_edit_snbt_icon);
+            _Delete = new ImageIcon(Properties.Resources.classic_action_delete_image, Properties.Resources.classic_action_delete_icon);
+
+            _Undo = new ImageIcon(Properties.Resources.classic_action_undo_image, Properties.Resources.classic_action_undo_icon);
+            _Redo = new ImageIcon(Properties.Resources.classic_action_redo_image, Properties.Resources.classic_action_redo_icon);
+            _Refresh = new ImageIcon(Properties.Resources.classic_action_refresh_image, Properties.Resources.classic_action_refresh_icon);
+            _Search = new ImageIcon(Properties.Resources.classic_action_search_image, Properties.Resources.classic_action_search_icon);
+            _AddSnbt = new ImageIcon(Properties.Resources.classic_action_add_snbt_image, Properties.Resources.classic_action_add_snbt_icon);
+
+            _ByteTag = new ImageIcon(Properties.Resources.legacy_tag_byte_image, Properties.Resources.legacy_tag_byte_icon);
+            _ShortTag = new ImageIcon(Properties.Resources.legacy_tag_short_image, Properties.Resources.legacy_tag_short_icon);
+            _IntTag = new ImageIcon(Properties.Resources.legacy_tag_int_image, Properties.Resources.legacy_tag_int_icon);
+            _LongTag = new ImageIcon(Properties.Resources.legacy_tag_long_image, Properties.Resources.legacy_tag_long_icon);
+            _FloatTag = new ImageIcon(Properties.Resources.legacy_tag_float_image, Properties.Resources.legacy_tag_float_icon);
+            _DoubleTag = new ImageIcon(Properties.Resources.legacy_tag_double_image, Properties.Resources.legacy_tag_double_icon);
+            _StringTag = new ImageIcon(Properties.Resources.legacy_tag_string_image, Properties.Resources.legacy_tag_string_icon);
+            _ByteArrayTag = new ImageIcon(Properties.Resources.legacy_tag_byte_array_image, Properties.Resources.legacy_tag_byte_array_icon);
+            _IntArrayTag = new ImageIcon(Properties.Resources.legacy_tag_int_array_image, Properties.Resources.legacy_tag_int_array_icon);
+            _LongArrayTag = new ImageIcon(Properties.Resources.legacy_tag_long_array_image, Properties.Resources.legacy_tag_long_array_icon);
+            _CompoundTag = new ImageIcon(Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
+            _ListTag = new ImageIcon(Properties.Resources.legacy_tag_list_image, Properties.Resources.legacy_tag_list_icon);
+
+            _NbtStudio = new ImageIcon(Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
+        }
+    }
+
+    // new icons by AmberW
+    public class AmberIconSource : SimpleIconSource
+    {
+        public override string Name => "Amber";
+        public static AmberIconSource Instance = new AmberIconSource();
+        private AmberIconSource()
         {
             _File = new ImageIcon(Properties.Resources.new_file_image, Properties.Resources.new_file_icon);
             _Folder = new ImageIcon(Properties.Resources.new_folder_image, Properties.Resources.new_folder_icon);

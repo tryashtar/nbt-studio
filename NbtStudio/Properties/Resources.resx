@@ -262,6 +262,96 @@
   <data name="classic_region_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\classic\classic_region_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="legacy_file_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_file_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_file_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_file_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_folder_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_folder_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_folder_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_folder_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_region_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_region_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_region_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_region_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_byte_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_byte_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_byte_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_byte_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_byte_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_byte_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_byte_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_byte_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_compound_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_compound_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_compound_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_compound_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_double_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_double_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_double_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_double_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_float_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_float_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_float_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_float_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_int_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_int_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_int_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_int_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_int_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_int_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_int_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_int_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_list_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_list_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_list_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_list_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_long_array_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_long_array_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_long_array_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_long_array_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_long_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_long_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_long_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_long_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_short_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_short_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_short_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_short_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_string_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_string_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="legacy_tag_string_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\legacy\legacy_tag_string_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="new_action_add_snbt_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new\new_action_add_snbt_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -465,5 +555,11 @@
   </data>
   <data name="tag_string_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\tag_string_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="wooden_box_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\wooden-box_icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="wooden_box_image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\wooden-box_image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

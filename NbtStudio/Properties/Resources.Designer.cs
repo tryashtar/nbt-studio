@@ -543,6 +543,306 @@ namespace NbtStudio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon legacy_file_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_file_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_file_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_file_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_folder_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_folder_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_folder_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_folder_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_region_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_region_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_region_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_region_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_byte_array_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_byte_array_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_byte_array_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_byte_array_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_byte_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_byte_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_byte_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_byte_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_compound_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_compound_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_compound_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_compound_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_double_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_double_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_double_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_double_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_float_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_float_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_float_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_float_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_int_array_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_int_array_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_int_array_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_int_array_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_int_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_int_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_int_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_int_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_list_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_list_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_list_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_list_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_long_array_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_long_array_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_long_array_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_long_array_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_long_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_long_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_long_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_long_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_short_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_short_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_short_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_short_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon legacy_tag_string_icon {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_string_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap legacy_tag_string_image {
+            get {
+                object obj = ResourceManager.GetObject("legacy_tag_string_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon new_action_add_snbt_icon {
             get {
                 object obj = ResourceManager.GetObject("new_action_add_snbt_icon", resourceCulture);
@@ -1216,6 +1516,26 @@ namespace NbtStudio.Properties {
         internal static System.Drawing.Bitmap tag_string_image {
             get {
                 object obj = ResourceManager.GetObject("tag_string_image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon wooden_box_icon {
+            get {
+                object obj = ResourceManager.GetObject("wooden_box_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap wooden_box_image {
+            get {
+                object obj = ResourceManager.GetObject("wooden_box_image", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

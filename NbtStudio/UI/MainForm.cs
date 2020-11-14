@@ -576,12 +576,23 @@ namespace NbtStudio.UI
             AboutWindow.Focus();
         }
 
+        private IconSetWindow IconSetWindow;
         private void ChangeIcons()
         {
-            Properties.Settings.Default.IconSet++;
-            if (Properties.Settings.Default.IconSet > IconSourceRegistry.MaxID)
-                Properties.Settings.Default.IconSet = 0;
-            SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
+            if (IconSetWindow == null || IconSetWindow.IsDisposed)
+            {
+                IconSetWindow = new IconSetWindow(IconSource);
+                IconSetWindow.FormClosed += IconSetWindow_FormClosed;
+            }
+            if (!IconSetWindow.Visible)
+                IconSetWindow.Show(this);
+            IconSetWindow.Focus();
+        }
+
+        private void IconSetWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (IconSetWindow.SelectedSource != null)
+                SetIconSource(IconSetWindow.SelectedSource);
         }
 
         private void AddSnbt()
