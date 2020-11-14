@@ -13,7 +13,7 @@ namespace NbtStudio
         private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
         private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
 
-        public UndoHistory(Func<object,string> description_generator)
+        public UndoHistory(Func<object, string> description_generator)
         {
             DescriptionGenerator = description_generator;
         }
@@ -25,6 +25,8 @@ namespace NbtStudio
 
         public void SaveAction(UndoableAction action)
         {
+            if (!action.IsDone)
+                throw new ArgumentException($"Action {GetDescription(action.Description)} hasn't been done yet, we can't save it to the undo stack");
             RedoStack.Clear();
             if (BatchNumber == 0)
                 UndoStack.Push(action);
