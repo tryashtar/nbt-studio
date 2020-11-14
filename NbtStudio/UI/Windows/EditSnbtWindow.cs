@@ -26,23 +26,25 @@ namespace NbtStudio.UI
             SettingName = set_name;
             if (required == null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
             {
-                this.Width = this.Width * 5 / 2;
-                this.Height = this.Height * 5 / 2;
+                this.Width = 750;
+                this.Height = 500;
                 MinifyCheck.Visible = true;
                 InputBox.Multiline = true;
             }
             else if (required.Value == NbtTagType.String || NbtUtil.IsArrayType(required.Value))
             {
-                this.Width = this.Width * 2;
-                this.Height = this.Height * 3 / 2;
+                this.Width = 600;
+                this.Height = 300;
                 InputBox.Multiline = true;
                 InputBox.WordWrap = true;
                 InputBox.ScrollBars = ScrollBars.Vertical;
             }
             else if (required.Value == NbtTagType.Float || required.Value == NbtTagType.Double)
             {
-                this.Width = this.Width * 3 / 2;
+                this.Width = 600;
             }
+            if (!SettingName)
+                this.Height -= (NameBox.Height + 20);
             InputBox.AcceptsReturn = InputBox.Multiline;
             if (InputBox.Multiline)
                 this.FormBorderStyle = FormBorderStyle.Sizable;

@@ -278,10 +278,16 @@ namespace NbtStudio.UI
                     {
                         var export = new ExportWindow(nbtfile.ExportSettings, dialog.FileName);
                         if (export.ShowDialog() == DialogResult.OK)
+                        {
                             nbtfile.SaveAs(dialog.FileName, export.GetSettings());
+                            Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        }
                     }
                     else
+                    {
                         file.SaveAs(dialog.FileName);
+                        Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                    }
                 }
             }
         }

@@ -31,6 +31,8 @@ namespace NbtStudio.UI
             {
                 string extension = Path.GetExtension(destination_path);
                 RadioSnbt.Checked = extension == ".snbt" || extension == ".json";
+                if (!RadioSnbt.Checked)
+                    RadioNbt.Checked = true;
                 CheckLittleEndian.Checked = extension == ".mcstructure";
                 CheckJson.Checked = extension == ".json";
             }

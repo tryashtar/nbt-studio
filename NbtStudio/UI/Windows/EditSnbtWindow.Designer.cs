@@ -32,10 +32,10 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.MinifyCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
-            this.InputBox = new NbtStudio.UI.TagSnbtTextBox();
-            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.NameLabel = new System.Windows.Forms.Label();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
+            this.InputBox = new NbtStudio.UI.TagSnbtTextBox();
             this.ButtonsPanel.SuspendLayout();
             this.MainTable.SuspendLayout();
             this.SuspendLayout();
@@ -83,37 +83,10 @@
             this.ButtonsPanel.Controls.Add(this.ButtonCancel);
             this.ButtonsPanel.Controls.Add(this.ButtonOk);
             this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ButtonsPanel.Location = new System.Drawing.Point(0, 80);
+            this.ButtonsPanel.Location = new System.Drawing.Point(0, 79);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(284, 41);
             this.ButtonsPanel.TabIndex = 4;
-            // 
-            // InputBox
-            // 
-            this.InputBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.InputBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.MainTable.SetColumnSpan(this.InputBox, 2);
-            this.InputBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.InputBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.InputBox.Location = new System.Drawing.Point(10, 41);
-            this.InputBox.Margin = new System.Windows.Forms.Padding(10);
-            this.InputBox.MaxLength = 2147483647;
-            this.InputBox.Name = "InputBox";
-            this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.InputBox.Size = new System.Drawing.Size(264, 26);
-            this.InputBox.TabIndex = 3;
-            this.InputBox.WordWrap = false;
-            // 
-            // NameBox
-            // 
-            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
-            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.NameBox.Location = new System.Drawing.Point(64, 10);
-            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.NameBox.Name = "NameBox";
-            this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 2;
             // 
             // NameLabel
             // 
@@ -141,8 +114,35 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.MainTable.Size = new System.Drawing.Size(284, 80);
+            this.MainTable.Size = new System.Drawing.Size(284, 79);
             this.MainTable.TabIndex = 0;
+            // 
+            // NameBox
+            // 
+            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NameBox.Location = new System.Drawing.Point(64, 10);
+            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.NameBox.Name = "NameBox";
+            this.NameBox.Size = new System.Drawing.Size(209, 21);
+            this.NameBox.TabIndex = 2;
+            // 
+            // InputBox
+            // 
+            this.InputBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.InputBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.MainTable.SetColumnSpan(this.InputBox, 2);
+            this.InputBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.InputBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.InputBox.Location = new System.Drawing.Point(10, 41);
+            this.InputBox.Margin = new System.Windows.Forms.Padding(10);
+            this.InputBox.MaxLength = 2147483647;
+            this.InputBox.Name = "InputBox";
+            this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.InputBox.Size = new System.Drawing.Size(264, 26);
+            this.InputBox.TabIndex = 3;
+            this.InputBox.WordWrap = false;
             // 
             // EditSnbtWindow
             // 
@@ -152,13 +152,13 @@
             this.AutoScroll = true;
             this.AutoSize = true;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(284, 121);
+            this.ClientSize = new System.Drawing.Size(284, 120);
             this.Controls.Add(this.MainTable);
             this.Controls.Add(this.ButtonsPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(300, 147);
+            this.MinimumSize = new System.Drawing.Size(300, 100);
             this.Name = "EditSnbtWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
