@@ -98,7 +98,8 @@ namespace NbtStudio.UI
             var name = GetName();
             if (name == "")
                 name = null;
-            NbtTag.Name = name;
+            if (NbtTag.Name != name)
+                NbtTag.Name = name;
         }
 
         public enum NameCheckResult

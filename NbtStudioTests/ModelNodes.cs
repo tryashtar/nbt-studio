@@ -68,10 +68,12 @@ namespace NbtStudioTests
             root.Add(new NbtCompound("test3"));
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Add(new NbtShort("test4"));
+            Assert.AreEqual(view.Root.DescendantsCount, 5);
             AssertSynchronized(view, model);
             root.Remove("test2");
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Clear();
+            Assert.AreEqual(view.Root.DescendantsCount, 3);
             AssertSynchronized(view, model);
             root.Clear();
             AssertSynchronized(view, model);

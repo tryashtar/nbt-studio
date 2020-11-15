@@ -109,7 +109,11 @@ namespace NbtStudio.UI
             if (value == null)
                 NbtUtil.ResetValue(NbtTag);
             else
-                NbtUtil.SetValue(NbtTag, value);
+            {
+                var current = NbtUtil.GetValue(NbtTag);
+                if (!current.Equals(value))
+                    NbtUtil.SetValue(NbtTag, value);
+            }
         }
 
         public enum ValueCheckResult
