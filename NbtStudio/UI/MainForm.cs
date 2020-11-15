@@ -65,6 +65,8 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionChangeIcons = DualMenuItem.SingleMenuItem("&Change Icons", x => x.Refresh, Keys.Control | Keys.I);
         private readonly DualMenuItem ActionAddSnbt = DualMenuItem.SingleButton("Add as SNBT", x => x.AddSnbt);
         private readonly DualMenuItem ActionAddChunk = DualMenuItem.SingleButton("Add Chunk", x => x.Chunk);
+        private readonly DualMenuItem ActionUpdate = DualMenuItem.SingleMenuItem("&Update", null, Keys.None);
+        private readonly DualMenuItem ActionCheckUpdates = DualMenuItem.SingleMenuItem("Check for &Updates", null, Keys.Control | Keys.U);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -97,21 +99,23 @@ namespace NbtStudio.UI
             ActionChangeIcons.Click += (s, e) => ChangeIcons();
             ActionAddSnbt.Click += (s, e) => AddSnbt();
             ActionAddChunk.Click += (s, e) => AddChunk();
+            ActionUpdate.Click += (s, e) => ShowUpdate();
+            ActionCheckUpdates.Click += (s, e) => CheckForUpdates();
 
             ActionNew.AddTo(Tools, MenuFile);
             ActionOpenFile.AddTo(Tools, MenuFile);
             ActionOpenFolder.AddTo(Tools, MenuFile);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             ActionSave.AddTo(Tools, MenuFile);
-            ActionSaveAs.AddTo(MenuFile);
-            ActionNewRegion.AddTo(MenuFile);
-            ActionNewClipboard.AddTo(MenuFile);
+            ActionSaveAs.AddToMenuItem(MenuFile);
+            ActionNewRegion.AddToMenuItem(MenuFile);
+            ActionNewClipboard.AddToMenuItem(MenuFile);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
-            DropDownRecent.AddTo(MenuFile);
-            ActionSort.AddTo(Tools);
+            DropDownRecent.AddToMenuItem(MenuFile);
+            ActionSort.AddToToolStrip(Tools);
             Tools.Items.Add(new ToolStripSeparator());
-            ActionUndo.AddTo(MenuEdit);
-            ActionRedo.AddTo(MenuEdit);
+            ActionUndo.AddToMenuItem(MenuEdit);
+            ActionRedo.AddToMenuItem(MenuEdit);
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             ActionCut.AddTo(Tools, MenuEdit);
             ActionCopy.AddTo(Tools, MenuEdit);
@@ -123,19 +127,23 @@ namespace NbtStudio.UI
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
-            DropDownUndoHistory.AddTo(MenuEdit);
-            DropDownRedoHistory.AddTo(MenuEdit);
+            DropDownUndoHistory.AddToMenuItem(MenuEdit);
+            DropDownRedoHistory.AddToMenuItem(MenuEdit);
             Tools.Items.Add(new ToolStripSeparator());
-            ActionAddChunk.AddTo(Tools);
-            ActionAbout.AddTo(MenuHelp);
-            ActionChangeIcons.AddTo(MenuHelp);
+            ActionAddChunk.AddToToolStrip(Tools);
+            ActionAbout.AddToMenuItem(MenuHelp);
+            ActionChangeIcons.AddToMenuItem(MenuHelp);
+            ActionUpdate.Visible = false;
+            ActionUpdate.AddToMenuStrip(MenuStrip);
+            MenuHelp.DropDownItems.Add(new ToolStripSeparator());
+            ActionCheckUpdates.AddToMenuItem(MenuHelp);
 
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
             {
-                item.AddTo(Tools);
+                item.AddToToolStrip(Tools);
             }
-            ActionAddSnbt.AddTo(Tools);
+            ActionAddSnbt.AddToToolStrip(Tools);
 
             Tools.Items.Add(new ToolStripSeparator());
             ActionFind.AddTo(Tools, MenuSearch);
@@ -152,11 +160,54 @@ namespace NbtStudio.UI
                 ActionEdit, ActionEditSnbt, ActionDelete,
                 DropDownUndoHistory, DropDownRedoHistory, ActionFind,
                 ActionAbout, ActionAddSnbt, ActionAddChunk,
-                ActionChangeIcons
+                ActionChangeIcons, ActionUpdate, ActionCheckUpdates
             );
             ItemCollection.AddRange(CreateTagButtons.Values);
 
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
+
+            UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
+            UpdateChecker.Start();
+            UpdateChecker.ContinueWith(x =>
+            {
+                if (x.Status == TaskStatus.RanToCompletion && x.Result != null)
+                {
+                    ReadyUpdate = x.Result;
+                    ActionUpdate.Visible = true;
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private Task<AvailableUpdate> UpdateChecker;
+        private AvailableUpdate ReadyUpdate;
+        private void CheckForUpdates()
+        {
+            if (UpdateChecker != null && !UpdateChecker.IsCompleted)
+                return;
+            UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
+            UpdateChecker.Start();
+            UpdateChecker.ContinueWith(x =>
+            {
+                if (x.Status == TaskStatus.Faulted)
+                    MessageBox.Show(Util.ExceptionMessage(x.Exception), "Failed to check for updates");
+                else if (x.Status == TaskStatus.RanToCompletion)
+                {
+                    if (x.Result == null)
+                    {
+                        if (MessageBox.Show("You already seem to have the latest update.\n" +
+                            "Click OK to go to the update page:\n\n" +
+                            "https://github.com/tryashtar/nbt-studio/releases",
+                            "No update found", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                            Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                    }
+                    else
+                    {
+                        ReadyUpdate = x.Result;
+                        ActionUpdate.Visible = true;
+                        ShowUpdate();
+                    }
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void SetIconSource(IconSource source)
@@ -587,6 +638,18 @@ namespace NbtStudio.UI
             if (!IconSetWindow.Visible)
                 IconSetWindow.Show(this);
             IconSetWindow.Focus();
+        }
+
+        private UpdateWindow UpdateWindow;
+        private void ShowUpdate()
+        {
+            if (ReadyUpdate == null)
+                return;
+            if (UpdateWindow == null || UpdateWindow.IsDisposed)
+                UpdateWindow = new UpdateWindow(ReadyUpdate);
+            if (!UpdateWindow.Visible)
+                UpdateWindow.Show(this);
+            UpdateWindow.Focus();
         }
 
         private void IconSetWindow_FormClosed(object sender, FormClosedEventArgs e)

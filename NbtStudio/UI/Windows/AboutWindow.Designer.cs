@@ -55,10 +55,10 @@
             this.NameLabel.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(3)))), ((int)(((byte)(102)))), ((int)(((byte)(214)))));
             this.NameLabel.Location = new System.Drawing.Point(81, 12);
             this.NameLabel.Name = "NameLabel";
-            this.NameLabel.Size = new System.Drawing.Size(106, 24);
+            this.NameLabel.Size = new System.Drawing.Size(142, 24);
             this.NameLabel.TabIndex = 0;
             this.NameLabel.TabStop = true;
-            this.NameLabel.Text = "NBT Studio";
+            this.NameLabel.Text = "NBT Studio v{0}";
             this.NameLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.NameLabel_LinkClicked);
             // 
             // InfoLabel
@@ -117,7 +117,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(260, 194);
+            this.ClientSize = new System.Drawing.Size(278, 194);
             this.Controls.Add(this.NbtIconLabel);
             this.Controls.Add(this.GenericIconLabel);
             this.Controls.Add(this.NbtExplorerLabel);

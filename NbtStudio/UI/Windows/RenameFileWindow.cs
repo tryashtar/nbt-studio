@@ -48,5 +48,10 @@ namespace NbtStudio.UI
         {
             Confirm();
         }
+
+        private void RenameFileWindow_Load(object sender, EventArgs e)
+        {
+            CenterToParent();
+        }
     }
 }

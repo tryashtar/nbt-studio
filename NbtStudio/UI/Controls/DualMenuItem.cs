@@ -134,14 +134,19 @@ namespace NbtStudio.UI
             strip.Items.Add(Button);
         }
 
-        public void AddTo(ToolStrip strip)
+        public void AddToToolStrip(ToolStrip strip)
         {
             strip.Items.Add(Button);
         }
 
-        public void AddTo(ToolStripMenuItem menu)
+        public void AddToMenuItem(ToolStripMenuItem menu)
         {
             menu.DropDownItems.Add(MenuItem);
+        }
+
+        public void AddToMenuStrip(MenuStrip strip)
+        {
+            strip.Items.Add(MenuItem);
         }
     }
 
