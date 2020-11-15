@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
+    // settings an NBT file can be saved with, and the implementation for saving as such
     public class ExportSettings
     {
         public readonly bool Snbt;
@@ -18,6 +19,7 @@ namespace NbtStudio
         public readonly bool BigEndian;
         public readonly bool BedrockHeader;
 
+        // keep this private and only expose the static constructors below so callers don't have to include irrelevant information
         private ExportSettings(bool snbt, bool minified, bool json, NbtCompression compression, bool big_endian, bool bedrock_header)
         {
             Snbt = snbt;
@@ -62,6 +64,7 @@ namespace NbtStudio
                     long size = file.SaveToStream(writer, Compression);
                     if (BedrockHeader)
                     {
+                        // bedrock level.dat files start with a header containing a magic number and then the little-endian size of the data
                         writer.Seek(0, SeekOrigin.Begin);
                         writer.Write(new byte[] { 8, 0, 0, 0 }, 0, 4);
                         writer.Write(Util.GetBytes((int)size, little_endian: !BigEndian), 0, 4);

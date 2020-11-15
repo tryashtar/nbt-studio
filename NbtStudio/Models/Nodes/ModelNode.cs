@@ -9,19 +9,24 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public abstract class ModelNode : INode
+    // the main implementation of INode
+    // this node does not wrap an object, but allows derived classes to do so easily
+    // type T is the type of the children, e.g. RegionNode is ModelNode<Chunk>
+    public abstract class ModelNode<T> : INode
     {
-        protected readonly NbtTreeModel Tree;
+        private readonly NbtTreeModel Tree;
         public INode Parent { get; private set; }
         private bool ChildrenReady = false;
-        private OrderedDictionary<object, INode> ChildNodes;
+        private OrderedDictionary<T, INode> ChildNodes;
         public IEnumerable<INode> Children
         {
             get
             {
+                // some nodes call RefreshChildren when calling GetChildren (especially for the first time)
+                // so use this flag to make sure we don't enter this section twice
                 if (!ChildrenReady)
                 {
-                    ChildNodes = new OrderedDictionary<object, INode>();
+                    ChildNodes = new OrderedDictionary<T, INode>();
                     var children = GetChildren().Where(x => x != null);
                     foreach (var item in children)
                     {
@@ -32,12 +37,15 @@ namespace NbtStudio
                 return ChildNodes.Values;
             }
         }
+
+        // default implementation fetches children, this can be overridden to defer it to later
         public virtual bool HasChildren => Children.Any();
+
         public TreePath Path
         {
             get
             {
-                var path = new List<object>();
+                var path = new List<INode>();
                 INode item = this;
                 while (item != null)
                 {
@@ -55,7 +63,12 @@ namespace NbtStudio
             Parent = parent;
         }
 
-        protected abstract IEnumerable<object> GetChildren();
+        // allow derived nodes to simply fetch children from their wrapped object
+        // they don't have to worry about converting them into INodes
+        protected abstract IEnumerable<T> GetChildren();
+
+        // derived class should call this when its children change
+        // this notifies the model of any added/removed children, which in turn notifies the view
         protected void RefreshChildren()
         {
             if (!ChildrenReady)
@@ -76,6 +89,7 @@ namespace NbtStudio
                     indices[i] = index;
                     nodes[i] = node;
                 }
+                // remove afterwards to ensure indices don't shift as we go
                 foreach (var item in remove)
                 {
                     ChildNodes.Remove(item);
@@ -100,16 +114,25 @@ namespace NbtStudio
             Tree.NotifyNodeChanged(this);
         }
 
+        // save an undoable action to the model
         protected void NoticeAction(UndoableAction action)
         {
             Tree.UndoHistory.SaveAction(action);
         }
 
-        protected IEnumerable<T> FindChildren<T>(IEnumerable<object> objects, Func<T, object> getter) where T : INode
+        // help derived nodes find their children in INode form, since they usually just fetch the raw objects
+        // mostly used for implementing Paste which returns the nodes it created
+        protected IEnumerable<INode> NodeChildren(IEnumerable<T> objects)
         {
-            return Children.OfType<T>().Where(x => objects.Contains(getter(x)));
+            foreach (var item in objects)
+            {
+                if (ChildNodes.TryGetValue(item, out var result))
+                    yield return result;
+            }
         }
 
+        // make all action implementations virtual, disallowing everything
+        // derived nodes can allow and implement actions if they wish
         public virtual string Description => "unknown node";
         public virtual bool CanDelete => false;
         public virtual void Delete() { }
@@ -117,7 +140,7 @@ namespace NbtStudio
         public virtual void Sort() { }
         public virtual bool CanCopy => false;
         public virtual DataObject Copy() => null;
-        public virtual bool CanCut => CanDelete && CanCopy;
+        public virtual bool CanCut => CanDelete && CanCopy; // sensible defaults for cut
         public virtual DataObject Cut() { var copy = Copy(); Delete(); return copy; }
         public virtual bool CanPaste => false;
         public virtual IEnumerable<INode> Paste(IDataObject data) => Enumerable.Empty<INode>();

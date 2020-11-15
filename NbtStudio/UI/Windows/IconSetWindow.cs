@@ -58,7 +58,9 @@ namespace NbtStudio.UI
                     MakePictureBox(source.ByteTag),
                     MakePictureBox(source.StringTag),
                     MakePictureBox(source.IntArrayTag),
-                    MakePictureBox(source.ListTag)
+                    MakePictureBox(source.ListTag),
+                    MakePictureBox(source.Region),
+                    MakePictureBox(source.Chunk)
                 });
                 if (current == source)
                 {

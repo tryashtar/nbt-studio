@@ -12,6 +12,8 @@ using System.Collections.ObjectModel;
 
 namespace NbtStudio
 {
+    // the model version of the tree of nodes
+    // this is mostly necessary because TreeViewAdv requires it, but it has some extra stuff as well
     public partial class NbtTreeModel : ITreeModel
     {
         public event EventHandler<TreeModelEventArgs> NodesChanged;

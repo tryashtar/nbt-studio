@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class NbtTagNode : ModelNode
+    public class NbtTagNode : ModelNode<NbtTag>
     {
         public readonly NbtTag Tag;
         public NbtTagNode(NbtTreeModel tree, INode parent, NbtTag tag) : base(tree, parent)
@@ -29,11 +29,11 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        protected override IEnumerable<object> GetChildren()
+        protected override IEnumerable<NbtTag> GetChildren()
         {
             if (Tag is NbtContainerTag container)
                 return container;
-            return Enumerable.Empty<object>();
+            return Enumerable.Empty<NbtTag>();
         }
 
         public override string Description => Tag.TagDescription();
@@ -53,7 +53,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(Tag, data);
-            return FindChildren<NbtTagNode>(tags, x => x.Tag);
+            return NodeChildren(tags);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(Tag, nodes.Filter(x => x.GetNbtTag()));
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)

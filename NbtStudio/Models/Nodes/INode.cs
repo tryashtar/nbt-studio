@@ -9,13 +9,20 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
+    // basic interface for all items that can be interacted with on the form (tags, files, chunks, etc.)
+    // this allows us to create relationships like NBT tags being the direct children of NBT files
+    // NbtTreeModel creates nodes for the root objects, and they then create their own children
+    // nodes can notify the NbtTreeModel of changes, so it can save undo history and synchronize nodes to the NbtTreeView
+    // the ModelNodes test class verifies that we can create an NbtCompound, attach it to an NbtTreeModel, edit it as we please, and it creates nodes on the model and view automatically
     public interface INode
     {
         INode Parent { get; }
-        TreePath Path { get; }
+        TreePath Path { get; } // path from the root node to this node, can be created by following Parent until null
         IEnumerable<INode> Children { get; }
-        bool HasChildren { get; }
-        string Description { get; }
+        bool HasChildren { get; } // allows nodes to be expandable without evaluating children yet
+        string Description { get; } // appears in undo history
+        
+        // operations to be performed on nodes
         bool CanDelete { get; }
         void Delete();
         bool CanSort { get; }
@@ -32,8 +39,10 @@ namespace NbtStudio
         void ReceiveDrop(IEnumerable<INode> nodes, int index);
     }
 
+    // pass in an object and get the best matching node type
     public static class NodeRegistry
     {
+        // these used to be included in the static constructor of each class, but they don't run without interacting with the concrete class first
         static NodeRegistry()
         {
             Register<NbtTag>((tree, parent, tag) => new NbtTagNode(tree, parent, tag));

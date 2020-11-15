@@ -15,6 +15,7 @@ namespace NbtStudio
         public int ChunkCount { get; private set; }
         public event EventHandler ChunksChanged;
         public event EventHandler OnSaved;
+        public event EventHandler<UndoableAction> ActionPerformed;
         private readonly Chunk[,] Chunks;
         private readonly byte[] Locations;
         private readonly byte[] Timestamps;
@@ -104,19 +105,44 @@ namespace NbtStudio
             }
         }
 
+        private void PerformAction(DescriptionHolder holder, Action action, Action undo)
+        {
+            var undoable = new UndoableAction(holder, action, undo);
+            undoable.Do();
+            ActionPerformed?.Invoke(this, undoable);
+        }
+
         public void RemoveChunk(int x, int z)
         {
             if (Chunks[x, z] != null)
             {
-                Chunks[x, z].Region = null;
-                Chunks[x, z] = null;
-                ChunkCount--;
                 HasChunkChanges = true;
-                ChunksChanged?.Invoke(this, EventArgs.Empty);
+                var chunk = Chunks[x, z];
+                PerformAction(new DescriptionHolder("Remove {0} from {1}", chunk, this),
+                    () => DoRemoveChunk(x, z),
+                    () => DoAddChunk(chunk)
+                );
             }
         }
 
         public void AddChunk(Chunk chunk)
+        {
+            HasChunkChanges = true;
+            PerformAction(new DescriptionHolder("Add {0} to {1}", chunk, this),
+                () => DoAddChunk(chunk),
+                () => DoRemoveChunk(chunk.X, chunk.Z)
+            );
+        }
+
+        private void DoRemoveChunk(int x, int z)
+        {
+            Chunks[x, z].Region = null;
+            Chunks[x, z] = null;
+            ChunkCount--;
+            ChunksChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void DoAddChunk(Chunk chunk)
         {
             if (Chunks[chunk.X, chunk.Z] != null)
                 throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");

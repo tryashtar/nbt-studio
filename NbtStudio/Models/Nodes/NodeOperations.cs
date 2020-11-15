@@ -58,11 +58,14 @@ namespace NbtStudio
             return String.Join(", ", strings);
         }
 
+        // used like Filter(nodes, x=>x.GetNbtTag()) to get NBT for every node that has it
         public static IEnumerable<T> Filter<T>(this IEnumerable<INode> nodes, Func<INode, T> transformer)
         {
             return nodes.Select(transformer).Where(x => x != null);
         }
 
+        // technically these could go in INode but I'd prefer to keep it clean of project-specific stuff
+        // I could make like an INbtStudioNode but I don't want to type that a lot
         public static NbtTag GetNbtTag(this INode node)
         {
             if (node is NbtTagNode nbt)
@@ -119,6 +122,7 @@ namespace NbtStudio
         }
     }
 
+    // shared implementations of operations like copy, paste, drag and drop for NBT tags
     public static class NbtNodeOperations
     {
         public static DataObject Copy(NbtTag tag)
@@ -192,6 +196,7 @@ namespace NbtStudio
         }
     }
 
+    // shared implementations of operations like copy, paste, drag and drop for file-like things
     public static class FileNodeOperations
     {
         public static string Description(string path)
@@ -234,6 +239,8 @@ namespace NbtStudio
             return data;
         }
 
+        // default cut is copy then delete
+        // but for files we wait until pasting to delete
         public static DataObject Cut(string path)
         {
             var data = new DataObject();

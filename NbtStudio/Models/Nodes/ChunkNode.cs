@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class ChunkNode : ModelNode
+    public class ChunkNode : ModelNode<NbtTag>
     {
         public readonly Chunk Chunk;
         private bool HasSetupEvents = false;
@@ -67,11 +67,9 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        protected override IEnumerable<object> GetChildren()
+        protected override IEnumerable<NbtTag> GetChildren()
         {
-            if (!Chunk.IsLoaded)
-                Chunk.Load();
-            return Chunk.Data;
+            return AccessChunkData();
         }
 
         public override string Description => NbtUtil.ChunkDescription(Chunk);
@@ -79,19 +77,7 @@ namespace NbtStudio
         public override bool CanCopy => !Chunk.IsExternal;
         public override DataObject Copy() => NbtNodeOperations.Copy(AccessChunkData());
         public override bool CanDelete => !Chunk.IsExternal;
-        public override void Delete()
-        {
-            var region = Chunk.Region;
-            if (region != null)
-            {
-                var action = new UndoableAction(new DescriptionHolder("Remove {0}", Chunk),
-                    () => { region.RemoveChunk(Chunk.X, Chunk.Z); },
-                    () => { region.AddChunk(Chunk); }
-                );
-                action.Do();
-                NoticeAction(action);
-            }
-        }
+        public override void Delete() => Chunk.Remove();
         public override bool CanEdit => !Chunk.IsExternal;
         public override bool CanPaste => !Chunk.IsExternal;
         public override bool CanRename => !Chunk.IsExternal;
@@ -100,7 +86,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(AccessChunkData(), data);
-            return FindChildren<NbtTagNode>(tags, x => x.Tag);
+            return NodeChildren(tags);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)

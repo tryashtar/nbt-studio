@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class FolderNode : ModelNode
+    public class FolderNode : ModelNode<IHavePath>
     {
         public readonly NbtFolder Folder;
         public FolderNode(NbtTreeModel tree, INode parent, NbtFolder folder) : base(tree, parent)
@@ -35,7 +35,7 @@ namespace NbtStudio
             }
         }
 
-        protected override IEnumerable<object> GetChildren()
+        protected override IEnumerable<IHavePath> GetChildren()
         {
             if (!Folder.HasScanned)
                 Folder.Scan();
@@ -57,6 +57,7 @@ namespace NbtStudio
         public override bool CanPaste => true;
         public override IEnumerable<INode> Paste(IDataObject data)
         {
+            var children = GetChildren().ToList();
             var files = (string[])data.GetData("FileDrop");
             var drop_effect = (MemoryStream)data.GetData("Preferred DropEffect");
             if (files == null || drop_effect == null)
@@ -84,7 +85,8 @@ namespace NbtStudio
                 }
             }
             Folder.Scan();
-            return FindChildren<FolderNode>(files, x => x.Folder.Files);
+            var new_children = children.Except(GetChildren().ToList());
+            return NodeChildren(new_children);
         }
         public override bool CanRename => true;
         public override bool CanSort => false;

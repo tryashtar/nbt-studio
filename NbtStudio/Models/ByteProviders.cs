@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
+    // implementations for allowing tags to be edited by the hex window
     public static class ByteProviders
     {
         public static IByteTransformer GetByteProvider(NbtTag tag)
@@ -62,6 +63,8 @@ namespace NbtStudio
         void SetBytes(IEnumerable<byte> bytes);
     }
 
+    // base implementation that handles all kinds of tags
+    // derived class just needs to define the single interop between raw bytes and tag data
     public abstract class NbtByteProvider : IByteTransformer
     {
         protected readonly NbtTag Tag;

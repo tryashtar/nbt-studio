@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class NbtFileNode : ModelNode
+    public class NbtFileNode : ModelNode<NbtTag>
     {
         public readonly NbtFile File;
         public NbtFileNode(NbtTreeModel tree, INode parent, NbtFile file) : base(tree, parent)
@@ -29,13 +29,15 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        protected override IEnumerable<object> GetChildren()
+        protected override IEnumerable<NbtTag> GetChildren()
         {
             return File.RootTag;
         }
 
         public override string Description => File.Path == null ? "unsaved file" : System.IO.Path.GetFileName(File.Path);
 
+        // file nodes copy as both a file and a compound
+        // they can then be pasted as text or into explorer, cool!
         public override bool CanCopy => true;
         public override DataObject Copy()
         {
@@ -63,7 +65,7 @@ namespace NbtStudio
         public override IEnumerable<INode> Paste(IDataObject data)
         {
             var tags = NbtNodeOperations.Paste(File.RootTag, data);
-            return FindChildren<NbtTagNode>(tags, x => x.Tag);
+            return NodeChildren(tags);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is NbtTagNode) && NbtNodeOperations.CanReceiveDrop(File.RootTag, nodes.Filter(x => x.GetNbtTag()));
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)

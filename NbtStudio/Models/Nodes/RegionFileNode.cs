@@ -10,13 +10,19 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class RegionFileNode : ModelNode
+    public class RegionFileNode : ModelNode<Chunk>
     {
         public readonly RegionFile Region;
         public RegionFileNode(NbtTreeModel tree, INode parent, RegionFile file) : base(tree, parent)
         {
             Region = file;
             Region.ChunksChanged += Region_ChunksChanged;
+            Region.ActionPerformed += Region_ActionPerformed;
+        }
+
+        private void Region_ActionPerformed(object sender, UndoableAction e)
+        {
+            NoticeAction(e);
         }
 
         private void Region_ChunksChanged(object sender, EventArgs e)
@@ -24,7 +30,7 @@ namespace NbtStudio
             RefreshChildren();
         }
 
-        protected override IEnumerable<object> GetChildren()
+        protected override IEnumerable<Chunk> GetChildren()
         {
             return Region.AllChunks;
         }
@@ -54,20 +60,21 @@ namespace NbtStudio
         {
             var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
             var available = Region.GetAvailableCoords();
-            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.x, slot.z));
+            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.x, slot.z)).ToList();
             foreach (var chunk in chunks)
             {
                 Region.AddChunk(chunk);
             }
-            return FindChildren<ChunkNode>(chunks, x => x.Chunk);
+            return NodeChildren(chunks);
         }
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is ChunkNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
         {
-            var chunks = nodes.Filter(x => x.GetChunk());
+            var chunks = nodes.Filter(x => x.GetChunk()).ToList();
             foreach (var chunk in chunks)
             {
-                Region.AddChunk(chunk);
+                if (Region.GetChunk(chunk.X, chunk.Z) == null)
+                    Region.AddChunk(chunk);
             }
         }
     }

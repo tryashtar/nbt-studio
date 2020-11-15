@@ -186,17 +186,6 @@ namespace NbtStudio
             }
         }
 
-        // clears any existing data in the tag's array
-        public static void SetSize(NbtTag tag, int size)
-        {
-            if (tag is NbtByteArray tag_byte_array)
-                tag_byte_array.Value = new byte[size];
-            else if (tag is NbtIntArray tag_int_array)
-                tag_int_array.Value = new int[size];
-            else if (tag is NbtLongArray tag_long_array)
-                tag_long_array.Value = new long[size];
-        }
-
         public static NbtTag CreateTag(NbtTagType type)
         {
             switch (type)
