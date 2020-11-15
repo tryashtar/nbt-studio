@@ -55,9 +55,24 @@ namespace NbtStudio.UI
             Confirm();
         }
 
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
         private void UpdateWindow_Load(object sender, EventArgs e)
         {
             CenterToParent();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                this.Close();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

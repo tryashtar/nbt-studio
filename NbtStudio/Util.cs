@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -226,8 +227,18 @@ namespace NbtStudio
             string message = exception.Message;
             if (exception is AggregateException aggregate)
                 message += "\n" + String.Join("\n", aggregate.InnerExceptions.Select(ExceptionMessage));
-            if (exception.InnerException != null)
-                message += "\n" + ExceptionMessage(exception.InnerException);
+            else
+            {
+                if (exception is WebException web)
+                {
+                    using (var reader = new StreamReader(web.Response.GetResponseStream()))
+                    {
+                        message += "\n" + reader.ReadToEnd();
+                    }
+                }
+                if (exception.InnerException != null)
+                    message += "\n" + ExceptionMessage(exception.InnerException);
+            }
             return message;
         }
 

@@ -16,15 +16,18 @@ namespace NbtStudio
     {
         public static AvailableUpdate CheckForUpdates()
         {
+#if DEBUG
+            return null;
+#endif
             var old = AvailableUpdate.TemporaryPath(Application.ExecutablePath);
             if (File.Exists(old))
                 File.Delete(old);
             var current = GetCurrentVersion();
             var client = new WebClient();
+            client.Headers.Add(HttpRequestHeader.UserAgent, "NBT Studio update checker");
             bool success = false;
             try
             {
-                client.Headers.Add(HttpRequestHeader.UserAgent, "NBT Studio update checker");
                 var versions = GetAllVersions(client);
                 var newer = GetNewerVersions(current, versions);
                 if (!newer.Any())
