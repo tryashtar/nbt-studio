@@ -333,6 +333,7 @@ namespace NbtStudio
         public override string Name => Path.GetFileNameWithoutExtension(Filepath);
         private readonly Dictionary<string, IconType> FileNameMap = new Dictionary<string, IconType>
         {
+            { "file", IconType.File },
             { "folder", IconType.Folder },
             { "region", IconType.Region },
             { "chunk", IconType.Chunk },
