@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,31 +12,51 @@ namespace NbtStudio
 {
     public static class IconSourceRegistry
     {
-        private static readonly Dictionary<int, IconSource> Sources = new Dictionary<int, IconSource>();
-        public static IEnumerable<KeyValuePair<int, IconSource>> RegisteredSources => Sources.AsEnumerable();
+        public static IconSource DefaultSource { get; private set; }
+        private static readonly Dictionary<string, IconSource> Sources = new Dictionary<string, IconSource>();
+        public static IEnumerable<KeyValuePair<string, IconSource>> RegisteredSources => Sources.AsEnumerable();
         static IconSourceRegistry()
         {
-            Sources[0] = AmberIconSource.Instance;
-            Sources[1] = YusukeIconSource.Instance;
-            Sources[2] = MixedIconSource.Instance;
+            SetDefault(AmberIconSource.Instance);
+            Sources["builtin_amber"] = AmberIconSource.Instance;
+            Sources["builtin_yusuke"] = YusukeIconSource.Instance;
+            Sources["builtin_mixed"] = MixedIconSource.Instance;
         }
-        public static int MaxID => Sources.Keys.Max();
 
-        public static int GetID(IconSource source)
+        public static void SetDefault(IconSource source)
+        {
+            DefaultSource = source;
+        }
+
+        public static void Register(string id, IconSource source)
+        {
+            Sources[id] = source;
+        }
+
+        public static string GetID(IconSource source)
         {
             foreach (var item in Sources)
             {
                 if (item.Value == source)
                     return item.Key;
             }
-            return -1;
+            return null;
         }
 
-        public static IconSource FromID(int id)
+        public static IconSource FromID(string id)
         {
             if (Sources.TryGetValue(id, out var source))
                 return source;
-            return NullIconSource.Instance;
+            return DefaultSource;
+        }
+
+        public static void RegisterCustomSource(string filepath)
+        {
+            using (ZipArchive zip = ZipFile.OpenRead(filepath))
+            {
+                var source = new ZippedIconSource(filepath, zip);
+                Register(filepath, source);
+            }
         }
     }
 
@@ -46,137 +69,136 @@ namespace NbtStudio
             Image = image;
             Icon = icon;
         }
+
+        public bool HasNull => Image == null || Icon == null;
+    }
+
+    public enum IconType
+    {
+        File,
+        Folder,
+        Region,
+        Chunk,
+
+        NewFile,
+        OpenFile,
+        OpenFolder,
+        Save,
+        SaveAll,
+
+        Sort,
+        Cut,
+        Copy,
+        Paste,
+        Rename,
+        Edit,
+        EditSnbt,
+        Delete,
+
+        Undo,
+        Redo,
+        Refresh,
+        Search,
+        AddSnbt,
+
+        ByteTag,
+        ShortTag,
+        IntTag,
+        LongTag,
+        FloatTag,
+        DoubleTag,
+        StringTag,
+        ByteArrayTag,
+        IntArrayTag,
+        LongArrayTag,
+        CompoundTag,
+        ListTag,
+
+        NbtStudio
     }
 
     public abstract class IconSource
     {
+        public abstract ImageIcon GetImage(IconType type);
         public abstract string Name { get; }
 
-        public abstract ImageIcon File { get; }
-        public abstract ImageIcon Folder { get; }
-        public abstract ImageIcon Region { get; }
-        public abstract ImageIcon Chunk { get; }
+        public ImageIcon File => GetImage(IconType.File);
+        public ImageIcon Folder => GetImage(IconType.Folder);
+        public ImageIcon Region => GetImage(IconType.Region);
+        public ImageIcon Chunk => GetImage(IconType.Chunk);
 
-        public abstract ImageIcon NewFile { get; }
-        public abstract ImageIcon OpenFile { get; }
-        public abstract ImageIcon OpenFolder { get; }
-        public abstract ImageIcon Save { get; }
-        public abstract ImageIcon SaveAll { get; }
+        public ImageIcon NewFile => GetImage(IconType.NewFile);
+        public ImageIcon OpenFile => GetImage(IconType.OpenFile);
+        public ImageIcon OpenFolder => GetImage(IconType.OpenFolder);
+        public ImageIcon Save => GetImage(IconType.Save);
+        public ImageIcon SaveAll => GetImage(IconType.SaveAll);
 
-        public abstract ImageIcon Sort { get; }
-        public abstract ImageIcon Cut { get; }
-        public abstract ImageIcon Copy { get; }
-        public abstract ImageIcon Paste { get; }
-        public abstract ImageIcon Rename { get; }
-        public abstract ImageIcon Edit { get; }
-        public abstract ImageIcon EditSnbt { get; }
-        public abstract ImageIcon Delete { get; }
+        public ImageIcon Sort => GetImage(IconType.Sort);
+        public ImageIcon Cut => GetImage(IconType.Cut);
+        public ImageIcon Copy => GetImage(IconType.Copy);
+        public ImageIcon Paste => GetImage(IconType.Paste);
+        public ImageIcon Rename => GetImage(IconType.Rename);
+        public ImageIcon Edit => GetImage(IconType.Edit);
+        public ImageIcon EditSnbt => GetImage(IconType.EditSnbt);
+        public ImageIcon Delete => GetImage(IconType.Delete);
 
-        public abstract ImageIcon Undo { get; }
-        public abstract ImageIcon Redo { get; }
-        public abstract ImageIcon Refresh { get; }
-        public abstract ImageIcon Search { get; }
-        public abstract ImageIcon AddSnbt { get; }
+        public ImageIcon Undo => GetImage(IconType.Undo);
+        public ImageIcon Redo => GetImage(IconType.Redo);
+        public ImageIcon Refresh => GetImage(IconType.Refresh);
+        public ImageIcon Search => GetImage(IconType.Search);
+        public ImageIcon AddSnbt => GetImage(IconType.AddSnbt);
 
-        public abstract ImageIcon ByteTag { get; }
-        public abstract ImageIcon ShortTag { get; }
-        public abstract ImageIcon IntTag { get; }
-        public abstract ImageIcon LongTag { get; }
-        public abstract ImageIcon FloatTag { get; }
-        public abstract ImageIcon DoubleTag { get; }
-        public abstract ImageIcon StringTag { get; }
-        public abstract ImageIcon ByteArrayTag { get; }
-        public abstract ImageIcon IntArrayTag { get; }
-        public abstract ImageIcon LongArrayTag { get; }
-        public abstract ImageIcon CompoundTag { get; }
-        public abstract ImageIcon ListTag { get; }
+        public ImageIcon ByteTag => GetImage(IconType.ByteTag);
+        public ImageIcon ShortTag => GetImage(IconType.ShortTag);
+        public ImageIcon IntTag => GetImage(IconType.IntTag);
+        public ImageIcon LongTag => GetImage(IconType.LongTag);
+        public ImageIcon FloatTag => GetImage(IconType.FloatTag);
+        public ImageIcon DoubleTag => GetImage(IconType.DoubleTag);
+        public ImageIcon StringTag => GetImage(IconType.StringTag);
+        public ImageIcon ByteArrayTag => GetImage(IconType.ByteArrayTag);
+        public ImageIcon IntArrayTag => GetImage(IconType.IntArrayTag);
+        public ImageIcon LongArrayTag => GetImage(IconType.LongArrayTag);
+        public ImageIcon CompoundTag => GetImage(IconType.CompoundTag);
+        public ImageIcon ListTag => GetImage(IconType.ListTag);
 
-        public abstract ImageIcon NbtStudio { get; }
+        public ImageIcon NbtStudio => GetImage(IconType.NbtStudio);
     }
 
     public abstract class SimpleIconSource : IconSource
     {
-        protected ImageIcon _File;
-        protected ImageIcon _Folder;
-        protected ImageIcon _Region;
-        protected ImageIcon _Chunk;
+        private readonly Dictionary<IconType, ImageIcon> Cache = new Dictionary<IconType, ImageIcon>();
 
-        protected ImageIcon _NewFile;
-        protected ImageIcon _OpenFile;
-        protected ImageIcon _OpenFolder;
-        protected ImageIcon _Save;
-        protected ImageIcon _SaveAll;
+        public override ImageIcon GetImage(IconType type)
+        {
+            if (Cache.TryGetValue(type, out var result))
+                return result;
+            return default;
+        }
 
-        protected ImageIcon _Sort;
-        protected ImageIcon _Cut;
-        protected ImageIcon _Copy;
-        protected ImageIcon _Paste;
-        protected ImageIcon _Rename;
-        protected ImageIcon _Edit;
-        protected ImageIcon _EditSnbt;
-        protected ImageIcon _Delete;
+        protected void Add(IconType type, Image image, Icon icon)
+        {
+            Cache[type] = new ImageIcon(image, icon);
+        }
+    }
 
-        protected ImageIcon _Undo;
-        protected ImageIcon _Redo;
-        protected ImageIcon _Refresh;
-        protected ImageIcon _Search;
-        protected ImageIcon _AddSnbt;
+    public abstract class DeferToDefaultIconSource : IconSource
+    {
+        private readonly Dictionary<IconType, ImageIcon> Cache = new Dictionary<IconType, ImageIcon>();
 
-        protected ImageIcon _ByteTag;
-        protected ImageIcon _ShortTag;
-        protected ImageIcon _IntTag;
-        protected ImageIcon _LongTag;
-        protected ImageIcon _FloatTag;
-        protected ImageIcon _DoubleTag;
-        protected ImageIcon _StringTag;
-        protected ImageIcon _ByteArrayTag;
-        protected ImageIcon _IntArrayTag;
-        protected ImageIcon _LongArrayTag;
-        protected ImageIcon _CompoundTag;
-        protected ImageIcon _ListTag;
+        public override ImageIcon GetImage(IconType type)
+        {
+            if (Cache.TryGetValue(type, out var result))
+                return result;
+            var defer = IconSourceRegistry.DefaultSource;
+            if (defer == null)
+                return default;
+            return defer.GetImage(type);
+        }
 
-        protected ImageIcon _NbtStudio;
-
-        public override ImageIcon File => _File;
-        public override ImageIcon Folder => _Folder;
-        public override ImageIcon Region => _Region;
-        public override ImageIcon Chunk => _Chunk;
-
-        public override ImageIcon NewFile => _NewFile;
-        public override ImageIcon OpenFile => _OpenFile;
-        public override ImageIcon OpenFolder => _OpenFolder;
-        public override ImageIcon Save => _Save;
-        public override ImageIcon SaveAll => _SaveAll;
-
-        public override ImageIcon Sort => _Sort;
-        public override ImageIcon Cut => _Cut;
-        public override ImageIcon Copy => _Copy;
-        public override ImageIcon Paste => _Paste;
-        public override ImageIcon Rename => _Rename;
-        public override ImageIcon Edit => _Edit;
-        public override ImageIcon EditSnbt => _EditSnbt;
-        public override ImageIcon Delete => _Delete;
-
-        public override ImageIcon Undo => _Undo;
-        public override ImageIcon Redo => _Redo;
-        public override ImageIcon Refresh => _Refresh;
-        public override ImageIcon Search => _Search;
-        public override ImageIcon AddSnbt => _AddSnbt;
-
-        public override ImageIcon ByteTag => _ByteTag;
-        public override ImageIcon ShortTag => _ShortTag;
-        public override ImageIcon IntTag => _IntTag;
-        public override ImageIcon LongTag => _LongTag;
-        public override ImageIcon FloatTag => _FloatTag;
-        public override ImageIcon DoubleTag => _DoubleTag;
-        public override ImageIcon StringTag => _StringTag;
-        public override ImageIcon ByteArrayTag => _ByteArrayTag;
-        public override ImageIcon IntArrayTag => _IntArrayTag;
-        public override ImageIcon LongArrayTag => _LongArrayTag;
-        public override ImageIcon CompoundTag => _CompoundTag;
-        public override ImageIcon ListTag => _ListTag;
-
-        public override ImageIcon NbtStudio => _NbtStudio;
+        protected void Add(IconType type, Image image, Icon icon)
+        {
+            Cache[type] = new ImageIcon(image, icon);
+        }
     }
 
     public class NullIconSource : SimpleIconSource
@@ -193,46 +215,46 @@ namespace NbtStudio
         public static MixedIconSource Instance = new MixedIconSource();
         private MixedIconSource()
         {
-            _File = new ImageIcon(Properties.Resources.classic_file_image, Properties.Resources.classic_file_icon);
-            _Folder = new ImageIcon(Properties.Resources.classic_folder_image, Properties.Resources.classic_folder_icon);
-            _Region = new ImageIcon(Properties.Resources.classic_region_image, Properties.Resources.classic_region_icon);
-            _Chunk = new ImageIcon(Properties.Resources.classic_chunk_image, Properties.Resources.classic_chunk_icon);
+            Add(IconType.File, Properties.Resources.classic_file_image, Properties.Resources.classic_file_icon);
+            Add(IconType.Folder, Properties.Resources.classic_folder_image, Properties.Resources.classic_folder_icon);
+            Add(IconType.Region, Properties.Resources.classic_region_image, Properties.Resources.classic_region_icon);
+            Add(IconType.Chunk, Properties.Resources.classic_chunk_image, Properties.Resources.classic_chunk_icon);
 
-            _NewFile = new ImageIcon(Properties.Resources.classic_action_new_image, Properties.Resources.classic_action_new_icon);
-            _OpenFile = new ImageIcon(Properties.Resources.classic_action_open_file_image, Properties.Resources.classic_action_open_file_icon);
-            _OpenFolder = new ImageIcon(Properties.Resources.classic_action_open_folder_image, Properties.Resources.classic_action_open_folder_icon);
-            _Save = new ImageIcon(Properties.Resources.classic_action_save_image, Properties.Resources.classic_action_save_icon);
-            _SaveAll = new ImageIcon(Properties.Resources.classic_action_save_all_image, Properties.Resources.classic_action_save_all_icon);
+            Add(IconType.NewFile, Properties.Resources.classic_action_new_image, Properties.Resources.classic_action_new_icon);
+            Add(IconType.OpenFile, Properties.Resources.classic_action_open_file_image, Properties.Resources.classic_action_open_file_icon);
+            Add(IconType.OpenFolder, Properties.Resources.classic_action_open_folder_image, Properties.Resources.classic_action_open_folder_icon);
+            Add(IconType.Save, Properties.Resources.classic_action_save_image, Properties.Resources.classic_action_save_icon);
+            Add(IconType.SaveAll, Properties.Resources.classic_action_save_all_image, Properties.Resources.classic_action_save_all_icon);
 
-            _Sort = new ImageIcon(Properties.Resources.classic_action_sort_image, Properties.Resources.classic_action_sort_icon);
-            _Cut = new ImageIcon(Properties.Resources.classic_action_cut_image, Properties.Resources.classic_action_cut_icon);
-            _Copy = new ImageIcon(Properties.Resources.classic_action_copy_image, Properties.Resources.classic_action_copy_icon);
-            _Paste = new ImageIcon(Properties.Resources.classic_action_paste_image, Properties.Resources.classic_action_paste_icon);
-            _Rename = new ImageIcon(Properties.Resources.classic_action_rename_image, Properties.Resources.classic_action_rename_icon);
-            _Edit = new ImageIcon(Properties.Resources.classic_action_edit_image, Properties.Resources.classic_action_edit_icon);
-            _EditSnbt = new ImageIcon(Properties.Resources.classic_action_edit_snbt_image, Properties.Resources.classic_action_edit_snbt_icon);
-            _Delete = new ImageIcon(Properties.Resources.classic_action_delete_image, Properties.Resources.classic_action_delete_icon);
+            Add(IconType.Sort, Properties.Resources.classic_action_sort_image, Properties.Resources.classic_action_sort_icon);
+            Add(IconType.Cut, Properties.Resources.classic_action_cut_image, Properties.Resources.classic_action_cut_icon);
+            Add(IconType.Copy, Properties.Resources.classic_action_copy_image, Properties.Resources.classic_action_copy_icon);
+            Add(IconType.Paste, Properties.Resources.classic_action_paste_image, Properties.Resources.classic_action_paste_icon);
+            Add(IconType.Rename, Properties.Resources.classic_action_rename_image, Properties.Resources.classic_action_rename_icon);
+            Add(IconType.Edit, Properties.Resources.classic_action_edit_image, Properties.Resources.classic_action_edit_icon);
+            Add(IconType.EditSnbt, Properties.Resources.classic_action_edit_snbt_image, Properties.Resources.classic_action_edit_snbt_icon);
+            Add(IconType.Delete, Properties.Resources.classic_action_delete_image, Properties.Resources.classic_action_delete_icon);
 
-            _Undo = new ImageIcon(Properties.Resources.classic_action_undo_image, Properties.Resources.classic_action_undo_icon);
-            _Redo = new ImageIcon(Properties.Resources.classic_action_redo_image, Properties.Resources.classic_action_redo_icon);
-            _Refresh = new ImageIcon(Properties.Resources.classic_action_refresh_image, Properties.Resources.classic_action_refresh_icon);
-            _Search = new ImageIcon(Properties.Resources.classic_action_search_image, Properties.Resources.classic_action_search_icon);
-            _AddSnbt = new ImageIcon(Properties.Resources.classic_action_add_snbt_image, Properties.Resources.classic_action_add_snbt_icon);
+            Add(IconType.Undo, Properties.Resources.classic_action_undo_image, Properties.Resources.classic_action_undo_icon);
+            Add(IconType.Redo, Properties.Resources.classic_action_redo_image, Properties.Resources.classic_action_redo_icon);
+            Add(IconType.Refresh, Properties.Resources.classic_action_refresh_image, Properties.Resources.classic_action_refresh_icon);
+            Add(IconType.Search, Properties.Resources.classic_action_search_image, Properties.Resources.classic_action_search_icon);
+            Add(IconType.AddSnbt, Properties.Resources.classic_action_add_snbt_image, Properties.Resources.classic_action_add_snbt_icon);
 
-            _ByteTag = new ImageIcon(Properties.Resources.tag_byte_image, Properties.Resources.tag_byte_icon);
-            _ShortTag = new ImageIcon(Properties.Resources.tag_short_image, Properties.Resources.tag_short_icon);
-            _IntTag = new ImageIcon(Properties.Resources.tag_int_image, Properties.Resources.tag_int_icon);
-            _LongTag = new ImageIcon(Properties.Resources.tag_long_image, Properties.Resources.tag_long_icon);
-            _FloatTag = new ImageIcon(Properties.Resources.tag_float_image, Properties.Resources.tag_float_icon);
-            _DoubleTag = new ImageIcon(Properties.Resources.tag_double_image, Properties.Resources.tag_double_icon);
-            _StringTag = new ImageIcon(Properties.Resources.tag_string_image, Properties.Resources.tag_string_icon);
-            _ByteArrayTag = new ImageIcon(Properties.Resources.tag_byte_array_image, Properties.Resources.tag_byte_array_icon);
-            _IntArrayTag = new ImageIcon(Properties.Resources.tag_int_array_image, Properties.Resources.tag_int_array_icon);
-            _LongArrayTag = new ImageIcon(Properties.Resources.tag_long_array_image, Properties.Resources.tag_long_array_icon);
-            _CompoundTag = new ImageIcon(Properties.Resources.tag_compound_image, Properties.Resources.tag_compound_icon);
-            _ListTag = new ImageIcon(Properties.Resources.tag_list_image, Properties.Resources.tag_list_icon);
+            Add(IconType.ByteTag, Properties.Resources.tag_byte_image, Properties.Resources.tag_byte_icon);
+            Add(IconType.ShortTag, Properties.Resources.tag_short_image, Properties.Resources.tag_short_icon);
+            Add(IconType.IntTag, Properties.Resources.tag_int_image, Properties.Resources.tag_int_icon);
+            Add(IconType.LongTag, Properties.Resources.tag_long_image, Properties.Resources.tag_long_icon);
+            Add(IconType.FloatTag, Properties.Resources.tag_float_image, Properties.Resources.tag_float_icon);
+            Add(IconType.DoubleTag, Properties.Resources.tag_double_image, Properties.Resources.tag_double_icon);
+            Add(IconType.StringTag, Properties.Resources.tag_string_image, Properties.Resources.tag_string_icon);
+            Add(IconType.ByteArrayTag, Properties.Resources.tag_byte_array_image, Properties.Resources.tag_byte_array_icon);
+            Add(IconType.IntArrayTag, Properties.Resources.tag_int_array_image, Properties.Resources.tag_int_array_icon);
+            Add(IconType.LongArrayTag, Properties.Resources.tag_long_array_image, Properties.Resources.tag_long_array_icon);
+            Add(IconType.CompoundTag, Properties.Resources.tag_compound_image, Properties.Resources.tag_compound_icon);
+            Add(IconType.ListTag, Properties.Resources.tag_list_image, Properties.Resources.tag_list_icon);
 
-            _NbtStudio = new ImageIcon(Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
+            Add(IconType.NbtStudio, Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
         }
     }
 
@@ -243,46 +265,46 @@ namespace NbtStudio
         public static YusukeIconSource Instance = new YusukeIconSource();
         private YusukeIconSource()
         {
-            _File = new ImageIcon(Properties.Resources.legacy_file_image, Properties.Resources.legacy_file_icon);
-            _Folder = new ImageIcon(Properties.Resources.legacy_folder_image, Properties.Resources.classic_folder_icon);
-            _Region = new ImageIcon(Properties.Resources.legacy_region_image, Properties.Resources.legacy_region_icon);
-            _Chunk = new ImageIcon(Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
+            Add(IconType.File, Properties.Resources.legacy_file_image, Properties.Resources.legacy_file_icon);
+            Add(IconType.Folder, Properties.Resources.legacy_folder_image, Properties.Resources.classic_folder_icon);
+            Add(IconType.Region, Properties.Resources.legacy_region_image, Properties.Resources.legacy_region_icon);
+            Add(IconType.Chunk, Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
 
-            _NewFile = new ImageIcon(Properties.Resources.classic_action_new_image, Properties.Resources.classic_action_new_icon);
-            _OpenFile = new ImageIcon(Properties.Resources.classic_action_open_file_image, Properties.Resources.classic_action_open_file_icon);
-            _OpenFolder = new ImageIcon(Properties.Resources.classic_action_open_folder_image, Properties.Resources.classic_action_open_folder_icon);
-            _Save = new ImageIcon(Properties.Resources.classic_action_save_image, Properties.Resources.classic_action_save_icon);
-            _SaveAll = new ImageIcon(Properties.Resources.classic_action_save_all_image, Properties.Resources.classic_action_save_all_icon);
+            Add(IconType.NewFile, Properties.Resources.classic_action_new_image, Properties.Resources.classic_action_new_icon);
+            Add(IconType.OpenFile, Properties.Resources.classic_action_open_file_image, Properties.Resources.classic_action_open_file_icon);
+            Add(IconType.OpenFolder, Properties.Resources.classic_action_open_folder_image, Properties.Resources.classic_action_open_folder_icon);
+            Add(IconType.Save, Properties.Resources.classic_action_save_image, Properties.Resources.classic_action_save_icon);
+            Add(IconType.SaveAll, Properties.Resources.classic_action_save_all_image, Properties.Resources.classic_action_save_all_icon);
 
-            _Sort = new ImageIcon(Properties.Resources.classic_action_sort_image, Properties.Resources.classic_action_sort_icon);
-            _Cut = new ImageIcon(Properties.Resources.classic_action_cut_image, Properties.Resources.classic_action_cut_icon);
-            _Copy = new ImageIcon(Properties.Resources.classic_action_copy_image, Properties.Resources.classic_action_copy_icon);
-            _Paste = new ImageIcon(Properties.Resources.classic_action_paste_image, Properties.Resources.classic_action_paste_icon);
-            _Rename = new ImageIcon(Properties.Resources.classic_action_rename_image, Properties.Resources.classic_action_rename_icon);
-            _Edit = new ImageIcon(Properties.Resources.classic_action_edit_image, Properties.Resources.classic_action_edit_icon);
-            _EditSnbt = new ImageIcon(Properties.Resources.classic_action_edit_snbt_image, Properties.Resources.classic_action_edit_snbt_icon);
-            _Delete = new ImageIcon(Properties.Resources.classic_action_delete_image, Properties.Resources.classic_action_delete_icon);
+            Add(IconType.Sort, Properties.Resources.classic_action_sort_image, Properties.Resources.classic_action_sort_icon);
+            Add(IconType.Cut, Properties.Resources.classic_action_cut_image, Properties.Resources.classic_action_cut_icon);
+            Add(IconType.Copy, Properties.Resources.classic_action_copy_image, Properties.Resources.classic_action_copy_icon);
+            Add(IconType.Paste, Properties.Resources.classic_action_paste_image, Properties.Resources.classic_action_paste_icon);
+            Add(IconType.Rename, Properties.Resources.classic_action_rename_image, Properties.Resources.classic_action_rename_icon);
+            Add(IconType.Edit, Properties.Resources.classic_action_edit_image, Properties.Resources.classic_action_edit_icon);
+            Add(IconType.EditSnbt, Properties.Resources.classic_action_edit_snbt_image, Properties.Resources.classic_action_edit_snbt_icon);
+            Add(IconType.Delete, Properties.Resources.classic_action_delete_image, Properties.Resources.classic_action_delete_icon);
 
-            _Undo = new ImageIcon(Properties.Resources.classic_action_undo_image, Properties.Resources.classic_action_undo_icon);
-            _Redo = new ImageIcon(Properties.Resources.classic_action_redo_image, Properties.Resources.classic_action_redo_icon);
-            _Refresh = new ImageIcon(Properties.Resources.classic_action_refresh_image, Properties.Resources.classic_action_refresh_icon);
-            _Search = new ImageIcon(Properties.Resources.classic_action_search_image, Properties.Resources.classic_action_search_icon);
-            _AddSnbt = new ImageIcon(Properties.Resources.classic_action_add_snbt_image, Properties.Resources.classic_action_add_snbt_icon);
+            Add(IconType.Undo, Properties.Resources.classic_action_undo_image, Properties.Resources.classic_action_undo_icon);
+            Add(IconType.Redo, Properties.Resources.classic_action_redo_image, Properties.Resources.classic_action_redo_icon);
+            Add(IconType.Refresh, Properties.Resources.classic_action_refresh_image, Properties.Resources.classic_action_refresh_icon);
+            Add(IconType.Search, Properties.Resources.classic_action_search_image, Properties.Resources.classic_action_search_icon);
+            Add(IconType.AddSnbt, Properties.Resources.classic_action_add_snbt_image, Properties.Resources.classic_action_add_snbt_icon);
 
-            _ByteTag = new ImageIcon(Properties.Resources.legacy_tag_byte_image, Properties.Resources.legacy_tag_byte_icon);
-            _ShortTag = new ImageIcon(Properties.Resources.legacy_tag_short_image, Properties.Resources.legacy_tag_short_icon);
-            _IntTag = new ImageIcon(Properties.Resources.legacy_tag_int_image, Properties.Resources.legacy_tag_int_icon);
-            _LongTag = new ImageIcon(Properties.Resources.legacy_tag_long_image, Properties.Resources.legacy_tag_long_icon);
-            _FloatTag = new ImageIcon(Properties.Resources.legacy_tag_float_image, Properties.Resources.legacy_tag_float_icon);
-            _DoubleTag = new ImageIcon(Properties.Resources.legacy_tag_double_image, Properties.Resources.legacy_tag_double_icon);
-            _StringTag = new ImageIcon(Properties.Resources.legacy_tag_string_image, Properties.Resources.legacy_tag_string_icon);
-            _ByteArrayTag = new ImageIcon(Properties.Resources.legacy_tag_byte_array_image, Properties.Resources.legacy_tag_byte_array_icon);
-            _IntArrayTag = new ImageIcon(Properties.Resources.legacy_tag_int_array_image, Properties.Resources.legacy_tag_int_array_icon);
-            _LongArrayTag = new ImageIcon(Properties.Resources.legacy_tag_long_array_image, Properties.Resources.legacy_tag_long_array_icon);
-            _CompoundTag = new ImageIcon(Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
-            _ListTag = new ImageIcon(Properties.Resources.legacy_tag_list_image, Properties.Resources.legacy_tag_list_icon);
+            Add(IconType.ByteTag, Properties.Resources.legacy_tag_byte_image, Properties.Resources.legacy_tag_byte_icon);
+            Add(IconType.ShortTag, Properties.Resources.legacy_tag_short_image, Properties.Resources.legacy_tag_short_icon);
+            Add(IconType.IntTag, Properties.Resources.legacy_tag_int_image, Properties.Resources.legacy_tag_int_icon);
+            Add(IconType.LongTag, Properties.Resources.legacy_tag_long_image, Properties.Resources.legacy_tag_long_icon);
+            Add(IconType.FloatTag, Properties.Resources.legacy_tag_float_image, Properties.Resources.legacy_tag_float_icon);
+            Add(IconType.DoubleTag, Properties.Resources.legacy_tag_double_image, Properties.Resources.legacy_tag_double_icon);
+            Add(IconType.StringTag, Properties.Resources.legacy_tag_string_image, Properties.Resources.legacy_tag_string_icon);
+            Add(IconType.ByteArrayTag, Properties.Resources.legacy_tag_byte_array_image, Properties.Resources.legacy_tag_byte_array_icon);
+            Add(IconType.IntArrayTag, Properties.Resources.legacy_tag_int_array_image, Properties.Resources.legacy_tag_int_array_icon);
+            Add(IconType.LongArrayTag, Properties.Resources.legacy_tag_long_array_image, Properties.Resources.legacy_tag_long_array_icon);
+            Add(IconType.CompoundTag, Properties.Resources.legacy_tag_compound_image, Properties.Resources.legacy_tag_compound_icon);
+            Add(IconType.ListTag, Properties.Resources.legacy_tag_list_image, Properties.Resources.legacy_tag_list_icon);
 
-            _NbtStudio = new ImageIcon(Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
+            Add(IconType.NbtStudio, Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
         }
     }
 
@@ -293,46 +315,134 @@ namespace NbtStudio
         public static AmberIconSource Instance = new AmberIconSource();
         private AmberIconSource()
         {
-            _File = new ImageIcon(Properties.Resources.new_file_image, Properties.Resources.new_file_icon);
-            _Folder = new ImageIcon(Properties.Resources.new_folder_image, Properties.Resources.new_folder_icon);
-            _Region = new ImageIcon(Properties.Resources.new_region_image, Properties.Resources.new_region_icon);
-            _Chunk = new ImageIcon(Properties.Resources.new_chunk_image, Properties.Resources.new_chunk_icon);
+            Add(IconType.File, Properties.Resources.new_file_image, Properties.Resources.new_file_icon);
+            Add(IconType.Folder, Properties.Resources.new_folder_image, Properties.Resources.new_folder_icon);
+            Add(IconType.Region, Properties.Resources.new_region_image, Properties.Resources.new_region_icon);
+            Add(IconType.Chunk, Properties.Resources.new_chunk_image, Properties.Resources.new_chunk_icon);
 
-            _NewFile = new ImageIcon(Properties.Resources.new_action_new_image, Properties.Resources.new_action_new_icon);
-            _OpenFile = new ImageIcon(Properties.Resources.new_action_open_file_image, Properties.Resources.new_action_open_file_icon);
-            _OpenFolder = new ImageIcon(Properties.Resources.new_action_open_folder_image, Properties.Resources.new_action_open_folder_icon);
-            _Save = new ImageIcon(Properties.Resources.new_action_save_image, Properties.Resources.new_action_save_icon);
-            _SaveAll = new ImageIcon(Properties.Resources.new_action_save_all_image, Properties.Resources.new_action_save_all_icon);
+            Add(IconType.NewFile, Properties.Resources.new_action_new_image, Properties.Resources.new_action_new_icon);
+            Add(IconType.OpenFile, Properties.Resources.new_action_open_file_image, Properties.Resources.new_action_open_file_icon);
+            Add(IconType.OpenFolder, Properties.Resources.new_action_open_folder_image, Properties.Resources.new_action_open_folder_icon);
+            Add(IconType.Save, Properties.Resources.new_action_save_image, Properties.Resources.new_action_save_icon);
+            Add(IconType.SaveAll, Properties.Resources.new_action_save_all_image, Properties.Resources.new_action_save_all_icon);
 
-            _Sort = new ImageIcon(Properties.Resources.new_action_sort_image, Properties.Resources.new_action_sort_icon);
-            _Cut = new ImageIcon(Properties.Resources.new_action_cut_image, Properties.Resources.new_action_cut_icon);
-            _Copy = new ImageIcon(Properties.Resources.new_action_copy_image, Properties.Resources.new_action_copy_icon);
-            _Paste = new ImageIcon(Properties.Resources.new_action_paste_image, Properties.Resources.new_action_paste_icon);
-            _Rename = new ImageIcon(Properties.Resources.new_action_rename_image, Properties.Resources.new_action_rename_icon);
-            _Edit = new ImageIcon(Properties.Resources.new_action_edit_image, Properties.Resources.new_action_edit_icon);
-            _EditSnbt = new ImageIcon(Properties.Resources.new_action_edit_snbt_image, Properties.Resources.new_action_edit_snbt_icon);
-            _Delete = new ImageIcon(Properties.Resources.new_action_delete_image, Properties.Resources.new_action_delete_icon);
+            Add(IconType.Sort, Properties.Resources.new_action_sort_image, Properties.Resources.new_action_sort_icon);
+            Add(IconType.Cut, Properties.Resources.new_action_cut_image, Properties.Resources.new_action_cut_icon);
+            Add(IconType.Copy, Properties.Resources.new_action_copy_image, Properties.Resources.new_action_copy_icon);
+            Add(IconType.Paste, Properties.Resources.new_action_paste_image, Properties.Resources.new_action_paste_icon);
+            Add(IconType.Rename, Properties.Resources.new_action_rename_image, Properties.Resources.new_action_rename_icon);
+            Add(IconType.Edit, Properties.Resources.new_action_edit_image, Properties.Resources.new_action_edit_icon);
+            Add(IconType.EditSnbt, Properties.Resources.new_action_edit_snbt_image, Properties.Resources.new_action_edit_snbt_icon);
+            Add(IconType.Delete, Properties.Resources.new_action_delete_image, Properties.Resources.new_action_delete_icon);
 
-            _Undo = new ImageIcon(Properties.Resources.new_action_undo_image, Properties.Resources.new_action_undo_icon);
-            _Redo = new ImageIcon(Properties.Resources.new_action_redo_image, Properties.Resources.new_action_redo_icon);
-            _Refresh = new ImageIcon(Properties.Resources.new_action_refresh_image, Properties.Resources.new_action_refresh_icon);
-            _Search = new ImageIcon(Properties.Resources.new_action_search_image, Properties.Resources.new_action_search_icon);
-            _AddSnbt = new ImageIcon(Properties.Resources.new_action_add_snbt_image, Properties.Resources.new_action_add_snbt_icon);
+            Add(IconType.Undo, Properties.Resources.new_action_undo_image, Properties.Resources.new_action_undo_icon);
+            Add(IconType.Redo, Properties.Resources.new_action_redo_image, Properties.Resources.new_action_redo_icon);
+            Add(IconType.Refresh, Properties.Resources.new_action_refresh_image, Properties.Resources.new_action_refresh_icon);
+            Add(IconType.Search, Properties.Resources.new_action_search_image, Properties.Resources.new_action_search_icon);
+            Add(IconType.AddSnbt, Properties.Resources.new_action_add_snbt_image, Properties.Resources.new_action_add_snbt_icon);
 
-            _ByteTag = new ImageIcon(Properties.Resources.tag_byte_image, Properties.Resources.tag_byte_icon);
-            _ShortTag = new ImageIcon(Properties.Resources.tag_short_image, Properties.Resources.tag_short_icon);
-            _IntTag = new ImageIcon(Properties.Resources.tag_int_image, Properties.Resources.tag_int_icon);
-            _LongTag = new ImageIcon(Properties.Resources.tag_long_image, Properties.Resources.tag_long_icon);
-            _FloatTag = new ImageIcon(Properties.Resources.tag_float_image, Properties.Resources.tag_float_icon);
-            _DoubleTag = new ImageIcon(Properties.Resources.tag_double_image, Properties.Resources.tag_double_icon);
-            _StringTag = new ImageIcon(Properties.Resources.tag_string_image, Properties.Resources.tag_string_icon);
-            _ByteArrayTag = new ImageIcon(Properties.Resources.tag_byte_array_image, Properties.Resources.tag_byte_array_icon);
-            _IntArrayTag = new ImageIcon(Properties.Resources.tag_int_array_image, Properties.Resources.tag_int_array_icon);
-            _LongArrayTag = new ImageIcon(Properties.Resources.tag_long_array_image, Properties.Resources.tag_long_array_icon);
-            _CompoundTag = new ImageIcon(Properties.Resources.tag_compound_image, Properties.Resources.tag_compound_icon);
-            _ListTag = new ImageIcon(Properties.Resources.tag_list_image, Properties.Resources.tag_list_icon);
+            Add(IconType.ByteTag, Properties.Resources.tag_byte_image, Properties.Resources.tag_byte_icon);
+            Add(IconType.ShortTag, Properties.Resources.tag_short_image, Properties.Resources.tag_short_icon);
+            Add(IconType.IntTag, Properties.Resources.tag_int_image, Properties.Resources.tag_int_icon);
+            Add(IconType.LongTag, Properties.Resources.tag_long_image, Properties.Resources.tag_long_icon);
+            Add(IconType.FloatTag, Properties.Resources.tag_float_image, Properties.Resources.tag_float_icon);
+            Add(IconType.DoubleTag, Properties.Resources.tag_double_image, Properties.Resources.tag_double_icon);
+            Add(IconType.StringTag, Properties.Resources.tag_string_image, Properties.Resources.tag_string_icon);
+            Add(IconType.ByteArrayTag, Properties.Resources.tag_byte_array_image, Properties.Resources.tag_byte_array_icon);
+            Add(IconType.IntArrayTag, Properties.Resources.tag_int_array_image, Properties.Resources.tag_int_array_icon);
+            Add(IconType.LongArrayTag, Properties.Resources.tag_long_array_image, Properties.Resources.tag_long_array_icon);
+            Add(IconType.CompoundTag, Properties.Resources.tag_compound_image, Properties.Resources.tag_compound_icon);
+            Add(IconType.ListTag, Properties.Resources.tag_list_image, Properties.Resources.tag_list_icon);
 
-            _NbtStudio = new ImageIcon(Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
+            Add(IconType.NbtStudio, Properties.Resources.app_image_256, Properties.Resources.app_icon_256);
+        }
+    }
+
+    public class ZippedIconSource : DeferToDefaultIconSource
+    {
+        private readonly string Filepath;
+        public override string Name => Path.GetFileNameWithoutExtension(Filepath);
+        private readonly Dictionary<string, IconType> FileNameMap = new Dictionary<string, IconType>
+        {
+            { "folder", IconType.Folder },
+            { "region", IconType.Region },
+            { "chunk", IconType.Chunk },
+            { "new_file", IconType.NewFile },
+            { "open_file", IconType.OpenFile },
+            { "open_folder", IconType.OpenFolder },
+            { "save", IconType.Save },
+            { "save_all", IconType.SaveAll },
+            { "sort", IconType.Sort },
+            { "cut", IconType.Cut },
+            { "copy", IconType.Copy },
+            { "paste", IconType.Paste },
+            { "rename", IconType.Rename },
+            { "edit", IconType.Edit },
+            { "edit_snbt", IconType.EditSnbt },
+            { "delete", IconType.Delete },
+            { "undo", IconType.Undo },
+            { "redo", IconType.Redo },
+            { "refresh", IconType.Refresh },
+            { "search", IconType.Search },
+            { "add_snbt", IconType.AddSnbt },
+            { "byte_tag", IconType.ByteTag },
+            { "short_tag", IconType.ShortTag },
+            { "int_tag", IconType.IntTag },
+            { "long_tag", IconType.LongTag },
+            { "float_tag", IconType.FloatTag },
+            { "double_tag", IconType.DoubleTag },
+            { "string_tag", IconType.StringTag },
+            { "byte_array_tag", IconType.ByteArrayTag },
+            { "int_array_tag", IconType.IntArrayTag },
+            { "long_array_tag", IconType.LongArrayTag },
+            { "compound_tag", IconType.CompoundTag },
+            { "list_tag", IconType.ListTag },
+            { "nbt_studio", IconType.NbtStudio },
+        };
+        public ZippedIconSource(string path, ZipArchive zip)
+        {
+            Filepath = path;
+            foreach (var entry in zip.Entries)
+            {
+                var name = entry.FullName;
+                if (Path.GetExtension(name) != ".png")
+                    continue;
+                var simple = Path.GetFileNameWithoutExtension(name);
+                if (!FileNameMap.TryGetValue(simple, out var type))
+                    continue;
+                var image = Image.FromStream(entry.Open());
+                Icon icon;
+                using (var icon_stream = new MemoryStream())
+                {
+                    ConvertToIcon(image, icon_stream);
+                    icon_stream.Position = 0;
+                    icon = new Icon(icon_stream);
+                }
+                Add(type, image, icon);
+            }
+        }
+
+        private static void ConvertToIcon(Image input, Stream output)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                input.Save(memoryStream, ImageFormat.Png);
+                var iconWriter = new BinaryWriter(output);
+                iconWriter.Write((byte)0);
+                iconWriter.Write((byte)0);
+                iconWriter.Write((short)1);
+                iconWriter.Write((short)1);
+                iconWriter.Write((byte)input.Width);
+                iconWriter.Write((byte)input.Height);
+                iconWriter.Write((byte)0);
+                iconWriter.Write((byte)0);
+                iconWriter.Write((short)0);
+                iconWriter.Write((short)32);
+                iconWriter.Write((int)memoryStream.Length);
+                iconWriter.Write((int)(6 + 16));
+                iconWriter.Write(memoryStream.ToArray());
+                iconWriter.Flush();
+            }
         }
     }
 }

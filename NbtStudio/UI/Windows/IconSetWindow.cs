@@ -12,6 +12,7 @@ namespace NbtStudio.UI
 {
     public partial class IconSetWindow : Form
     {
+        private int SelectedRow = 0;
         private readonly IconSource CurrentSource;
         public IconSource SelectedSource { get; private set; }
         public IconSetWindow(IconSource current)
@@ -19,15 +20,15 @@ namespace NbtStudio.UI
             InitializeComponent();
             CurrentSource = current;
             this.Icon = current.Refresh.Icon;
-            var table = new TableLayoutPanel()
-            {
-                Dock = DockStyle.Fill,
-                AutoSize = true
-            };
+            RefreshIcons();
+        }
+
+        public void RefreshIcons()
+        {
             Action select = () => { };
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            table.CellPaint += Table_CellPaint;
+            int row = 0;
+            IconTable.Controls.Clear();
+            IconTable.RowStyles.Clear();
             foreach (var item in IconSourceRegistry.RegisteredSources)
             {
                 var source = item.Value;
@@ -62,22 +63,23 @@ namespace NbtStudio.UI
                     MakePictureBox(source.Region),
                     MakePictureBox(source.Chunk)
                 });
-                if (current == source)
+                if (CurrentSource == source)
                 {
+                    SelectedRow = row;
                     preview.BackColor = Color.FromArgb(201, 255, 221);
                     select = () => button.Select();
                 }
-                table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
-                table.Controls.Add(button, 0, item.Key);
-                table.Controls.Add(preview, 1, item.Key);
+                IconTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+                IconTable.Controls.Add(button, 0, row);
+                IconTable.Controls.Add(preview, 1, row);
+                row++;
             }
-            Controls.Add(table);
             select();
         }
 
-        private void Table_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
+        private void IconTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
-            if (IconSourceRegistry.GetID(CurrentSource) == e.Row)
+            if (e.Row == SelectedRow)
                 e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(201, 255, 221)), e.CellBounds);
         }
 
@@ -107,6 +109,44 @@ namespace NbtStudio.UI
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void ImportButton_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog
+            {
+                Title = "Select a custom icon ZIP file",
+                RestoreDirectory = false,
+                Multiselect = true,
+                Filter = "ZIP Files|*.zip"
+            })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var file in dialog.FileNames)
+                    {
+                        TryImportSource(file);
+                    }
+                    RefreshIcons();
+                }
+            }
+        }
+
+        public static bool TryImportSource(string path)
+        {
+            try
+            {
+                IconSourceRegistry.RegisterCustomSource(path);
+                Properties.Settings.Default.CustomIconSets.Add(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Properties.Settings.Default.CustomIconSets.Remove(path);
+                MessageBox.Show($"The custom icon source at '{path}' failed to load.\n\n{Util.ExceptionMessage(ex)}",
+                    "Failed to load custom icon source");
+                return false;
+            }
         }
     }
 

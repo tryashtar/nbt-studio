@@ -164,6 +164,12 @@ namespace NbtStudio.UI
             );
             ItemCollection.AddRange(CreateTagButtons.Values);
 
+            if (Properties.Settings.Default.CustomIconSets == null)
+                Properties.Settings.Default.CustomIconSets = new StringCollection();
+            foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
+            {
+                IconSetWindow.TryImportSource(item);
+            }
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
 
             UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
@@ -792,7 +798,7 @@ namespace NbtStudio.UI
             ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
             ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
             bool multiple_files = ViewModel.OpenedFiles.Skip(1).Any();
-            var save_image = multiple_files ? (Func<IconSource, ImageIcon>)(x => x.Save) : (Func<IconSource, ImageIcon>)(x => x.SaveAll);
+            var save_image = multiple_files ? (Func<IconSource, ImageIcon>)(x => x.Save) : (x => x.SaveAll);
             ActionSave.ImageGetter = save_image;
             ActionSaveAs.ImageGetter = save_image;
             ActionUndo.Enabled = UndoHistory.CanUndo;
@@ -934,6 +940,9 @@ namespace NbtStudio.UI
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Properties.Settings.Default.TreeZoom = (int)NbtTree.Font.Size;
+            var icon_sets = Properties.Settings.Default.CustomIconSets.Cast<string>().Distinct().ToArray();
+            Properties.Settings.Default.CustomIconSets.Clear();
+            Properties.Settings.Default.CustomIconSets.AddRange(icon_sets);
             Properties.Settings.Default.Save();
         }
 
