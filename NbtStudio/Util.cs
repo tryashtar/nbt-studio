@@ -229,7 +229,7 @@ namespace NbtStudio
                 message += "\n" + String.Join("\n", aggregate.InnerExceptions.Select(ExceptionMessage));
             else
             {
-                if (exception is WebException web)
+                if (exception is WebException web && web.Response != null)
                 {
                     using (var reader = new StreamReader(web.Response.GetResponseStream()))
                     {

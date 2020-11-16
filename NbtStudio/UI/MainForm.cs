@@ -195,13 +195,19 @@ namespace NbtStudio.UI
             UpdateChecker.ContinueWith(x =>
             {
                 if (x.Status == TaskStatus.Faulted)
-                    MessageBox.Show(Util.ExceptionMessage(x.Exception), "Failed to check for updates");
+                {
+                    if (MessageBox.Show(Util.ExceptionMessage(x.Exception) + "\n\n" +
+                        "Would you like to go to the update page?\n\n" +
+                        "https://github.com/tryashtar/nbt-studio/releases",
+                        "Failed to check for updates", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                        Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                }
                 else if (x.Status == TaskStatus.RanToCompletion)
                 {
                     if (x.Result == null)
                     {
                         if (MessageBox.Show("You already seem to have the latest update.\n" +
-                            "Click OK to go to the update page:\n\n" +
+                            "Would you like to go to the update page?\n\n" +
                             "https://github.com/tryashtar/nbt-studio/releases",
                             "No update found", MessageBoxButtons.OKCancel) == DialogResult.OK)
                             Process.Start("https://github.com/tryashtar/nbt-studio/releases");
