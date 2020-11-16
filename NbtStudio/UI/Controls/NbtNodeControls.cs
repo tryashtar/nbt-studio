@@ -52,13 +52,13 @@ namespace NbtStudio.UI
             if (IconSource == null)
                 return null;
             if (obj is NbtFileNode)
-                return IconSource.File.Image;
+                return IconSource.GetImage(IconType.File).Image;
             if (obj is FolderNode)
-                return IconSource.Folder.Image;
+                return IconSource.GetImage(IconType.Folder).Image;
             if (obj is RegionFileNode)
-                return IconSource.Region.Image;
+                return IconSource.GetImage(IconType.Region).Image;
             if (obj is ChunkNode)
-                return IconSource.Chunk.Image;
+                return IconSource.GetImage(IconType.Chunk).Image;
             if (obj is NbtTagNode tag)
                 return NbtUtil.TagTypeImage(IconSource, tag.Tag.TagType).Image;
             return null;

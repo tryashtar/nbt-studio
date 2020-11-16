@@ -33,6 +33,11 @@ namespace NbtStudio
             Sources[id] = source;
         }
 
+        public static void Unregister(string id)
+        {
+            Sources.Remove(id);
+        }
+
         public static string GetID(IconSource source)
         {
             foreach (var item in Sources)
@@ -119,49 +124,8 @@ namespace NbtStudio
 
     public abstract class IconSource
     {
-        public abstract ImageIcon GetImage(IconType type);
         public abstract string Name { get; }
-
-        public ImageIcon File => GetImage(IconType.File);
-        public ImageIcon Folder => GetImage(IconType.Folder);
-        public ImageIcon Region => GetImage(IconType.Region);
-        public ImageIcon Chunk => GetImage(IconType.Chunk);
-
-        public ImageIcon NewFile => GetImage(IconType.NewFile);
-        public ImageIcon OpenFile => GetImage(IconType.OpenFile);
-        public ImageIcon OpenFolder => GetImage(IconType.OpenFolder);
-        public ImageIcon Save => GetImage(IconType.Save);
-        public ImageIcon SaveAll => GetImage(IconType.SaveAll);
-
-        public ImageIcon Sort => GetImage(IconType.Sort);
-        public ImageIcon Cut => GetImage(IconType.Cut);
-        public ImageIcon Copy => GetImage(IconType.Copy);
-        public ImageIcon Paste => GetImage(IconType.Paste);
-        public ImageIcon Rename => GetImage(IconType.Rename);
-        public ImageIcon Edit => GetImage(IconType.Edit);
-        public ImageIcon EditSnbt => GetImage(IconType.EditSnbt);
-        public ImageIcon Delete => GetImage(IconType.Delete);
-
-        public ImageIcon Undo => GetImage(IconType.Undo);
-        public ImageIcon Redo => GetImage(IconType.Redo);
-        public ImageIcon Refresh => GetImage(IconType.Refresh);
-        public ImageIcon Search => GetImage(IconType.Search);
-        public ImageIcon AddSnbt => GetImage(IconType.AddSnbt);
-
-        public ImageIcon ByteTag => GetImage(IconType.ByteTag);
-        public ImageIcon ShortTag => GetImage(IconType.ShortTag);
-        public ImageIcon IntTag => GetImage(IconType.IntTag);
-        public ImageIcon LongTag => GetImage(IconType.LongTag);
-        public ImageIcon FloatTag => GetImage(IconType.FloatTag);
-        public ImageIcon DoubleTag => GetImage(IconType.DoubleTag);
-        public ImageIcon StringTag => GetImage(IconType.StringTag);
-        public ImageIcon ByteArrayTag => GetImage(IconType.ByteArrayTag);
-        public ImageIcon IntArrayTag => GetImage(IconType.IntArrayTag);
-        public ImageIcon LongArrayTag => GetImage(IconType.LongArrayTag);
-        public ImageIcon CompoundTag => GetImage(IconType.CompoundTag);
-        public ImageIcon ListTag => GetImage(IconType.ListTag);
-
-        public ImageIcon NbtStudio => GetImage(IconType.NbtStudio);
+        public abstract ImageIcon GetImage(IconType type);
     }
 
     public abstract class SimpleIconSource : IconSource
@@ -193,6 +157,11 @@ namespace NbtStudio
             if (defer == null)
                 return default;
             return defer.GetImage(type);
+        }
+
+        public bool IsDeferring(IconType type)
+        {
+            return !Cache.ContainsKey(type);
         }
 
         protected void Add(IconType type, Image image, Icon icon)

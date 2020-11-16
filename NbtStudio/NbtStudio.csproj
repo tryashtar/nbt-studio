@@ -109,6 +109,18 @@
     </Compile>
     <Compile Include="UI\Controls\ConvenienceControls.cs" />
     <Compile Include="UI\Controls\DualMenuItem.cs" />
+    <Compile Include="UI\Controls\IconSourcePreview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\IconSourcePreview.Designer.cs">
+      <DependentUpon>IconSourcePreview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Controls\IconSourceButtons.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\IconSourceButtons.Designer.cs">
+      <DependentUpon>IconSourceButtons.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Windows\IconSetWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -216,6 +228,12 @@
     </Compile>
     <Compile Include="Updater.cs" />
     <Compile Include="Util.cs" />
+    <EmbeddedResource Include="UI\Controls\IconSourcePreview.resx">
+      <DependentUpon>IconSourcePreview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Controls\IconSourceButtons.resx">
+      <DependentUpon>IconSourceButtons.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Windows\IconSetWindow.resx">
       <DependentUpon>IconSetWindow.cs</DependentUpon>
     </EmbeddedResource>

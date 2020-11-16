@@ -16,7 +16,7 @@ namespace NbtStudio.UI
             InitializeComponent();
 
             OriginalItem = file;
-            this.Icon = source.Rename.Icon;
+            this.Icon = source.GetImage(IconType.Rename).Icon;
             NameBox.SetItem(file);
             NameBox.SelectAll();
         }

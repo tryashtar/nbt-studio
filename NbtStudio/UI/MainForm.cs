@@ -40,31 +40,31 @@ namespace NbtStudio.UI
         private readonly string[] ClickedFiles;
 
         private readonly DualItemCollection ItemCollection;
-        private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", x => x.NewFile, Keys.Control | Keys.N);
-        private readonly DualMenuItem ActionNewClipboard = DualMenuItem.SingleMenuItem("New from &Clipboard", x => x.Paste, Keys.Control | Keys.Alt | Keys.V);
-        private readonly DualMenuItem ActionNewRegion = DualMenuItem.SingleMenuItem("New &Region File", x => x.Region, Keys.Control | Keys.Alt | Keys.R);
-        private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", x => x.OpenFile, Keys.Control | Keys.O);
-        private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", x => x.OpenFolder, Keys.Control | Keys.Shift | Keys.O);
-        private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", x => x.Save, Keys.Control | Keys.S);
-        private readonly DualMenuItem ActionSaveAs = DualMenuItem.SingleMenuItem("Save &As", x => x.Save, Keys.Control | Keys.Shift | Keys.S);
+        private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", IconType.NewFile, Keys.Control | Keys.N);
+        private readonly DualMenuItem ActionNewClipboard = DualMenuItem.SingleMenuItem("New from &Clipboard", IconType.Paste, Keys.Control | Keys.Alt | Keys.V);
+        private readonly DualMenuItem ActionNewRegion = DualMenuItem.SingleMenuItem("New &Region File", IconType.Region, Keys.Control | Keys.Alt | Keys.R);
+        private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", IconType.OpenFile, Keys.Control | Keys.O);
+        private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", IconType.OpenFolder, Keys.Control | Keys.Shift | Keys.O);
+        private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", IconType.Save, Keys.Control | Keys.S);
+        private readonly DualMenuItem ActionSaveAs = DualMenuItem.SingleMenuItem("Save &As", IconType.Save, Keys.Control | Keys.Shift | Keys.S);
         private readonly DualMenuItem DropDownRecent = DualMenuItem.SingleMenuItem("&Recent...", null, Keys.None);
-        private readonly DualMenuItem ActionSort = DualMenuItem.SingleButton("Sort", x => x.Sort);
-        private readonly DualMenuItem ActionUndo = DualMenuItem.SingleMenuItem("&Undo", x => x.Undo, Keys.Control | Keys.Z);
-        private readonly DualMenuItem ActionRedo = DualMenuItem.SingleMenuItem("&Redo", x => x.Redo, Keys.Control | Keys.Shift | Keys.Z);
-        private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", x => x.Cut, Keys.Control | Keys.X);
-        private readonly DualMenuItem ActionCopy = new DualMenuItem("&Copy", "Copy", x => x.Copy, Keys.Control | Keys.C);
-        private readonly DualMenuItem ActionPaste = new DualMenuItem("&Paste", "Paste", x => x.Paste, Keys.Control | Keys.V);
-        private readonly DualMenuItem ActionRename = new DualMenuItem("Re&name", "Rename", x => x.Rename, Keys.F2);
-        private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", x => x.Edit, Keys.Control | Keys.E);
-        private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", x => x.EditSnbt, Keys.Control | Keys.Shift | Keys.E);
-        private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", x => x.Delete, Keys.Delete);
-        private readonly DualMenuItem DropDownUndoHistory = DualMenuItem.SingleMenuItem("Undo History...", x => x.Undo, Keys.None);
-        private readonly DualMenuItem DropDownRedoHistory = DualMenuItem.SingleMenuItem("Redo History...", x => x.Redo, Keys.None);
-        private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", x => x.Search, Keys.Control | Keys.F);
-        private readonly DualMenuItem ActionAbout = DualMenuItem.SingleMenuItem("&About", x => x.NbtStudio, Keys.Shift | Keys.F1);
-        private readonly DualMenuItem ActionChangeIcons = DualMenuItem.SingleMenuItem("&Change Icons", x => x.Refresh, Keys.Control | Keys.I);
-        private readonly DualMenuItem ActionAddSnbt = DualMenuItem.SingleButton("Add as SNBT", x => x.AddSnbt);
-        private readonly DualMenuItem ActionAddChunk = DualMenuItem.SingleButton("Add Chunk", x => x.Chunk);
+        private readonly DualMenuItem ActionSort = DualMenuItem.SingleButton("Sort", IconType.Sort);
+        private readonly DualMenuItem ActionUndo = DualMenuItem.SingleMenuItem("&Undo", IconType.Undo, Keys.Control | Keys.Z);
+        private readonly DualMenuItem ActionRedo = DualMenuItem.SingleMenuItem("&Redo", IconType.Redo, Keys.Control | Keys.Shift | Keys.Z);
+        private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", IconType.Cut, Keys.Control | Keys.X);
+        private readonly DualMenuItem ActionCopy = new DualMenuItem("&Copy", "Copy", IconType.Copy, Keys.Control | Keys.C);
+        private readonly DualMenuItem ActionPaste = new DualMenuItem("&Paste", "Paste", IconType.Paste, Keys.Control | Keys.V);
+        private readonly DualMenuItem ActionRename = new DualMenuItem("Re&name", "Rename", IconType.Rename, Keys.F2);
+        private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", IconType.Edit, Keys.Control | Keys.E);
+        private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", IconType.EditSnbt, Keys.Control | Keys.Shift | Keys.E);
+        private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", IconType.Delete, Keys.Delete);
+        private readonly DualMenuItem DropDownUndoHistory = DualMenuItem.SingleMenuItem("Undo History...", IconType.Undo, Keys.None);
+        private readonly DualMenuItem DropDownRedoHistory = DualMenuItem.SingleMenuItem("Redo History...", IconType.Redo, Keys.None);
+        private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", IconType.Search, Keys.Control | Keys.F);
+        private readonly DualMenuItem ActionAbout = DualMenuItem.SingleMenuItem("&About", IconType.NbtStudio, Keys.Shift | Keys.F1);
+        private readonly DualMenuItem ActionChangeIcons = DualMenuItem.SingleMenuItem("&Change Icons", IconType.Refresh, Keys.Control | Keys.I);
+        private readonly DualMenuItem ActionAddSnbt = DualMenuItem.SingleButton("Add as SNBT", IconType.AddSnbt);
+        private readonly DualMenuItem ActionAddChunk = DualMenuItem.SingleButton("Add Chunk", IconType.Chunk);
         private readonly DualMenuItem ActionUpdate = DualMenuItem.SingleMenuItem("&Update", null, Keys.None);
         private readonly DualMenuItem ActionCheckUpdates = DualMenuItem.SingleMenuItem("Check for &Updates", null, Keys.Control | Keys.U);
         public MainForm(string[] args)
@@ -72,6 +72,8 @@ namespace NbtStudio.UI
             ClickedFiles = args;
             if (Properties.Settings.Default.RecentFiles == null)
                 Properties.Settings.Default.RecentFiles = new StringCollection();
+            if (Properties.Settings.Default.CustomIconSets == null)
+                Properties.Settings.Default.CustomIconSets = new StringCollection();
 
             // stuff from the designer
             InitializeComponent();
@@ -164,8 +166,6 @@ namespace NbtStudio.UI
             );
             ItemCollection.AddRange(CreateTagButtons.Values);
 
-            if (Properties.Settings.Default.CustomIconSets == null)
-                Properties.Settings.Default.CustomIconSets = new StringCollection();
             foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
             {
                 IconSetWindow.TryImportSource(item);
@@ -222,7 +222,7 @@ namespace NbtStudio.UI
             ItemCollection.SetIconSource(source);
             NbtTree.SetIconSource(source);
             NbtTree.Refresh();
-            this.Icon = source.NbtStudio.Icon;
+            this.Icon = source.GetImage(IconType.NbtStudio).Icon;
             Properties.Settings.Default.IconSet = IconSourceRegistry.GetID(source);
         }
 
@@ -707,7 +707,7 @@ namespace NbtStudio.UI
             {
                 var button = DualMenuItem.SingleButton(
                     hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
-                    image: x => NbtUtil.TagTypeImage(x, type));
+                    icon: NbtUtil.TagIconType(type));
                 button.Click += (s, e) => AddTag(type);
                 buttons.Add(type, button);
             }
@@ -798,9 +798,9 @@ namespace NbtStudio.UI
             ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
             ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
             bool multiple_files = ViewModel.OpenedFiles.Skip(1).Any();
-            var save_image = multiple_files ? (Func<IconSource, ImageIcon>)(x => x.Save) : (x => x.SaveAll);
-            ActionSave.ImageGetter = save_image;
-            ActionSaveAs.ImageGetter = save_image;
+            var save_image = multiple_files ? IconType.SaveAll : IconType.Save;
+            ActionSave.IconType = save_image;
+            ActionSaveAs.IconType = save_image;
             ActionUndo.Enabled = UndoHistory.CanUndo;
             ActionRedo.Enabled = UndoHistory.CanRedo;
             NbtTree_SelectionChanged(sender, e);
@@ -906,15 +906,15 @@ namespace NbtStudio.UI
                 {
                     if (menu.Items.Count > 0)
                         menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("&Save File", IconSource.Save.Image, (s, ea) => Save(saveable));
-                    menu.Items.Add("Save File &As", IconSource.Save.Image, (s, ea) => SaveAs(saveable));
+                    menu.Items.Add("&Save File", IconSource.GetImage(IconType.Save).Image, (s, ea) => Save(saveable));
+                    menu.Items.Add("Save File &As", IconSource.GetImage(IconType.Save).Image, (s, ea) => SaveAs(saveable));
                 }
                 var path = obj.GetHasPath();
                 if (path?.Path != null)
-                    menu.Items.Add("&Open in Explorer", IconSource.OpenFile.Image, (s, ea) => OpenInExplorer(path));
+                    menu.Items.Add("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, (s, ea) => OpenInExplorer(path));
                 var folder = obj.GetNbtFolder();
                 if (folder != null)
-                    menu.Items.Add("&Refresh", IconSource.Refresh.Image, (s, ea) => folder.Scan());
+                    menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, (s, ea) => folder.Scan());
                 var container = obj.GetNbtTag() as NbtContainerTag;
                 if (container != null)
                 {
@@ -1010,14 +1010,14 @@ namespace NbtStudio.UI
             EventHandler click;
             if (directory)
             {
-                image = IconSource.Folder.Image;
+                image = IconSource.GetImage(IconType.Folder).Image;
                 click = (s, e) => OpenFolder(path);
             }
             else
             {
                 if (!File.Exists(path))
                     return null;
-                image = IconSource.File.Image;
+                image = IconSource.GetImage(IconType.File).Image;
                 click = (s, e) => OpenFiles(new[] { path });
             }
             return new ToolStripMenuItem(path, image, click);

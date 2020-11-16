@@ -19,12 +19,13 @@ namespace NbtStudio.UI
         {
             InitializeComponent();
             CurrentSource = current;
-            this.Icon = current.Refresh.Icon;
+            this.Icon = current.GetImage(IconType.Refresh).Icon;
             RefreshIcons();
         }
 
         public void RefreshIcons()
         {
+            SuspendLayout();
             Action select = () => { };
             int row = 0;
             IconTable.Controls.Clear();
@@ -32,68 +33,43 @@ namespace NbtStudio.UI
             foreach (var item in IconSourceRegistry.RegisteredSources)
             {
                 var source = item.Value;
-                var button = new Button()
-                {
-                    Font = this.Font,
-                    Text = source.Name,
-                    Dock = DockStyle.Fill,
-                    Margin = new Padding(5)
-                };
-                button.Click += (s, e) =>
+                var buttons = new IconSourceButtons(source);
+                buttons.Dock = DockStyle.Fill;
+                IconTable.RowStyles.Add(new RowStyle(SizeType.Absolute, buttons.Height));
+                IconTable.Controls.Add(buttons, 0, row);
+                if (buttons.PreferredSize.Width > IconTable.ColumnStyles[0].Width)
+                    IconTable.ColumnStyles[0].Width = buttons.PreferredSize.Width;
+                buttons.ConfirmClicked += (s, e) =>
                 {
                     SelectedSource = source;
                     this.Close();
                 };
-                var preview = new FlowLayoutPanel()
+                buttons.DeleteClicked += (s, e) =>
                 {
-                    Dock = DockStyle.Fill,
-                    AutoSize = true
+                    IconSourceRegistry.Unregister(item.Key);
+                    Properties.Settings.Default.CustomIconSets.Remove(item.Key);
+                    RefreshIcons();
                 };
-                preview.Controls.AddRange(new[]
-                {
-                    MakePictureBox(source.OpenFile),
-                    MakePictureBox(source.Save),
-                    MakePictureBox(source.Edit),
-                    MakePictureBox(source.Cut),
-                    MakePictureBox(source.Undo),
-                    MakePictureBox(source.ByteTag),
-                    MakePictureBox(source.StringTag),
-                    MakePictureBox(source.IntArrayTag),
-                    MakePictureBox(source.ListTag),
-                    MakePictureBox(source.Region),
-                    MakePictureBox(source.Chunk)
-                });
+                var preview = new IconSourcePreview(source);
+                preview.Dock = DockStyle.Fill;
+                IconTable.Controls.Add(preview, 1, row);
                 if (CurrentSource == source)
                 {
                     SelectedRow = row;
+                    buttons.BackColor = Color.FromArgb(201, 255, 221);
                     preview.BackColor = Color.FromArgb(201, 255, 221);
-                    select = () => button.Select();
+                    select = () => buttons.Select();
                 }
-                IconTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
-                IconTable.Controls.Add(button, 0, row);
-                IconTable.Controls.Add(preview, 1, row);
                 row++;
             }
             select();
+            ResumeLayout();
         }
 
         private void IconTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
             if (e.Row == SelectedRow)
                 e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(201, 255, 221)), e.CellBounds);
-        }
-
-        private PictureBox MakePictureBox(ImageIcon icon)
-        {
-            return new InterpPictureBox
-            {
-                Height = 32,
-                Width = 32,
-                Margin = new Padding(5),
-                Image = icon.Image,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                InterpolationMode = InterpolationMode.NearestNeighbor
-            };
         }
 
         private void IconSetWindow_Load(object sender, EventArgs e)
@@ -147,16 +123,6 @@ namespace NbtStudio.UI
                     "Failed to load custom icon source");
                 return false;
             }
-        }
-    }
-
-    public class InterpPictureBox : PictureBox
-    {
-        public InterpolationMode InterpolationMode;
-        protected override void OnPaint(PaintEventArgs pe)
-        {
-            pe.Graphics.InterpolationMode = InterpolationMode;
-            base.OnPaint(pe);
         }
     }
 }

@@ -478,33 +478,38 @@ namespace NbtStudio
             return $"{AllFiles}|{AllNbtFiles}|{IndividualNbtFiles()}";
         }
 
-        public static ImageIcon TagTypeImage(IconSource source, NbtTagType type)
+        public static IconType TagIconType(NbtTagType type)
         {
             if (type == NbtTagType.Byte)
-                return source.ByteTag;
+                return IconType.ByteTag;
             if (type == NbtTagType.Short)
-                return source.ShortTag;
+                return IconType.ShortTag;
             if (type == NbtTagType.Int)
-                return source.IntTag;
+                return IconType.IntTag;
             if (type == NbtTagType.Long)
-                return source.LongTag;
+                return IconType.LongTag;
             if (type == NbtTagType.Float)
-                return source.FloatTag;
+                return IconType.FloatTag;
             if (type == NbtTagType.Double)
-                return source.DoubleTag;
+                return IconType.DoubleTag;
             if (type == NbtTagType.String)
-                return source.StringTag;
+                return IconType.StringTag;
             if (type == NbtTagType.ByteArray)
-                return source.ByteArrayTag;
+                return IconType.ByteArrayTag;
             if (type == NbtTagType.IntArray)
-                return source.IntArrayTag;
+                return IconType.IntArrayTag;
             if (type == NbtTagType.LongArray)
-                return source.LongArrayTag;
+                return IconType.LongArrayTag;
             if (type == NbtTagType.Compound)
-                return source.CompoundTag;
+                return IconType.CompoundTag;
             if (type == NbtTagType.List)
-                return source.ListTag;
-            return default;
+                return IconType.ListTag;
+            throw new ArgumentException($"No icon for {type}");
+        }
+
+        public static ImageIcon TagTypeImage(IconSource source, NbtTagType type)
+        {
+            return source.GetImage(TagIconType(type));
         }
 
         public static void AddTo(this NbtTag tag, NbtContainerTag container)

@@ -22,7 +22,7 @@ namespace NbtStudio.UI
             ChunkRegion = region;
             Manager = new ChunkCoordsEditControls(chunk, region, XBox, ZBox);
 
-            this.Icon = source.Chunk.Icon;
+            this.Icon = source.GetImage(IconType.Chunk).Icon;
             if (purpose == ChunkEditPurpose.Create)
                 this.Text = $"Create Chunk";
             else if (purpose == ChunkEditPurpose.Move)
