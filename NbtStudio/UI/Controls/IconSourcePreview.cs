@@ -9,28 +9,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 
-namespace NbtStudio
+namespace NbtStudio.UI
 {
     public partial class IconSourcePreview : UserControl
     {
-        public IconSourcePreview(IconSource source)
+        private FullIconPreviewWindow FullDisplayForm;
+        private readonly IconSource Source;
+        public IconSourcePreview(IconSource source, params IconType[] types) : this(source, true, types)
+        { }
+
+        public IconSourcePreview(IconSource source, bool show_preview_button, params IconType[] types)
         {
+            Source = source;
             InitializeComponent();
 
-            IconsPanel.Controls.AddRange(new[]
-               {
-                    MakePictureBox(source, IconType.OpenFile),
-                    MakePictureBox(source, IconType.Save),
-                    MakePictureBox(source, IconType.Edit),
-                    MakePictureBox(source, IconType.Cut),
-                    MakePictureBox(source, IconType.Undo),
-                    MakePictureBox(source, IconType.ByteTag),
-                    MakePictureBox(source, IconType.StringTag),
-                    MakePictureBox(source, IconType.IntArrayTag),
-                    MakePictureBox(source, IconType.ListTag),
-                    MakePictureBox(source, IconType.Region),
-                    MakePictureBox(source, IconType.Chunk)
-                });
+            var boxes = types.Select(x => MakePictureBox(source, x)).ToArray();
+            IconsPanel.Controls.AddRange(boxes);
+            IconsPanel.Controls.Add(PreviewButton);
+            if (!show_preview_button)
+                PreviewButton.Visible = false;
         }
 
         private PictureBox MakePictureBox(IconSource source, IconType type)
@@ -47,6 +44,20 @@ namespace NbtStudio
             if (source is DeferToDefaultIconSource defer && defer.IsDeferring(type))
                 box.Enabled = false;
             return box;
+        }
+
+        private void PreviewButton_Click(object sender, EventArgs e)
+        {
+            if (FullDisplayForm == null || FullDisplayForm.IsDisposed)
+                FullDisplayForm = new FullIconPreviewWindow(Source);
+            if (!FullDisplayForm.Visible)
+            {
+                FullDisplayForm.Show(this.ParentForm);
+                FullDisplayForm.Location = this.PointToScreen(new Point(-20, 0));
+            }
+            else
+                FullDisplayForm.Close();
+            FullDisplayForm.Focus();
         }
     }
 

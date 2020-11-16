@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace NbtStudio
+namespace NbtStudio.UI
 {
     public partial class IconSourceButtons : UserControl
     {

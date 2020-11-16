@@ -1,4 +1,4 @@
-﻿namespace NbtStudio
+﻿namespace NbtStudio.UI
 {
     partial class IconSourcePreview
     {
@@ -29,16 +29,30 @@
         private void InitializeComponent()
         {
             this.IconsPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.PreviewButton = new System.Windows.Forms.Button();
+            this.IconsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // IconsPanel
             // 
             this.IconsPanel.AutoSize = true;
+            this.IconsPanel.Controls.Add(this.PreviewButton);
             this.IconsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IconsPanel.Location = new System.Drawing.Point(0, 0);
             this.IconsPanel.Name = "IconsPanel";
             this.IconsPanel.Size = new System.Drawing.Size(299, 46);
             this.IconsPanel.TabIndex = 0;
+            // 
+            // PreviewButton
+            // 
+            this.PreviewButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.PreviewButton.Location = new System.Drawing.Point(3, 3);
+            this.PreviewButton.Name = "PreviewButton";
+            this.PreviewButton.Size = new System.Drawing.Size(40, 40);
+            this.PreviewButton.TabIndex = 1;
+            this.PreviewButton.Text = "👁️";
+            this.PreviewButton.UseVisualStyleBackColor = true;
+            this.PreviewButton.Click += new System.EventHandler(this.PreviewButton_Click);
             // 
             // IconSourcePreview
             // 
@@ -49,6 +63,7 @@
             this.Controls.Add(this.IconsPanel);
             this.Name = "IconSourcePreview";
             this.Size = new System.Drawing.Size(299, 46);
+            this.IconsPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -57,5 +72,6 @@
         #endregion
 
         private System.Windows.Forms.FlowLayoutPanel IconsPanel;
+        private System.Windows.Forms.Button PreviewButton;
     }
 }

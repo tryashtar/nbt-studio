@@ -49,7 +49,19 @@ namespace NbtStudio.UI
                     Properties.Settings.Default.CustomIconSets.Remove(item.Key);
                     RefreshIcons();
                 };
-                var preview = new IconSourcePreview(source);
+                var preview = new IconSourcePreview(source,
+                    IconType.OpenFile,
+                    IconType.Save,
+                    IconType.Edit,
+                    IconType.Cut,
+                    IconType.Undo,
+                    IconType.ByteTag,
+                    IconType.StringTag,
+                    IconType.IntArrayTag,
+                    IconType.ListTag,
+                    IconType.Region,
+                    IconType.Chunk
+                );
                 preview.Dock = DockStyle.Fill;
                 IconTable.Controls.Add(preview, 1, row);
                 IconTable.RowStyles[row].Height = Math.Max(IconTable.RowStyles[row].Height, preview.PreferredSize.Height + 5);

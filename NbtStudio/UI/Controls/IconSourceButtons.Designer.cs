@@ -1,4 +1,4 @@
-﻿namespace NbtStudio
+﻿namespace NbtStudio.UI
 {
     partial class IconSourceButtons
     {
