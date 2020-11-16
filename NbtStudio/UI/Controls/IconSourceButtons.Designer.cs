@@ -39,7 +39,7 @@
             this.DeleteButton.Location = new System.Drawing.Point(0, 0);
             this.DeleteButton.Margin = new System.Windows.Forms.Padding(5);
             this.DeleteButton.Name = "DeleteButton";
-            this.DeleteButton.Size = new System.Drawing.Size(24, 46);
+            this.DeleteButton.Size = new System.Drawing.Size(41, 46);
             this.DeleteButton.TabIndex = 1;
             this.DeleteButton.Text = "✖";
             this.DeleteButton.UseVisualStyleBackColor = true;
@@ -49,11 +49,11 @@
             // 
             this.ConfirmButton.AutoSize = true;
             this.ConfirmButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.ConfirmButton.Location = new System.Drawing.Point(24, 0);
+            this.ConfirmButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.ConfirmButton.Location = new System.Drawing.Point(41, 0);
             this.ConfirmButton.Margin = new System.Windows.Forms.Padding(0, 5, 5, 5);
             this.ConfirmButton.Name = "ConfirmButton";
-            this.ConfirmButton.Size = new System.Drawing.Size(275, 46);
+            this.ConfirmButton.Size = new System.Drawing.Size(258, 46);
             this.ConfirmButton.TabIndex = 0;
             this.ConfirmButton.UseVisualStyleBackColor = true;
             this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);

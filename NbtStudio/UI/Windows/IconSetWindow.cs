@@ -37,8 +37,7 @@ namespace NbtStudio.UI
                 buttons.Dock = DockStyle.Fill;
                 IconTable.RowStyles.Add(new RowStyle(SizeType.Absolute, buttons.Height));
                 IconTable.Controls.Add(buttons, 0, row);
-                if (buttons.PreferredSize.Width > IconTable.ColumnStyles[0].Width)
-                    IconTable.ColumnStyles[0].Width = buttons.PreferredSize.Width;
+                IconTable.ColumnStyles[0].Width = Math.Max(IconTable.ColumnStyles[0].Width, buttons.PreferredSize.Width + 5);
                 buttons.ConfirmClicked += (s, e) =>
                 {
                     SelectedSource = source;
@@ -53,6 +52,7 @@ namespace NbtStudio.UI
                 var preview = new IconSourcePreview(source);
                 preview.Dock = DockStyle.Fill;
                 IconTable.Controls.Add(preview, 1, row);
+                IconTable.RowStyles[row].Height = Math.Max(IconTable.RowStyles[row].Height, preview.PreferredSize.Height + 5);
                 if (CurrentSource == source)
                 {
                     SelectedRow = row;
@@ -113,7 +113,8 @@ namespace NbtStudio.UI
             try
             {
                 IconSourceRegistry.RegisterCustomSource(path);
-                Properties.Settings.Default.CustomIconSets.Add(path);
+                if (!Properties.Settings.Default.CustomIconSets.Contains(path))
+                    Properties.Settings.Default.CustomIconSets.Add(path);
                 return true;
             }
             catch (Exception ex)

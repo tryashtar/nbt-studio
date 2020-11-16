@@ -33,6 +33,7 @@
             // 
             // IconsPanel
             // 
+            this.IconsPanel.AutoSize = true;
             this.IconsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IconsPanel.Location = new System.Drawing.Point(0, 0);
             this.IconsPanel.Name = "IconsPanel";
@@ -49,6 +50,7 @@
             this.Name = "IconSourcePreview";
             this.Size = new System.Drawing.Size(299, 46);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
