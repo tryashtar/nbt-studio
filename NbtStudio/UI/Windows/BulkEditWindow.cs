@@ -27,14 +27,14 @@ namespace NbtStudio.UI
             if (purpose == BulkEditPurpose.Rename)
             {
                 this.Text = $"Rename {Util.Pluralize(tags.Count, "tag")}";
-                this.Icon = source.Rename.Icon;
+                this.Icon = source.GetImage(IconType.Rename).Icon;
                 CurrentColumn.Text = "Current Name";
                 NewColumn.Text = "New Name";
             }
             else
             {
                 this.Text = $"Edit {Util.Pluralize(tags.Count, "tag")}";
-                this.Icon = source.Edit.Icon;
+                this.Icon = source.GetImage(IconType.Edit).Icon;
                 CurrentColumn.Text = "Current Value";
                 NewColumn.Text = "New Value";
             }

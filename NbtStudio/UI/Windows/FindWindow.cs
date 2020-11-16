@@ -21,7 +21,7 @@ namespace NbtStudio.UI
             InitializeComponent();
 
             SearchingView = view;
-            this.Icon = source.Search.Icon;
+            this.Icon = source.GetImage(IconType.Search).Icon;
             UpdateButtons();
         }
 

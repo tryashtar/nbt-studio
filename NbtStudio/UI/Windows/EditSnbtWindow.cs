@@ -55,7 +55,7 @@ namespace NbtStudio.UI
                 InputBox.SetFromTag(tag);
             if (required == null)
             {
-                this.Icon = source.AddSnbt.Icon;
+                this.Icon = source.GetImage(IconType.AddSnbt).Icon;
                 this.Text = "Create Tag as SNBT";
             }
             else

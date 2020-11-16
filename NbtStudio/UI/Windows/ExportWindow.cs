@@ -13,7 +13,7 @@ namespace NbtStudio.UI
         public ExportWindow(IconSource source, ExportSettings template, string destination_path)
         {
             InitializeComponent();
-            this.Icon = source.Save.Icon;
+            this.Icon = source.GetImage(IconType.Save).Icon;
             CompressionBox.Items.Add(new CompressionDisplay("Uncompressed", NbtCompression.None));
             CompressionBox.Items.Add(new CompressionDisplay("G-Zip", NbtCompression.GZip));
             CompressionBox.Items.Add(new CompressionDisplay("ZLib", NbtCompression.ZLib));

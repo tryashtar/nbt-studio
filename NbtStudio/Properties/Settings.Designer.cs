@@ -108,13 +108,24 @@ namespace NbtStudio.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int IconSet {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string IconSet {
             get {
-                return ((int)(this["IconSet"]));
+                return ((string)(this["IconSet"]));
             }
             set {
                 this["IconSet"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection CustomIconSets {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["CustomIconSets"]));
+            }
+            set {
+                this["CustomIconSets"] = value;
             }
         }
     }

@@ -46,16 +46,16 @@ namespace NbtStudio.UI
                     Button.Visible = value;
             }
         }
-        private Func<IconSource, ImageIcon> _ImageGetter;
-        public Func<IconSource, ImageIcon> ImageGetter
+        private IconType? _IconType;
+        public IconType? IconType
         {
-            get => _ImageGetter;
+            get => _IconType;
             set
             {
-                _ImageGetter = value;
-                if (_IconSource != null && _ImageGetter != null)
+                _IconType = value;
+                if (_IconSource != null && _IconType != null)
                 {
-                    var image = _ImageGetter(_IconSource).Image;
+                    var image = _IconSource.GetImage(_IconType.Value).Image;
                     if (MenuItem != null)
                         MenuItem.Image = image;
                     if (Button != null)
@@ -70,9 +70,9 @@ namespace NbtStudio.UI
             set
             {
                 _IconSource = value;
-                if (_IconSource != null && _ImageGetter != null)
+                if (_IconSource != null && _IconType != null)
                 {
-                    var image = _ImageGetter(_IconSource).Image;
+                    var image = _IconSource.GetImage(_IconType.Value).Image;
                     if (MenuItem != null)
                         MenuItem.Image = image;
                     if (Button != null)
@@ -81,9 +81,9 @@ namespace NbtStudio.UI
             }
         }
 
-        public DualMenuItem(string text, string hover, Func<IconSource, ImageIcon> image, Keys shortcut)
+        public DualMenuItem(string text, string hover, IconType? icon, Keys shortcut)
         {
-            _ImageGetter = image;
+            _IconType = icon;
             MenuItem = CreateMenuItem(text, shortcut);
             Button = CreateButton(hover);
             MenuItem.Click += (s, e) => Click?.Invoke(s, e);
@@ -96,20 +96,20 @@ namespace NbtStudio.UI
             Button = button;
         }
 
-        public static DualMenuItem SingleMenuItem(string text, Func<IconSource, ImageIcon> image, Keys shortcut)
+        public static DualMenuItem SingleMenuItem(string text, IconType? icon, Keys shortcut)
         {
             var menu = CreateMenuItem(text, shortcut);
             var item = new DualMenuItem(menu, null);
-            item._ImageGetter = image;
+            item._IconType = icon;
             menu.Click += (s, e) => item.Click?.Invoke(s, e);
             return item;
         }
 
-        public static DualMenuItem SingleButton(string hover, Func<IconSource, ImageIcon> image)
+        public static DualMenuItem SingleButton(string hover, IconType? icon)
         {
             var button = CreateButton(hover);
             var item = new DualMenuItem(null, button);
-            item._ImageGetter = image;
+            item._IconType = icon;
             button.Click += (s, e) => item.Click?.Invoke(s, e);
             return item;
         }

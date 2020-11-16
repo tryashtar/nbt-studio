@@ -12,86 +12,76 @@ namespace NbtStudio.UI
 {
     public partial class IconSetWindow : Form
     {
+        private int SelectedRow = 0;
         private readonly IconSource CurrentSource;
         public IconSource SelectedSource { get; private set; }
         public IconSetWindow(IconSource current)
         {
             InitializeComponent();
             CurrentSource = current;
-            this.Icon = current.Refresh.Icon;
-            var table = new TableLayoutPanel()
-            {
-                Dock = DockStyle.Fill,
-                AutoSize = true
-            };
+            this.Icon = current.GetImage(IconType.Refresh).Icon;
+            RefreshIcons();
+        }
+
+        public void RefreshIcons()
+        {
+            SuspendLayout();
             Action select = () => { };
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            table.CellPaint += Table_CellPaint;
+            int row = 0;
+            IconTable.Controls.Clear();
+            IconTable.RowStyles.Clear();
             foreach (var item in IconSourceRegistry.RegisteredSources)
             {
                 var source = item.Value;
-                var button = new Button()
-                {
-                    Font = this.Font,
-                    Text = source.Name,
-                    Dock = DockStyle.Fill,
-                    Margin = new Padding(5)
-                };
-                button.Click += (s, e) =>
+                var buttons = new IconSourceButtons(source);
+                buttons.Dock = DockStyle.Fill;
+                IconTable.RowStyles.Add(new RowStyle(SizeType.Absolute, buttons.Height));
+                IconTable.Controls.Add(buttons, 0, row);
+                IconTable.ColumnStyles[0].Width = Math.Max(IconTable.ColumnStyles[0].Width, buttons.PreferredSize.Width + 5);
+                buttons.ConfirmClicked += (s, e) =>
                 {
                     SelectedSource = source;
                     this.Close();
                 };
-                var preview = new FlowLayoutPanel()
+                buttons.DeleteClicked += (s, e) =>
                 {
-                    Dock = DockStyle.Fill,
-                    AutoSize = true
+                    IconSourceRegistry.Unregister(item.Key);
+                    Properties.Settings.Default.CustomIconSets.Remove(item.Key);
+                    RefreshIcons();
                 };
-                preview.Controls.AddRange(new[]
+                var preview = new IconSourcePreview(source,
+                    IconType.OpenFile,
+                    IconType.Save,
+                    IconType.Edit,
+                    IconType.Cut,
+                    IconType.Undo,
+                    IconType.ByteTag,
+                    IconType.StringTag,
+                    IconType.IntArrayTag,
+                    IconType.ListTag,
+                    IconType.Region,
+                    IconType.Chunk
+                );
+                preview.Dock = DockStyle.Fill;
+                IconTable.Controls.Add(preview, 1, row);
+                IconTable.RowStyles[row].Height = Math.Max(IconTable.RowStyles[row].Height, preview.PreferredSize.Height + 5);
+                if (CurrentSource == source)
                 {
-                    MakePictureBox(source.OpenFile),
-                    MakePictureBox(source.Save),
-                    MakePictureBox(source.Edit),
-                    MakePictureBox(source.Cut),
-                    MakePictureBox(source.Undo),
-                    MakePictureBox(source.ByteTag),
-                    MakePictureBox(source.StringTag),
-                    MakePictureBox(source.IntArrayTag),
-                    MakePictureBox(source.ListTag),
-                    MakePictureBox(source.Region),
-                    MakePictureBox(source.Chunk)
-                });
-                if (current == source)
-                {
+                    SelectedRow = row;
+                    buttons.BackColor = Color.FromArgb(201, 255, 221);
                     preview.BackColor = Color.FromArgb(201, 255, 221);
-                    select = () => button.Select();
+                    select = () => buttons.Select();
                 }
-                table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
-                table.Controls.Add(button, 0, item.Key);
-                table.Controls.Add(preview, 1, item.Key);
+                row++;
             }
-            Controls.Add(table);
             select();
+            ResumeLayout();
         }
 
-        private void Table_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
+        private void IconTable_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
-            if (IconSourceRegistry.GetID(CurrentSource) == e.Row)
+            if (e.Row == SelectedRow)
                 e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(201, 255, 221)), e.CellBounds);
-        }
-
-        private PictureBox MakePictureBox(ImageIcon icon)
-        {
-            return new InterpPictureBox
-            {
-                Height = 32,
-                Width = 32,
-                Margin = new Padding(5),
-                Image = icon.Image,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                InterpolationMode = InterpolationMode.NearestNeighbor
-            };
         }
 
         private void IconSetWindow_Load(object sender, EventArgs e)
@@ -108,15 +98,44 @@ namespace NbtStudio.UI
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
-    }
 
-    public class InterpPictureBox : PictureBox
-    {
-        public InterpolationMode InterpolationMode;
-        protected override void OnPaint(PaintEventArgs pe)
+        private void ImportButton_Click(object sender, EventArgs e)
         {
-            pe.Graphics.InterpolationMode = InterpolationMode;
-            base.OnPaint(pe);
+            using (var dialog = new OpenFileDialog
+            {
+                Title = "Select a custom icon ZIP file",
+                RestoreDirectory = false,
+                Multiselect = true,
+                Filter = "ZIP Files|*.zip"
+            })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var file in dialog.FileNames)
+                    {
+                        TryImportSource(file);
+                    }
+                    RefreshIcons();
+                }
+            }
+        }
+
+        public static bool TryImportSource(string path)
+        {
+            try
+            {
+                IconSourceRegistry.RegisterCustomSource(path);
+                if (!Properties.Settings.Default.CustomIconSets.Contains(path))
+                    Properties.Settings.Default.CustomIconSets.Add(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Properties.Settings.Default.CustomIconSets.Remove(path);
+                MessageBox.Show($"The custom icon source at '{path}' failed to load.\n\n{Util.ExceptionMessage(ex)}",
+                    "Failed to load custom icon source");
+                return false;
+            }
         }
     }
 }
