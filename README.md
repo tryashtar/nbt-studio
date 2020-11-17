@@ -1,4 +1,4 @@
-# <img src="NbtStudio/Resources/app_image_256.png" width=48> NBT Studio
+# <img src="NbtStudio/Resources/nbt_studio_icon_256.png" width=48> NBT Studio
 
 ### [Download link](https://github.com/tryashtar/nbt-studio/releases)
 
