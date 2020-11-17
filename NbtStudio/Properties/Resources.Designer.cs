@@ -61,1041 +61,341 @@ namespace NbtStudio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon app_icon_16 {
-            get {
-                object obj = ResourceManager.GetObject("app_icon_16", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon app_icon_256 {
-            get {
-                object obj = ResourceManager.GetObject("app_icon_256", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap app_image_16 {
-            get {
-                object obj = ResourceManager.GetObject("app_image_16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap app_image_256 {
-            get {
-                object obj = ResourceManager.GetObject("app_image_256", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_add_snbt_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_add_snbt_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_add_snbt_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_add_snbt_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_copy_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_copy_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_copy_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_copy_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_cut_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_cut_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_cut_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_cut_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_delete_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_delete_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_delete_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_delete_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_edit_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_edit_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_edit_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_edit_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_edit_snbt_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_edit_snbt_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_edit_snbt_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_edit_snbt_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_new_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_new_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_new_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_new_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_open_file_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_open_file_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_open_file_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_open_file_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_open_folder_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_open_folder_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_open_folder_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_open_folder_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_paste_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_paste_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_paste_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_paste_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_redo_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_redo_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_redo_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_redo_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_refresh_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_refresh_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_refresh_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_refresh_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_rename_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_rename_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_rename_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_rename_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_save_all_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_save_all_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_save_all_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_save_all_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_save_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_save_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_save_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_save_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_search_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_search_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_search_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_search_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_sort_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_sort_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_sort_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_sort_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_action_undo_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_undo_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_action_undo_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_action_undo_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_chunk_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_chunk_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_chunk_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_chunk_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_file_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_file_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_file_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_file_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_folder_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_folder_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_folder_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_folder_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon classic_region_icon {
-            get {
-                object obj = ResourceManager.GetObject("classic_region_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap classic_region_image {
-            get {
-                object obj = ResourceManager.GetObject("classic_region_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_file_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_file_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap legacy_file_image {
-            get {
-                object obj = ResourceManager.GetObject("legacy_file_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_folder_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_folder_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap legacy_folder_image {
-            get {
-                object obj = ResourceManager.GetObject("legacy_folder_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_region_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_region_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_region_image {
+        internal static System.Drawing.Bitmap amber_action_add_snbt {
             get {
-                object obj = ResourceManager.GetObject("legacy_region_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_add_snbt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_byte_array_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_byte_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_byte_array_image {
+        internal static System.Drawing.Bitmap amber_action_copy {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_byte_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_copy", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_byte_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_byte_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_byte_image {
+        internal static System.Drawing.Bitmap amber_action_cut {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_byte_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_cut", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_compound_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_compound_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_compound_image {
+        internal static System.Drawing.Bitmap amber_action_delete {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_compound_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_delete", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_double_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_double_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_double_image {
+        internal static System.Drawing.Bitmap amber_action_edit {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_double_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_edit", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_float_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_float_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_float_image {
+        internal static System.Drawing.Bitmap amber_action_edit_snbt {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_float_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_edit_snbt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_int_array_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_int_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_int_array_image {
+        internal static System.Drawing.Bitmap amber_action_new_file {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_int_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_new_file", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_int_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_int_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_int_image {
+        internal static System.Drawing.Bitmap amber_action_open_file {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_int_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_open_file", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_list_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_list_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_list_image {
+        internal static System.Drawing.Bitmap amber_action_open_folder {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_list_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_open_folder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_long_array_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_long_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_long_array_image {
+        internal static System.Drawing.Bitmap amber_action_paste {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_long_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_paste", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_long_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_long_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_long_image {
+        internal static System.Drawing.Bitmap amber_action_redo {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_long_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_redo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_short_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_short_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_short_image {
+        internal static System.Drawing.Bitmap amber_action_refresh {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_short_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_refresh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon legacy_tag_string_icon {
-            get {
-                object obj = ResourceManager.GetObject("legacy_tag_string_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap legacy_tag_string_image {
+        internal static System.Drawing.Bitmap amber_action_rename {
             get {
-                object obj = ResourceManager.GetObject("legacy_tag_string_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_rename", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon new_action_add_snbt_icon {
-            get {
-                object obj = ResourceManager.GetObject("new_action_add_snbt_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_add_snbt_image {
+        internal static System.Drawing.Bitmap amber_action_save {
             get {
-                object obj = ResourceManager.GetObject("new_action_add_snbt_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon new_action_copy_icon {
-            get {
-                object obj = ResourceManager.GetObject("new_action_copy_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_copy_image {
+        internal static System.Drawing.Bitmap amber_action_save_all {
             get {
-                object obj = ResourceManager.GetObject("new_action_copy_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_save_all", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon new_action_cut_icon {
-            get {
-                object obj = ResourceManager.GetObject("new_action_cut_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_cut_image {
+        internal static System.Drawing.Bitmap amber_action_search {
             get {
-                object obj = ResourceManager.GetObject("new_action_cut_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_search", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon new_action_delete_icon {
-            get {
-                object obj = ResourceManager.GetObject("new_action_delete_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_delete_image {
+        internal static System.Drawing.Bitmap amber_action_sort {
             get {
-                object obj = ResourceManager.GetObject("new_action_delete_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_sort", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon new_action_edit_icon {
-            get {
-                object obj = ResourceManager.GetObject("new_action_edit_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_edit_image {
+        internal static System.Drawing.Bitmap amber_action_undo {
             get {
-                object obj = ResourceManager.GetObject("new_action_edit_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/action_undo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_edit_snbt_icon {
+        internal static System.Drawing.Bitmap amber_file_chunk {
             get {
-                object obj = ResourceManager.GetObject("new_action_edit_snbt_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/file_chunk", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_edit_snbt_image {
+        internal static System.Drawing.Bitmap amber_file_file {
             get {
-                object obj = ResourceManager.GetObject("new_action_edit_snbt_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/file_file", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_new_icon {
+        internal static System.Drawing.Bitmap amber_file_folder {
             get {
-                object obj = ResourceManager.GetObject("new_action_new_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/file_folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_new_image {
+        internal static System.Drawing.Bitmap amber_file_region {
             get {
-                object obj = ResourceManager.GetObject("new_action_new_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/file_region", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_open_file_icon {
+        internal static System.Drawing.Bitmap amber_tag_byte {
             get {
-                object obj = ResourceManager.GetObject("new_action_open_file_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_byte", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_open_file_image {
+        internal static System.Drawing.Bitmap amber_tag_byte_array {
             get {
-                object obj = ResourceManager.GetObject("new_action_open_file_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_byte_array", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_open_folder_icon {
+        internal static System.Drawing.Bitmap amber_tag_compound {
             get {
-                object obj = ResourceManager.GetObject("new_action_open_folder_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_compound", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_open_folder_image {
+        internal static System.Drawing.Bitmap amber_tag_double {
             get {
-                object obj = ResourceManager.GetObject("new_action_open_folder_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_double", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_paste_icon {
+        internal static System.Drawing.Bitmap amber_tag_float {
             get {
-                object obj = ResourceManager.GetObject("new_action_paste_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_float", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_paste_image {
+        internal static System.Drawing.Bitmap amber_tag_int {
             get {
-                object obj = ResourceManager.GetObject("new_action_paste_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_int", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_redo_icon {
+        internal static System.Drawing.Bitmap amber_tag_int_array {
             get {
-                object obj = ResourceManager.GetObject("new_action_redo_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_int_array", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_redo_image {
+        internal static System.Drawing.Bitmap amber_tag_list {
             get {
-                object obj = ResourceManager.GetObject("new_action_redo_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_list", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_refresh_icon {
+        internal static System.Drawing.Bitmap amber_tag_long {
             get {
-                object obj = ResourceManager.GetObject("new_action_refresh_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_long", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_refresh_image {
+        internal static System.Drawing.Bitmap amber_tag_long_array {
             get {
-                object obj = ResourceManager.GetObject("new_action_refresh_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_long_array", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_rename_icon {
+        internal static System.Drawing.Bitmap amber_tag_short {
             get {
-                object obj = ResourceManager.GetObject("new_action_rename_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("amber/tag_short", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_rename_image {
+        internal static System.Drawing.Bitmap amber_tag_string {
             get {
-                object obj = ResourceManager.GetObject("new_action_rename_image", resourceCulture);
+                object obj = ResourceManager.GetObject("amber/tag_string", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1103,29 +403,19 @@ namespace NbtStudio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon new_action_save_all_icon {
+        internal static System.Drawing.Icon nbt_studio_icon_16 {
             get {
-                object obj = ResourceManager.GetObject("new_action_save_all_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("nbt_studio_icon_16", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap new_action_save_all_image {
-            get {
-                object obj = ResourceManager.GetObject("new_action_save_all_image", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon new_action_save_icon {
+        internal static System.Drawing.Icon nbt_studio_icon_256 {
             get {
-                object obj = ResourceManager.GetObject("new_action_save_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("nbt_studio_icon_256", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -1133,389 +423,389 @@ namespace NbtStudio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_save_image {
+        internal static System.Drawing.Bitmap nbt_studio_image_16 {
             get {
-                object obj = ResourceManager.GetObject("new_action_save_image", resourceCulture);
+                object obj = ResourceManager.GetObject("nbt_studio_image_16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_search_icon {
+        internal static System.Drawing.Bitmap nbt_studio_image_256 {
             get {
-                object obj = ResourceManager.GetObject("new_action_search_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("nbt_studio_image_256", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_search_image {
+        internal static System.Drawing.Bitmap tryashtar_action_add_snbt {
             get {
-                object obj = ResourceManager.GetObject("new_action_search_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tryashtar/action_add_snbt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_sort_icon {
+        internal static System.Drawing.Bitmap tryashtar_action_edit_snbt {
             get {
-                object obj = ResourceManager.GetObject("new_action_sort_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("tryashtar/action_edit_snbt", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_sort_image {
+        internal static System.Drawing.Bitmap tryashtar_file_chunk {
             get {
-                object obj = ResourceManager.GetObject("new_action_sort_image", resourceCulture);
+                object obj = ResourceManager.GetObject("tryashtar/file_chunk", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_action_undo_icon {
+        internal static System.Drawing.Bitmap tryashtar_file_region {
             get {
-                object obj = ResourceManager.GetObject("new_action_undo_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("tryashtar/file_region", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_action_undo_image {
+        internal static System.Drawing.Bitmap yusuke_action_copy {
             get {
-                object obj = ResourceManager.GetObject("new_action_undo_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_copy", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_chunk_icon {
+        internal static System.Drawing.Bitmap yusuke_action_cut {
             get {
-                object obj = ResourceManager.GetObject("new_chunk_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_cut", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_chunk_image {
+        internal static System.Drawing.Bitmap yusuke_action_delete {
             get {
-                object obj = ResourceManager.GetObject("new_chunk_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_delete", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_file_icon {
+        internal static System.Drawing.Bitmap yusuke_action_edit {
             get {
-                object obj = ResourceManager.GetObject("new_file_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_edit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_file_image {
+        internal static System.Drawing.Bitmap yusuke_action_new_file {
             get {
-                object obj = ResourceManager.GetObject("new_file_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_new_file", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_folder_icon {
+        internal static System.Drawing.Bitmap yusuke_action_open_file {
             get {
-                object obj = ResourceManager.GetObject("new_folder_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_open_file", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_folder_image {
+        internal static System.Drawing.Bitmap yusuke_action_open_folder {
             get {
-                object obj = ResourceManager.GetObject("new_folder_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_open_folder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon new_region_icon {
+        internal static System.Drawing.Bitmap yusuke_action_paste {
             get {
-                object obj = ResourceManager.GetObject("new_region_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_paste", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap new_region_image {
+        internal static System.Drawing.Bitmap yusuke_action_redo {
             get {
-                object obj = ResourceManager.GetObject("new_region_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_redo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_byte_array_icon {
+        internal static System.Drawing.Bitmap yusuke_action_refresh {
             get {
-                object obj = ResourceManager.GetObject("tag_byte_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_refresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_byte_array_image {
+        internal static System.Drawing.Bitmap yusuke_action_rename {
             get {
-                object obj = ResourceManager.GetObject("tag_byte_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_rename", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_byte_icon {
+        internal static System.Drawing.Bitmap yusuke_action_save {
             get {
-                object obj = ResourceManager.GetObject("tag_byte_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_save", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_byte_image {
+        internal static System.Drawing.Bitmap yusuke_action_save_all {
             get {
-                object obj = ResourceManager.GetObject("tag_byte_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_save_all", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_compound_icon {
+        internal static System.Drawing.Bitmap yusuke_action_search {
             get {
-                object obj = ResourceManager.GetObject("tag_compound_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_search", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_compound_image {
+        internal static System.Drawing.Bitmap yusuke_action_sort {
             get {
-                object obj = ResourceManager.GetObject("tag_compound_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/action_sort", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_double_icon {
+        internal static System.Drawing.Bitmap yusuke_action_undo {
             get {
-                object obj = ResourceManager.GetObject("tag_double_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/action_undo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_double_image {
+        internal static System.Drawing.Bitmap yusuke_file_chunk {
             get {
-                object obj = ResourceManager.GetObject("tag_double_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/file_chunk", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_float_icon {
+        internal static System.Drawing.Bitmap yusuke_file_file {
             get {
-                object obj = ResourceManager.GetObject("tag_float_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/file_file", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_float_image {
+        internal static System.Drawing.Bitmap yusuke_file_folder {
             get {
-                object obj = ResourceManager.GetObject("tag_float_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/file_folder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_int_array_icon {
+        internal static System.Drawing.Bitmap yusuke_file_region {
             get {
-                object obj = ResourceManager.GetObject("tag_int_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/file_region", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_int_array_image {
+        internal static System.Drawing.Bitmap yusuke_folder {
             get {
-                object obj = ResourceManager.GetObject("tag_int_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/folder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_int_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_byte {
             get {
-                object obj = ResourceManager.GetObject("tag_int_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_byte", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_int_image {
+        internal static System.Drawing.Bitmap yusuke_tag_byte_array {
             get {
-                object obj = ResourceManager.GetObject("tag_int_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_byte_array", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_list_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_compound {
             get {
-                object obj = ResourceManager.GetObject("tag_list_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_compound", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_list_image {
+        internal static System.Drawing.Bitmap yusuke_tag_double {
             get {
-                object obj = ResourceManager.GetObject("tag_list_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_double", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_long_array_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_float {
             get {
-                object obj = ResourceManager.GetObject("tag_long_array_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_float", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_long_array_image {
+        internal static System.Drawing.Bitmap yusuke_tag_int {
             get {
-                object obj = ResourceManager.GetObject("tag_long_array_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_int", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_long_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_int_array {
             get {
-                object obj = ResourceManager.GetObject("tag_long_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_int_array", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_long_image {
+        internal static System.Drawing.Bitmap yusuke_tag_list {
             get {
-                object obj = ResourceManager.GetObject("tag_long_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_list", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_short_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_long {
             get {
-                object obj = ResourceManager.GetObject("tag_short_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_long", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_short_image {
+        internal static System.Drawing.Bitmap yusuke_tag_long_array {
             get {
-                object obj = ResourceManager.GetObject("tag_short_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_long_array", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon tag_string_icon {
+        internal static System.Drawing.Bitmap yusuke_tag_short {
             get {
-                object obj = ResourceManager.GetObject("tag_string_icon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                object obj = ResourceManager.GetObject("yusuke/tag_short", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tag_string_image {
+        internal static System.Drawing.Bitmap yusuke_tag_string {
             get {
-                object obj = ResourceManager.GetObject("tag_string_image", resourceCulture);
+                object obj = ResourceManager.GetObject("yusuke/tag_string", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

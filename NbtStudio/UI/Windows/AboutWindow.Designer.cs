@@ -39,7 +39,7 @@
             // 
             // ImageBox
             // 
-            this.ImageBox.Image = global::NbtStudio.Properties.Resources.app_image_256;
+            this.ImageBox.Image = global::NbtStudio.Properties.Resources.nbt_studio_image_256;
             this.ImageBox.Location = new System.Drawing.Point(12, 12);
             this.ImageBox.Name = "ImageBox";
             this.ImageBox.Size = new System.Drawing.Size(64, 64);

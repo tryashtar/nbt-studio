@@ -15,6 +15,7 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -27,7 +28,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\app_icon_256.ico</ApplicationIcon>
+    <ApplicationIcon>nbt_studio_icon_256.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>NbtStudio.Program</StartupObject>
@@ -297,6 +297,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\amber\action_add_snbt.png" />
+    <None Include="Resources\amber\action_copy.png" />
+    <None Include="Resources\yusuke\action_copy.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -316,436 +319,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\legacy\legacy_folder_icon.ico" />
-    <None Include="Resources\legacy\legacy_folder_image.png" />
-    <None Include="Resources\legacy\legacy_region_icon.ico" />
-    <None Include="Resources\legacy\legacy_region_image.png" />
-    <None Include="Resources\tag_byte_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_byte_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_byte_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_byte_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_compound_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_compound_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_double_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_double_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_float_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_float_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_int_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_int_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_int_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_int_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_list_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_list_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_long_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_long_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_long_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_long_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_short_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_short_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_string_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\tag_string_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\app_icon_16.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\app_icon_256.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\app_image_256.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\app_image_16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_add_snbt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_add_snbt_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_copy_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_copy_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_cut_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_cut_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_delete_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_delete_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_edit_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_edit_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_edit_snbt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_edit_snbt_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_new_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_new_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_open_file_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_open_file_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_open_folder_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_open_folder_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_paste_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_paste_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_redo_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_redo_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_refresh_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_refresh_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_rename_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_rename_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_save_all_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_save_all_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_save_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_save_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_search_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_search_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_sort_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_sort_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_undo_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_action_undo_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_chunk_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_chunk_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_file_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_file_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_folder_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_folder_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_region_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new\new_region_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_add_snbt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_add_snbt_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_copy_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_copy_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_cut_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_cut_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_delete_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_delete_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_edit_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_edit_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_edit_snbt_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_edit_snbt_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_new_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_new_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_open_file_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_open_file_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_open_folder_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_open_folder_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_paste_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_paste_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_redo_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_redo_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_refresh_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_refresh_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_rename_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_rename_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_save_all_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_save_all_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_save_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_save_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_search_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_search_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_sort_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_sort_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_undo_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_action_undo_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_chunk_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_chunk_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_file_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_file_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_folder_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_folder_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_region_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\classic\classic_region_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_file_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_long_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_long_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_short_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_short_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_string_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_string_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_byte_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_byte_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_byte_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_byte_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_compound_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_compound_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_double_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_double_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_float_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_float_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_int_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_int_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_int_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_int_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_list_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_list_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_long_array_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_tag_long_array_image.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\legacy\legacy_file_image.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
@@ -756,6 +329,225 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_new_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tryashtar\action_add_snbt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_cut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_edit_snbt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_new_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_open_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_open_folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_paste.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_redo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_rename.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_save_all.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_sort.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\action_undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\file_chunk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\file_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\file_folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\file_region.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_byte.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_byte_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_compound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_double.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_float.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_int.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_int_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_long.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_long_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_short.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\amber\tag_string.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tryashtar\action_edit_snbt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tryashtar\file_chunk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tryashtar\file_region.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_open_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_open_folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_paste.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_redo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_rename.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_save_all.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_sort.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\file_chunk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\file_file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\file_folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\file_region.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_byte.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_byte_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_compound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_double.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_float.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_int.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_int_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_long.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_long_array.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_short.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\tag_string.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yusuke\action_cut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nbt_studio_icon_16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nbt_studio_icon_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nbt_studio_icon_256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nbt_studio_icon_256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="nbt_studio_icon_256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.0.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.0\build\Fody.targets')" />

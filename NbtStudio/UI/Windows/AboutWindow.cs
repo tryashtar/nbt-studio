@@ -9,10 +9,10 @@ namespace NbtStudio.UI
 {
     public partial class AboutWindow : Form
     {
-        public AboutWindow()
+        public AboutWindow(IconSource source)
         {
             InitializeComponent();
-            this.Icon = Properties.Resources.app_icon_16;
+            this.Icon = source.GetImage(IconType.NbtStudio).Icon;
             NameLabel.Text = String.Format(NameLabel.Text, Updater.GetCurrentVersion().ToString(false));
         }
 

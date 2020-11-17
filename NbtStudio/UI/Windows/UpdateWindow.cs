@@ -12,12 +12,12 @@ namespace NbtStudio.UI
     {
         private readonly AvailableUpdate AvailableUpdate;
 
-        public UpdateWindow(AvailableUpdate update)
+        public UpdateWindow(IconSource source, AvailableUpdate update)
         {
             InitializeComponent();
 
             AvailableUpdate = update;
-            this.Icon = Properties.Resources.app_icon_16;
+            this.Icon = source.GetImage(IconType.NbtStudio).Icon;
             CurrentVersionValue.Text = Updater.GetCurrentVersion().ToString(false);
             AvailableVersionValue.Text = update.Version.ToString(false);
             ChangelogBox.Text = update.Changelog;

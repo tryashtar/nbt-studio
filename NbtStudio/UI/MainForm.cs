@@ -633,7 +633,7 @@ namespace NbtStudio.UI
         private void About()
         {
             if (AboutWindow == null || AboutWindow.IsDisposed)
-                AboutWindow = new AboutWindow();
+                AboutWindow = new AboutWindow(IconSource);
             if (!AboutWindow.Visible)
                 AboutWindow.Show(this);
             AboutWindow.Focus();
@@ -658,7 +658,7 @@ namespace NbtStudio.UI
             if (ReadyUpdate == null)
                 return;
             if (UpdateWindow == null || UpdateWindow.IsDisposed)
-                UpdateWindow = new UpdateWindow(ReadyUpdate);
+                UpdateWindow = new UpdateWindow(IconSource, ReadyUpdate);
             if (!UpdateWindow.Visible)
                 UpdateWindow.Show(this);
             UpdateWindow.Focus();
