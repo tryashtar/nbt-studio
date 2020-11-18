@@ -11,8 +11,8 @@ namespace NbtStudio.SNBT
     public class SnbtOptions
     {
         public bool Minified;
-        public QuoteOption KeyQuoting;
-        public QuoteOption StringValueQuoting;
+        public Predicate<string> ShouldQuoteKeys;
+        public Predicate<string> ShouldQuoteStrings;
         public bool NumberSuffixes;
         public bool ArrayPrefixes;
         public bool EscapeNewlines;
@@ -23,11 +23,13 @@ namespace NbtStudio.SNBT
             return this;
         }
 
+        private static readonly Regex StringRegex = new Regex("^[A-Za-z0-9._+-]+$", RegexOptions.Compiled);
+
         public static SnbtOptions Default => new SnbtOptions
         {
             Minified = true,
-            KeyQuoting = QuoteOption.WhenRequired,
-            StringValueQuoting = QuoteOption.Always,
+            ShouldQuoteKeys = x => !StringRegex.IsMatch(x),
+            ShouldQuoteStrings = x => true,
             NumberSuffixes = true,
             ArrayPrefixes = true,
             EscapeNewlines = true
@@ -37,8 +39,8 @@ namespace NbtStudio.SNBT
         public static SnbtOptions JsonLike => new SnbtOptions
         {
             Minified = true,
-            KeyQuoting = QuoteOption.Always,
-            StringValueQuoting = QuoteOption.Always,
+            ShouldQuoteKeys = x => true,
+            ShouldQuoteStrings = x => x != "null",
             NumberSuffixes = false,
             ArrayPrefixes = false,
             EscapeNewlines = true
@@ -48,8 +50,8 @@ namespace NbtStudio.SNBT
         public static SnbtOptions Preview => new SnbtOptions
         {
             Minified = true,
-            KeyQuoting = QuoteOption.Never,
-            StringValueQuoting = QuoteOption.Never,
+            ShouldQuoteKeys = x => false,
+            ShouldQuoteStrings = x => false,
             NumberSuffixes = false,
             ArrayPrefixes = false,
             EscapeNewlines = false
@@ -83,7 +85,6 @@ namespace NbtStudio.SNBT
         public const char STRING_SECONDARY_QUOTE = '\'';
         public const string VALUE_SPACING = " ";
         public const string INDENTATION = "    ";
-        private static readonly Regex StringRegex = new Regex("^[A-Za-z0-9._+-]+$", RegexOptions.Compiled);
 
         // convert a tag to its string form
         // expanded: for compounds and lists of non-numeric type, creates pretty indented structure. for all tags, causes spaces between values
@@ -156,7 +157,7 @@ namespace NbtStudio.SNBT
         }
         public static string ToSnbt(this NbtString tag, SnbtOptions options)
         {
-            return QuoteIfRequested(tag.Value, options.StringValueQuoting, options.EscapeNewlines);
+            return QuoteIfRequested(tag.Value, options.ShouldQuoteStrings, options.EscapeNewlines);
         }
 
         public static string ToSnbt(this NbtByteArray tag, SnbtOptions options)
@@ -217,18 +218,17 @@ namespace NbtStudio.SNBT
             return s.ToString();
         }
 
-        private static string QuoteIfRequested(string str, QuoteOption option, bool escape_newlines)
+        private static string QuoteIfRequested(string str, Predicate<string> should_quote, bool escape_newlines)
         {
-            if (option == QuoteOption.Never)
-                return str;
-            if (option == QuoteOption.Always)
+            if (should_quote(str))
                 return QuoteAndEscape(str, escape_newlines);
-            return StringRegex.IsMatch(str) ? str : QuoteAndEscape(str, escape_newlines);
+            else
+                return str;
         }
 
         private static string GetName(NbtTag tag, SnbtOptions options)
         {
-            return QuoteIfRequested(tag.Name, options.KeyQuoting, options.EscapeNewlines);
+            return QuoteIfRequested(tag.Name, options.ShouldQuoteKeys, options.EscapeNewlines);
         }
 
         private static string GetNameBeforeValue(NbtTag tag, SnbtOptions options)
