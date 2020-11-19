@@ -59,6 +59,22 @@ namespace NbtStudio.UI
             parent.Expand();
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            if (SelectedNodes.Any())
+            {
+                string text = $"{Util.Pluralize(SelectedNodes.Count, "item")} selected";
+                var size = e.Graphics.MeasureString(text, this.Font).ToSize();
+                var format = new StringFormat { Alignment = StringAlignment.Far };
+                int y_buffer = 5;
+                int x_buffer = 10;
+                var rectangle = new Rectangle(DisplayRectangle.Width - size.Width - x_buffer, DisplayRectangle.Height - size.Height - y_buffer, size.Width + 3, size.Height + 3);
+                e.Graphics.FillRectangle(new SolidBrush(this.BackColor), rectangle);
+                e.Graphics.DrawString(text, this.Font, Brushes.Gray, rectangle, format);
+            }
+        }
+
         protected override void OnModelChanged()
         {
             base.OnModelChanged();
