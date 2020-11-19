@@ -58,7 +58,7 @@ namespace NbtStudioTests
             var view = new NbtTreeView();
             var model = new NbtTreeModel((object)root);
             view.Model = model;
-            Assert.AreEqual(model.RootNodes.Count, 1);
+            Assert.AreEqual(model.Root.Children.Count(), 1);
             Assert.AreEqual(view.Root.Children.Count, 1);
             AssertSynchronized(view, model);
             root.Add(new NbtByte("test1"));
@@ -87,7 +87,7 @@ namespace NbtStudioTests
             {
                 view_queue.Enqueue(root);
             }
-            foreach (var root in model.RootNodes)
+            foreach (var root in model.Root.Children)
             {
                 model_queue.Enqueue(root);
             }

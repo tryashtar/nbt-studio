@@ -47,7 +47,7 @@ namespace NbtStudio
             {
                 var path = new List<INode>();
                 INode item = this;
-                while (item != null)
+                while (item != null && !(item is ModelRootNode))
                 {
                     path.Add(item);
                     item = item.Parent;
@@ -114,6 +114,11 @@ namespace NbtStudio
             Tree.NotifyNodeChanged(this);
         }
 
+        protected void NotifyChanged()
+        {
+            Tree.NotifyNodeChanged(this);
+        }
+
         // save an undoable action to the model
         protected void NoticeAction(UndoableAction action)
         {
@@ -131,11 +136,26 @@ namespace NbtStudio
             }
         }
 
+        protected Dictionary<T,INode> NodeChildrenMap(IEnumerable<T> objects)
+        {
+            var dictionary = new Dictionary<T, INode>();
+            foreach (var item in objects)
+            {
+                if (ChildNodes.TryGetValue(item, out var result))
+                    dictionary[item] = result;
+            }
+            return dictionary;
+        }
+
         // make all action implementations virtual, disallowing everything
         // derived nodes can allow and implement actions if they wish
         public virtual string Description => "unknown node";
         public virtual bool CanDelete => false;
-        public virtual void Delete() { }
+        public virtual void Delete()
+        {
+            if (Parent is ModelRootNode root)
+                root.Remove(this);
+        }
         public virtual bool CanSort => false;
         public virtual void Sort() { }
         public virtual bool CanCopy => false;

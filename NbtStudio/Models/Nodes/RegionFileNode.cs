@@ -18,6 +18,12 @@ namespace NbtStudio
             Region = file;
             Region.ChunksChanged += Region_ChunksChanged;
             Region.ActionPerformed += Region_ActionPerformed;
+            Region.OnSaved += Region_OnSaved;
+        }
+
+        private void Region_OnSaved(object sender, EventArgs e)
+        {
+            RefreshChildren();
         }
 
         private void Region_ActionPerformed(object sender, UndoableAction e)
@@ -51,6 +57,7 @@ namespace NbtStudio
         public override void Delete()
         {
             FileNodeOperations.DeleteFile(Region.Path);
+            base.Delete();
         }
         public override bool CanEdit => Region.Path != null;
         public override bool CanPaste => true;

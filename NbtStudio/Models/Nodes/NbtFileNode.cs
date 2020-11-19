@@ -17,6 +17,12 @@ namespace NbtStudio
             File = file;
             File.RootTag.Changed += RootTag_Changed;
             File.RootTag.ActionPerformed += RootTag_ActionPerformed;
+            File.OnSaved += File_OnSaved;
+        }
+
+        private void File_OnSaved(object sender, EventArgs e)
+        {
+            NotifyChanged();
         }
 
         private void RootTag_ActionPerformed(object sender, UndoableAction e)
@@ -56,6 +62,7 @@ namespace NbtStudio
         public override void Delete()
         {
             FileNodeOperations.DeleteFile(File.Path);
+            base.Delete();
         }
         public override bool CanEdit => File.Path != null;
         public override bool CanPaste => NbtNodeOperations.CanPaste(File.RootTag);

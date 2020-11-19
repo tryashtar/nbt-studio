@@ -44,6 +44,7 @@ namespace NbtStudio
         public override void Delete()
         {
             Tag.Remove();
+            base.Delete();
         }
         public override bool CanEdit => NbtNodeOperations.CanEdit(Tag);
         public override bool CanPaste => NbtNodeOperations.CanPaste(Tag);

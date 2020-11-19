@@ -52,6 +52,7 @@ namespace NbtStudio
         public override void Delete()
         {
             FileNodeOperations.DeleteFolder(Folder.Path);
+            base.Delete();
         }
         public override bool CanEdit => true;
         public override bool CanPaste => true;

@@ -77,7 +77,11 @@ namespace NbtStudio
         public override bool CanCopy => !Chunk.IsExternal;
         public override DataObject Copy() => NbtNodeOperations.Copy(AccessChunkData());
         public override bool CanDelete => !Chunk.IsExternal;
-        public override void Delete() => Chunk.Remove();
+        public override void Delete()
+        {
+            Chunk.Remove();
+            base.Delete();
+        }
         public override bool CanEdit => !Chunk.IsExternal;
         public override bool CanPaste => !Chunk.IsExternal;
         public override bool CanRename => !Chunk.IsExternal;

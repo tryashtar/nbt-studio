@@ -122,6 +122,19 @@ namespace NbtStudio
         }
     }
 
+    public static class GenericNodeOperations
+    {
+        public static IEnumerable<INode> RemoveAncestors(INode destination, IEnumerable<INode> nodes)
+        {
+            var ancestors = destination.Path.FullPath;
+            foreach (var item in nodes)
+            {
+                if (!ancestors.Contains(item))
+                    yield return item;
+            }
+        }
+    }
+
     // shared implementations of operations like copy, paste, drag and drop for NBT tags
     public static class NbtNodeOperations
     {

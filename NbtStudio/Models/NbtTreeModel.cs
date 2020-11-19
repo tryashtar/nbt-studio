@@ -24,15 +24,14 @@ namespace NbtStudio
 #pragma warning restore 67
         public event EventHandler Changed;
 
-        private readonly List<INode> Roots;
-        public ReadOnlyCollection<INode> RootNodes => Roots.AsReadOnly();
+        public readonly ModelRootNode Root;
         public readonly UndoHistory UndoHistory;
 
         public NbtTreeModel(IEnumerable<object> roots)
         {
             UndoHistory = new UndoHistory(GetDescription);
             UndoHistory.Changed += UndoHistory_Changed;
-            Roots = roots.Select(x => NodeRegistry.CreateRootNode(this, x)).ToList();
+            Root = new ModelRootNode(this, roots);
         }
 
         private void UndoHistory_Changed(object sender, EventArgs e)
@@ -88,8 +87,9 @@ namespace NbtStudio
         private IEnumerable<INode> BreadthFirstSearch(Predicate<INode> predicate)
         {
             var queue = new Queue<INode>();
-            foreach (var item in Roots)
+            foreach (var item in Root.Children)
             {
+                // don't just enqueue Root directly because the predicate might not match it
                 queue.Enqueue(item);
             }
             while (queue.Any())
@@ -128,7 +128,7 @@ namespace NbtStudio
         public IEnumerable<object> GetChildren(TreePath treePath)
         {
             if (treePath.IsEmpty())
-                return Roots;
+                return Root.Children;
             else
                 return ((INode)treePath.LastNode).Children;
         }
