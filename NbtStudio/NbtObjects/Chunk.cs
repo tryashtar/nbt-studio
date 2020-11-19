@@ -10,6 +10,8 @@ namespace NbtStudio
 {
     public class Chunk
     {
+        public const int BlocksXDimension = 16;
+        public const int BlocksZDimension = 16;
         public RegionFile Region { get; internal set; }
         public int X { get; private set; }
         public int Z { get; private set; }

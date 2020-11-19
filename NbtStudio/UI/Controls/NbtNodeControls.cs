@@ -44,22 +44,22 @@ namespace NbtStudio.UI
 
         private Image GetIcon(TreeNodeAdv node)
         {
-            return GetImage(node.Tag);
+            return GetImage(node.Tag as INode);
         }
 
-        private Image GetImage(object obj)
+        private Image GetImage(INode node)
         {
             if (IconSource == null)
                 return null;
-            if (obj is NbtFileNode)
+            if (node is NbtFileNode)
                 return IconSource.GetImage(IconType.File).Image;
-            if (obj is FolderNode)
+            if (node is FolderNode)
                 return IconSource.GetImage(IconType.Folder).Image;
-            if (obj is RegionFileNode)
+            if (node is RegionFileNode)
                 return IconSource.GetImage(IconType.Region).Image;
-            if (obj is ChunkNode)
+            if (node is ChunkNode)
                 return IconSource.GetImage(IconType.Chunk).Image;
-            if (obj is NbtTagNode tag)
+            if (node is NbtTagNode tag)
                 return NbtUtil.TagTypeImage(IconSource, tag.Tag.TagType).Image;
             return null;
         }
@@ -107,6 +107,11 @@ namespace NbtStudio.UI
             return new SizeF(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
+        public override string GetToolTip(TreeNodeAdv node)
+        {
+            return PreviewTooltip(node.Tag as INode);
+        }
+
         private (string name, string value) GetText(TreeNodeAdv node)
         {
             var (name, value) = PreviewNameAndValue(node);
@@ -142,7 +147,14 @@ namespace NbtStudio.UI
             if (node is RegionFileNode region)
                 return Path.GetFileName(region.Region.Path);
             if (node is ChunkNode chunk)
-                return $"Chunk [{chunk.Chunk.X}, {chunk.Chunk.Z}]";
+            {
+                string text = $"Chunk [{chunk.Chunk.X}, {chunk.Chunk.Z}]";
+                var coords = chunk.Chunk.Region.Coords;
+                if (coords == null)
+                    return text;
+                var world = coords.WorldChunk(chunk.Chunk);
+                return $"{text} in world at ({world.x}, {world.z})";
+            }
             if (node is NbtTagNode tag)
                 return tag.Tag.Name;
             return null;
@@ -179,6 +191,19 @@ namespace NbtStudio.UI
             }
             if (node is NbtTagNode tag)
                 return NbtUtil.PreviewNbtValue(tag.Tag);
+            return null;
+        }
+
+        private static string PreviewTooltip(INode node)
+        {
+            if (node is ChunkNode chunk)
+            {
+                var coords = chunk.Chunk.Region.Coords;
+                if (coords == null)
+                    return null;
+                var blocks = coords.WorldBlocks(chunk.Chunk);
+                return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
+            }
             return null;
         }
 

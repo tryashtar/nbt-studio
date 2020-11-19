@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NbtStudio
@@ -12,6 +13,19 @@ namespace NbtStudio
     {
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
+        private static readonly Regex CoordsRegex = new Regex(@"^r\.(?<x>-?[0-9]+)\.(?<z>-?[0-9]+)");
+        public RegionCoords Coords
+        {
+            get
+            {
+                if (Path == null)
+                    return null;
+                var match = CoordsRegex.Match(System.IO.Path.GetFileNameWithoutExtension(Path));
+                if (!match.Success)
+                    return null;
+                return new RegionCoords(int.Parse(match.Groups["x"].Value), int.Parse(match.Groups["z"].Value));
+            }
+        }
         public int ChunkCount { get; private set; }
         public event EventHandler ChunksChanged;
         public event EventHandler OnSaved;
@@ -247,6 +261,30 @@ namespace NbtStudio
                 File.Move(Path, path);
                 Path = path;
             }
+        }
+    }
+
+    public class RegionCoords
+    {
+        public readonly int X;
+        public readonly int Z;
+        public RegionCoords(int x, int z)
+        {
+            X = x;
+            Z = z;
+        }
+
+        public (int x, int z) WorldChunk(Chunk chunk)
+        {
+            return (RegionFile.ChunkXDimension * X + chunk.X, RegionFile.ChunkZDimension * Z + chunk.Z);
+        }
+
+        public (int x_min, int x_max, int z_min, int z_max) WorldBlocks(Chunk chunk)
+        {
+            var (chunk_x, chunk_z) = WorldChunk(chunk);
+            int block_x = Chunk.BlocksXDimension * chunk_x;
+            int block_z = Chunk.BlocksZDimension * chunk_z;
+            return (block_x, block_x + Chunk.BlocksXDimension - 1, block_z, block_z + Chunk.BlocksZDimension - 1);
         }
     }
 }

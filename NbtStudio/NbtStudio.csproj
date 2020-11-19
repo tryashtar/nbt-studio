@@ -88,6 +88,7 @@
     <Compile Include="IconSource.cs" />
     <Compile Include="Models\ByteProviders.cs" />
     <Compile Include="Models\Nodes\FolderNode.cs" />
+    <Compile Include="Models\Nodes\ModelRootNode.cs" />
     <Compile Include="Models\Nodes\NodeOperations.cs" />
     <Compile Include="Models\Nodes\INode.cs" />
     <Compile Include="Models\Nodes\ModelNode.cs" />

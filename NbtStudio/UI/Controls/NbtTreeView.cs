@@ -27,6 +27,7 @@ namespace NbtStudio.UI
             this.Collapsing += NbtTreeView_Collapsing;
             this.FontChanged += NbtTreeView_FontChanged;
             this.LoadOnDemand = true;
+            this.ShowNodeToolTips = true;
         }
 
         public void SetIconSource(IconSource source)
