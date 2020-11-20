@@ -406,9 +406,12 @@ namespace NbtStudio
         public ZippedIconSource(string path, ZipArchive zip)
         {
             Filepath = path;
+            bool any = false;
             foreach (var entry in zip.Entries)
             {
                 var name = entry.FullName;
+                if (name.Contains('/'))
+                    continue;
                 if (Path.GetExtension(name) != ".png")
                     continue;
                 var simple = Path.GetFileNameWithoutExtension(name);
@@ -416,7 +419,10 @@ namespace NbtStudio
                     continue;
                 var image = Image.FromStream(entry.Open());
                 Add(type, image);
+                any = true;
             }
+            if (!any)
+                throw new FormatException("No images were found in this icon set");
         }
     }
 }

@@ -68,7 +68,7 @@ namespace NbtStudio.UI
         {
             pe.Graphics.InterpolationMode = InterpolationMode;
             base.OnPaint(pe);
-            if (!this.Enabled)
+            if (!this.Enabled && this.Image != null)
             {
                 using (var img = new Bitmap(this.Image, this.ClientSize))
                 {
