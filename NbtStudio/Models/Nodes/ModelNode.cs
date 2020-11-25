@@ -12,13 +12,13 @@ namespace NbtStudio
     // the main implementation of INode
     // this node does not wrap an object, but allows derived classes to do so easily
     // type T is the type of the children, e.g. RegionNode is ModelNode<Chunk>
-    public abstract class ModelNode<T> : INode
+    public abstract class ModelNode<T> : IModelNode
     {
         private readonly NbtTreeModel Tree;
         public INode Parent { get; private set; }
         private bool ChildrenReady = false;
         private OrderedDictionary<T, INode> ChildNodes;
-        public IEnumerable<INode> Children
+        public IReadOnlyList<INode> Children
         {
             get
             {
@@ -30,16 +30,34 @@ namespace NbtStudio
                     var children = GetChildren().Where(x => x != null);
                     foreach (var item in children)
                     {
-                        ChildNodes.Add(item, NodeRegistry.CreateNode(Tree, this, item));
+                        var node = NodeRegistry.CreateNode(Tree, this, item);
+                        ChildNodes.Add(item, node);
+                        int plus = node.DescendantsCount + 1;
+                        UpdateDescendantsCount(x => x + plus);
                     }
                     ChildrenReady = true;
                 }
-                return ChildNodes.Values;
+                return ChildNodes.Values.ToList();
             }
         }
 
         // default implementation fetches children, this can be overridden to defer it to later
         public virtual bool HasChildren => Children.Any();
+
+        public int DescendantsCount { get; private set; } = 0;
+        public void SetDescendantsCount(int value)
+        {
+            DescendantsCount = value;
+        }
+        private void UpdateDescendantsCount(Func<int, int> apply)
+        {
+            IModelNode item = this;
+            while (item != null)
+            {
+                item.SetDescendantsCount(apply(item.DescendantsCount));
+                item = item.Parent as IModelNode;
+            }
+        }
 
         public TreePath Path
         {
@@ -92,6 +110,8 @@ namespace NbtStudio
                 // remove afterwards to ensure indices don't shift as we go
                 foreach (var item in remove)
                 {
+                    int minus = ChildNodes[item].DescendantsCount + 1;
+                    UpdateDescendantsCount(x => x - minus);
                     ChildNodes.Remove(item);
                 }
                 Tree.NotifyNodesRemoved(path, nodes, indices);
@@ -105,6 +125,8 @@ namespace NbtStudio
                     var item = add[i];
                     int index = new_children.IndexOf(item);
                     var node = NodeRegistry.CreateNode(Tree, this, item);
+                    int plus = node.DescendantsCount + 1;
+                    UpdateDescendantsCount(x => x + plus);
                     indices[i] = index;
                     nodes[i] = node;
                     ChildNodes.Insert(index, item, node);
@@ -136,7 +158,7 @@ namespace NbtStudio
             }
         }
 
-        protected Dictionary<T,INode> NodeChildrenMap(IEnumerable<T> objects)
+        protected Dictionary<T, INode> NodeChildrenMap(IEnumerable<T> objects)
         {
             var dictionary = new Dictionary<T, INode>();
             foreach (var item in objects)
@@ -168,5 +190,11 @@ namespace NbtStudio
         public virtual bool CanEdit => false;
         public virtual bool CanReceiveDrop(IEnumerable<INode> nodes) => false;
         public virtual void ReceiveDrop(IEnumerable<INode> nodes, int index) { }
+    }
+
+    // hidden down here because it's shameful!
+    internal interface IModelNode : INode
+    {
+        void SetDescendantsCount(int value);
     }
 }

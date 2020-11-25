@@ -18,10 +18,11 @@ namespace NbtStudio
     {
         INode Parent { get; }
         TreePath Path { get; } // path from the root node to this node, can be created by following Parent until null
-        IEnumerable<INode> Children { get; }
+        IReadOnlyList<INode> Children { get; }
         bool HasChildren { get; } // allows nodes to be expandable without evaluating children yet
         string Description { get; } // appears in undo history
-        
+        int DescendantsCount { get; } // total number of descendant nodes, cached
+
         // operations to be performed on nodes
         bool CanDelete { get; }
         void Delete();

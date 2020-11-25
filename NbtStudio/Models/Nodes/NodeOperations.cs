@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -119,6 +120,153 @@ namespace NbtStudio
             if (node is FolderNode folder)
                 return folder.Folder;
             return null;
+        }
+    }
+
+    public enum SearchDirection
+    {
+        Forward,
+        Backward
+    }
+
+    public class TreeSearchReport
+    {
+        public int NodesSearched;
+        public int TotalNodes;
+        public decimal Percentage => (decimal)NodesSearched / TotalNodes;
+    }
+
+    public static class SearchNodeOperations
+    {
+        public static INode SearchFrom(NbtTreeModel model, INode start, Predicate<INode> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, CancellationToken token, bool wrap)
+        {
+            if (direction == SearchDirection.Forward)
+            {
+                var first = model.Root.Children.First();
+                if (start == null)
+                    start = first;
+                else
+                    start = NextNode(start);
+                return SearchFromNext(model, start, predicate, NextNode, progress, token, new TreeSearchReport(), wrap ? first : null);
+            }
+            else
+            {
+                var last = FinalNode(model.Root);
+                if (start == null)
+                    start = last;
+                else
+                    start = PreviousNode(start);
+                return SearchFromNext(model, start, predicate, PreviousNode, progress, token, new TreeSearchReport(), wrap ? last : null);
+            }
+        }
+
+        public static IEnumerable<INode> SearchAll(NbtTreeModel model, Predicate<INode> predicate, IProgress<TreeSearchReport> progress, CancellationToken token)
+        {
+            var report = new TreeSearchReport();
+            report.TotalNodes = model.Root.DescendantsCount;
+            var node = model.Root.Children.First();
+            while (node != null)
+            {
+                node = NextNode(node);
+                if (node != null && predicate(node))
+                    yield return node;
+                report.NodesSearched++;
+                if (report.NodesSearched % 200 == 0)
+                {
+                    report.TotalNodes = model.Root.DescendantsCount;
+                    progress.Report(report);
+                    token.ThrowIfCancellationRequested();
+                }
+            }
+        }
+
+        private static INode SearchFromNext(NbtTreeModel model, INode node, Predicate<INode> predicate, Func<INode, INode> next, IProgress<TreeSearchReport> progress, CancellationToken token, TreeSearchReport report, INode wrap_start)
+        {
+            var start = node;
+            report.TotalNodes = model.Root.DescendantsCount;
+            while (node != null && !predicate(node))
+            {
+                node = next(node);
+                report.NodesSearched++;
+                if (report.NodesSearched % 200 == 0)
+                {
+                    report.TotalNodes = model.Root.DescendantsCount;
+                    progress.Report(report);
+                    token.ThrowIfCancellationRequested();
+                }
+            }
+            if (node != null && node != model.Root)
+                return node;
+            if (wrap_start == null)
+                return null;
+
+            // search again from new starting point, until reaching original starting point
+            node = SearchFromNext(model, wrap_start, x => x == start || predicate(x), next, progress, token, report, null);
+            if (node == start)
+                return null;
+            else
+                return node;
+        }
+
+        public static INode NextNode(INode node)
+        {
+            var children = node.Children;
+            if (children.Count > 0)
+                return children.First();
+            INode next = null;
+            while (next == null && node != null)
+            {
+                if (node.Parent == null)
+                    return null;
+                next = Sibling(node, 1);
+                if (next == null)
+                    node = node.Parent;
+            }
+            return next;
+        }
+
+        public static INode PreviousNode(INode node)
+        {
+            var prev = Sibling(node, -1);
+            if (prev == null)
+                return node.Parent;
+            while (prev != null)
+            {
+                var children = prev.Children;
+                if (children.Count == 0)
+                    return prev;
+                prev = children[children.Count - 1];
+            }
+            return null;
+        }
+
+        private static INode Sibling(INode node, int add)
+        {
+            if (node.Parent == null)
+                return null;
+            var children = node.Parent.Children;
+            int i;
+            for (i = 0; i < children.Count; i++)
+            {
+                if (children[i] == node)
+                    break;
+            }
+            i += add;
+            if (i < 0 || i >= children.Count)
+                return null;
+            return children[i];
+        }
+
+        public static INode FinalNode(INode root)
+        {
+            var current = root;
+            while (true)
+            {
+                var children = current.Children;
+                if (children.Count == 0)
+                    return current;
+                current = current.Children.Last();
+            }
         }
     }
 

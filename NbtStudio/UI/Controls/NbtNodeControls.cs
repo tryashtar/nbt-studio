@@ -138,7 +138,7 @@ namespace NbtStudio.UI
         public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag as INode);
         public static string PreviewValue(TreeNodeAdv node) => PreviewValue(node.Tag as INode);
 
-        private static string PreviewName(INode node)
+        public static string PreviewName(INode node)
         {
             if (node is NbtFileNode file)
                 return Path.GetFileName(file.File.Path);
@@ -160,7 +160,7 @@ namespace NbtStudio.UI
             return null;
         }
 
-        private static string PreviewValue(INode node)
+        public static string PreviewValue(INode node)
         {
             if (node is NbtFileNode file)
                 return NbtUtil.PreviewNbtValue(file.File.RootTag);

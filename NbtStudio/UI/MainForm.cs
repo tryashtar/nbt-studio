@@ -623,7 +623,7 @@ namespace NbtStudio.UI
         private void Find()
         {
             if (FindWindow == null || FindWindow.IsDisposed)
-                FindWindow = new FindWindow(IconSource, NbtTree);
+                FindWindow = new FindWindow(IconSource, ViewModel, NbtTree);
             if (!FindWindow.Visible)
                 FindWindow.Show(this);
             FindWindow.Focus();

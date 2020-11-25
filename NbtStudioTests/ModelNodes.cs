@@ -69,11 +69,13 @@ namespace NbtStudioTests
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Add(new NbtShort("test4"));
             Assert.AreEqual(view.Root.DescendantsCount, 5);
+            Assert.AreEqual(model.Root.DescendantsCount, 5);
             AssertSynchronized(view, model);
             root.Remove("test2");
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Clear();
             Assert.AreEqual(view.Root.DescendantsCount, 3);
+            Assert.AreEqual(model.Root.DescendantsCount, 3);
             AssertSynchronized(view, model);
             root.Clear();
             AssertSynchronized(view, model);
@@ -96,6 +98,7 @@ namespace NbtStudioTests
                 Assert.AreEqual(view_queue.Count, model_queue.Count);
                 var view_item = view_queue.Dequeue();
                 var model_item = model_queue.Dequeue();
+                Assert.AreEqual(view_item.DescendantsCount, model_item.DescendantsCount);
                 foreach (var child in view_item.Children)
                 {
                     view_queue.Enqueue(child);

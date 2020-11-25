@@ -13,33 +13,35 @@ namespace NbtStudio.UI
 {
     public partial class FindWindow : Form
     {
-        private TreeNodeAdv LastFound;
+        private INode LastFound;
+        private NbtTreeModel SearchingModel;
         private NbtTreeView SearchingView;
 
-        public FindWindow(IconSource source, NbtTreeView view)
+        public FindWindow(IconSource source, NbtTreeModel model, NbtTreeView view)
         {
             InitializeComponent();
 
+            SearchingModel = model;
             SearchingView = view;
             this.Icon = source.GetImage(IconType.Search).Icon;
             UpdateButtons();
         }
 
-        private static bool Matches(TreeNodeAdv adv, string name_search, string value_search)
+        private static bool Matches(INode node, string name_search, string value_search)
         {
-            string name = NbtText.PreviewName(adv);
-            string value = NbtText.PreviewValue(adv);
+            string name = NbtText.PreviewName(node);
+            string value = NbtText.PreviewValue(node);
             return RegexTextBox.IsMatch(name, name_search) && RegexTextBox.IsMatch(value, value_search);
         }
 
-        private static bool MatchesRegex(TreeNodeAdv adv, Regex name_search, Regex value_search)
+        private static bool MatchesRegex(INode node, Regex name_search, Regex value_search)
         {
-            string name = NbtText.PreviewName(adv);
-            string value = NbtText.PreviewValue(adv);
+            string name = NbtText.PreviewName(node);
+            string value = NbtText.PreviewValue(node);
             return RegexTextBox.IsMatchRegex(name, name_search) && RegexTextBox.IsMatchRegex(value, value_search);
         }
 
-        private Predicate<TreeNodeAdv> GetPredicate()
+        private Predicate<INode> GetPredicate()
         {
             if (RegexCheck.Checked)
             {
@@ -55,54 +57,38 @@ namespace NbtStudio.UI
             }
         }
 
-        private TreeNodeAdv DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
+        private INode DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
-            var start = SearchingView.SelectedNode ?? LastFound;
+            var start = (SearchingView.SelectedNode?.Tag as INode) ?? LastFound;
             var predicate = GetPredicate();
-            SearchingView.SuspendLayout();
-            try
+            var find = SearchNodeOperations.SearchFrom(SearchingModel, start, predicate, direction, progress, CancelSource.Token, true);
+            if (find == null)
+                return null;
+            else
             {
-                var find = SearchingView.SearchFrom(start, predicate, direction, progress, CancelSource.Token, true);
-                if (find == null)
-                    return null;
-                else
-                {
-                    LastFound = find;
-                    return find;
-                }
-            }
-            finally
-            {
-                SearchingView.ResumeLayout();
+                LastFound = find;
+                return find;
             }
         }
 
-        private List<TreeNodeAdv> DoSearchAll(IProgress<TreeSearchReport> progress)
+        private List<INode> DoSearchAll(IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
-            SearchingView.SuspendLayout();
-            try
-            {
-                var results = SearchingView.SearchAll(predicate, progress, CancelSource.Token).ToList();
-                return results;
-            }
-            finally
-            {
-                SearchingView.ResumeLayout();
-            }
+            var results = SearchNodeOperations.SearchAll(SearchingModel, predicate, progress, CancelSource.Token).ToList();
+            return results;
         }
 
         private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
-        private Task<IEnumerable<TreeNodeAdv>> ActiveSearch;
-        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<TreeNodeAdv>> function)
+        private Task<IEnumerable<INode>> ActiveSearch;
+        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<INode>> function)
         {
             if (ActiveSearch != null && !ActiveSearch.IsCompleted)
                 return;
             var progress = new Progress<TreeSearchReport>();
             progress.ProgressChanged += Progress_ProgressChanged;
-            ActiveSearch = new Task<IEnumerable<TreeNodeAdv>>(() => function(progress));
+            ActiveSearch = new Task<IEnumerable<INode>>(() => function(progress));
             ActiveSearch.Start();
             ProgressBar.Visible = true;
             ProgressBar.Value = 0;
@@ -115,10 +101,16 @@ namespace NbtStudio.UI
                     LastFound = x.Result.Last();
                     foreach (var item in x.Result)
                     {
-                        FastEnsureVisible(item);
-                        item.IsSelected = true;
+                        var node = SearchingView.FindNode(item.Path, true);
+                        if (node != null)
+                        {
+                            FastEnsureVisible(node);
+                            node.IsSelected = true;
+                        }
                     }
-                    SearchingView.ScrollTo(LastFound);
+                    var scroll = SearchingView.FindNode(LastFound.Path, true);
+                    if (scroll != null)
+                        SearchingView.ScrollTo(scroll);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
@@ -141,11 +133,11 @@ namespace NbtStudio.UI
 
         public void Search(SearchDirection direction)
         {
-            List<TreeNodeAdv> ItemOrNull(TreeNodeAdv item)
+            List<INode> ItemOrNull(INode item)
             {
                 if (item == null)
                     return null;
-                return new List<TreeNodeAdv> { item };
+                return new List<INode> { item };
             }
             StartActiveSearch(x => ItemOrNull(DoSearch(direction, x)));
         }
@@ -246,6 +238,7 @@ namespace NbtStudio.UI
                 components.Dispose();
             }
             LastFound = null;
+            SearchingModel = null;
             SearchingView = null;
             CancelSource.Cancel();
             ActiveSearch = null;
