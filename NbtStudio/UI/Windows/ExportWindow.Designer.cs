@@ -97,10 +97,10 @@
             // CheckLittleEndian
             // 
             this.CheckLittleEndian.AutoSize = true;
-            this.CheckLittleEndian.Location = new System.Drawing.Point(75, 12);
+            this.CheckLittleEndian.Location = new System.Drawing.Point(75, 38);
             this.CheckLittleEndian.Name = "CheckLittleEndian";
             this.CheckLittleEndian.Size = new System.Drawing.Size(84, 17);
-            this.CheckLittleEndian.TabIndex = 1;
+            this.CheckLittleEndian.TabIndex = 2;
             this.CheckLittleEndian.Text = "Little-Endian";
             this.CheckLittleEndian.UseVisualStyleBackColor = true;
             // 
@@ -108,10 +108,10 @@
             // 
             this.CompressionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CompressionBox.FormattingEnabled = true;
-            this.CompressionBox.Location = new System.Drawing.Point(76, 58);
+            this.CompressionBox.Location = new System.Drawing.Point(75, 11);
             this.CompressionBox.Name = "CompressionBox";
             this.CompressionBox.Size = new System.Drawing.Size(103, 21);
-            this.CompressionBox.TabIndex = 3;
+            this.CompressionBox.TabIndex = 1;
             // 
             // CheckJson
             // 
@@ -126,10 +126,10 @@
             // CheckBedrockHeader
             // 
             this.CheckBedrockHeader.AutoSize = true;
-            this.CheckBedrockHeader.Location = new System.Drawing.Point(75, 35);
+            this.CheckBedrockHeader.Location = new System.Drawing.Point(75, 61);
             this.CheckBedrockHeader.Name = "CheckBedrockHeader";
             this.CheckBedrockHeader.Size = new System.Drawing.Size(104, 17);
-            this.CheckBedrockHeader.TabIndex = 2;
+            this.CheckBedrockHeader.TabIndex = 3;
             this.CheckBedrockHeader.Text = "Bedrock Header";
             this.CheckBedrockHeader.UseVisualStyleBackColor = true;
             // 
