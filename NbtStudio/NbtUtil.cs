@@ -480,17 +480,19 @@ namespace NbtStudio
         private static string AllFiles => "All Files|*";
         private static string AllNbtFiles(IEnumerable<FileExtension> source) => $"All NBT Files|{String.Join("; ", source.Select(x => "*." + x.Extension))}";
         private static string IndividualNbtFiles(IEnumerable<FileExtension> source) => String.Join("|", source.Select(GetEntry));
-        private static string IndividualNbtFiles<T>(IEnumerable<FileExtension> source, Func<FileExtension, T> order) => String.Join("|", source.OrderBy(order).Select(GetEntry));
-        public static string SaveFilter(string first_extension)
+        public static string SaveFilter(ISaveable item)
         {
-            var relevant = NbtExtensions.Where(x => !x.IsRegion);
-            if (first_extension == null)
+            var relevant = NbtExtensions.Where(x => x.IsRegion == item is RegionFile);
+            if (item.Path == null)
                 return $"{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}|{AllFiles}";
-            var first = NbtExtensions.FirstOrDefault(x => "." + x.Extension == first_extension);
-            if (first == null)
-                return $"{AllFiles}|{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}";
-            string individual = IndividualNbtFiles(relevant, x => x != first); // OrderBy puts false before true
-            return $"{individual}|{AllNbtFiles(relevant)}|{AllFiles}";
+            else
+            {
+                string extension = Path.GetExtension(item.Path);
+                if (!relevant.Any(x => "." + x.Extension == extension))
+                    return $"{AllFiles}|{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}";
+                relevant = relevant.OrderByDescending(x => "." + x.Extension == extension);
+            }
+            return $"{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}|{AllFiles}";
         }
         public static string OpenFilter()
         {

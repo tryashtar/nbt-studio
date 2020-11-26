@@ -356,7 +356,7 @@ namespace NbtStudio.UI
                 Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
                 RestoreDirectory = true,
                 FileName = file.Path,
-                Filter = NbtUtil.SaveFilter(Path.GetExtension(file.Path))
+                Filter = NbtUtil.SaveFilter(file)
             })
             {
                 if (file.Path != null)
