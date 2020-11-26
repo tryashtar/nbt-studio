@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.RadioSnbt = new System.Windows.Forms.RadioButton();
@@ -36,26 +37,28 @@
             this.CheckLittleEndian = new System.Windows.Forms.CheckBox();
             this.CompressionBox = new System.Windows.Forms.ComboBox();
             this.CheckJson = new System.Windows.Forms.CheckBox();
+            this.CheckBedrockHeader = new System.Windows.Forms.CheckBox();
+            this.Tooltips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // ButtonCancel
             // 
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonCancel.Location = new System.Drawing.Point(191, 71);
+            this.ButtonCancel.Location = new System.Drawing.Point(103, 147);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 7;
+            this.ButtonCancel.TabIndex = 8;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(110, 71);
+            this.ButtonOk.Location = new System.Drawing.Point(22, 147);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOk.TabIndex = 6;
+            this.ButtonOk.TabIndex = 7;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.UseVisualStyleBackColor = true;
             this.ButtonOk.Click += new System.EventHandler(this.ButtonOk_Click);
@@ -63,10 +66,10 @@
             // RadioSnbt
             // 
             this.RadioSnbt.AutoSize = true;
-            this.RadioSnbt.Location = new System.Drawing.Point(12, 35);
+            this.RadioSnbt.Location = new System.Drawing.Point(12, 89);
             this.RadioSnbt.Name = "RadioSnbt";
             this.RadioSnbt.Size = new System.Drawing.Size(54, 17);
-            this.RadioSnbt.TabIndex = 3;
+            this.RadioSnbt.TabIndex = 4;
             this.RadioSnbt.Text = "SNBT";
             this.RadioSnbt.UseVisualStyleBackColor = true;
             // 
@@ -84,10 +87,10 @@
             // CheckMinify
             // 
             this.CheckMinify.AutoSize = true;
-            this.CheckMinify.Location = new System.Drawing.Point(75, 36);
+            this.CheckMinify.Location = new System.Drawing.Point(75, 90);
             this.CheckMinify.Name = "CheckMinify";
             this.CheckMinify.Size = new System.Drawing.Size(53, 17);
-            this.CheckMinify.TabIndex = 4;
+            this.CheckMinify.TabIndex = 5;
             this.CheckMinify.Text = "Minify";
             this.CheckMinify.UseVisualStyleBackColor = true;
             // 
@@ -105,20 +108,30 @@
             // 
             this.CompressionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CompressionBox.FormattingEnabled = true;
-            this.CompressionBox.Location = new System.Drawing.Point(163, 10);
+            this.CompressionBox.Location = new System.Drawing.Point(76, 58);
             this.CompressionBox.Name = "CompressionBox";
             this.CompressionBox.Size = new System.Drawing.Size(103, 21);
-            this.CompressionBox.TabIndex = 2;
+            this.CompressionBox.TabIndex = 3;
             // 
             // CheckJson
             // 
             this.CheckJson.AutoSize = true;
-            this.CheckJson.Location = new System.Drawing.Point(131, 36);
+            this.CheckJson.Location = new System.Drawing.Point(75, 113);
             this.CheckJson.Name = "CheckJson";
             this.CheckJson.Size = new System.Drawing.Size(54, 17);
-            this.CheckJson.TabIndex = 5;
+            this.CheckJson.TabIndex = 6;
             this.CheckJson.Text = "JSON";
             this.CheckJson.UseVisualStyleBackColor = true;
+            // 
+            // CheckBedrockHeader
+            // 
+            this.CheckBedrockHeader.AutoSize = true;
+            this.CheckBedrockHeader.Location = new System.Drawing.Point(75, 35);
+            this.CheckBedrockHeader.Name = "CheckBedrockHeader";
+            this.CheckBedrockHeader.Size = new System.Drawing.Size(104, 17);
+            this.CheckBedrockHeader.TabIndex = 2;
+            this.CheckBedrockHeader.Text = "Bedrock Header";
+            this.CheckBedrockHeader.UseVisualStyleBackColor = true;
             // 
             // ExportWindow
             // 
@@ -126,7 +139,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(278, 106);
+            this.ClientSize = new System.Drawing.Size(190, 182);
+            this.Controls.Add(this.CheckBedrockHeader);
             this.Controls.Add(this.CheckJson);
             this.Controls.Add(this.CompressionBox);
             this.Controls.Add(this.CheckLittleEndian);
@@ -156,5 +170,7 @@
         private System.Windows.Forms.CheckBox CheckLittleEndian;
         private System.Windows.Forms.ComboBox CompressionBox;
         private System.Windows.Forms.CheckBox CheckJson;
+        private System.Windows.Forms.CheckBox CheckBedrockHeader;
+        private System.Windows.Forms.ToolTip Tooltips;
     }
 }

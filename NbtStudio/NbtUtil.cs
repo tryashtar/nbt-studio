@@ -449,34 +449,54 @@ namespace NbtStudio
             return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
         }
 
-        private static readonly Dictionary<string, string> NbtExtensions = new Dictionary<string, string>
+        private class FileExtension
         {
-            { "nbt", "NBT files" },
-            { "snbt", "SNBT files" },
-            { "dat", "DAT files" },
-            { "mca", "Anvil Region files" },
-            { "mcr", "Legacy Region files" },
-            { "mcc", "External Chunk files" },
-            { "mcstructure", "Bedrock Structure files" },
-            { "schematic", "MCEdit Schematic files" }
+            public readonly string Extension;
+            public readonly string Description;
+            public readonly bool IsRegion;
+            public readonly bool IsBinary;
+
+            public FileExtension(string extension, string description, bool binary = true, bool region = false)
+            {
+                Extension = extension;
+                Description = description;
+                IsBinary = binary;
+                IsRegion = region;
+            }
+        }
+        private static readonly List<FileExtension> NbtExtensions = new List<FileExtension>
+        {
+            { new FileExtension("nbt", "NBT files") },
+            { new FileExtension("snbt", "SNBT files", binary: false) },
+            { new FileExtension("dat", "DAT files") },
+            { new FileExtension("mca", "Anvil Region files", region: true) },
+            { new FileExtension("mcr", "Legacy Region files", region: true) },
+            { new FileExtension("mcc", "External Chunk files") },
+            { new FileExtension("mcstructure", "Bedrock Structure files") },
+            { new FileExtension("json", "JSON files", binary: false) },
+            { new FileExtension("schematic", "MCEdit Schematic files") }
         };
+        private static string GetEntry(FileExtension f) => $"{f.Description}|*.{f.Extension}";
         private static string AllFiles => "All Files|*";
-        private static string AllNbtFiles => $"All NBT Files|{String.Join("; ", NbtExtensions.Keys.Select(x => "*." + x))}";
-        private static string IndividualNbtFiles() => String.Join("|", NbtExtensions.Select(x => $"{x.Value}|*.{x.Key}"));
-        private static string IndividualNbtFiles<T>(Func<KeyValuePair<string, string>, T> order) => String.Join("|", NbtExtensions.OrderBy(order).Select(x => $"{x.Value}|*.{x.Key}"));
+        private static string AllNbtFiles(IEnumerable<FileExtension> source) => $"All NBT Files|{String.Join("; ", source.Select(x => "*." + x.Extension))}";
+        private static string IndividualNbtFiles(IEnumerable<FileExtension> source) => String.Join("|", source.Select(GetEntry));
+        private static string IndividualNbtFiles<T>(IEnumerable<FileExtension> source, Func<FileExtension, T> order) => String.Join("|", source.OrderBy(order).Select(GetEntry));
         public static string SaveFilter(string first_extension)
         {
+            var relevant = NbtExtensions.Where(x => !x.IsRegion);
             if (first_extension == null)
-                return $"{IndividualNbtFiles()}|{AllNbtFiles}|{AllFiles}";
-            if (!NbtExtensions.ContainsKey(first_extension.Substring(1)))
-                return $"{AllFiles}|{IndividualNbtFiles()}|{AllNbtFiles}";
-            string individual = IndividualNbtFiles(x => "." + x.Key != first_extension); // OrderBy puts false before true
-            return $"{individual}|{AllNbtFiles}|{AllFiles}";
+                return $"{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}|{AllFiles}";
+            var first = NbtExtensions.FirstOrDefault(x => "." + x.Extension == first_extension);
+            if (first == null)
+                return $"{AllFiles}|{IndividualNbtFiles(relevant)}|{AllNbtFiles(relevant)}";
+            string individual = IndividualNbtFiles(relevant, x => x != first); // OrderBy puts false before true
+            return $"{individual}|{AllNbtFiles(relevant)}|{AllFiles}";
         }
         public static string OpenFilter()
         {
-            return $"{AllFiles}|{AllNbtFiles}|{IndividualNbtFiles()}";
+            return $"{AllFiles}|{AllNbtFiles(NbtExtensions)}|{IndividualNbtFiles(NbtExtensions)}";
         }
+        public static bool? BinaryExtension(string extension) => NbtExtensions.FirstOrDefault(x => "." + x.Extension == extension)?.IsBinary;
 
         public static IconType TagIconType(NbtTagType type)
         {

@@ -9,7 +9,6 @@ namespace NbtStudio.UI
 {
     public partial class ExportWindow : Form
     {
-        private bool BedrockHeader;
         public ExportWindow(IconSource source, ExportSettings template, string destination_path)
         {
             InitializeComponent();
@@ -20,23 +19,27 @@ namespace NbtStudio.UI
             CompressionBox.SelectedIndex = 0;
             if (template != null)
             {
-                BedrockHeader = template.BedrockHeader;
                 RadioSnbt.Checked = template.Snbt;
+                RadioNbt.Checked = !template.Snbt;
                 CompressionBox.SelectedItem = CompressionBox.Items.Cast<CompressionDisplay>().FirstOrDefault(x => x.Compression == template.Compression);
                 CheckMinify.Checked = template.Minified;
                 CheckJson.Checked = template.Json;
                 CheckLittleEndian.Checked = !template.BigEndian;
+                CheckBedrockHeader.Checked = template.BedrockHeader;
             }
             else
             {
                 string extension = Path.GetExtension(destination_path);
-                RadioSnbt.Checked = extension == ".snbt" || extension == ".json";
-                if (!RadioSnbt.Checked)
-                    RadioNbt.Checked = true;
+                bool? binary = NbtUtil.BinaryExtension(extension);
+                RadioSnbt.Checked = binary == false;
+                RadioNbt.Checked = binary == true;
                 CheckLittleEndian.Checked = extension == ".mcstructure";
                 CheckJson.Checked = extension == ".json";
             }
             SetEnables();
+            Tooltips.SetToolTip(CheckLittleEndian, "Required for all Bedrock Edition files");
+            Tooltips.SetToolTip(CheckBedrockHeader, "Required for Bedrock Edition level.dat files");
+            Tooltips.SetToolTip(CheckJson, "Quotes all keys, removes type suffixes and list indicators");
         }
 
         public ExportSettings GetSettings()
@@ -44,7 +47,7 @@ namespace NbtStudio.UI
             if (RadioSnbt.Checked)
                 return ExportSettings.AsSnbt(CheckMinify.Checked, CheckJson.Checked);
             else
-                return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, BedrockHeader);
+                return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, CheckBedrockHeader.Checked);
         }
 
         private void Apply()
@@ -67,8 +70,10 @@ namespace NbtStudio.UI
         {
             CompressionBox.Enabled = RadioNbt.Checked;
             CheckLittleEndian.Enabled = RadioNbt.Checked;
+            CheckBedrockHeader.Enabled = RadioNbt.Checked;
             CheckMinify.Enabled = RadioSnbt.Checked;
             CheckJson.Enabled = RadioSnbt.Checked;
+            ButtonOk.Enabled = RadioNbt.Checked || RadioSnbt.Checked;
         }
 
         private class CompressionDisplay
