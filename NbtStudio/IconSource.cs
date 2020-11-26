@@ -21,6 +21,7 @@ namespace NbtStudio
             Sources["builtin_amber"] = AmberIconSource.Instance;
             Sources["builtin_yusuke"] = YusukeIconSource.Instance;
             Sources["builtin_mixed"] = MixedIconSource.Instance;
+            Sources["builtin_wiki"] = WikiIconSource.Instance;
         }
 
         public static void SetDefault(IconSource source)
@@ -193,7 +194,7 @@ namespace NbtStudio
             {
                 var defer = IconSourceRegistry.DefaultSource;
                 if (defer != null)
-                    defer.GetImage(type);
+                    return defer.GetImage(type);
             }
             return base.GetImage(type);
         }
@@ -268,10 +269,10 @@ namespace NbtStudio
         public static YusukeIconSource Instance = new YusukeIconSource();
         private YusukeIconSource()
         {
-            Add(IconType.File, Properties.Resources.yusuke_file_file);
+            Add(IconType.File, Properties.Resources.yusuke_file_chunk);
             Add(IconType.Folder, Properties.Resources.yusuke_file_folder);
             Add(IconType.Region, Properties.Resources.yusuke_file_region);
-            Add(IconType.Chunk, Properties.Resources.yusuke_file_chunk);
+            Add(IconType.Chunk, Properties.Resources.yusuke_tag_compound);
 
             Add(IconType.NewFile, Properties.Resources.yusuke_action_new_file);
             Add(IconType.OpenFile, Properties.Resources.yusuke_action_open_file);
@@ -358,6 +359,27 @@ namespace NbtStudio
             Add(IconType.ListTag, Properties.Resources.amber_tag_list);
 
             Add(IconType.NbtStudio, Properties.Resources.nbt_studio_image_256);
+        }
+    }
+
+    public class WikiIconSource : DeferToDefaultIconSource
+    {
+        public override string Name => "Wiki";
+        public static WikiIconSource Instance = new WikiIconSource();
+        private WikiIconSource()
+        {
+            Add(IconType.ByteTag, Properties.Resources.wiki_tag_byte);
+            Add(IconType.ShortTag, Properties.Resources.wiki_tag_short);
+            Add(IconType.IntTag, Properties.Resources.wiki_tag_int);
+            Add(IconType.LongTag, Properties.Resources.wiki_tag_long);
+            Add(IconType.FloatTag, Properties.Resources.wiki_tag_float);
+            Add(IconType.DoubleTag, Properties.Resources.wiki_tag_double);
+            Add(IconType.StringTag, Properties.Resources.wiki_tag_string);
+            Add(IconType.ByteArrayTag, Properties.Resources.wiki_tag_byte_array);
+            Add(IconType.IntArrayTag, Properties.Resources.wiki_tag_int_array);
+            Add(IconType.LongArrayTag, Properties.Resources.wiki_tag_long_array);
+            Add(IconType.CompoundTag, Properties.Resources.wiki_tag_compound);
+            Add(IconType.ListTag, Properties.Resources.wiki_tag_list);
         }
     }
 

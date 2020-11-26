@@ -549,6 +549,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="nbt_studio_icon_256.ico" />
+    <None Include="Resources\wiki\tag_string.png" />
+    <None Include="Resources\wiki\tag_short.png" />
+    <None Include="Resources\wiki\tag_long_array.png" />
+    <None Include="Resources\wiki\tag_long.png" />
+    <None Include="Resources\wiki\tag_list.png" />
+    <None Include="Resources\wiki\tag_int_array.png" />
+    <None Include="Resources\wiki\tag_int.png" />
+    <None Include="Resources\wiki\tag_float.png" />
+    <None Include="Resources\wiki\tag_double.png" />
+    <None Include="Resources\wiki\tag_compound.png" />
+    <None Include="Resources\wiki\tag_byte_array.png" />
+    <None Include="Resources\wiki\tag_byte.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.6.0.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.0\build\Fody.targets')" />
