@@ -37,9 +37,10 @@
             this.CurrentColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.NewColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RegexCheck = new System.Windows.Forms.CheckBox();
-            this.FindBox = new NbtStudio.UI.RegexTextBox();
             this.ReplaceBox = new System.Windows.Forms.TextBox();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
+            this.TagsChangingLabel = new System.Windows.Forms.Label();
+            this.FindBox = new NbtStudio.UI.RegexTextBox();
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -60,7 +61,7 @@
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonCancel.Location = new System.Drawing.Point(93, 9);
+            this.ButtonCancel.Location = new System.Drawing.Point(93, 29);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
             this.ButtonCancel.TabIndex = 9;
@@ -71,7 +72,7 @@
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonOk.Location = new System.Drawing.Point(12, 9);
+            this.ButtonOk.Location = new System.Drawing.Point(12, 29);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(75, 23);
             this.ButtonOk.TabIndex = 8;
@@ -111,8 +112,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.MainTable.Size = new System.Drawing.Size(463, 341);
             this.MainTable.TabIndex = 0;
             // 
@@ -138,6 +138,7 @@
             this.ActionList.UseCompatibleStateImageBehavior = false;
             this.ActionList.View = System.Windows.Forms.View.Details;
             this.ActionList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.ActionList_ColumnWidthChanging);
+            this.ActionList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ActionList_ItemCheck);
             this.ActionList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ActionList_ItemChecked);
             this.ActionList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.ActionList_ItemSelectionChanged);
             // 
@@ -164,19 +165,6 @@
             this.RegexCheck.UseVisualStyleBackColor = true;
             this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
             // 
-            // FindBox
-            // 
-            this.FindBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
-            this.FindBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.FindBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.FindBox.Location = new System.Drawing.Point(77, 10);
-            this.FindBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.FindBox.Name = "FindBox";
-            this.FindBox.RegexMode = false;
-            this.FindBox.Size = new System.Drawing.Size(209, 21);
-            this.FindBox.TabIndex = 2;
-            this.FindBox.TextChanged += new System.EventHandler(this.FindBox_TextChanged);
-            // 
             // ReplaceBox
             // 
             this.ReplaceBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
@@ -193,13 +181,38 @@
             // ButtonsPanel
             // 
             this.ButtonsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonsPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ButtonsPanel.Controls.Add(this.TagsChangingLabel);
             this.ButtonsPanel.Controls.Add(this.ButtonOk);
             this.ButtonsPanel.Controls.Add(this.ButtonCancel);
-            this.ButtonsPanel.Location = new System.Drawing.Point(283, 297);
+            this.ButtonsPanel.Location = new System.Drawing.Point(283, 277);
             this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
+            this.ButtonsPanel.Size = new System.Drawing.Size(177, 61);
             this.ButtonsPanel.TabIndex = 7;
+            // 
+            // TagsChangingLabel
+            // 
+            this.TagsChangingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.TagsChangingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.TagsChangingLabel.ForeColor = System.Drawing.Color.Gray;
+            this.TagsChangingLabel.Location = new System.Drawing.Point(12, 10);
+            this.TagsChangingLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
+            this.TagsChangingLabel.Name = "TagsChangingLabel";
+            this.TagsChangingLabel.Size = new System.Drawing.Size(156, 16);
+            this.TagsChangingLabel.TabIndex = 10;
+            this.TagsChangingLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // FindBox
+            // 
+            this.FindBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.FindBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.FindBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.FindBox.Location = new System.Drawing.Point(77, 10);
+            this.FindBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.FindBox.Name = "FindBox";
+            this.FindBox.RegexMode = false;
+            this.FindBox.Size = new System.Drawing.Size(209, 21);
+            this.FindBox.TabIndex = 2;
+            this.FindBox.TextChanged += new System.EventHandler(this.FindBox_TextChanged);
             // 
             // BulkEditWindow
             // 
@@ -241,5 +254,6 @@
         private System.Windows.Forms.ListView ActionList;
         private System.Windows.Forms.ColumnHeader CurrentColumn;
         private System.Windows.Forms.ColumnHeader NewColumn;
+        private System.Windows.Forms.Label TagsChangingLabel;
     }
 }

@@ -12,13 +12,13 @@ namespace NbtStudio.UI
     public partial class BulkEditWindow : Form
     {
         private readonly BulkEditPurpose Purpose;
-        private readonly List<NbtTag> WorkingTags;
+        private readonly List<NbtTag> ChangedTags = new List<NbtTag>();
+        private int ChangingCount = 0;
 
         private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
         {
             InitializeComponent();
 
-            WorkingTags = tags;
             Purpose = purpose;
             ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
             SetMinimumSize();
@@ -53,24 +53,30 @@ namespace NbtStudio.UI
                 return NbtUtil.PreviewNbtValue(tag);
         }
 
-        public static void BulkRename(IconSource source, IEnumerable<NbtTag> tags)
+        // returns changed tags
+        public static IEnumerable<NbtTag> BulkRename(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => x.Parent is NbtCompound).ToList();
             if (list.Any())
             {
                 var window = new BulkEditWindow(source, list, BulkEditPurpose.Rename);
                 window.ShowDialog();
+                return window.ChangedTags;
             }
+            return Enumerable.Empty<NbtTag>();
         }
 
-        public static void BulkEdit(IconSource source, IEnumerable<NbtTag> tags)
+        // returns changed tags
+        public static IEnumerable<NbtTag> BulkEdit(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => NbtUtil.IsValueType(x.TagType)).ToList();
             if (list.Any())
             {
                 var window = new BulkEditWindow(source, list, BulkEditPurpose.EditValue);
                 window.ShowDialog();
+                return window.ChangedTags;
             }
+            return Enumerable.Empty<NbtTag>();
         }
 
         private void Confirm()
@@ -101,6 +107,7 @@ namespace NbtStudio.UI
                         tag.Name = transformed;
                     else
                         NbtUtil.SetValue(tag, result);
+                    ChangedTags.Add(tag);
                 }
             }
             return true;
@@ -167,13 +174,26 @@ namespace NbtStudio.UI
         private void UpdatePreview()
         {
             var transformer = GetTransformer();
+            ChangingCount = 0;
             foreach (ListViewItem item in ActionList.Items)
             {
-                UpdateSinglePreview(item, transformer);
+                if (UpdateSinglePreview(item, transformer))
+                    ChangingCount++;
             }
+            UpdateChangeLabel();
         }
 
-        private void UpdateSinglePreview(ListViewItem item, Func<string, string> transformer)
+        private void UpdateChangeLabel()
+        {
+            if (Purpose == BulkEditPurpose.Rename)
+                TagsChangingLabel.Text = $"Renaming {Util.Pluralize(ChangingCount, "tag")}";
+            else
+                TagsChangingLabel.Text = $"Editing {Util.Pluralize(ChangingCount, "tag")}";
+            ButtonOk.Enabled = ChangingCount > 0;
+        }
+
+        // returns true if the transformation is applicable and valid
+        private bool UpdateSinglePreview(ListViewItem item, Func<string, string> transformer)
         {
             string current = item.SubItems[0].Text;
             string transformed = transformer(current);
@@ -181,12 +201,15 @@ namespace NbtStudio.UI
             {
                 item.SubItems[1].Text = "";
                 item.BackColor = default;
+                return false;
             }
             else
             {
                 item.SubItems[1].Text = transformed;
                 var tag = (NbtTag)item.Tag;
-                item.BackColor = IsValidFor(tag, transformed, out _) ? default : Color.Pink;
+                bool valid = IsValidFor(tag, transformed, out _);
+                item.BackColor = valid ? default : Color.Pink;
+                return valid;
             }
         }
 
@@ -254,9 +277,24 @@ namespace NbtStudio.UI
             UpdatePreview();
         }
 
+        private void ActionList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // if it's currently being changed but getting unchecked, reduce count by 1
+            if (e.CurrentValue == CheckState.Checked && e.NewValue == CheckState.Unchecked && UpdateSinglePreview(ActionList.Items[e.Index], GetTransformer()))
+            {
+                ChangingCount--;
+                UpdateChangeLabel();
+            }
+        }
+
         private void ActionList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            UpdateSinglePreview(e.Item, GetTransformer());
+            // if it just got checked and is being changed, increase count by 1
+            if (e.Item.Checked && UpdateSinglePreview(e.Item, GetTransformer()))
+            {
+                ChangingCount++;
+                UpdateChangeLabel();
+            }
         }
     }
 

@@ -470,15 +470,15 @@ namespace NbtStudio.UI
         private void BulkRename(IEnumerable<NbtTag> tags)
         {
             UndoHistory.StartBatchOperation();
-            BulkEditWindow.BulkRename(IconSource, tags);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", tags), false);
+            var changed = BulkEditWindow.BulkRename(IconSource, tags);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", changed), false);
         }
 
         private void BulkEdit(IEnumerable<NbtTag> tags)
         {
             UndoHistory.StartBatchOperation();
-            BulkEditWindow.BulkEdit(IconSource, tags);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", tags), false);
+            var changed = BulkEditWindow.BulkEdit(IconSource, tags);
+            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", changed), false);
         }
 
         private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
