@@ -13,9 +13,18 @@ namespace NbtStudio.SNBT
         public bool Minified;
         public Predicate<string> ShouldQuoteKeys;
         public Predicate<string> ShouldQuoteStrings;
+        public QuoteMode KeyQuoteMode;
+        public QuoteMode StringQuoteMode;
         public bool NumberSuffixes;
         public bool ArrayPrefixes;
         public bool EscapeNewlines;
+
+        public enum QuoteMode
+        {
+            Automatic,
+            DoubleQuotes,
+            SingleQuotes
+        }
 
         public SnbtOptions Expanded()
         {
@@ -30,6 +39,8 @@ namespace NbtStudio.SNBT
             Minified = true,
             ShouldQuoteKeys = x => !StringRegex.IsMatch(x),
             ShouldQuoteStrings = x => true,
+            KeyQuoteMode = QuoteMode.Automatic,
+            StringQuoteMode = QuoteMode.Automatic,
             NumberSuffixes = true,
             ArrayPrefixes = true,
             EscapeNewlines = true
@@ -41,6 +52,8 @@ namespace NbtStudio.SNBT
             Minified = true,
             ShouldQuoteKeys = x => true,
             ShouldQuoteStrings = x => x != "null",
+            KeyQuoteMode = QuoteMode.DoubleQuotes,
+            StringQuoteMode = QuoteMode.DoubleQuotes,
             NumberSuffixes = false,
             ArrayPrefixes = false,
             EscapeNewlines = true
@@ -56,12 +69,6 @@ namespace NbtStudio.SNBT
             ArrayPrefixes = false,
             EscapeNewlines = false
         };
-    }
-    public enum QuoteOption
-    {
-        Always,
-        Never,
-        WhenRequired
     }
     public static class Snbt
     {
@@ -157,7 +164,7 @@ namespace NbtStudio.SNBT
         }
         public static string ToSnbt(this NbtString tag, SnbtOptions options)
         {
-            return QuoteIfRequested(tag.Value, options.ShouldQuoteStrings, options.EscapeNewlines);
+            return QuoteIfRequested(tag.Value, options.ShouldQuoteStrings, options.StringQuoteMode, options.EscapeNewlines);
         }
 
         public static string ToSnbt(this NbtByteArray tag, SnbtOptions options)
@@ -218,17 +225,17 @@ namespace NbtStudio.SNBT
             return s.ToString();
         }
 
-        private static string QuoteIfRequested(string str, Predicate<string> should_quote, bool escape_newlines)
+        private static string QuoteIfRequested(string str, Predicate<string> should_quote, SnbtOptions.QuoteMode mode, bool escape_newlines)
         {
             if (should_quote(str))
-                return QuoteAndEscape(str, escape_newlines);
+                return QuoteAndEscape(str, mode, escape_newlines);
             else
                 return str;
         }
 
         private static string GetName(NbtTag tag, SnbtOptions options)
         {
-            return QuoteIfRequested(tag.Name, options.ShouldQuoteKeys, options.EscapeNewlines);
+            return QuoteIfRequested(tag.Name, options.ShouldQuoteKeys, options.KeyQuoteMode, options.EscapeNewlines);
         }
 
         private static string GetNameBeforeValue(NbtTag tag, SnbtOptions options)
@@ -239,11 +246,17 @@ namespace NbtStudio.SNBT
         }
 
         // adapted directly from minecraft's (decompiled) source
-        private static string QuoteAndEscape(string input, bool escape_newlines)
+        private static string QuoteAndEscape(string input, SnbtOptions.QuoteMode mode, bool escape_newlines)
         {
             const char PLACEHOLDER_QUOTE = '\0';
             var builder = new StringBuilder(PLACEHOLDER_QUOTE.ToString()); // dummy value to be replaced at end
-            char preferred_quote = PLACEHOLDER_QUOTE; // dummy value when we're not sure which quote type to use yet
+            char preferred_quote;
+            if (mode == SnbtOptions.QuoteMode.DoubleQuotes)
+                preferred_quote = '"';
+            else if (mode == SnbtOptions.QuoteMode.SingleQuotes)
+                preferred_quote = '\'';
+            else
+                preferred_quote = PLACEHOLDER_QUOTE; // dummy value when we're not sure which quote type to use yet
             foreach (char c in input)
             {
                 if (c == STRING_ESCAPE)
