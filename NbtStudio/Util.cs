@@ -166,6 +166,11 @@ namespace NbtStudio
             return items.Any() && !items.Skip(1).Any();
         }
 
+        public static bool CountGreaterThan<T>(this IEnumerable<T> items, int count)
+        {
+            return items.Skip(count).Any();
+        }
+
         public static DataObject Merge(DataObject obj1, DataObject obj2)
         {
             var result = new DataObject();

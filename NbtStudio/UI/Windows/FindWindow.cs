@@ -91,12 +91,23 @@ namespace NbtStudio.UI
             ActiveSearch = new Task<IEnumerable<INode>>(() => function(progress));
             ActiveSearch.Start();
             ProgressBar.Visible = true;
+            FoundResultsLabel.Visible = false;
             ProgressBar.Value = 0;
             ActiveSearch.ContinueWith(x =>
             {
                 ProgressBar.Visible = false;
-                if (x.Result != null && x.Result.Any())
+                if (x.Result == null || !x.Result.Any())
                 {
+                    FoundResultsLabel.Text = "No results found";
+                    FoundResultsLabel.Visible = true;
+                }
+                else
+                {
+                    if (x.Result.CountGreaterThan(1))
+                    {
+                        FoundResultsLabel.Text = $"Found {x.Result.Count()} matching results";
+                        FoundResultsLabel.Visible = true;
+                    }
                     SearchingView.ClearSelection();
                     LastFound = x.Result.Last();
                     foreach (var item in x.Result)
