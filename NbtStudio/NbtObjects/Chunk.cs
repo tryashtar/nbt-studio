@@ -109,7 +109,7 @@ namespace NbtStudio
                     {
                         file.LoadFromStream(stream, NbtCompression.AutoDetect);
                         Compression = file.FileCompression;
-                        SetData(file.RootTag);
+                        SetData(file.GetRootTag<NbtCompound>());
                     }
                     catch
                     {

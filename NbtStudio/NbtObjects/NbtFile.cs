@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
@@ -17,12 +17,13 @@ namespace NbtStudio
         public string Path { get; private set; }
         public bool IsFolder => false;
         public event EventHandler OnSaved;
-        public NbtCompound RootTag { get; private set; }
+        public NbtTag RootTag { get; private set; }
+        public T GetRootTag<T>() where T : NbtTag => RootTag as T;
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
         public bool HasUnsavedChanges { get; private set; } = false;
 
-        private NbtFile(string path, NbtCompound root, ExportSettings settings)
+        private NbtFile(string path, NbtTag root, ExportSettings settings)
         {
             Path = path;
             SetRoot(root);
@@ -32,7 +33,7 @@ namespace NbtStudio
         public NbtFile() : this(new NbtCompound(""))
         { }
 
-        public NbtFile(NbtCompound root)
+        public NbtFile(NbtTag root)
         {
             if (root.Name == null)
                 root.Name = "";
@@ -42,19 +43,30 @@ namespace NbtStudio
             HasUnsavedChanges = true;
         }
 
-        private void SetRoot(NbtCompound root)
+        private void SetRoot(NbtTag root)
         {
             RootTag = root;
             RootTag.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
-        private static bool LooksSuspicious(NbtTag tag)
+        private static bool LooksSuspicious(string name)
         {
-            foreach (var ch in tag.Name)
+            if (name == null)
+                return false;
+            foreach (var ch in name)
             {
                 if (Char.IsControl(ch))
                     return true;
             }
+            return false;
+        }
+
+        private static bool LooksSuspicious(NbtTag tag)
+        {
+            if (LooksSuspicious(tag.Name))
+                return true;
+            if (tag is NbtContainerTag container && container.Any(x => LooksSuspicious(x.Name)))
+                return true;
             return false;
         }
 
@@ -66,19 +78,19 @@ namespace NbtStudio
 
             // SNBT
             var attempt1 = TryCreateFromSnbt(path);
-            if (attempt1 != null && !attempt1.RootTag.Tags.Any(LooksSuspicious))
+            if (attempt1 != null && !LooksSuspicious(attempt1.RootTag))
                 return attempt1;
             // java files
             var attempt2 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true);
-            if (attempt2 != null && !attempt2.RootTag.Tags.Any(LooksSuspicious))
+            if (attempt2 != null && !LooksSuspicious(attempt2.RootTag))
                 return attempt2;
             // bedrock files
             var attempt3 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false);
-            if (attempt3 != null && !attempt3.RootTag.Tags.Any(LooksSuspicious))
+            if (attempt3 != null && !LooksSuspicious(attempt3.RootTag))
                 return attempt3;
             // bedrock level.dat files
             var attempt4 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, bedrock_header: true);
-            if (attempt4 != null && !attempt4.RootTag.Tags.Any(LooksSuspicious))
+            if (attempt4 != null && !LooksSuspicious(attempt4.RootTag))
                 return attempt4;
             return attempt1 ?? attempt2 ?? attempt3 ?? attempt4;
         }
