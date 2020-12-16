@@ -88,11 +88,9 @@ namespace NbtStudio
             return new RegionFile();
         }
 
-        public static RegionFile TryCreate(string path)
+        public static Failable<RegionFile> TryCreate(string path)
         {
-            try
-            { return new RegionFile(path); }
-            catch { return null; }
+            return new Failable<RegionFile>(() => new RegionFile(path));
         }
 
         internal FileStream GetStream()

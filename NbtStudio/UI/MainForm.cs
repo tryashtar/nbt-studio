@@ -733,13 +733,14 @@ namespace NbtStudio.UI
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
             var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
-            var bad = files.Where(x => x.item == null);
-            var good = files.Where(x => x.item != null);
+            var bad = files.Where(x => x.item.Failed);
+            var good = files.Where(x => !x.item.Failed);
             if (bad.Any())
             {
                 string message = $"{Util.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-                MessageBox.Show(message, "Load Failure");
+                var window = new ExceptionWindow("Load Failure", message, bad.First().item.Exception);
+                window.ShowDialog(this);
             }
             if (good.Any())
             {

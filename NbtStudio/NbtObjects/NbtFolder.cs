@@ -39,8 +39,8 @@ namespace NbtStudio
                 if (!FileDict.ContainsKey(path))
                 {
                     var file = OpenFile(path);
-                    if (file != null)
-                        FileDict.Add(path, file);
+                    if (!file.Failed)
+                        FileDict.Add(path, file.Result);
                 }
             }
             foreach (var key in FileDict.Keys.ToList())
@@ -69,17 +69,22 @@ namespace NbtStudio
             ContentsChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public static ISaveable OpenFile(string path)
+        public static Failable<ISaveable> OpenFile(string path)
         {
-            return (ISaveable)NbtFile.TryCreate(path) ??
-                RegionFile.TryCreate(path);
+            var attempt1 = NbtFile.TryCreate(path);
+            if (!attempt1.Failed)
+                return attempt1.Cast<ISaveable>();
+            var attempt2 = RegionFile.TryCreate(path);
+            if (!attempt2.Failed)
+                return attempt2.Cast<ISaveable>();
+            return attempt1.Cast<ISaveable>();
         }
 
-        public static IHavePath OpenFileOrFolder(string path)
+        public static Failable<IHavePath> OpenFileOrFolder(string path)
         {
             if (Directory.Exists(path))
-                return new NbtFolder(path, true);
-            return OpenFile(path);
+                return new Failable<IHavePath>(() => new NbtFolder(path, true));
+            return OpenFile(path).Cast<IHavePath>();
         }
 
         public void Move(string path)
