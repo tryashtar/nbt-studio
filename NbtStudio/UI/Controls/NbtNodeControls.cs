@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NbtStudio.UI
 {
@@ -69,17 +71,47 @@ namespace NbtStudio.UI
     {
         public override void Draw(TreeNodeAdv node, DrawContext context)
         {
-            var (name, value) = GetText(node);
-            var size = MeasureSizeF(node, context);
-            PointF point = new PointF(context.Bounds.X, context.Bounds.Y + (context.Bounds.Height - size.Height) / 2);
             DrawSelection(node, context);
+            DrawOrMeasure(node, context, draw: true);
+        }
+
+        private SizeF DrawOrMeasure(TreeNodeAdv node, DrawContext context, bool draw)
+        {
+            var (name, value) = GetText(node);
             var boldfont = new Font(context.Font, FontStyle.Bold);
+            context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            var format = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
+            SizeF size = SizeF.Empty;
+            var rectangle = context.Bounds;
+
             if (name != null)
             {
-                context.Graphics.DrawString(name, boldfont, new SolidBrush(Parent.ForeColor), point);
-                point.X += context.Graphics.MeasureString(name, boldfont).Width;
+                if (draw)
+                    context.Graphics.DrawString(name, boldfont, new SolidBrush(Parent.ForeColor), rectangle, format);
+                var name_size = context.Graphics.MeasureString(name, boldfont, rectangle.Size, format);
+                size = AppendSizes(size, name_size);
+                rectangle.X += (int)name_size.Width;
             }
-            context.Graphics.DrawString(value, context.Font, new SolidBrush(Parent.ForeColor), point);
+            if (value != null)
+            {
+                if (draw)
+                    context.Graphics.DrawString(value, context.Font, new SolidBrush(Parent.ForeColor), rectangle, format);
+                var value_size = context.Graphics.MeasureString(value, context.Font, rectangle.Size, format);
+                size = AppendSizes(size, value_size);
+            }
+            return size;
+        }
+
+        private static SizeF AppendSizes(SizeF size1, SizeF size2)
+        {
+            return new SizeF(size1.Width + size2.Width, Math.Max(size1.Height, size2.Height));
+        }
+
+        public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
+        {
+            var size = DrawOrMeasure(node, context, draw: false);
+            return new Size((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
         }
 
         public static void DrawSelection(TreeNodeAdv node, DrawContext context)
@@ -90,21 +122,6 @@ namespace NbtStudio.UI
                 context.Graphics.FillRectangle(new SolidBrush(Util.SelectionColor), context.Bounds);
             else if (node.IsSelected)
                 context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);
-        }
-
-        public override Size MeasureSize(TreeNodeAdv node, DrawContext context)
-        {
-            var size = MeasureSizeF(node, context);
-            return new Size((int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
-        }
-
-        private SizeF MeasureSizeF(TreeNodeAdv node, DrawContext context)
-        {
-            var (name, value) = GetText(node);
-            var boldfont = new Font(context.Font, FontStyle.Bold);
-            SizeF s1 = name == null ? SizeF.Empty : context.Graphics.MeasureString(name, boldfont);
-            SizeF s2 = context.Graphics.MeasureString(value, context.Font);
-            return new SizeF(s1.Width + s2.Width, Math.Max(s1.Height, s2.Height));
         }
 
         public override string GetToolTip(TreeNodeAdv node)

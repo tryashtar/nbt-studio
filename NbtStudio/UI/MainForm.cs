@@ -745,7 +745,7 @@ namespace NbtStudio.UI
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                ViewModel = new NbtTreeModel(good.Select(x => x.item));
+                ViewModel = new NbtTreeModel(good.Select(x => x.item.Result));
             }
         }
 
