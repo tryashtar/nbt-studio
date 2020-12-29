@@ -48,6 +48,12 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", IconType.Save, Keys.Control | Keys.S);
         private readonly DualMenuItem ActionSaveAs = DualMenuItem.SingleMenuItem("Save &As", IconType.Save, Keys.Control | Keys.Shift | Keys.S);
         private readonly DualMenuItem DropDownRecent = DualMenuItem.SingleMenuItem("&Recent...", null, Keys.None);
+        private readonly DualMenuItem DropDownImport = DualMenuItem.SingleMenuItem("&Import...", null, Keys.None);
+        private readonly DualMenuItem ActionImportFile = DualMenuItem.SingleMenuItem("&File", IconType.OpenFile, Keys.Control | Keys.I);
+        private readonly DualMenuItem ActionImportFolder = DualMenuItem.SingleMenuItem("F&older", IconType.OpenFolder, Keys.Control | Keys.Shift | Keys.I);
+        private readonly DualMenuItem ActionImportNew = DualMenuItem.SingleMenuItem("&New File", IconType.NewFile, Keys.Control | Keys.Alt | Keys.N);
+        private readonly DualMenuItem ActionImportNewRegion = DualMenuItem.SingleMenuItem("New &Region File", IconType.Region, Keys.None);
+        private readonly DualMenuItem ActionImportClipboard = DualMenuItem.SingleMenuItem("From &Clipboard", IconType.Paste, Keys.Control | Keys.Alt | Keys.I);
         private readonly DualMenuItem ActionSort = DualMenuItem.SingleButton("Sort", IconType.Sort);
         private readonly DualMenuItem ActionUndo = DualMenuItem.SingleMenuItem("&Undo", IconType.Undo, Keys.Control | Keys.Z);
         private readonly DualMenuItem ActionRedo = DualMenuItem.SingleMenuItem("&Redo", IconType.Redo, Keys.Control | Keys.Shift | Keys.Z);
@@ -84,6 +90,11 @@ namespace NbtStudio.UI
             ActionNewRegion.Click += (s, e) => NewRegion();
             ActionOpenFile.Click += (s, e) => OpenFile();
             ActionOpenFolder.Click += (s, e) => OpenFolder();
+            ActionImportFile.Click += (s, e) => ImportFile();
+            ActionImportFolder.Click += (s, e) => ImportFolder();
+            ActionImportNew.Click += (s, e) => ImportNew();
+            ActionImportNewRegion.Click += (s, e) => ImportNewRegion();
+            ActionImportClipboard.Click += (s, e) => ImportClipboard();
             ActionSave.Click += (s, e) => Save();
             ActionSaveAs.Click += (s, e) => SaveAs();
             ActionSort.Click += (s, e) => Sort();
@@ -105,13 +116,20 @@ namespace NbtStudio.UI
             ActionCheckUpdates.Click += (s, e) => CheckForUpdates();
 
             ActionNew.AddTo(Tools, MenuFile);
+            ActionNewRegion.AddToMenuItem(MenuFile);
+            ActionNewClipboard.AddToMenuItem(MenuFile);
+            MenuFile.DropDownItems.Add(new ToolStripSeparator());
             ActionOpenFile.AddTo(Tools, MenuFile);
             ActionOpenFolder.AddTo(Tools, MenuFile);
+            DropDownImport.AddToMenuItem(MenuFile);
+            ActionImportFile.AddToDual(DropDownImport);
+            ActionImportFolder.AddToDual(DropDownImport);
+            ActionImportNew.AddToDual(DropDownImport);
+            ActionImportNewRegion.AddToDual(DropDownImport);
+            ActionImportClipboard.AddToDual(DropDownImport);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             ActionSave.AddTo(Tools, MenuFile);
             ActionSaveAs.AddToMenuItem(MenuFile);
-            ActionNewRegion.AddToMenuItem(MenuFile);
-            ActionNewClipboard.AddToMenuItem(MenuFile);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             DropDownRecent.AddToMenuItem(MenuFile);
             ActionSort.AddToToolStrip(Tools);
@@ -155,7 +173,9 @@ namespace NbtStudio.UI
 
             ItemCollection = new DualItemCollection(
                 ActionNew, ActionNewClipboard, ActionNewRegion,
-                ActionOpenFile, ActionOpenFolder, ActionSave,
+                ActionOpenFile, ActionOpenFolder, DropDownImport,
+                ActionImportFile, ActionImportFolder, ActionImportClipboard,
+                ActionImportNew, ActionImportNewRegion, ActionSave,
                 ActionSaveAs, DropDownRecent, ActionSort,
                 ActionUndo, ActionRedo, ActionCut,
                 ActionCopy, ActionPaste, ActionRename,
@@ -247,6 +267,11 @@ namespace NbtStudio.UI
             OpenFile(new NbtFile(), skip_confirm: true);
         }
 
+        private void ImportNew()
+        {
+            ViewModel.Import(new NbtFile());
+        }
+
         private void NewRegion()
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
@@ -254,12 +279,17 @@ namespace NbtStudio.UI
             OpenFile(RegionFile.EmptyRegion(), skip_confirm: true);
         }
 
-        private void NewPaste()
+        private void ImportNewRegion()
+        {
+            ViewModel.Import(RegionFile.EmptyRegion());
+        }
+
+        private void PasteLike(Action<IEnumerable<string>> when_paths, Action<NbtFile> when_file)
         {
             if (Clipboard.ContainsFileDropList())
             {
                 var files = Clipboard.GetFileDropList();
-                OpenFiles(files.Cast<string>());
+                when_paths(files.Cast<string>());
             }
             else if (Clipboard.ContainsText())
             {
@@ -267,13 +297,13 @@ namespace NbtStudio.UI
                 if (SnbtParser.TryParse(text, named: false, out var tag) || SnbtParser.TryParse(text, named: true, out tag))
                 {
                     if (tag is NbtCompound compound)
-                        OpenFile(new NbtFile(compound));
+                        when_file(new NbtFile(compound));
                     else
                     {
                         var root = new NbtCompound();
                         tag.Name = NbtUtil.GetAutomaticName(tag, root);
                         root.Add(tag);
-                        OpenFile(new NbtFile(root));
+                        when_file(new NbtFile(root));
                     }
                 }
                 else
@@ -281,10 +311,18 @@ namespace NbtStudio.UI
             }
         }
 
-        private void OpenFile()
+        private void NewPaste()
         {
-            if (!ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
+            PasteLike(x => OpenFiles(x), x => OpenFile(x));
+        }
+
+        private void ImportClipboard()
+        {
+            PasteLike(x => ImportFiles(x), x => ImportFile(x));
+        }
+
+        private void BrowseFileLike(Action<string[]> then)
+        {
             using (var dialog = new OpenFileDialog
             {
                 Title = "Select NBT files",
@@ -294,21 +332,12 @@ namespace NbtStudio.UI
             })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
-                    OpenFiles(dialog.FileNames, skip_confirm: true);
+                    then(dialog.FileNames);
             }
         }
 
-        private void OpenFile(ISaveable file, bool skip_confirm = false)
+        private void BrowseFolderLike(Action<string> then)
         {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
-            ViewModel = new NbtTreeModel(file);
-        }
-
-        private void OpenFolder()
-        {
-            if (!ConfirmIfUnsaved("Open a new folder anyway?"))
-                return;
             using (var dialog = new CommonOpenFileDialog
             {
                 Title = "Select a folder that contains NBT files",
@@ -318,8 +347,51 @@ namespace NbtStudio.UI
             })
             {
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    OpenFolder(dialog.FileName, skip_confirm: true);
+                    then(dialog.FileName);
             }
+        }
+
+        private void OpenFile()
+        {
+            if (!ConfirmIfUnsaved("Open a new file anyway?"))
+                return;
+            BrowseFileLike(x => OpenFiles(x, skip_confirm: true));
+        }
+
+        private void OpenFile(ISaveable file, bool skip_confirm = false)
+        {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
+                return;
+            ViewModel = new NbtTreeModel(file);
+        }
+
+        private void ImportFile()
+        {
+            BrowseFileLike(x => ImportFiles(x));
+        }
+
+        private void ImportFile(ISaveable file)
+        {
+            ViewModel.Import(file);
+        }
+
+        private void OpenFolder()
+        {
+            if (!ConfirmIfUnsaved("Open a new folder anyway?"))
+                return;
+            BrowseFolderLike(x => OpenFolder(x, skip_confirm: true));
+        }
+
+        private void ImportFolder()
+        {
+            BrowseFolderLike(x => ImportFolder(x));
+        }
+
+        private void Discard(IEnumerable<INode> nodes)
+        {
+            var unsaved_files = nodes.Filter(x => x.GetSaveable()).Where(x => x.HasUnsavedChanges);
+            if (!unsaved_files.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                ViewModel.RemoveMany(nodes);
         }
 
         private void Save()
@@ -728,10 +800,14 @@ namespace NbtStudio.UI
             ViewModel = new NbtTreeModel(new NbtFolder(path, true));
         }
 
-        private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
+        private void ImportFolder(string path)
         {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
+            Properties.Settings.Default.RecentFiles.Add(path);
+            ViewModel.Import(new NbtFolder(path, true));
+        }
+
+        private void OpenPathsLike(IEnumerable<string> paths, Action<IEnumerable<IHavePath>> then)
+        {
             var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
             var bad = files.Where(x => x.item == null);
             var good = files.Where(x => x.item != null);
@@ -744,8 +820,20 @@ namespace NbtStudio.UI
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                ViewModel = new NbtTreeModel(good.Select(x => x.item));
+                then(good.Select(x => x.item));
             }
+        }
+
+        private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
+        {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
+                return;
+            OpenPathsLike(paths, x => ViewModel = new NbtTreeModel(x));
+        }
+
+        private void ImportFiles(IEnumerable<string> paths)
+        {
+            OpenPathsLike(paths, x => ViewModel.ImportMany(x));
         }
 
         private void OpenRecentFile()
@@ -827,7 +915,7 @@ namespace NbtStudio.UI
         private void NbtTree_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
+                e.Effect = Control.ModifierKeys == Keys.Shift ? DragDropEffects.Copy : DragDropEffects.Move;
             else
             {
                 var tags = NbtTree.INodesFromDrag(e);
@@ -846,7 +934,10 @@ namespace NbtStudio.UI
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                OpenFiles(files);
+                if (e.Effect == DragDropEffects.Move)
+                    OpenFiles(files);
+                else if (e.Effect == DragDropEffects.Copy)
+                    ImportFiles(files);
             }
             else
             {
@@ -894,6 +985,12 @@ namespace NbtStudio.UI
             if (e.Button == MouseButtons.Right)
             {
                 var menu = new ContextMenuStrip();
+                var obj = NbtTree.INodeFromClick(e);
+                if (obj.Parent is ModelRootNode)
+                {
+                    var selected_roots = NbtTree.SelectedINodes.Where(x => x.Parent is ModelRootNode);
+                    menu.Items.Add("&Discard", IconSource.GetImage(IconType.Delete).Image, (s, ea) => Discard(selected_roots));
+                }
                 if (e.Node.CanExpand)
                 {
                     if (e.Node.IsExpanded)
@@ -902,11 +999,10 @@ namespace NbtStudio.UI
                         menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
                     var children = NbtTree.AllChildren(e.Node);
                     if (children.All(x => x.IsSelected))
-                        menu.Items.Add("R&emove Children from Selection", null, (s, ea) => SetAllSelected(children, false));
+                        menu.Items.Add("Dese&lect all Children", null, (s, ea) => SetAllSelected(children, false));
                     else
-                        menu.Items.Add("A&dd Children to Selection", null, (s, ea) => SetAllSelected(children, true));
+                        menu.Items.Add("Se&lect all Children", null, (s, ea) => SetAllSelected(children, true));
                 }
-                var obj = NbtTree.INodeFromClick(e);
                 var saveable = obj.GetSaveable();
                 if (saveable != null)
                 {
