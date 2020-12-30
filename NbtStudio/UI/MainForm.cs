@@ -399,6 +399,7 @@ namespace NbtStudio.UI
 
         private void RefreshItems(IEnumerable<IRefreshable> items)
         {
+            items = items.Where(x => x.CanRefresh);
             var unsaved = items.OfType<ISaveable>().Where(x => x.HasUnsavedChanges);
             if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
@@ -1152,7 +1153,7 @@ namespace NbtStudio.UI
 
         private void Refresh_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IRefreshable>()).Where(x => x.CanRefresh);
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IRefreshable>());
             RefreshItems(selected);
         }
 
