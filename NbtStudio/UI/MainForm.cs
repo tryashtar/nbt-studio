@@ -55,6 +55,7 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionImportNewRegion = DualMenuItem.SingleMenuItem("New &Region File", IconType.Region, Keys.None);
         private readonly DualMenuItem ActionImportClipboard = DualMenuItem.SingleMenuItem("From &Clipboard", IconType.Paste, Keys.Control | Keys.Alt | Keys.I);
         private readonly DualMenuItem ActionSort = DualMenuItem.SingleButton("Sort", IconType.Sort);
+        private readonly DualMenuItem ActionRefresh = DualMenuItem.SingleButton("Refresh", IconType.Refresh);
         private readonly DualMenuItem ActionUndo = DualMenuItem.SingleMenuItem("&Undo", IconType.Undo, Keys.Control | Keys.Z);
         private readonly DualMenuItem ActionRedo = DualMenuItem.SingleMenuItem("&Redo", IconType.Redo, Keys.Control | Keys.Shift | Keys.Z);
         private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", IconType.Cut, Keys.Control | Keys.X);
@@ -98,6 +99,7 @@ namespace NbtStudio.UI
             ActionSave.Click += (s, e) => Save();
             ActionSaveAs.Click += (s, e) => SaveAs();
             ActionSort.Click += (s, e) => Sort();
+            ActionRefresh.Click += (s, e) => RefreshAll();
             ActionUndo.Click += (s, e) => Undo();
             ActionRedo.Click += (s, e) => Redo();
             ActionCut.Click += (s, e) => Cut();
@@ -133,6 +135,7 @@ namespace NbtStudio.UI
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             DropDownRecent.AddToMenuItem(MenuFile);
             ActionSort.AddToToolStrip(Tools);
+            ActionRefresh.AddToToolStrip(Tools);
             Tools.Items.Add(new ToolStripSeparator());
             ActionUndo.AddToMenuItem(MenuEdit);
             ActionRedo.AddToMenuItem(MenuEdit);
@@ -176,7 +179,7 @@ namespace NbtStudio.UI
                 ActionOpenFile, ActionOpenFolder, DropDownImport,
                 ActionImportFile, ActionImportFolder, ActionImportClipboard,
                 ActionImportNew, ActionImportNewRegion, ActionSave,
-                ActionSaveAs, DropDownRecent, ActionSort,
+                ActionSaveAs, DropDownRecent, ActionSort, ActionRefresh,
                 ActionUndo, ActionRedo, ActionCut,
                 ActionCopy, ActionPaste, ActionRename,
                 ActionEdit, ActionEditSnbt, ActionDelete,
@@ -389,9 +392,33 @@ namespace NbtStudio.UI
 
         private void Discard(IEnumerable<INode> nodes)
         {
-            var unsaved_files = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
-            if (!unsaved_files.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            var unsaved = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
+            if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 ViewModel.RemoveMany(nodes);
+        }
+
+        private void RefreshItems(IEnumerable<IRefreshable> items)
+        {
+            var unsaved = items.OfType<ISaveable>().Where(x => x.HasUnsavedChanges);
+            if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                UndoHistory.StartBatchOperation();
+                var errors = new List<Exception>();
+                foreach (var item in items)
+                {
+                    try
+                    {
+                        item.Refresh();
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(ex);
+                    }
+                }
+                UndoHistory.FinishBatchOperation(new DescriptionHolder("Refresh {0}", items.ToArray()), true);
+                if (errors.Any())
+                    MessageBox.Show($"{Util.Pluralize(errors.Count, "item")} failed to refresh", "Refresh error");
+            }
         }
 
         private void Save()
@@ -417,24 +444,27 @@ namespace NbtStudio.UI
                 file.Save();
                 NbtTree.Refresh();
             }
-            else
-                SaveAs(file);
+            else if (file is IExportable exp)
+                SaveAs(exp);
         }
 
-        private void SaveAs(ISaveable file)
+        private void SaveAs(IExportable file)
         {
+            string path = null;
+            if (file is IHavePath has_path)
+                path = has_path.Path;
             using (var dialog = new SaveFileDialog
             {
-                Title = file.Path == null ? "Save NBT file" : $"Save {Path.GetFileName(file.Path)} as...",
+                Title = path == null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
                 RestoreDirectory = true,
-                FileName = file.Path,
-                Filter = NbtUtil.SaveFilter(file)
+                FileName = path,
+                Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
             })
             {
-                if (file.Path != null)
+                if (path != null)
                 {
-                    dialog.InitialDirectory = Path.GetDirectoryName(file.Path);
-                    dialog.FileName = Path.GetFileName(file.Path);
+                    dialog.InitialDirectory = Path.GetDirectoryName(path);
+                    dialog.FileName = Path.GetFileName(path);
                 }
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
@@ -469,6 +499,11 @@ namespace NbtStudio.UI
             UndoHistory.StartBatchOperation();
             obj.Sort();
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
+        }
+
+        private void RefreshAll()
+        {
+            RefreshItems(ViewModel.OpenedFiles);
         }
 
         private void Undo()
@@ -891,6 +926,7 @@ namespace NbtStudio.UI
                 return;
             ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
             ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
+            ActionRefresh.Enabled = ViewModel.OpenedFiles.Any();
             bool multiple_files = ViewModel.OpenedFiles.Skip(1).Any();
             var save_image = multiple_files ? IconType.SaveAll : IconType.Save;
             ActionSave.IconType = save_image;
@@ -984,52 +1020,64 @@ namespace NbtStudio.UI
         {
             var menu = new ContextMenuStrip();
             var obj = NbtTree.INodeFromClick(e);
+            var root_items = new List<ToolStripItem>();
+            var node_items = new List<ToolStripItem>();
+            var file_items = new List<ToolStripItem>();
+            var nbt_items = new List<ToolStripItem>();
             if (obj.Parent is ModelRootNode)
-                menu.Items.Add("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click);
+                root_items.Add(new ToolStripMenuItem("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click));
             if (e.Node.CanExpand)
             {
                 if (e.Node.IsExpanded)
-                    menu.Items.Add("&Collapse", null, Collapse_Click);
+                    node_items.Add(new ToolStripMenuItem("&Collapse", null, Collapse_Click));
                 else
-                    menu.Items.Add("&Expand All", null, ExpandAll_Click);
+                    node_items.Add(new ToolStripMenuItem("&Expand All", null, ExpandAll_Click));
                 var children = NbtTree.AllChildren(e.Node);
                 if (children.All(x => x.IsSelected))
-                    menu.Items.Add("Dese&lect all Children", null, DeselectChildren_Click);
+                    node_items.Add(new ToolStripMenuItem("Dese&lect all Children", null, DeselectChildren_Click));
                 else
-                    menu.Items.Add("Se&lect all Children", null, SelectChildren_Click);
+                    node_items.Add(new ToolStripMenuItem("Se&lect all Children", null, SelectChildren_Click));
             }
             var saveable = obj.Get<ISaveable>();
-            if (saveable != null)
-            {
-                if (menu.Items.Count > 0)
-                    menu.Items.Add(new ToolStripSeparator());
-                menu.Items.Add("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click);
-                menu.Items.Add("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click);
-                if (saveable.CanSave)
-                    menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click);
-            }
+            if (saveable != null && saveable.CanSave)
+                file_items.Add(new ToolStripMenuItem("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click));
+            if (obj.Get<IExportable>() != null)
+                file_items.Add(new ToolStripMenuItem("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click));
+            var refresh = obj.Get<IRefreshable>();
+            if (refresh != null && refresh.CanRefresh)
+                file_items.Add(new ToolStripMenuItem("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click));
             var path = obj.Get<IHavePath>();
-            if (path?.Path != null)
-                menu.Items.Add("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click);
+            if (path != null && path.Path != null)
+                file_items.Add(new ToolStripMenuItem("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click));
             var container = obj.GetNbtTag() as NbtContainerTag;
             if (container != null)
             {
-                if (menu.Items.Count > 0)
-                    menu.Items.Add(new ToolStripSeparator());
                 var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
                 bool single = Util.ExactlyOne(addable);
                 var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
                 var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag_Click(x))).ToArray();
                 if (single)
-                    menu.Items.AddRange(items);
+                    nbt_items.AddRange(items);
                 else
                 {
                     var add = new ToolStripMenuItem("Add...");
                     add.DropDownItems.AddRange(items);
-                    menu.Items.Add(add);
+                    nbt_items.Add(add);
                 }
             }
+            AddMenuSections(menu.Items, root_items, node_items, file_items, nbt_items);
             return menu;
+        }
+
+        private void AddMenuSections(ToolStripItemCollection collection, params IEnumerable<ToolStripItem>[] sources)
+        {
+            for (int i = 0; i < sources.Length - 1; i++)
+            {
+                collection.AddRange(sources[i].ToArray());
+                if (sources[i].Any())
+                    collection.Add(new ToolStripSeparator());
+            }
+            collection.AddRange(sources[sources.Length - 1].ToArray());
         }
 
         private void Discard_Click(object sender, EventArgs e)
@@ -1085,7 +1133,7 @@ namespace NbtStudio.UI
 
         private void SaveAs_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<ISaveable>());
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IExportable>());
             foreach (var item in selected)
             {
                 SaveAs(item);
@@ -1104,10 +1152,7 @@ namespace NbtStudio.UI
         private void Refresh_Click(object sender, EventArgs e)
         {
             var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IRefreshable>()).Where(x => x.CanRefresh);
-            foreach (var item in selected)
-            {
-                item.Refresh();
-            }
+            RefreshItems(selected);
         }
 
         private void AddTag_Click(NbtTagType type)

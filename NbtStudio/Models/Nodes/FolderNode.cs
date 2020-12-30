@@ -94,7 +94,7 @@ namespace NbtStudio
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x.Get<ISaveable>() != null || x is FolderNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
         {
-            var files = nodes.Filter(x => x.Get<ISaveable>());
+            var files = nodes.Filter(x => x.Get<IFile>());
             var folders = nodes.Filter(x => x.Get<NbtFolder>());
             foreach (var file in files)
             {

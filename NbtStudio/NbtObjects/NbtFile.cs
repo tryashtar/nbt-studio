@@ -12,10 +12,9 @@ namespace NbtStudio
 {
     // represents a loadable and saveable NBT file
     // uses fNbt.NbtFile to do the work reading/writing binary data to disk, but can also read/write SNBT without using one
-    public class NbtFile : ISaveable
+    public class NbtFile : IFile
     {
         public string Path { get; private set; }
-        public bool IsFolder => false;
         public event EventHandler OnSaved;
         public NbtCompound RootTag { get; private set; }
         public ExportSettings ExportSettings { get; private set; }
@@ -167,8 +166,8 @@ namespace NbtStudio
         public void Refresh()
         {
             var current = TryCreateFromExportSettings(Path, ExportSettings);
-            RootTag.Clear();
             var tags = current.RootTag.ToList();
+            RootTag.Clear();
             current.RootTag.Clear();
             RootTag.AddRange(tags);
             HasUnsavedChanges = false;
@@ -182,27 +181,5 @@ namespace NbtStudio
                 Path = path;
             }
         }
-    }
-
-    public interface IHavePath
-    {
-        string Path { get; }
-        bool IsFolder { get; }
-        void Move(string path);
-    }
-
-    public interface ISaveable : IHavePath, IRefreshable
-    {
-        event EventHandler OnSaved;
-        bool HasUnsavedChanges { get; }
-        bool CanSave { get; }
-        void Save();
-        void SaveAs(string path);
-    }
-
-    public interface IRefreshable : IHavePath
-    {
-        bool CanRefresh { get; }
-        void Refresh();
     }
 }

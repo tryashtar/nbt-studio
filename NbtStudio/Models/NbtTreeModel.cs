@@ -70,15 +70,15 @@ namespace NbtStudio
         }
 
         public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.HasUnsavedChanges);
-        public IEnumerable<ISaveable> OpenedFiles
+        public IEnumerable<IFile> OpenedFiles
         {
             get
             {
-                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<ISaveable>() != null))
+                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<IFile>() != null))
                 {
-                    var saveable = item.Get<ISaveable>();
-                    if (saveable != null)
-                        yield return saveable;
+                    var file = item.Get<IFile>();
+                    if (file != null)
+                        yield return file;
                 }
             }
         }
