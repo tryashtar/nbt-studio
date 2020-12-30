@@ -10,14 +10,14 @@ namespace NbtStudio.UI
 {
     public partial class ExceptionWindow : Form
     {
-        public readonly Exception Exception;
+        public readonly Failable Error;
         public bool Expanded { get; private set; } = false;
-        public ExceptionWindow(string title, string message, Exception exception)
+        public ExceptionWindow(string title, string message, Failable failable)
         {
             InitializeComponent();
-            Exception = exception;
-            MessageLabel.Text = message + "\n\n" + Util.ExceptionMessage(exception);
-            ExtraInfoLabel.Text = Exception.ToString();
+            Error = failable;
+            MessageLabel.Text = message + "\n\n" + failable.ToStringSimple();
+            ExtraInfoLabel.Text = failable.ToStringDetailed();
             Text = title;
             this.Icon = SystemIcons.Warning;
         }
@@ -50,15 +50,19 @@ namespace NbtStudio.UI
         public void SetExpanded(bool expanded)
         {
             Expanded = expanded;
-            ExtraInfoPanel.Visible = expanded;
             if (expanded)
             {
-                this.Height += ExtraInfoPanel.Height;
+                ExtraInfoPanel.Height = 300;
+                this.Width += 100;
+                ExtraInfoPanel.Visible = true;
                 ButtonDetails.Text = "Less Details";
             }
             else
             {
+                ExtraInfoPanel.Visible = false;
+                ExtraInfoPanel.Height = 300;
                 this.Height -= ExtraInfoPanel.Height;
+                this.Width -= 100;
                 ButtonDetails.Text = "More Details";
             }
         }

@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class Failable<T>
+    public abstract class Failable
+    {
+        public abstract string ToStringSimple();
+        public abstract string ToStringDetailed();
+    }
+
+    public class Failable<T> : Failable
     {
         public readonly Exception Exception;
         private readonly T _Result;
@@ -67,6 +73,41 @@ namespace NbtStudio
         public Failable<U> Cast<U>()
         {
             return new Failable<U>((U)(object)_Result, Exception, Description, Nested.Select(x => x.Cast<U>()).ToList());
+        }
+
+        public override string ToStringSimple()
+        {
+            if (IsAggregate)
+            {
+                var types = new HashSet<Type>();
+                var summaries = new List<string>();
+                foreach (var item in Nested)
+                {
+                    if (types.Add(item.Exception.GetType()))
+                        summaries.Add(item.ToStringSimple());
+                }
+                return String.Join("\n", summaries);
+            }
+            else
+            {
+                if (Failed)
+                    return Util.ExceptionMessage(Exception);
+                else
+                    return $"{Description}: Operation succeeded";
+            }
+        }
+
+        public override string ToStringDetailed()
+        {
+            if (IsAggregate)
+                return String.Join("\n\n", Nested.Select(x => x.ToStringDetailed()));
+            else
+            {
+                if (Failed)
+                    return $"{Description}:\n{Exception}";
+                else
+                    return $"{Description}: Operation succeeded";
+            }
         }
     }
 }

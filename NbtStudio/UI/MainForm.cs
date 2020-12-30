@@ -851,7 +851,8 @@ namespace NbtStudio.UI
             {
                 string message = $"{Util.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-                var window = new ExceptionWindow("Load Failure", message, bad.First().item.Exception);
+                var fail = Failable<IHavePath>.Aggregate(bad.Select(x => x.item).ToArray());
+                var window = new ExceptionWindow("Load Failure", message, fail);
                 window.ShowDialog(this);
             }
             if (good.Any())

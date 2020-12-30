@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.OKPanel = new System.Windows.Forms.Panel();
+            this.ButtonCopy = new System.Windows.Forms.Button();
             this.ButtonDetails = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.MessageLabel = new System.Windows.Forms.Label();
             this.MessagePanel = new System.Windows.Forms.Panel();
             this.ExtraInfoPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.ExtraInfoLabel = new System.Windows.Forms.Label();
-            this.ButtonCopy = new System.Windows.Forms.Button();
             this.OKPanel.SuspendLayout();
             this.MessagePanel.SuspendLayout();
             this.ExtraInfoPanel.SuspendLayout();
@@ -48,17 +48,27 @@
             this.OKPanel.Controls.Add(this.ButtonDetails);
             this.OKPanel.Controls.Add(this.ButtonOk);
             this.OKPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.OKPanel.Location = new System.Drawing.Point(0, 74);
+            this.OKPanel.Location = new System.Drawing.Point(0, 59);
             this.OKPanel.Name = "OKPanel";
-            this.OKPanel.Size = new System.Drawing.Size(289, 50);
+            this.OKPanel.Size = new System.Drawing.Size(317, 58);
             this.OKPanel.TabIndex = 0;
+            // 
+            // ButtonCopy
+            // 
+            this.ButtonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonCopy.Location = new System.Drawing.Point(13, 13);
+            this.ButtonCopy.Name = "ButtonCopy";
+            this.ButtonCopy.Size = new System.Drawing.Size(93, 35);
+            this.ButtonCopy.TabIndex = 3;
+            this.ButtonCopy.Text = "Copy";
+            this.ButtonCopy.Click += new System.EventHandler(this.ButtonCopy_Click);
             // 
             // ButtonDetails
             // 
             this.ButtonDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonDetails.Location = new System.Drawing.Point(114, 11);
+            this.ButtonDetails.Location = new System.Drawing.Point(113, 13);
             this.ButtonDetails.Name = "ButtonDetails";
-            this.ButtonDetails.Size = new System.Drawing.Size(80, 30);
+            this.ButtonDetails.Size = new System.Drawing.Size(93, 35);
             this.ButtonDetails.TabIndex = 2;
             this.ButtonDetails.Text = "More Details";
             this.ButtonDetails.Click += new System.EventHandler(this.ButtonDetails_Click);
@@ -66,9 +76,9 @@
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(200, 11);
+            this.ButtonOk.Location = new System.Drawing.Point(213, 13);
             this.ButtonOk.Name = "ButtonOk";
-            this.ButtonOk.Size = new System.Drawing.Size(80, 30);
+            this.ButtonOk.Size = new System.Drawing.Size(93, 35);
             this.ButtonOk.TabIndex = 1;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.Click += new System.EventHandler(this.OKButton_Click);
@@ -77,33 +87,33 @@
             // 
             this.MessageLabel.AutoSize = true;
             this.MessageLabel.Location = new System.Drawing.Point(0, 0);
-            this.MessageLabel.MaximumSize = new System.Drawing.Size(400, 0);
+            this.MessageLabel.MaximumSize = new System.Drawing.Size(467, 0);
             this.MessageLabel.Name = "MessageLabel";
-            this.MessageLabel.Padding = new System.Windows.Forms.Padding(8, 6, 14, 6);
-            this.MessageLabel.Size = new System.Drawing.Size(22, 25);
+            this.MessageLabel.Padding = new System.Windows.Forms.Padding(9, 7, 16, 7);
+            this.MessageLabel.Size = new System.Drawing.Size(25, 29);
             this.MessageLabel.TabIndex = 1;
             // 
             // MessagePanel
             // 
+            this.MessagePanel.AutoScroll = true;
             this.MessagePanel.AutoSize = true;
             this.MessagePanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.MessagePanel.Controls.Add(this.ExtraInfoPanel);
             this.MessagePanel.Controls.Add(this.MessageLabel);
             this.MessagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MessagePanel.Location = new System.Drawing.Point(0, 0);
             this.MessagePanel.Name = "MessagePanel";
-            this.MessagePanel.Size = new System.Drawing.Size(289, 74);
+            this.MessagePanel.Size = new System.Drawing.Size(317, 0);
             this.MessagePanel.TabIndex = 2;
             // 
             // ExtraInfoPanel
             // 
             this.ExtraInfoPanel.AutoScroll = true;
-            this.ExtraInfoPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.ExtraInfoPanel.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ExtraInfoPanel.Controls.Add(this.ExtraInfoLabel);
             this.ExtraInfoPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ExtraInfoPanel.Location = new System.Drawing.Point(0, -96);
+            this.ExtraInfoPanel.Location = new System.Drawing.Point(0, -30);
             this.ExtraInfoPanel.Name = "ExtraInfoPanel";
-            this.ExtraInfoPanel.Size = new System.Drawing.Size(289, 170);
+            this.ExtraInfoPanel.Size = new System.Drawing.Size(317, 89);
             this.ExtraInfoPanel.TabIndex = 3;
             this.ExtraInfoPanel.Visible = false;
             // 
@@ -111,36 +121,28 @@
             // 
             this.ExtraInfoLabel.AutoSize = true;
             this.ExtraInfoLabel.Location = new System.Drawing.Point(3, 0);
-            this.ExtraInfoLabel.MaximumSize = new System.Drawing.Size(400, 0);
             this.ExtraInfoLabel.Name = "ExtraInfoLabel";
-            this.ExtraInfoLabel.Padding = new System.Windows.Forms.Padding(8, 6, 14, 6);
-            this.ExtraInfoLabel.Size = new System.Drawing.Size(22, 25);
+            this.ExtraInfoLabel.Padding = new System.Windows.Forms.Padding(9, 7, 16, 7);
+            this.ExtraInfoLabel.Size = new System.Drawing.Size(25, 29);
             this.ExtraInfoLabel.TabIndex = 2;
-            // 
-            // ButtonCopy
-            // 
-            this.ButtonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonCopy.Location = new System.Drawing.Point(28, 11);
-            this.ButtonCopy.Name = "ButtonCopy";
-            this.ButtonCopy.Size = new System.Drawing.Size(80, 30);
-            this.ButtonCopy.TabIndex = 3;
-            this.ButtonCopy.Text = "Copy";
-            this.ButtonCopy.Click += new System.EventHandler(this.ButtonCopy_Click);
             // 
             // ExceptionWindow
             // 
             this.AcceptButton = this.ButtonOk;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(289, 124);
+            this.ClientSize = new System.Drawing.Size(317, 117);
             this.Controls.Add(this.MessagePanel);
+            this.Controls.Add(this.ExtraInfoPanel);
             this.Controls.Add(this.OKPanel);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(581, 802);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(100, 140);
+            this.MinimumSize = new System.Drawing.Size(114, 156);
             this.Name = "ExceptionWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
