@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -980,62 +980,149 @@ namespace NbtStudio.UI
             }
         }
 
+        private ContextMenuStrip CreateContextMenu(TreeNodeAdvMouseEventArgs e)
+        {
+            var menu = new ContextMenuStrip();
+            var obj = NbtTree.INodeFromClick(e);
+            if (obj.Parent is ModelRootNode)
+                menu.Items.Add("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click);
+            if (e.Node.CanExpand)
+            {
+                if (e.Node.IsExpanded)
+                    menu.Items.Add("&Collapse", null, Collapse_Click);
+                else
+                    menu.Items.Add("&Expand All", null, ExpandAll_Click);
+                var children = NbtTree.AllChildren(e.Node);
+                if (children.All(x => x.IsSelected))
+                    menu.Items.Add("Dese&lect all Children", null, DeselectChildren_Click);
+                else
+                    menu.Items.Add("Se&lect all Children", null, SelectChildren_Click);
+            }
+            var saveable = obj.GetSaveable();
+            if (saveable != null)
+            {
+                if (menu.Items.Count > 0)
+                    menu.Items.Add(new ToolStripSeparator());
+                menu.Items.Add("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click);
+                menu.Items.Add("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click);
+            }
+            var path = obj.GetHasPath();
+            if (path?.Path != null)
+                menu.Items.Add("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click);
+            var folder = obj.GetNbtFolder();
+            if (folder != null)
+                menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click);
+            var container = obj.GetNbtTag() as NbtContainerTag;
+            if (container != null)
+            {
+                if (menu.Items.Count > 0)
+                    menu.Items.Add(new ToolStripSeparator());
+                var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
+                bool single = Util.ExactlyOne(addable);
+                var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
+                var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag_Click(x))).ToArray();
+                if (single)
+                    menu.Items.AddRange(items);
+                else
+                {
+                    var add = new ToolStripMenuItem("Add...");
+                    add.DropDownItems.AddRange(items);
+                    menu.Items.Add(add);
+                }
+            }
+            return menu;
+        }
+
+        private void Discard_Click(object sender, EventArgs e)
+        {
+            var selected_roots = NbtTree.SelectedINodes.Where(x => x.Parent is ModelRootNode);
+            Discard(selected_roots);
+        }
+
+        private void Collapse_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedNodes;
+            foreach (var node in selected)
+            {
+                node.CollapseAll();
+            }
+        }
+
+        private void ExpandAll_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedNodes;
+            foreach (var node in selected)
+            {
+                node.ExpandAll();
+            }
+        }
+
+        private void SelectChildren_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedNodes;
+            foreach (var node in selected)
+            {
+                SetAllSelected(NbtTree.AllChildren(node), true);
+            }
+        }
+
+        private void DeselectChildren_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedNodes;
+            foreach (var node in selected)
+            {
+                SetAllSelected(NbtTree.AllChildren(node), false);
+            }
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedINodes.Filter(x => x.GetSaveable());
+            foreach (var item in selected)
+            {
+                Save(item);
+            }
+        }
+
+        private void SaveAs_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedINodes.Filter(x => x.GetSaveable());
+            foreach (var item in selected)
+            {
+                SaveAs(item);
+            }
+        }
+
+        private void OpenInExplorer_Click(object sender, EventArgs e)
+        {
+            var selected = NbtTree.SelectedINodes.Filter(x => x.GetHasPath());
+            foreach (var item in selected)
+            {
+                OpenInExplorer(item);
+            }
+        }
+
+        private void Refresh_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void AddTag_Click(NbtTagType type)
+        {
+            var selected = NbtTree.SelectedINodes.Filter(x => x.GetNbtTag()).OfType<NbtContainerTag>();
+            foreach (var item in selected)
+            {
+                AddTag(item, type);
+            }
+        }
+
         private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
-                var menu = new ContextMenuStrip();
-                var obj = NbtTree.INodeFromClick(e);
-                if (obj.Parent is ModelRootNode)
-                {
-                    var selected_roots = NbtTree.SelectedINodes.Where(x => x.Parent is ModelRootNode);
-                    menu.Items.Add("&Discard", IconSource.GetImage(IconType.Delete).Image, (s, ea) => Discard(selected_roots));
-                }
-                if (e.Node.CanExpand)
-                {
-                    if (e.Node.IsExpanded)
-                        menu.Items.Add("&Collapse", null, (s, ea) => e.Node.Collapse());
-                    else
-                        menu.Items.Add("&Expand All", null, (s, ea) => e.Node.ExpandAll());
-                    var children = NbtTree.AllChildren(e.Node);
-                    if (children.All(x => x.IsSelected))
-                        menu.Items.Add("Dese&lect all Children", null, (s, ea) => SetAllSelected(children, false));
-                    else
-                        menu.Items.Add("Se&lect all Children", null, (s, ea) => SetAllSelected(children, true));
-                }
-                var saveable = obj.GetSaveable();
-                if (saveable != null)
-                {
-                    if (menu.Items.Count > 0)
-                        menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("&Save File", IconSource.GetImage(IconType.Save).Image, (s, ea) => Save(saveable));
-                    menu.Items.Add("Save File &As", IconSource.GetImage(IconType.Save).Image, (s, ea) => SaveAs(saveable));
-                }
-                var path = obj.GetHasPath();
-                if (path?.Path != null)
-                    menu.Items.Add("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, (s, ea) => OpenInExplorer(path));
-                var folder = obj.GetNbtFolder();
-                if (folder != null)
-                    menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, (s, ea) => folder.Scan());
-                var container = obj.GetNbtTag() as NbtContainerTag;
-                if (container != null)
-                {
-                    if (menu.Items.Count > 0)
-                        menu.Items.Add(new ToolStripSeparator());
-                    var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
-                    bool single = Util.ExactlyOne(addable);
-                    var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
-                    var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag(container, x))).ToArray();
-                    if (single)
-                        menu.Items.AddRange(items);
-                    else
-                    {
-                        var add = new ToolStripMenuItem("Add...");
-                        add.DropDownItems.AddRange(items);
-                        menu.Items.Add(add);
-                    }
-                }
-                menu.Show(NbtTree.PointToScreen(e.Location));
+                var menu = CreateContextMenu(e);
+                menu.Show(NbtTree, e.Location);
+                e.Handled = true;
             }
         }
 
