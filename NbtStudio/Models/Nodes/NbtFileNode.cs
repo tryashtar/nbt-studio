@@ -37,7 +37,9 @@ namespace NbtStudio
 
         protected override IEnumerable<NbtTag> GetChildren()
         {
-            return File.RootTag;
+            if (File.RootTag is NbtContainerTag container)
+                return container;
+            return Enumerable.Empty<NbtTag>();
         }
 
         public override string Description => File.Path == null ? "unsaved file" : System.IO.Path.GetFileName(File.Path);

@@ -19,11 +19,12 @@
             this.ButtonFindPrev = new System.Windows.Forms.Button();
             this.RegexCheck = new System.Windows.Forms.CheckBox();
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new NbtStudio.UI.RegexTextBox();
             this.ValueLabel = new System.Windows.Forms.Label();
-            this.ValueBox = new NbtStudio.UI.RegexTextBox();
             this.ButtonFindAll = new System.Windows.Forms.Button();
             this.ProgressBar = new System.Windows.Forms.ProgressBar();
+            this.FoundResultsLabel = new System.Windows.Forms.Label();
+            this.ValueBox = new NbtStudio.UI.RegexTextBox();
+            this.NameBox = new NbtStudio.UI.RegexTextBox();
             this.SuspendLayout();
             // 
             // ButtonFindNext
@@ -34,7 +35,7 @@
             this.ButtonFindNext.Location = new System.Drawing.Point(191, 91);
             this.ButtonFindNext.Name = "ButtonFindNext";
             this.ButtonFindNext.Size = new System.Drawing.Size(75, 23);
-            this.ButtonFindNext.TabIndex = 7;
+            this.ButtonFindNext.TabIndex = 8;
             this.ButtonFindNext.Text = "Find Next";
             this.ButtonFindNext.UseVisualStyleBackColor = true;
             this.ButtonFindNext.Click += new System.EventHandler(this.ButtonFindNext_Click);
@@ -47,7 +48,7 @@
             this.ButtonFindPrev.Location = new System.Drawing.Point(77, 91);
             this.ButtonFindPrev.Name = "ButtonFindPrev";
             this.ButtonFindPrev.Size = new System.Drawing.Size(108, 23);
-            this.ButtonFindPrev.TabIndex = 6;
+            this.ButtonFindPrev.TabIndex = 7;
             this.ButtonFindPrev.Text = "Find Previous";
             this.ButtonFindPrev.UseVisualStyleBackColor = true;
             this.ButtonFindPrev.Click += new System.EventHandler(this.ButtonFindPrev_Click);
@@ -59,7 +60,7 @@
             this.RegexCheck.Location = new System.Drawing.Point(12, 93);
             this.RegexCheck.Name = "RegexCheck";
             this.RegexCheck.Size = new System.Drawing.Size(57, 17);
-            this.RegexCheck.TabIndex = 5;
+            this.RegexCheck.TabIndex = 6;
             this.RegexCheck.Text = "Regex";
             this.RegexCheck.UseVisualStyleBackColor = true;
             this.RegexCheck.CheckedChanged += new System.EventHandler(this.RegexCheck_CheckedChanged);
@@ -75,21 +76,6 @@
             this.NameLabel.TabIndex = 0;
             this.NameLabel.Text = "Name:";
             // 
-            // NameBox
-            // 
-            this.NameBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
-            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.NameBox.Location = new System.Drawing.Point(73, 14);
-            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.NameBox.Name = "NameBox";
-            this.NameBox.RegexMode = false;
-            this.NameBox.Size = new System.Drawing.Size(274, 21);
-            this.NameBox.TabIndex = 1;
-            this.NameBox.TextChanged += new System.EventHandler(this.NameBox_TextChanged);
-            // 
             // ValueLabel
             // 
             this.ValueLabel.AutoSize = true;
@@ -100,6 +86,41 @@
             this.ValueLabel.Size = new System.Drawing.Size(41, 15);
             this.ValueLabel.TabIndex = 2;
             this.ValueLabel.Text = "Value:";
+            // 
+            // ButtonFindAll
+            // 
+            this.ButtonFindAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonFindAll.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.ButtonFindAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ButtonFindAll.Location = new System.Drawing.Point(272, 91);
+            this.ButtonFindAll.Name = "ButtonFindAll";
+            this.ButtonFindAll.Size = new System.Drawing.Size(75, 23);
+            this.ButtonFindAll.TabIndex = 9;
+            this.ButtonFindAll.Text = "Find All";
+            this.ButtonFindAll.UseVisualStyleBackColor = true;
+            this.ButtonFindAll.Click += new System.EventHandler(this.ButtonFindAll_Click);
+            // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Location = new System.Drawing.Point(11, 71);
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(336, 14);
+            this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.ProgressBar.TabIndex = 4;
+            this.ProgressBar.Visible = false;
+            // 
+            // FoundResultsLabel
+            // 
+            this.FoundResultsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.FoundResultsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.FoundResultsLabel.ForeColor = System.Drawing.Color.Gray;
+            this.FoundResultsLabel.Location = new System.Drawing.Point(191, 68);
+            this.FoundResultsLabel.Margin = new System.Windows.Forms.Padding(10, 10, 5, 0);
+            this.FoundResultsLabel.Name = "FoundResultsLabel";
+            this.FoundResultsLabel.Size = new System.Drawing.Size(156, 17);
+            this.FoundResultsLabel.TabIndex = 5;
+            this.FoundResultsLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.FoundResultsLabel.Visible = false;
             // 
             // ValueBox
             // 
@@ -116,27 +137,20 @@
             this.ValueBox.TabIndex = 3;
             this.ValueBox.TextChanged += new System.EventHandler(this.ValueBox_TextChanged);
             // 
-            // ButtonFindAll
+            // NameBox
             // 
-            this.ButtonFindAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonFindAll.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.ButtonFindAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ButtonFindAll.Location = new System.Drawing.Point(272, 91);
-            this.ButtonFindAll.Name = "ButtonFindAll";
-            this.ButtonFindAll.Size = new System.Drawing.Size(75, 23);
-            this.ButtonFindAll.TabIndex = 8;
-            this.ButtonFindAll.Text = "Find All";
-            this.ButtonFindAll.UseVisualStyleBackColor = true;
-            this.ButtonFindAll.Click += new System.EventHandler(this.ButtonFindAll_Click);
-            // 
-            // ProgressBar
-            // 
-            this.ProgressBar.Location = new System.Drawing.Point(11, 71);
-            this.ProgressBar.Name = "ProgressBar";
-            this.ProgressBar.Size = new System.Drawing.Size(336, 14);
-            this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.ProgressBar.TabIndex = 4;
-            this.ProgressBar.Visible = false;
+            this.NameBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NameBox.Location = new System.Drawing.Point(73, 14);
+            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.NameBox.Name = "NameBox";
+            this.NameBox.RegexMode = false;
+            this.NameBox.Size = new System.Drawing.Size(274, 21);
+            this.NameBox.TabIndex = 1;
+            this.NameBox.TextChanged += new System.EventHandler(this.NameBox_TextChanged);
             // 
             // FindWindow
             // 
@@ -146,6 +160,7 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(360, 122);
+            this.Controls.Add(this.FoundResultsLabel);
             this.Controls.Add(this.ProgressBar);
             this.Controls.Add(this.ButtonFindAll);
             this.Controls.Add(this.ValueBox);
@@ -179,5 +194,6 @@
         private RegexTextBox ValueBox;
         private System.Windows.Forms.Button ButtonFindAll;
         private System.Windows.Forms.ProgressBar ProgressBar;
+        private System.Windows.Forms.Label FoundResultsLabel;
     }
 }
