@@ -148,6 +148,11 @@ namespace NbtStudio.UI
         {
             strip.Items.Add(MenuItem);
         }
+
+        public void AddToDual(DualMenuItem item)
+        {
+            AddToMenuItem(item.MenuItem);
+        }
     }
 
     public class DualItemCollection

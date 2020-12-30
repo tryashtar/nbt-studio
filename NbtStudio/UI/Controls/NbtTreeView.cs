@@ -176,8 +176,8 @@ namespace NbtStudio.UI
         {
             if (!node.IsExpandedOnce && !node.IsLeaf && node.Children.Count == 0)
             {
-                node.ExpandAll();
-                node.CollapseAll();
+                node.Expand();
+                node.Collapse();
             }
             return node.Children;
         }

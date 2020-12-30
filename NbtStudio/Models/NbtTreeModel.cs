@@ -33,14 +33,28 @@ namespace NbtStudio
             UndoHistory.Changed += UndoHistory_Changed;
             Root = new ModelRootNode(this, roots);
         }
+        public NbtTreeModel(object root) : this(new[] { root }) { }
+        public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
+
+        public void Import(object obj)
+        {
+            Root.Add(obj);
+        }
+
+        public void ImportMany(IEnumerable<object> objects)
+        {
+            Root.AddRange(objects);
+        }
+
+        public void RemoveMany(IEnumerable<INode> nodes)
+        {
+            Root.RemoveNodes(nodes);
+        }
 
         private void UndoHistory_Changed(object sender, EventArgs e)
         {
             Changed?.Invoke(this, EventArgs.Empty);
         }
-
-        public NbtTreeModel(object root) : this(new[] { root }) { }
-        public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
 
         public static string GetDescription(object obj)
         {
@@ -56,15 +70,15 @@ namespace NbtStudio
         }
 
         public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.HasUnsavedChanges);
-        public IEnumerable<ISaveable> OpenedFiles
+        public IEnumerable<IFile> OpenedFiles
         {
             get
             {
-                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.GetSaveable() != null))
+                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<IFile>() != null))
                 {
-                    var saveable = item.GetSaveable();
-                    if (saveable != null)
-                        yield return saveable;
+                    var file = item.Get<IFile>();
+                    if (file != null)
+                        yield return file;
                 }
             }
         }

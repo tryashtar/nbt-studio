@@ -77,7 +77,7 @@ namespace NbtStudio
         public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x is ChunkNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
         {
-            var chunks = nodes.Filter(x => x.GetChunk()).ToList();
+            var chunks = nodes.Filter(x => x.Get<Chunk>()).ToList();
             foreach (var chunk in chunks)
             {
                 if (Region.GetChunk(chunk.X, chunk.Z) == null)

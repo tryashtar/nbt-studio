@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class RegionFile : ISaveable
+    public class RegionFile : IFile
     {
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
@@ -30,17 +30,21 @@ namespace NbtStudio
         public event EventHandler ChunksChanged;
         public event EventHandler OnSaved;
         public event EventHandler<UndoableAction> ActionPerformed;
-        private readonly Chunk[,] Chunks;
-        private readonly byte[] Locations;
-        private readonly byte[] Timestamps;
+        private Chunk[,] Chunks;
+        private byte[] Locations;
+        private byte[] Timestamps;
         public string Path { get; private set; }
-        public bool IsFolder => false;
         public bool HasChunkChanges { get; private set; } = false;
         public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
-            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             Path = path;
+            Load();
+        }
+
+        private void Load()
+        {
+            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             var stream = GetStream();
             try
             {
@@ -193,6 +197,7 @@ namespace NbtStudio
         }
 
         public bool CanSave => Path != null;
+        public bool CanRefresh => CanSave;
         public void Save()
         {
             int current_offset = 8192;
@@ -201,33 +206,10 @@ namespace NbtStudio
             {
                 for (int x = 0; x < Chunks.GetLength(0); x++)
                 {
-                    var chunk = Chunks[x, z];
-                    bool update_timestamp = chunk != null && chunk.IsLoaded;
-                    int location = ChunkDataLocation(x, z);
-                    var data = chunk?.SaveBytes() ?? new byte[0];
-                    byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
-                    byte[] offset = CanWriteChunk(chunk) ? Util.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
-                    Locations[location] = offset[1];
-                    Locations[location + 1] = offset[2];
-                    Locations[location + 2] = offset[3];
-                    Locations[location + 3] = size;
-                    if (update_timestamp)
-                    {
-                        int timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                        byte[] time = Util.GetBytes(timestamp);
-                        Array.Copy(time, 0, Timestamps, location, 4);
-                    }
-                    if (CanWriteChunk(chunk))
-                    {
-                        int write_offset = current_offset;
-                        chunk_writes.Add(writer =>
-                            {
-                                writer.Seek(write_offset, SeekOrigin.Begin);
-                                writer.Write(data, 0, data.Length);
-                            });
-                    }
-                    current_offset += data.Length;
-                    current_offset = (int)Math.Ceiling((decimal)current_offset / 4096) * 4096;
+                    var (new_offset, save_action) = SaveChunkInternal(current_offset, x, z);
+                    current_offset = new_offset;
+                    if (save_action != null)
+                        chunk_writes.Add(save_action);
                 }
             }
             using (var writer = File.OpenWrite(Path))
@@ -243,6 +225,39 @@ namespace NbtStudio
             OnSaved?.Invoke(this, EventArgs.Empty);
         }
 
+        private (int new_offset, Action<FileStream> save_action) SaveChunkInternal(int current_offset, int x, int z)
+        {
+            var chunk = Chunks[x, z];
+            bool update_timestamp = chunk != null && chunk.IsLoaded;
+            int location = ChunkDataLocation(x, z);
+            var data = chunk?.SaveBytes() ?? new byte[0];
+            byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
+            byte[] offset = CanWriteChunk(chunk) ? Util.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
+            Locations[location] = offset[1];
+            Locations[location + 1] = offset[2];
+            Locations[location + 2] = offset[3];
+            Locations[location + 3] = size;
+            if (update_timestamp)
+            {
+                int timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                byte[] time = Util.GetBytes(timestamp);
+                Array.Copy(time, 0, Timestamps, location, 4);
+            }
+            Action<FileStream> result = null;
+            if (CanWriteChunk(chunk))
+            {
+                int write_offset = current_offset;
+                result = writer =>
+                {
+                    writer.Seek(write_offset, SeekOrigin.Begin);
+                    writer.Write(data, 0, data.Length);
+                };
+            }
+            current_offset += data.Length;
+            current_offset = (int)Math.Ceiling((decimal)current_offset / 4096) * 4096;
+            return (current_offset, result);
+        }
+
         private bool CanWriteChunk(Chunk chunk)
         {
             return chunk != null && !chunk.IsCorrupt;
@@ -252,6 +267,13 @@ namespace NbtStudio
         {
             Path = path;
             Save();
+        }
+
+        public void Refresh()
+        {
+            Load();
+            HasChunkChanges = false;
+            ChunksChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void Move(string path)

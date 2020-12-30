@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class NbtFolder : IHavePath, IDisposable
+    public class NbtFolder : IHavePath, IRefreshable, IDisposable
     {
         public string Path { get; private set; }
-        public bool IsFolder => true;
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
         public event EventHandler ContentsChanged;
         public IReadOnlyCollection<NbtFolder> Subfolders => SubfolderDict.Values;
-        public IReadOnlyCollection<ISaveable> Files => FileDict.Values;
+        public IReadOnlyCollection<IFile> Files => FileDict.Values;
         private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
-        private readonly Dictionary<string, ISaveable> FileDict = new Dictionary<string, ISaveable>();
+        private readonly Dictionary<string, IFile> FileDict = new Dictionary<string, IFile>();
+        public bool CanRefresh => true;
+        public void Refresh() => Scan();
 
         public NbtFolder(string path, bool recursive)
         {
@@ -69,9 +70,9 @@ namespace NbtStudio
             ContentsChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public static ISaveable OpenFile(string path)
+        public static IFile OpenFile(string path)
         {
-            return (ISaveable)NbtFile.TryCreate(path) ??
+            return (IFile)NbtFile.TryCreate(path) ??
                 RegionFile.TryCreate(path);
         }
 
