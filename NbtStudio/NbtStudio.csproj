@@ -100,6 +100,7 @@
     <Compile Include="NbtObjects\Chunk.cs" />
     <Compile Include="Models\ExportSettings.cs" />
     <Compile Include="Models\UndoHistory.cs" />
+    <Compile Include="NbtObjects\Interfaces.cs" />
     <Compile Include="NbtUtil.cs" />
     <Compile Include="NbtObjects\NbtFile.cs" />
     <Compile Include="NbtObjects\NbtFolder.cs" />
