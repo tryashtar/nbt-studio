@@ -65,6 +65,21 @@ namespace NbtStudio
             return nodes.Select(transformer).Where(x => x != null);
         }
 
+        public static T Get<T>(this INode node) where T : class
+        {
+            if (node is ChunkNode chunk)
+                return chunk.Chunk as T;
+            if (node is FolderNode folder)
+                return folder.Folder as T;
+            if (node is NbtFileNode file)
+                return file.File as T;
+            if (node is NbtTagNode tag)
+                return tag.Tag as T;
+            if (node is RegionFileNode region)
+                return region.Region as T;
+            return null;
+        }
+
         // technically these could go in INode but I'd prefer to keep it clean of project-specific stuff
         // I could make like an INbtStudioNode but I don't want to type that a lot
         public static NbtTag GetNbtTag(this INode node)
@@ -75,50 +90,6 @@ namespace NbtStudio
                 return file.File.RootTag;
             if (node is ChunkNode chunk)
                 return chunk.Chunk.Data;
-            return null;
-        }
-
-        public static ISaveable GetSaveable(this INode node)
-        {
-            if (node is NbtFileNode file)
-                return file.File;
-            if (node is RegionFileNode region)
-                return region.Region;
-            return null;
-        }
-
-        public static IHavePath GetHasPath(this INode node)
-        {
-            if (node is FolderNode folder)
-                return folder.Folder;
-            return GetSaveable(node);
-        }
-
-        public static NbtFile GetNbtFile(this INode node)
-        {
-            if (node is NbtFileNode file)
-                return file.File;
-            return null;
-        }
-
-        public static RegionFile GetRegionFile(this INode node)
-        {
-            if (node is RegionFileNode region)
-                return region.Region;
-            return null;
-        }
-
-        public static Chunk GetChunk(this INode node)
-        {
-            if (node is ChunkNode chunk)
-                return chunk.Chunk;
-            return null;
-        }
-
-        public static NbtFolder GetNbtFolder(this INode node)
-        {
-            if (node is FolderNode folder)
-                return folder.Folder;
             return null;
         }
     }

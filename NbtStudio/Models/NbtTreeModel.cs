@@ -74,9 +74,9 @@ namespace NbtStudio
         {
             get
             {
-                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.GetSaveable() != null))
+                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<ISaveable>() != null))
                 {
-                    var saveable = item.GetSaveable();
+                    var saveable = item.Get<ISaveable>();
                     if (saveable != null)
                         yield return saveable;
                 }

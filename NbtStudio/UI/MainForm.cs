@@ -389,7 +389,7 @@ namespace NbtStudio.UI
 
         private void Discard(IEnumerable<INode> nodes)
         {
-            var unsaved_files = nodes.Filter(x => x.GetSaveable()).Where(x => x.HasUnsavedChanges);
+            var unsaved_files = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
             if (!unsaved_files.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 ViewModel.RemoveMany(nodes);
         }
@@ -556,8 +556,8 @@ namespace NbtStudio.UI
         private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
         {
             if (!check(node)) return;
-            var chunk = node.GetChunk();
-            var path = node.GetHasPath();
+            var chunk = node.Get<Chunk>();
+            var path = node.Get<IHavePath>();
             var tag = node.GetNbtTag();
             // batch operation to combine the rename and value change into one undo
             UndoHistory.StartBatchOperation();
@@ -638,8 +638,8 @@ namespace NbtStudio.UI
         private void Delete(IEnumerable<INode> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
-            var file_nodes = nodes.Where(x => x.GetHasPath() != null);
-            var files = nodes.Filter(x => x.GetHasPath());
+            var file_nodes = nodes.Where(x => x.Get<IHavePath>() != null);
+            var files = nodes.Filter(x => x.Get<IHavePath>());
             if (files.Any())
             {
                 DialogResult result;
@@ -753,7 +753,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = NbtTree.SelectedINode?.GetRegionFile();
+            var parent = NbtTree.SelectedINode?.Get<RegionFile>();
             if (parent == null) return;
             var chunk = EditChunkWindow.CreateChunk(IconSource, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk != null)
@@ -865,7 +865,7 @@ namespace NbtStudio.UI
             var objs = NbtTree.SelectedINodes;
             var nbt = obj.GetNbtTag();
             var container = nbt as NbtContainerTag;
-            var region = obj.GetRegionFile();
+            var region = obj.Get<RegionFile>();
             foreach (var item in CreateTagButtons)
             {
                 item.Value.Enabled = container != null && container.CanAdd(item.Key);
@@ -998,20 +998,19 @@ namespace NbtStudio.UI
                 else
                     menu.Items.Add("Se&lect all Children", null, SelectChildren_Click);
             }
-            var saveable = obj.GetSaveable();
+            var saveable = obj.Get<ISaveable>();
             if (saveable != null)
             {
                 if (menu.Items.Count > 0)
                     menu.Items.Add(new ToolStripSeparator());
                 menu.Items.Add("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click);
                 menu.Items.Add("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click);
+                if (saveable.CanSave)
+                    menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click);
             }
-            var path = obj.GetHasPath();
+            var path = obj.Get<IHavePath>();
             if (path?.Path != null)
                 menu.Items.Add("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click);
-            var folder = obj.GetNbtFolder();
-            if (folder != null)
-                menu.Items.Add("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click);
             var container = obj.GetNbtTag() as NbtContainerTag;
             if (container != null)
             {
@@ -1077,7 +1076,7 @@ namespace NbtStudio.UI
 
         private void Save_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.GetSaveable());
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<ISaveable>());
             foreach (var item in selected)
             {
                 Save(item);
@@ -1086,7 +1085,7 @@ namespace NbtStudio.UI
 
         private void SaveAs_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.GetSaveable());
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<ISaveable>());
             foreach (var item in selected)
             {
                 SaveAs(item);
@@ -1095,7 +1094,7 @@ namespace NbtStudio.UI
 
         private void OpenInExplorer_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.GetHasPath());
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IHavePath>());
             foreach (var item in selected)
             {
                 OpenInExplorer(item);
@@ -1104,7 +1103,11 @@ namespace NbtStudio.UI
 
         private void Refresh_Click(object sender, EventArgs e)
         {
-
+            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IRefreshable>()).Where(x => x.CanRefresh);
+            foreach (var item in selected)
+            {
+                item.Refresh();
+            }
         }
 
         private void AddTag_Click(NbtTagType type)

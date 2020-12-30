@@ -20,6 +20,7 @@ namespace NbtStudio
         public NbtCompound RootTag { get; private set; }
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
+        public bool CanRefresh => CanSave;
         public bool HasUnsavedChanges { get; private set; } = false;
 
         private NbtFile(string path, NbtCompound root, ExportSettings settings)
@@ -135,6 +136,14 @@ namespace NbtStudio
             }
         }
 
+        public static NbtFile TryCreateFromExportSettings(string path, ExportSettings settings)
+        {
+            if (settings.Snbt)
+                return TryCreateFromSnbt(path);
+            else
+                return TryCreateFromNbt(path, settings.Compression, settings.BigEndian, settings.BedrockHeader);
+        }
+
         public void Save()
         {
             ExportSettings.Export(Path, RootTag);
@@ -155,6 +164,16 @@ namespace NbtStudio
             Save();
         }
 
+        public void Refresh()
+        {
+            var current = TryCreateFromExportSettings(Path, ExportSettings);
+            RootTag.Clear();
+            var tags = current.RootTag.ToList();
+            current.RootTag.Clear();
+            RootTag.AddRange(tags);
+            HasUnsavedChanges = false;
+        }
+
         public void Move(string path)
         {
             if (Path != null)
@@ -172,12 +191,18 @@ namespace NbtStudio
         void Move(string path);
     }
 
-    public interface ISaveable : IHavePath
+    public interface ISaveable : IHavePath, IRefreshable
     {
         event EventHandler OnSaved;
         bool HasUnsavedChanges { get; }
         bool CanSave { get; }
         void Save();
         void SaveAs(string path);
+    }
+
+    public interface IRefreshable : IHavePath
+    {
+        bool CanRefresh { get; }
+        void Refresh();
     }
 }

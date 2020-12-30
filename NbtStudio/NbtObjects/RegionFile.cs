@@ -30,17 +30,22 @@ namespace NbtStudio
         public event EventHandler ChunksChanged;
         public event EventHandler OnSaved;
         public event EventHandler<UndoableAction> ActionPerformed;
-        private readonly Chunk[,] Chunks;
-        private readonly byte[] Locations;
-        private readonly byte[] Timestamps;
+        private Chunk[,] Chunks;
+        private byte[] Locations;
+        private byte[] Timestamps;
         public string Path { get; private set; }
         public bool IsFolder => false;
         public bool HasChunkChanges { get; private set; } = false;
         public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
-            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             Path = path;
+            Load();
+        }
+
+        private void Load()
+        {
+            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
             var stream = GetStream();
             try
             {
@@ -193,6 +198,7 @@ namespace NbtStudio
         }
 
         public bool CanSave => Path != null;
+        public bool CanRefresh => CanSave;
         public void Save()
         {
             int current_offset = 8192;
@@ -252,6 +258,13 @@ namespace NbtStudio
         {
             Path = path;
             Save();
+        }
+
+        public void Refresh()
+        {
+            Load();
+            HasChunkChanges = false;
+            ChunksChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void Move(string path)

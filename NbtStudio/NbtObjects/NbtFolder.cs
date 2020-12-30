@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class NbtFolder : IHavePath, IDisposable
+    public class NbtFolder : IHavePath, IRefreshable, IDisposable
     {
         public string Path { get; private set; }
         public bool IsFolder => true;
@@ -19,6 +19,8 @@ namespace NbtStudio
         public IReadOnlyCollection<ISaveable> Files => FileDict.Values;
         private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
         private readonly Dictionary<string, ISaveable> FileDict = new Dictionary<string, ISaveable>();
+        public bool CanRefresh => true;
+        public void Refresh() => Scan();
 
         public NbtFolder(string path, bool recursive)
         {
