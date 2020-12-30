@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class Chunk
+    public class Chunk : IExportable
     {
         public const int BlocksXDimension = 16;
         public const int BlocksZDimension = 16;
@@ -109,7 +109,7 @@ namespace NbtStudio
                     {
                         file.LoadFromStream(stream, NbtCompression.AutoDetect);
                         Compression = file.FileCompression;
-                        SetData(file.RootTag);
+                        SetData(file.GetRootTag<NbtCompound>());
                     }
                     catch
                     {
@@ -120,6 +120,11 @@ namespace NbtStudio
             }
             stream.Dispose();
             OnLoaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void SaveAs(string path)
+        {
+            File.WriteAllBytes(path, SaveBytes());
         }
 
         public void Remove()

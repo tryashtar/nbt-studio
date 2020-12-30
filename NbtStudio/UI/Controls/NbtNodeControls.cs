@@ -142,8 +142,8 @@ namespace NbtStudio.UI
             string value = PreviewValue(node);
             if (node.Tag is INode inode)
             {
-                var saveable = inode.GetSaveable();
-                var chunk = inode.GetChunk();
+                var saveable = inode.Get<ISaveable>();
+                var chunk = inode.Get<Chunk>();
                 if ((saveable != null && saveable.HasUnsavedChanges) || (chunk != null && chunk.HasUnsavedChanges))
                     prefix = "* ";
             }

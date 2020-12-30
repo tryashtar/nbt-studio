@@ -48,7 +48,7 @@ namespace NbtStudio
             return options;
         }
 
-        public void Export(string path, NbtCompound root)
+        public void Export(string path, NbtTag root)
         {
             if (Snbt)
                 File.WriteAllText(path, root.ToSnbt(CreateOptions()));

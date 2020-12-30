@@ -14,23 +14,37 @@ namespace NbtStudio
             ChildObjects = children.ToList();
         }
 
-        protected override IEnumerable<object> GetChildren()
+        public void Add(object obj)
         {
-            return ChildObjects;
+            ChildObjects.Add(obj);
+            RefreshChildren();
+        }
+
+        public void AddRange(IEnumerable<object> objects)
+        {
+            ChildObjects.AddRange(objects);
+            RefreshChildren();
         }
 
         public void Remove(INode child)
         {
+            RemoveNodes(new[] { child });
+        }
+
+        public void RemoveNodes(IEnumerable<INode> nodes)
+        {
             var children = NodeChildrenMap(ChildObjects);
             foreach (var sibling in children)
             {
-                if (sibling.Value == child)
-                {
+                if (nodes.Contains(sibling.Value))
                     ChildObjects.Remove(sibling.Key);
-                    RefreshChildren();
-                    break;
-                }
             }
+            RefreshChildren();
+        }
+
+        protected override IEnumerable<object> GetChildren()
+        {
+            return ChildObjects;
         }
     }
 }

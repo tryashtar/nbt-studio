@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
@@ -12,17 +12,18 @@ namespace NbtStudio
 {
     // represents a loadable and saveable NBT file
     // uses fNbt.NbtFile to do the work reading/writing binary data to disk, but can also read/write SNBT without using one
-    public class NbtFile : ISaveable
+    public class NbtFile : IFile
     {
         public string Path { get; private set; }
-        public bool IsFolder => false;
         public event EventHandler OnSaved;
-        public NbtCompound RootTag { get; private set; }
+        public NbtTag RootTag { get; private set; }
+        public T GetRootTag<T>() where T : NbtTag => RootTag as T;
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path != null && ExportSettings != null;
+        public bool CanRefresh => CanSave;
         public bool HasUnsavedChanges { get; private set; } = false;
 
-        private NbtFile(string path, NbtCompound root, ExportSettings settings)
+        private NbtFile(string path, NbtTag root, ExportSettings settings)
         {
             Path = path;
             SetRoot(root);
@@ -32,7 +33,7 @@ namespace NbtStudio
         public NbtFile() : this(new NbtCompound(""))
         { }
 
-        public NbtFile(NbtCompound root)
+        public NbtFile(NbtTag root)
         {
             if (root.Name == null)
                 root.Name = "";
@@ -42,19 +43,30 @@ namespace NbtStudio
             HasUnsavedChanges = true;
         }
 
-        private void SetRoot(NbtCompound root)
+        private void SetRoot(NbtTag root)
         {
             RootTag = root;
             RootTag.Changed += (s, e) => HasUnsavedChanges = true;
         }
 
-        private static bool LooksSuspicious(NbtTag tag)
+        private static bool LooksSuspicious(string name)
         {
-            foreach (var ch in tag.Name)
+            if (name == null)
+                return false;
+            foreach (var ch in name)
             {
                 if (Char.IsControl(ch))
                     return true;
             }
+            return false;
+        }
+
+        private static bool LooksSuspicious(NbtTag tag)
+        {
+            if (LooksSuspicious(tag.Name))
+                return true;
+            if (tag is NbtContainerTag container && container.Any(x => LooksSuspicious(x.Name)))
+                return true;
             return false;
         }
 
@@ -122,6 +134,14 @@ namespace NbtStudio
             return new Failable<NbtFile>(() => CreateFromNbt(path, compression, big_endian, bedrock_header));
         }
 
+        public static Failable<NbtFile> TryCreateFromExportSettings(string path, ExportSettings settings)
+        {
+            if (settings.Snbt)
+                return TryCreateFromSnbt(path);
+            else
+                return TryCreateFromNbt(path, settings.Compression, settings.BigEndian, settings.BedrockHeader);
+        }
+
         public static NbtFile CreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
         {
             var file = new fNbt.NbtFile();
@@ -161,6 +181,17 @@ namespace NbtStudio
             Save();
         }
 
+        public void Refresh()
+        {
+            var current = TryCreateFromExportSettings(Path, ExportSettings).Result.RootTag as NbtContainerTag;
+            var self = RootTag as NbtContainerTag;
+            var tags = current.ToList();
+            self.Clear();
+            current.Clear();
+            self.AddRange(tags);
+            HasUnsavedChanges = false;
+        }
+
         public void Move(string path)
         {
             if (Path != null)
@@ -169,21 +200,5 @@ namespace NbtStudio
                 Path = path;
             }
         }
-    }
-
-    public interface IHavePath
-    {
-        string Path { get; }
-        bool IsFolder { get; }
-        void Move(string path);
-    }
-
-    public interface ISaveable : IHavePath
-    {
-        event EventHandler OnSaved;
-        bool HasUnsavedChanges { get; }
-        bool CanSave { get; }
-        void Save();
-        void SaveAs(string path);
     }
 }

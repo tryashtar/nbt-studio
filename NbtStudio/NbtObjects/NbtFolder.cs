@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
-    public class NbtFolder : IHavePath, IDisposable
+    public class NbtFolder : IHavePath, IRefreshable, IDisposable
     {
         public string Path { get; private set; }
-        public bool IsFolder => true;
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
         public event EventHandler ContentsChanged;
         public IReadOnlyCollection<NbtFolder> Subfolders => SubfolderDict.Values;
-        public IReadOnlyCollection<ISaveable> Files => FileDict.Values;
+        public IReadOnlyCollection<IFile> Files => FileDict.Values;
         private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
-        private readonly Dictionary<string, ISaveable> FileDict = new Dictionary<string, ISaveable>();
+        private readonly Dictionary<string, IFile> FileDict = new Dictionary<string, IFile>();
+        public bool CanRefresh => true;
+        public void Refresh() => Scan();
 
         public NbtFolder(string path, bool recursive)
         {
@@ -69,15 +70,15 @@ namespace NbtStudio
             ContentsChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public static Failable<ISaveable> OpenFile(string path)
+        public static Failable<IFile> OpenFile(string path)
         {
             var attempt1 = NbtFile.TryCreate(path);
             if (!attempt1.Failed)
-                return attempt1.Cast<ISaveable>();
+                return attempt1.Cast<IFile>();
             var attempt2 = RegionFile.TryCreate(path);
             if (!attempt2.Failed)
-                return attempt2.Cast<ISaveable>();
-            return attempt1.Cast<ISaveable>();
+                return attempt2.Cast<IFile>();
+            return attempt1.Cast<IFile>();
         }
 
         public static Failable<IHavePath> OpenFileOrFolder(string path)
