@@ -94,7 +94,7 @@ namespace NbtStudio
 
         public static Failable<RegionFile> TryCreate(string path)
         {
-            return new Failable<RegionFile>(() => new RegionFile(path));
+            return new Failable<RegionFile>(() => new RegionFile(path), "Load as region file");
         }
 
         internal FileStream GetStream()

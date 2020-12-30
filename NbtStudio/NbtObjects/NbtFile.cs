@@ -102,12 +102,12 @@ namespace NbtStudio
                     return attempt;
             }
             // everything failed, sob!
-            return attempted.First();
+            return Failable<NbtFile>.Aggregate(attempted.ToArray());
         }
 
         public static Failable<NbtFile> TryCreateFromSnbt(string path)
         {
-            return new Failable<NbtFile>(() => CreateFromSnbt(path));
+            return new Failable<NbtFile>(() => CreateFromSnbt(path), "Load as SNBT");
         }
 
         public static NbtFile CreateFromSnbt(string path)
@@ -131,7 +131,7 @@ namespace NbtStudio
 
         public static Failable<NbtFile> TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
         {
-            return new Failable<NbtFile>(() => CreateFromNbt(path, compression, big_endian, bedrock_header));
+            return new Failable<NbtFile>(() => CreateFromNbt(path, compression, big_endian, bedrock_header), $"Load as NBT (compression: {compression}, big endian: {big_endian}, bedrock header: {bedrock_header})");
         }
 
         public static Failable<NbtFile> TryCreateFromExportSettings(string path, ExportSettings settings)

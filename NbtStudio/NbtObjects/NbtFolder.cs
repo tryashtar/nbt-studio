@@ -72,19 +72,19 @@ namespace NbtStudio
 
         public static Failable<IFile> OpenFile(string path)
         {
-            var attempt1 = NbtFile.TryCreate(path);
+            var attempt1 = NbtFile.TryCreate(path).Cast<IFile>();
             if (!attempt1.Failed)
-                return attempt1.Cast<IFile>();
-            var attempt2 = RegionFile.TryCreate(path);
+                return attempt1;
+            var attempt2 = RegionFile.TryCreate(path).Cast<IFile>();
             if (!attempt2.Failed)
-                return attempt2.Cast<IFile>();
-            return attempt1.Cast<IFile>();
+                return attempt2;
+            return Failable<IFile>.Aggregate(attempt1, attempt2);
         }
 
         public static Failable<IHavePath> OpenFileOrFolder(string path)
         {
             if (Directory.Exists(path))
-                return new Failable<IHavePath>(() => new NbtFolder(path, true));
+                return new Failable<IHavePath>(() => new NbtFolder(path, true), "Load as folder");
             return OpenFile(path).Cast<IHavePath>();
         }
 
