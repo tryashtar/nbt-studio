@@ -65,6 +65,8 @@ namespace NbtStudio
         {
             if (LooksSuspicious(tag.Name))
                 return true;
+            if (tag is NbtString str && LooksSuspicious(str.Value))
+                return true;
             if (tag is NbtContainerTag container && container.Any(x => LooksSuspicious(x.Name)))
                 return true;
             return false;
@@ -157,6 +159,8 @@ namespace NbtStudio
             }
             if (file.RootTag == null)
                 throw new FormatException("File had no root tag");
+            if (!(file.RootTag is NbtCompound))
+                throw new FormatException("File did not contain an NBT compound");
 
             return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, bedrock_header));
         }
