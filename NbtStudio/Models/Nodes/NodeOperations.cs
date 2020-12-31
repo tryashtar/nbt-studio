@@ -298,7 +298,7 @@ namespace NbtStudio
             var snbts = text.Split('\n');
             foreach (var nbt in snbts)
             {
-                if (SnbtParser.TryParse(nbt, true, out NbtTag tag) || SnbtParser.TryParse(nbt, false, out tag))
+                if (SnbtParser.ClassicTryParse(nbt, true, out NbtTag tag) || SnbtParser.ClassicTryParse(nbt, false, out tag))
                     yield return tag;
             }
         }

@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="IconSource.cs" />
     <Compile Include="Models\ByteProviders.cs" />
+    <Compile Include="Models\Failable.cs" />
     <Compile Include="Models\Nodes\FolderNode.cs" />
     <Compile Include="Models\Nodes\ModelRootNode.cs" />
     <Compile Include="Models\Nodes\NodeOperations.cs" />
@@ -123,6 +124,12 @@
     </Compile>
     <Compile Include="UI\Controls\IconSourceButtons.Designer.cs">
       <DependentUpon>IconSourceButtons.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Windows\ExceptionWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Windows\ExceptionWindow.Designer.cs">
+      <DependentUpon>ExceptionWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\Windows\FullIconPreviewWindow.cs">
       <SubType>Form</SubType>
@@ -242,6 +249,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Controls\IconSourceButtons.resx">
       <DependentUpon>IconSourceButtons.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Windows\ExceptionWindow.resx">
+      <DependentUpon>ExceptionWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Windows\FullIconPreviewWindow.resx">
       <DependentUpon>FullIconPreviewWindow.cs</DependentUpon>

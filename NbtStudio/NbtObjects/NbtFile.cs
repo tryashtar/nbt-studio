@@ -70,89 +70,95 @@ namespace NbtStudio
             return false;
         }
 
-        public static NbtFile TryCreate(string path)
+        public static Failable<NbtFile> TryCreate(string path)
         {
-            // try loading the file four different ways
+            var methods = new Func<Failable<NbtFile>>[]
+            {
+                () => TryCreateFromSnbt(path), // SNBT
+                () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true), // java files
+                () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false), // bedrock files
+                () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, bedrock_header: true) // bedrock level.dat files
+            };
+            return TryVariousMethods(methods, x => LooksSuspicious(x.RootTag));
+        }
+
+        public static Failable<NbtFile> TryVariousMethods(IEnumerable<Func<Failable<NbtFile>>> methods, Predicate<NbtFile> suspicious)
+        {
+            // try loading a file a few different ways
             // if loading fails or looks suspicious, try a different way
             // if all loads are suspicious, choose the first that didn't fail
-
-            // SNBT
-            var attempt1 = TryCreateFromSnbt(path);
-            if (attempt1 != null && !LooksSuspicious(attempt1.RootTag))
-                return attempt1;
-            // java files
-            var attempt2 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true);
-            if (attempt2 != null && !LooksSuspicious(attempt2.RootTag))
-                return attempt2;
-            // bedrock files
-            var attempt3 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false);
-            if (attempt3 != null && !LooksSuspicious(attempt3.RootTag))
-                return attempt3;
-            // bedrock level.dat files
-            var attempt4 = TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, bedrock_header: true);
-            if (attempt4 != null && !LooksSuspicious(attempt4.RootTag))
-                return attempt4;
-            return attempt1 ?? attempt2 ?? attempt3 ?? attempt4;
+            var attempted = new List<Failable<NbtFile>>();
+            foreach (var method in methods)
+            {
+                var result = method();
+                if (!result.Failed && !suspicious(result.Result))
+                    return result;
+                attempted.Add(result);
+            }
+            // everything was suspicious, pick the first that didn't fail
+            foreach (var attempt in attempted)
+            {
+                if (!attempt.Failed)
+                    return attempt;
+            }
+            // everything failed, sob!
+            return Failable<NbtFile>.Aggregate(attempted.ToArray());
         }
 
-        public static NbtFile TryCreateFromSnbt(string path)
+        public static Failable<NbtFile> TryCreateFromSnbt(string path)
         {
-            try
-            {
-                using (var stream = File.OpenRead(path))
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    char[] firstchar = new char[1];
-                    reader.ReadBlock(firstchar, 0, 1);
-                    if (firstchar[0] != '{') // optimization to not load in huge files
-                        return null;
-                    var text = firstchar[0] + reader.ReadToEnd();
-                    var tag = SnbtParser.Parse(text, named: false);
-                    if (!(tag is NbtCompound compound))
-                        return null;
-                    compound.Name = "";
-                    var file = new fNbt.NbtFile(compound);
-                    return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
-                }
-            }
-            catch
-            {
-                return null;
-            }
+            return new Failable<NbtFile>(() => CreateFromSnbt(path), "Load as SNBT");
         }
 
-        public static NbtFile TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
+        public static NbtFile CreateFromSnbt(string path)
         {
-            try
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                var file = new fNbt.NbtFile();
-                file.BigEndian = big_endian;
-                using (var reader = File.OpenRead(path))
-                {
-                    if (bedrock_header)
-                    {
-                        var header = new byte[8];
-                        reader.Read(header, 0, header.Length);
-                    }
-                    file.LoadFromStream(reader, compression);
-                }
-                if (file.RootTag == null)
-                    return null;
-
-                return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, bedrock_header));
-            }
-            catch
-            {
-                return null;
+                char[] firstchar = new char[1];
+                reader.ReadBlock(firstchar, 0, 1);
+                if (firstchar[0] != '{') // optimization to not load in huge files
+                    throw new FormatException("File did not begin with a '{'");
+                var text = firstchar[0] + reader.ReadToEnd();
+                var tag = SnbtParser.Parse(text, named: false);
+                if (!(tag is NbtCompound compound))
+                    throw new FormatException("File did not contain an NBT compound");
+                compound.Name = "";
+                var file = new fNbt.NbtFile(compound);
+                return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
             }
         }
 
-        public static NbtFile TryCreateFromExportSettings(string path, ExportSettings settings)
+        public static Failable<NbtFile> TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
+        {
+            return new Failable<NbtFile>(() => CreateFromNbt(path, compression, big_endian, bedrock_header), $"Load as NBT (compression: {compression}, big endian: {big_endian}, bedrock header: {bedrock_header})");
+        }
+
+        public static Failable<NbtFile> TryCreateFromExportSettings(string path, ExportSettings settings)
         {
             if (settings.Snbt)
                 return TryCreateFromSnbt(path);
             else
                 return TryCreateFromNbt(path, settings.Compression, settings.BigEndian, settings.BedrockHeader);
+        }
+
+        public static NbtFile CreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)
+        {
+            var file = new fNbt.NbtFile();
+            file.BigEndian = big_endian;
+            using (var reader = File.OpenRead(path))
+            {
+                if (bedrock_header)
+                {
+                    var header = new byte[8];
+                    reader.Read(header, 0, header.Length);
+                }
+                file.LoadFromStream(reader, compression);
+            }
+            if (file.RootTag == null)
+                throw new FormatException("File had no root tag");
+
+            return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, bedrock_header));
         }
 
         public void Save()
@@ -177,7 +183,7 @@ namespace NbtStudio
 
         public void Refresh()
         {
-            var current = TryCreateFromExportSettings(Path, ExportSettings).RootTag as NbtContainerTag;
+            var current = TryCreateFromExportSettings(Path, ExportSettings).Result.RootTag as NbtContainerTag;
             var self = RootTag as NbtContainerTag;
             var tags = current.ToList();
             self.Clear();
