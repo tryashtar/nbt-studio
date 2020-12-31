@@ -324,41 +324,6 @@ namespace NbtStudio
             }
         }
 
-        public static void Sort(NbtCompound compound, IComparer<NbtTag> sorter, bool recursive)
-        {
-            var tags = compound.Tags.OrderBy(x => x, sorter).ToList();
-            compound.Clear();
-            foreach (var tag in tags)
-            {
-                if (recursive)
-                {
-                    if (tag is NbtCompound sub)
-                        Sort(sub, sorter, true);
-                    else if (tag is NbtList list)
-                        SortChildren(list, sorter);
-                }
-                tag.AddTo(compound);
-            }
-        }
-
-        private static void SortChildren(NbtList list, IComparer<NbtTag> sorter)
-        {
-            if (list.ListType == NbtTagType.Compound)
-            {
-                foreach (NbtCompound item in list)
-                {
-                    Sort(item, sorter, true);
-                }
-            }
-            else if (list.ListType == NbtTagType.List)
-            {
-                foreach (NbtList item in list)
-                {
-                    SortChildren(item, sorter);
-                }
-            }
-        }
-
         public static void SetEqualTo(this NbtTag destination, NbtTag source)
         {
             if (destination.TagType != source.TagType)
@@ -395,18 +360,7 @@ namespace NbtStudio
             {
                 child.SetEqualTo(source[child.Name]);
             }
-            SortRootBy(destination, source);
-        }
-
-        private static void SortRootBy(NbtCompound compound, NbtCompound source)
-        {
-            var sorter = new ExistingCompoundSorter(source);
-            var tags = compound.Tags.OrderBy(x => x, sorter).ToList();
-            compound.Clear();
-            foreach (var tag in tags)
-            {
-                compound.Add(tag);
-            }
+            destination.Sort(new ExistingCompoundSorter(source), false);
         }
 
         public static void SetListEqualTo(this NbtList destination, NbtList source)

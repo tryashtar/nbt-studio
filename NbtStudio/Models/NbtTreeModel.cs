@@ -138,6 +138,11 @@ namespace NbtStudio
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
+        public void NotifyNodesReordered(TreePath path)
+        {
+            StructureChanged?.Invoke(this, new TreePathEventArgs(path));
+        }
+
         IEnumerable ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);
         public IEnumerable<object> GetChildren(TreePath treePath)
         {

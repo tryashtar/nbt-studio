@@ -287,7 +287,14 @@ namespace NbtStudio
         public static void Sort(NbtTag tag)
         {
             if (tag is NbtCompound compound)
-                NbtUtil.Sort(compound, new NbtUtil.TagTypeSorter(), true);
+            {
+                // silly hack but :)
+                string before = compound.ToSnbt(SnbtOptions.JsonLike);
+                compound.Sort(new NbtUtil.TagTypeSorter(), true);
+                string after = compound.ToSnbt(SnbtOptions.JsonLike);
+                if (before == after)
+                    compound.Sort(new NbtUtil.TagNameSorter(), true);
+            }
         }
 
         public static IEnumerable<NbtTag> ParseTags(IDataObject data)

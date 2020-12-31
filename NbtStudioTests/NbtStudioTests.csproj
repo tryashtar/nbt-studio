@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sorting.cs" />
     <Compile Include="SetEqualTo.cs" />
     <Compile Include="ModelNodes.cs" />
     <Compile Include="Snbt.cs" />

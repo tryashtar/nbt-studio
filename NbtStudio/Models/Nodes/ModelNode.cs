@@ -133,7 +133,26 @@ namespace NbtStudio
                 }
                 Tree.NotifyNodesAdded(path, nodes, indices);
             }
+            if (!new_children.SequenceEqual(ChildNodes.Keys))
+            {
+                ChildNodes.SortKeys(new OrderLikeList(new_children));
+                Tree.NotifyNodesReordered(path);
+            }
             Tree.NotifyNodeChanged(this);
+        }
+
+        private class OrderLikeList : IComparer<T>
+        {
+            private readonly List<T> List;
+            public OrderLikeList(List<T> list)
+            {
+                List = list;
+            }
+
+            public int Compare(T x, T y)
+            {
+                return List.IndexOf(x).CompareTo(List.IndexOf(y));
+            }
         }
 
         protected void NotifyChanged()
