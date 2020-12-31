@@ -47,6 +47,16 @@ namespace NbtStudio
             }
         }
 
+        public static Failable<T> Failure(Exception exc, string description)
+        {
+            return new Failable<T>(default, exc, description);
+        }
+
+        public static Failable<T> AggregateFailure(params Exception[] exceptions)
+        {
+            return Aggregate(exceptions.Select(x => Failure(x, null)).ToArray());
+        }
+
         public static Failable<T> Aggregate(params Failable<T>[] failures)
         {
             var flattened = failures.SelectMany(x => x.GetRelevantFailures()).ToList();
@@ -79,11 +89,11 @@ namespace NbtStudio
         {
             if (IsAggregate)
             {
-                var types = new HashSet<Type>();
+                var messages = new HashSet<string>();
                 var summaries = new List<string>();
                 foreach (var item in Nested)
                 {
-                    if (types.Add(item.Exception.GetType()))
+                    if (messages.Add(item.Exception.Message))
                         summaries.Add(item.ToStringSimple());
                 }
                 return String.Join("\n", summaries);

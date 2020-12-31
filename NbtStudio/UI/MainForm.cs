@@ -297,20 +297,34 @@ namespace NbtStudio.UI
             else if (Clipboard.ContainsText())
             {
                 var text = Clipboard.GetText();
-                if (SnbtParser.TryParse(text, named: false, out var tag) || SnbtParser.TryParse(text, named: true, out tag))
+                var attempt1 = SnbtParser.TryParse(text, named: false);
+                if (!attempt1.Failed)
+                    PasteTagLike(attempt1.Result, when_file);
+                else
                 {
-                    if (tag is NbtCompound compound)
-                        when_file(new NbtFile(compound));
+                    var attempt2 = SnbtParser.TryParse(text, named: true);
+                    if (!attempt2.Failed)
+                        PasteTagLike(attempt2.Result, when_file);
                     else
                     {
-                        var root = new NbtCompound();
-                        tag.Name = NbtUtil.GetAutomaticName(tag, root);
-                        root.Add(tag);
-                        when_file(new NbtFile(root));
+                        var error = Failable<NbtTag>.Aggregate(attempt1, attempt2);
+                        var window = new ExceptionWindow("Clipboard Error", "Failed to parse SNBT from clipboard.", error);
+                        window.ShowDialog(this);
                     }
                 }
-                else
-                    MessageBox.Show("Failed to parse SNBT from clipboard.", "Clipboard Error");
+            }
+        }
+
+        private void PasteTagLike(NbtTag tag, Action<NbtFile> when_file)
+        {
+            if (tag is NbtCompound compound)
+                when_file(new NbtFile(compound));
+            else
+            {
+                var root = new NbtCompound();
+                tag.Name = NbtUtil.GetAutomaticName(tag, root);
+                root.Add(tag);
+                when_file(new NbtFile(root));
             }
         }
 
@@ -553,7 +567,14 @@ namespace NbtStudio.UI
             try
             { results = node.Paste(Clipboard.GetDataObject()); }
             catch (Exception ex)
-            { ShowException("Error while pasting", ex); }
+            {
+                if (!(ex is OperationCanceledException))
+                {
+                    var error = Failable<bool>.Failure(ex, "Pasting");
+                    var window = new ExceptionWindow("Error while pasting", "An error occurred while pasting:", error);
+                    window.ShowDialog(this);
+                }
+            }
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Paste {0} into {1}", results, node), true);
         }
 
@@ -722,8 +743,13 @@ namespace NbtStudio.UI
                 catch (Exception ex)
                 { errors.Add(ex); }
             }
-            if (errors.Any())
-                ShowException("Error while deleting", new AggregateException(errors));
+            var relevant = errors.Where(x => !(x is OperationCanceledException)).ToArray();
+            if (relevant.Any())
+            {
+                var error = Failable<bool>.AggregateFailure(relevant);
+                var window = new ExceptionWindow("Error while deleting", "An error occurred while deleting:", error);
+                window.ShowDialog(this);
+            }
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Delete {0}", nodes), false);
         }
 
@@ -887,12 +913,6 @@ namespace NbtStudio.UI
             if (!ViewModel.HasAnyUnsavedChanges)
                 return true;
             return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
-        }
-
-        private void ShowException(string caption, Exception exception)
-        {
-            if (!(exception is OperationCanceledException))
-                MessageBox.Show(Util.ExceptionMessage(exception), caption);
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)

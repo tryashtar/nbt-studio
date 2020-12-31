@@ -23,6 +23,11 @@ namespace NbtStudio.SNBT
 
         private readonly StringReader Reader;
 
+        public static Failable<NbtTag> TryParse(string snbt, bool named)
+        {
+            return new Failable<NbtTag>(() => Parse(snbt, named), "Parse SNBT");
+        }
+
         public static NbtTag Parse(string snbt, bool named)
         {
             var parser = new SnbtParser(snbt);
@@ -31,7 +36,7 @@ namespace NbtStudio.SNBT
             return value;
         }
 
-        public static bool TryParse(string snbt, bool named, out NbtTag tag)
+        public static bool ClassicTryParse(string snbt, bool named, out NbtTag tag)
         {
             try
             {
