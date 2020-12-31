@@ -187,12 +187,8 @@ namespace NbtStudio
 
         public void Refresh()
         {
-            var current = TryCreateFromExportSettings(Path, ExportSettings).Result.RootTag as NbtContainerTag;
-            var self = RootTag as NbtContainerTag;
-            var tags = current.ToList();
-            self.Clear();
-            current.Clear();
-            self.AddRange(tags);
+            var current = TryCreateFromExportSettings(Path, ExportSettings).Result.RootTag;
+            RootTag.SetEqualTo(current);
             HasUnsavedChanges = false;
         }
 

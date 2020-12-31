@@ -128,7 +128,7 @@ namespace NbtStudio.UI
             if (WorkingTag == null)
                 WorkingTag = tag;
             else
-                NbtUtil.SetValue(WorkingTag, NbtUtil.GetValue(tag));
+                WorkingTag.SetEqualTo(tag);
             if (SettingName)
             {
                 NameBox.SetTags(WorkingTag, TagParent);

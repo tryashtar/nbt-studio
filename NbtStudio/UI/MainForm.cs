@@ -308,7 +308,7 @@ namespace NbtStudio.UI
                     else
                     {
                         var error = Failable<NbtTag>.Aggregate(attempt1, attempt2);
-                        var window = new ExceptionWindow("Clipboard Error", "Failed to parse SNBT from clipboard.", error);
+                        var window = new ExceptionWindow("Clipboard error", "Failed to parse SNBT from clipboard.", error);
                         window.ShowDialog(this);
                     }
                 }
@@ -418,7 +418,7 @@ namespace NbtStudio.UI
             if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 UndoHistory.StartBatchOperation();
-                var errors = new List<Exception>();
+                var errors = new List<(IHavePath item, Exception exception)>();
                 foreach (var item in items)
                 {
                     try
@@ -427,12 +427,18 @@ namespace NbtStudio.UI
                     }
                     catch (Exception ex)
                     {
-                        errors.Add(ex);
+                        errors.Add((item as IHavePath, ex));
                     }
                 }
                 UndoHistory.FinishBatchOperation(new DescriptionHolder("Refresh {0}", items.ToArray()), true);
                 if (errors.Any())
-                    MessageBox.Show($"{Util.Pluralize(errors.Count, "item")} failed to refresh", "Refresh error");
+                {
+                    var error = Failable<bool>.AggregateFailure(errors.Select(x => x.exception).ToArray());
+                    string message = $"{Util.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
+                    message += String.Join("\n", errors.Select(x => x.item).Where(x => x != null).Select(x => Path.GetFileName(x.Path)));
+                    var window = new ExceptionWindow("Refresh error", message, error);
+                    window.ShowDialog(this);
+                }
             }
         }
 
@@ -878,7 +884,7 @@ namespace NbtStudio.UI
                 string message = $"{Util.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
                 var fail = Failable<IHavePath>.Aggregate(bad.Select(x => x.item).ToArray());
-                var window = new ExceptionWindow("Load Failure", message, fail);
+                var window = new ExceptionWindow("Load failure", message, fail);
                 window.ShowDialog(this);
             }
             if (good.Any())

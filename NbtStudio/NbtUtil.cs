@@ -278,6 +278,20 @@ namespace NbtStudio
             }
         }
 
+        public class ExistingCompoundSorter : IComparer<NbtTag>
+        {
+            private readonly NbtCompound Source;
+            public ExistingCompoundSorter(NbtCompound source)
+            {
+                Source = source;
+            }
+
+            public int Compare(NbtTag x, NbtTag y)
+            {
+                return Source.IndexOf(x.Name).CompareTo(Source.IndexOf(y.Name));
+            }
+        }
+
         public class TagTypeSorter : IComparer<NbtTag>
         {
             private static readonly Dictionary<NbtTagType, int> TypeOrder = new Dictionary<NbtTagType, int>
@@ -342,6 +356,73 @@ namespace NbtStudio
                 {
                     SortChildren(item, sorter);
                 }
+            }
+        }
+
+        public static void SetEqualTo(this NbtTag destination, NbtTag source)
+        {
+            if (destination.TagType != source.TagType)
+                throw new InvalidOperationException($"Tag types must match: {destination.TagType} != {source.TagType}");
+            if (source.TagType == NbtTagType.Compound)
+                ((NbtCompound)destination).SetCompoundEqualTo((NbtCompound)source);
+            else if (source.TagType == NbtTagType.List)
+                ((NbtList)destination).SetListEqualTo((NbtList)source);
+            else
+                SetValue(destination, GetValue(source));
+        }
+
+        private static bool PsuedoContains(NbtCompound compound, NbtTag tag)
+        {
+            if (compound.TryGet(tag.Name, out var existing))
+                return existing.TagType == tag.TagType;
+            return false;
+        }
+
+        public static void SetCompoundEqualTo(this NbtCompound destination, NbtCompound source)
+        {
+            var add_children = source.Where(x => !PsuedoContains(destination, x));
+            var remove_children = destination.Where(x => !PsuedoContains(source, x));
+            var update_children = destination.Except(remove_children);
+            foreach (var child in remove_children)
+            {
+                destination.Remove(child);
+            }
+            foreach (var child in add_children)
+            {
+                destination.Add((NbtTag)child.Clone());
+            }
+            foreach (var child in update_children)
+            {
+                child.SetEqualTo(source[child.Name]);
+            }
+            SortRootBy(destination, source);
+        }
+
+        private static void SortRootBy(NbtCompound compound, NbtCompound source)
+        {
+            var sorter = new ExistingCompoundSorter(source);
+            var tags = compound.Tags.OrderBy(x => x, sorter).ToList();
+            compound.Clear();
+            foreach (var tag in tags)
+            {
+                compound.Add(tag);
+            }
+        }
+
+        public static void SetListEqualTo(this NbtList destination, NbtList source)
+        {
+            if (destination.ListType != source.ListType)
+                destination.Clear();
+            while (destination.Count > source.Count)
+            {
+                destination.RemoveAt(destination.Count - 1);
+            }
+            int needs_updating = destination.Count;
+            if (source.Count > destination.Count)
+                destination.AddRange(source.Skip(destination.Count).Select(x => (NbtTag)x.Clone()));
+            for (int i = 0; i < needs_updating; i++)
+            {
+                destination[i].SetEqualTo(source[i]);
             }
         }
 
