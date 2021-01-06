@@ -1,0 +1,6 @@
+[submodule "fNbt"]
+	url = https://github.com/tryashtar/fNbt.git
+[submodule "TreeViewAdv"]
+	url = https://github.com/tryashtar/TreeViewAdv.git
+[submodule "Be.Windows.Forms.HexBox"]
+	url = https://github.com/tryashtar/HexBox.git
