@@ -67,6 +67,7 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", IconType.Delete, Keys.Delete);
         private readonly DualMenuItem DropDownUndoHistory = DualMenuItem.SingleMenuItem("Undo History...", IconType.Undo, Keys.None);
         private readonly DualMenuItem DropDownRedoHistory = DualMenuItem.SingleMenuItem("Redo History...", IconType.Redo, Keys.None);
+        private readonly DualMenuItem ActionClearUndoHistory = DualMenuItem.SingleMenuItem("Clear Undo History", null, Keys.None);
         private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", IconType.Search, Keys.Control | Keys.F);
         private readonly DualMenuItem ActionAbout = DualMenuItem.SingleMenuItem("&About", IconType.NbtStudio, Keys.Shift | Keys.F1);
         private readonly DualMenuItem ActionChangeIcons = DualMenuItem.SingleMenuItem("&Change Icons", IconType.Refresh, Keys.Control | Keys.I);
@@ -102,6 +103,7 @@ namespace NbtStudio.UI
             ActionRefresh.Click += (s, e) => RefreshAll();
             ActionUndo.Click += (s, e) => Undo();
             ActionRedo.Click += (s, e) => Redo();
+            ActionClearUndoHistory.Click += (s, e) => ClearUndoHistory();
             ActionCut.Click += (s, e) => Cut();
             ActionCopy.Click += (s, e) => Copy();
             ActionPaste.Click += (s, e) => Paste();
@@ -134,7 +136,6 @@ namespace NbtStudio.UI
             ActionSaveAs.AddToMenuItem(MenuFile);
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             DropDownRecent.AddToMenuItem(MenuFile);
-            ActionSort.AddToToolStrip(Tools);
             ActionRefresh.AddToToolStrip(Tools);
             Tools.Items.Add(new ToolStripSeparator());
             ActionUndo.AddToMenuItem(MenuEdit);
@@ -149,9 +150,11 @@ namespace NbtStudio.UI
             ActionEdit.AddTo(Tools, MenuEdit);
             ActionEditSnbt.AddTo(Tools, MenuEdit);
             ActionDelete.AddTo(Tools, MenuEdit);
+            ActionSort.AddToToolStrip(Tools);
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             DropDownUndoHistory.AddToMenuItem(MenuEdit);
             DropDownRedoHistory.AddToMenuItem(MenuEdit);
+            ActionClearUndoHistory.AddToMenuItem(MenuEdit);
             Tools.Items.Add(new ToolStripSeparator());
             ActionAddChunk.AddToToolStrip(Tools);
             ActionAbout.AddToMenuItem(MenuHelp);
@@ -183,8 +186,8 @@ namespace NbtStudio.UI
                 ActionUndo, ActionRedo, ActionCut,
                 ActionCopy, ActionPaste, ActionRename,
                 ActionEdit, ActionEditSnbt, ActionDelete,
-                DropDownUndoHistory, DropDownRedoHistory, ActionFind,
-                ActionAbout, ActionAddSnbt, ActionAddChunk,
+                DropDownUndoHistory, DropDownRedoHistory, ActionClearUndoHistory,
+                ActionFind, ActionAbout, ActionAddSnbt, ActionAddChunk,
                 ActionChangeIcons, ActionUpdate, ActionCheckUpdates
             );
             ItemCollection.AddRange(CreateTagButtons.Values);
@@ -535,6 +538,11 @@ namespace NbtStudio.UI
         private void Redo()
         {
             UndoHistory.Redo();
+        }
+
+        private void ClearUndoHistory()
+        {
+            UndoHistory.Clear();
         }
 
         private void CopyLike(Func<INode, bool> check, Func<INode, DataObject> perform)
@@ -1214,9 +1222,6 @@ namespace NbtStudio.UI
 
         private void MenuEdit_DropDownOpening(object sender, EventArgs e)
         {
-            DropDownUndoHistory.Enabled = false;
-            DropDownRedoHistory.Enabled = false;
-
             var undo_history = UndoHistory.GetUndoHistory();
             var redo_history = UndoHistory.GetRedoHistory();
 
@@ -1238,6 +1243,7 @@ namespace NbtStudio.UI
 
             DropDownUndoHistory.Enabled = undo_history.Any();
             DropDownRedoHistory.Enabled = redo_history.Any();
+            ActionClearUndoHistory.Enabled = undo_history.Any() || redo_history.Any();
         }
 
         private void UpdateRecentFiles()

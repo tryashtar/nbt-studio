@@ -72,6 +72,13 @@ namespace NbtStudio
             Changed?.Invoke(this, EventArgs.Empty);
         }
 
+        public void Clear()
+        {
+            UndoStack.Clear();
+            RedoStack.Clear();
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
         public bool CanUndo => UndoStack.Any();
         public bool CanRedo => RedoStack.Any();
 
