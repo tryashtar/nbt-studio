@@ -318,13 +318,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Be.Windows.Forms.HexBox\Be.Windows.Forms.HexBox.csproj">
-      <Project>{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}</Project>
-      <Name>Be.Windows.Forms.HexBox</Name>
-    </ProjectReference>
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
       <Project>{4488498d-976d-4da3-bf72-109531af0488}</Project>
       <Name>fNbt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj">
+      <Project>{26c5f25f-b450-4caf-ad8b-b8d11ae73457}</Project>
+      <Name>Be.Windows.Forms.HexBox</Name>
     </ProjectReference>
     <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
       <Project>{e73bb233-d88b-44a7-a98f-d71ee158381d}</Project>
