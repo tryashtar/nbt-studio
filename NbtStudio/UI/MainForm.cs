@@ -1143,7 +1143,7 @@ namespace NbtStudio.UI
 
         private void SelectChildren_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedNodes;
+            var selected = NbtTree.SelectedNodes.ToList();
             foreach (var node in selected)
             {
                 SetAllSelected(NbtTree.AllChildren(node), true);
@@ -1152,7 +1152,7 @@ namespace NbtStudio.UI
 
         private void DeselectChildren_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedNodes;
+            var selected = NbtTree.SelectedNodes.ToList();
             foreach (var node in selected)
             {
                 SetAllSelected(NbtTree.AllChildren(node), false);
