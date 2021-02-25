@@ -81,23 +81,23 @@ namespace NbtStudio.UI
             var boldfont = new Font(context.Font, FontStyle.Bold);
             context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            var format = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
             SizeF size = SizeF.Empty;
             var rectangle = context.Bounds;
+            var format = TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.PreserveGraphicsTranslateTransform | TextFormatFlags.VerticalCenter;
 
             if (name != null)
             {
                 if (draw)
-                    context.Graphics.DrawString(name, boldfont, new SolidBrush(Parent.ForeColor), rectangle, format);
-                var name_size = context.Graphics.MeasureString(name, boldfont, rectangle.Size, format);
+                    TextRenderer.DrawText(context.Graphics, name, boldfont, rectangle, Parent.ForeColor, format);
+                var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size);
                 size = AppendSizes(size, name_size);
                 rectangle.X += (int)name_size.Width;
             }
             if (value != null)
             {
                 if (draw)
-                    context.Graphics.DrawString(value, context.Font, new SolidBrush(Parent.ForeColor), rectangle, format);
-                var value_size = context.Graphics.MeasureString(value, context.Font, rectangle.Size, format);
+                    TextRenderer.DrawText(context.Graphics, value, context.Font, rectangle, Parent.ForeColor, format);
+                var value_size = TextRenderer.MeasureText(context.Graphics, value, context.Font, rectangle.Size);
                 size = AppendSizes(size, value_size);
             }
             return size;
@@ -149,7 +149,7 @@ namespace NbtStudio.UI
             }
             if (name == null)
                 return (prefix, value);
-            return (prefix + name + ": ", value);
+            return (prefix + name + ":", value);
         }
 
         public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag as INode);
