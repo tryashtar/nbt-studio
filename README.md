@@ -12,9 +12,9 @@ NBT Studio supports reading and writing the following NBT formats. Features mark
 * ☆ Bedrock NBT files, such as `.mcstructure` files (little-endian NBT)
 * ☆ SNBT files (stringified NBT, like in commands: `{Enchantments:[{id:sharpness,lvl:10s}]}`)
 
-<img src="NbtStudio/Resources/amber/action_save.png" width=16> ☆ NBT files can be exported to any of these formats using `Save as`. You can load an SNBT file, then export it as a little-endian g-zipped binary file if you wish.
+<img src="NbtStudio/Resources/amber/action_save.png" width=16> ☆ NBT files can be exported to any of these formats using <kbd>Save as</kbd>. You can load an SNBT file, then export it as a little-endian g-zipped binary file if you wish.
 
-<img src="NbtStudio/Resources/amber/action_new_file.png" width=16> ☆ NBT Studio also allows the creation of blank NBT files. You can start from scratch and export to any format. Additionally, you can use `Ctrl-Alt-V` to create a file from SNBT data on your clipboard.
+<img src="NbtStudio/Resources/amber/action_new_file.png" width=16> ☆ NBT Studio also allows the creation of blank NBT files. You can start from scratch and export to any format. Additionally, you can use <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>V</kbd> to create a file from SNBT data on your clipboard.
 
 ## <img src="NbtStudio/Resources/amber/action_edit_snbt.png" width=16> SNBT Support
 NBT Studio is designed around the easy transfer and conversion between textual SNBT data and structured NBT data. As mentioned, SNBT can be opened as a file or pasted as a new document.
@@ -27,14 +27,14 @@ NBT Studio is designed around the easy transfer and conversion between textual S
 NBT Studio adds an assortment of convenience features to make navigating and editing NBT data easier.
 
 * <img src="NbtStudio/Resources/amber/tag_byte.png" width=16> The tag creation and edit menus have fields for both tag name and value, so you don't have to do it in two steps
-* <img src="NbtStudio/Resources/amber/tag_int.png" width=16> Hold `Shift` while adding a tag to skip the menu and select its name automatically
+* <img src="NbtStudio/Resources/amber/tag_int.png" width=16> Hold <kbd>Shift</kbd> while adding a tag to skip the menu and select its name automatically
 * <img src="NbtStudio/Resources/amber/tag_list.png" width=16> NBT lists of type `byte`, `short`, `int`, or `long` can be edited as hex just like arrays
 * <img src="NbtStudio/Resources/amber/action_cut.png" width=16> Tags can be selected, dragged, and dropped to move them to a different parent
-* <img src="NbtStudio/Resources/amber/action_undo.png" width=16> Undo and redo functionality with `Ctrl-Z` and `Ctrl-Shift-Z`
+* <img src="NbtStudio/Resources/amber/action_undo.png" width=16> Undo and redo functionality with <kbd>Ctrl</kbd> <kbd>Z</kbd> and <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd>
 * <img src="NbtStudio/Resources/amber/action_delete.png" width=16> Deleting tags automatically selects the next tag for easy obliteration
 * <img src="NbtStudio/Resources/amber/action_search.png" width=16> New and improved search window allows searching by [regular expression](https://en.wikipedia.org/wiki/Regular_expression), as well as an option to select all matching tags
-* <img src="NbtStudio/Resources/amber/action_edit.png" width=16> Press `Enter` to edit the selected tag
-* <img src="NbtStudio/Resources/amber/action_sort.png" width=16> Press `Space` to expand/contract the selected tag, or `Ctrl-Space` to expand all
+* <img src="NbtStudio/Resources/amber/action_edit.png" width=16> Press <kbd>Enter</kbd> to edit the selected tag
+* <img src="NbtStudio/Resources/amber/action_sort.png" width=16> Press <kbd>Space</kbd> to expand/contract the selected tag, or <kbd>Ctrl</kbd> <kbd>Space</kbd> to expand all
 * <img src="NbtStudio/Resources/amber/action_save.png" width=16> Right-click on a file to see options to save it, or open it in File Explorer
 * <img src="NbtStudio/Resources/amber/tag_compound.png" width=16> Right-click on a container tag to see options to add a child tag
 * <img src="NbtStudio/Resources/amber/file_file.png" width=16> Files display an asterisk (`*`) to indicate there are unsaved changes
