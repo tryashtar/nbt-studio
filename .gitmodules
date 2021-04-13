@@ -7,3 +7,9 @@
 [submodule "HexBox"]
 	path = HexBox
 	url = https://github.com/tryashtar/HexBox
+[submodule "leveldb-mcpe"]
+	path = leveldb-mcpe
+	url = https://github.com/tryashtar/leveldb-mcpe
+[submodule "LevelDBWrapper"]
+	path = LevelDBWrapper
+	url = https://github.com/tryashtar/LevelDBWrapper
