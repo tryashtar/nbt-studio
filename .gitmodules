@@ -13,3 +13,6 @@
 [submodule "LevelDBWrapper"]
 	path = LevelDBWrapper
 	url = https://github.com/tryashtar/LevelDBWrapper
+[submodule "zlib"]
+	path = zlib
+	url = https://github.com/tryashtar/zlib-win-build
