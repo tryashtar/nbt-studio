@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbtStudio", "NbtStudio\NbtStudio.csproj", "{15C9ED53-E930-4FF3-AD1C-D92769464CB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0AC35E47-8DE5-45EA-BEF7-E2A1ACC23E14} = {0AC35E47-8DE5-45EA-BEF7-E2A1ACC23E14}
+		{89038ADB-C948-44B8-8FFF-02C9967BEC45} = {89038ADB-C948-44B8-8FFF-02C9967BEC45}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fNbt", "fNbt\fNbt\fNbt.csproj", "{4488498D-976D-4DA3-BF72-109531AF0488}"
 EndProject

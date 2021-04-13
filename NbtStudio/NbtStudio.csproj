@@ -32,7 +32,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -326,6 +326,10 @@
       <Project>{26c5f25f-b450-4caf-ad8b-b8d11ae73457}</Project>
       <Name>Be.Windows.Forms.HexBox</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LevelDBWrapper\LevelDBWrapper.csproj">
+      <Project>{7f1ddeec-3933-4443-b537-b59b2dab7dad}</Project>
+      <Name>LevelDBWrapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
       <Project>{e73bb233-d88b-44a7-a98f-d71ee158381d}</Project>
       <Name>Aga.Controls</Name>
@@ -583,4 +587,10 @@
     <Error Condition="!Exists('..\packages\Fody.6.0.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.0.0\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y "$(SolutionDir)leveldb-mcpe\$(Configuration)\leveldb.dll" "$(ProjectDir)$(OutDir)"
+xcopy /y "$(SolutionDir)zlib\zlib\libz\$(Configuration)\libz.dll" "$(ProjectDir)$(OutDir)"
+if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*.dll', '$(TargetDir)*.exe' -DestinationPath '$(TargetDir)NbtStudio.zip' -Force)
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
