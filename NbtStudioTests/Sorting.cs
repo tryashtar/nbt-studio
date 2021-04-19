@@ -26,7 +26,7 @@ namespace NbtStudioTests
             };
             var original = (NbtCompound)compound.Clone();
             UndoableAction action = null;
-            compound.ActionPerformed += (s, e) => action = e;
+            compound.ActionPerformed += a => action = a;
 
             compound.Sort(new AlphabeticalSorter(), true);
 

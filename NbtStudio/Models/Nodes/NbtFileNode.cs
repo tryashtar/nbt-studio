@@ -20,17 +20,17 @@ namespace NbtStudio
             File.OnSaved += File_OnSaved;
         }
 
-        private void File_OnSaved(object sender, EventArgs e)
+        private void File_OnSaved()
         {
             NotifyChanged();
         }
 
-        private void RootTag_ActionPerformed(object sender, UndoableAction e)
+        private void RootTag_ActionPerformed(UndoableAction action)
         {
-            NoticeAction(e);
+            NoticeAction(action);
         }
 
-        private void RootTag_Changed(object sender, NbtTag e)
+        private void RootTag_Changed(NbtTag changed)
         {
             RefreshChildren();
         }

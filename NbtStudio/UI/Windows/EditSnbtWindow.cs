@@ -145,7 +145,7 @@ namespace NbtStudio.UI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == (Keys.Control | Keys.Enter))
+            if (keyData == (Keys.Control | Keys.Enter) || keyData == (Keys.Shift | Keys.Enter))
             {
                 Apply();
                 return true;

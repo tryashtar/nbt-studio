@@ -14,7 +14,7 @@ namespace NbtStudio
 
     public interface ISaveable
     {
-        event EventHandler OnSaved;
+        event Action OnSaved;
         bool HasUnsavedChanges { get; }
         bool CanSave { get; }
         void Save();
