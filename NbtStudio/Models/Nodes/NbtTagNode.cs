@@ -19,6 +19,12 @@ namespace NbtStudio
             Tag.ActionPerformed += Tag_ActionPerformed;
         }
 
+        protected override void SelfDispose()
+        {
+            Tag.Changed -= Tag_Changed;
+            Tag.ActionPerformed -= Tag_ActionPerformed;
+        }
+
         private void Tag_ActionPerformed(UndoableAction action)
         {
             NoticeAction(action);

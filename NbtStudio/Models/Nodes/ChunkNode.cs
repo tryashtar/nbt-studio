@@ -57,6 +57,15 @@ namespace NbtStudio
             }
         }
 
+        protected override void SelfDispose()
+        {
+            if (HasSetupEvents)
+            {
+                Chunk.Data.Changed -= Data_Changed;
+                Chunk.Data.ActionPerformed -= Data_ActionPerformed;
+            }
+        }
+
         private void Data_ActionPerformed(UndoableAction action)
         {
             NoticeAction(action);

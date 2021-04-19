@@ -21,6 +21,13 @@ namespace NbtStudio
             Region.OnSaved += Region_OnSaved;
         }
 
+        protected override void SelfDispose()
+        {
+            Region.ChunksChanged -= Region_ChunksChanged;
+            Region.ActionPerformed -= Region_ActionPerformed;
+            Region.OnSaved -= Region_OnSaved;
+        }
+
         private void Region_OnSaved()
         {
             RefreshChildren();
