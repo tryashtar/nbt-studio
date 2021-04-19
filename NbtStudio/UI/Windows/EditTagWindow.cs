@@ -122,6 +122,16 @@ namespace NbtStudio.UI
         {
             Confirm();
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.Enter) || keyData == (Keys.Shift | Keys.Enter))
+            {
+                Confirm();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
 
     public enum EditPurpose

@@ -19,12 +19,12 @@ namespace NbtStudio
             Tag.ActionPerformed += Tag_ActionPerformed;
         }
 
-        private void Tag_ActionPerformed(object sender, UndoableAction e)
+        private void Tag_ActionPerformed(UndoableAction action)
         {
-            NoticeAction(e);
+            NoticeAction(action);
         }
 
-        private void Tag_Changed(object sender, NbtTag e)
+        private void Tag_Changed(NbtTag changed)
         {
             RefreshChildren();
         }

@@ -15,7 +15,7 @@ namespace NbtStudio
     public class NbtFile : IFile
     {
         public string Path { get; private set; }
-        public event EventHandler OnSaved;
+        public event Action OnSaved;
         public NbtTag RootTag { get; private set; }
         public T GetRootTag<T>() where T : NbtTag => RootTag as T;
         public ExportSettings ExportSettings { get; private set; }
@@ -46,7 +46,7 @@ namespace NbtStudio
         private void SetRoot(NbtTag root)
         {
             RootTag = root;
-            RootTag.Changed += (s, e) => HasUnsavedChanges = true;
+            RootTag.Changed += _ => HasUnsavedChanges = true;
         }
 
         private static bool LooksSuspicious(string name)
@@ -169,7 +169,7 @@ namespace NbtStudio
         {
             ExportSettings.Export(Path, RootTag);
             HasUnsavedChanges = false;
-            OnSaved?.Invoke(this, EventArgs.Empty);
+            OnSaved?.Invoke();
         }
 
         public void SaveAs(string path)

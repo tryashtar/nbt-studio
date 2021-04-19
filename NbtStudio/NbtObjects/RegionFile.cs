@@ -27,9 +27,9 @@ namespace NbtStudio
             }
         }
         public int ChunkCount { get; private set; }
-        public event EventHandler ChunksChanged;
-        public event EventHandler OnSaved;
-        public event EventHandler<UndoableAction> ActionPerformed;
+        public event Action ChunksChanged;
+        public event Action OnSaved;
+        public event Action<UndoableAction> ActionPerformed;
         private Chunk[,] Chunks;
         private byte[] Locations;
         private byte[] Timestamps;
@@ -125,7 +125,7 @@ namespace NbtStudio
         {
             var undoable = new UndoableAction(holder, action, undo);
             undoable.Do();
-            ActionPerformed?.Invoke(this, undoable);
+            ActionPerformed?.Invoke(undoable);
         }
 
         public void RemoveChunk(int x, int z)
@@ -155,7 +155,7 @@ namespace NbtStudio
             Chunks[x, z].Region = null;
             Chunks[x, z] = null;
             ChunkCount--;
-            ChunksChanged?.Invoke(this, EventArgs.Empty);
+            ChunksChanged?.Invoke();
         }
 
         private void DoAddChunk(Chunk chunk)
@@ -172,7 +172,7 @@ namespace NbtStudio
             chunk.Region = this;
             ChunkCount++;
             HasChunkChanges = true;
-            ChunksChanged?.Invoke(this, EventArgs.Empty);
+            ChunksChanged?.Invoke();
         }
 
         private static int ChunkDataLocation(int x, int z)
@@ -220,7 +220,7 @@ namespace NbtStudio
                 }
             }
             HasChunkChanges = false;
-            OnSaved?.Invoke(this, EventArgs.Empty);
+            OnSaved?.Invoke();
         }
 
         private (int new_offset, Action<FileStream> save_action) SaveChunkInternal(int current_offset, int x, int z)
@@ -271,7 +271,7 @@ namespace NbtStudio
         {
             Load();
             HasChunkChanges = false;
-            ChunksChanged?.Invoke(this, EventArgs.Empty);
+            ChunksChanged?.Invoke();
         }
 
         public void Move(string path)

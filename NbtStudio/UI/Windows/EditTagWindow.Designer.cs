@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ValueLabel = new System.Windows.Forms.Label();
-            this.ValueBox = new NbtStudio.UI.TagValueTextBox();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.ButtonsPanel = new System.Windows.Forms.Panel();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
+            this.ValueBox = new NbtStudio.UI.TagValueTextBox();
             this.MainTable.SuspendLayout();
             this.ButtonsPanel.SuspendLayout();
             this.SuspendLayout();
@@ -50,17 +50,6 @@
             this.NameLabel.Size = new System.Drawing.Size(44, 15);
             this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Name:";
-            // 
-            // NameBox
-            // 
-            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
-            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.NameBox.Location = new System.Drawing.Point(64, 10);
-            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.NameBox.Name = "NameBox";
-            this.NameBox.Size = new System.Drawing.Size(209, 21);
-            this.NameBox.TabIndex = 2;
             // 
             // ButtonCancel
             // 
@@ -97,18 +86,6 @@
             this.ValueLabel.TabIndex = 3;
             this.ValueLabel.Text = "Value:";
             // 
-            // ValueBox
-            // 
-            this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.ValueBox.Location = new System.Drawing.Point(64, 41);
-            this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
-            this.ValueBox.Name = "ValueBox";
-            this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ValueBox.Size = new System.Drawing.Size(209, 21);
-            this.ValueBox.TabIndex = 4;
-            // 
             // MainTable
             // 
             this.MainTable.AutoSize = true;
@@ -142,6 +119,29 @@
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(177, 41);
             this.ButtonsPanel.TabIndex = 5;
+            // 
+            // NameBox
+            // 
+            this.NameBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.NameBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.NameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.NameBox.Location = new System.Drawing.Point(64, 10);
+            this.NameBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.NameBox.Name = "NameBox";
+            this.NameBox.Size = new System.Drawing.Size(209, 21);
+            this.NameBox.TabIndex = 2;
+            // 
+            // ValueBox
+            // 
+            this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.ValueBox.Location = new System.Drawing.Point(64, 41);
+            this.ValueBox.Margin = new System.Windows.Forms.Padding(5, 10, 10, 0);
+            this.ValueBox.Name = "ValueBox";
+            this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ValueBox.Size = new System.Drawing.Size(209, 21);
+            this.ValueBox.TabIndex = 4;
             // 
             // EditTagWindow
             // 

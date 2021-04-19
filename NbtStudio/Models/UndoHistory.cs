@@ -97,12 +97,28 @@ namespace NbtStudio
         public void StartBatchOperation()
         {
             BatchNumber++;
+#if DEBUG
+            Console.WriteLine($"Starting a batch operation");
+            if (BatchNumber > 1)
+                Console.WriteLine($"It's nested (batch {BatchNumber}), that's a bit unusual");
+#endif
         }
 
         public void FinishBatchOperation(DescriptionHolder description, bool replace_single)
         {
             if (BatchNumber == 0)
+            {
+#if DEBUG
+                Console.WriteLine($"Told to finish a batch operation but we aren't currently doing one?");
+#endif
                 return;
+            }
+#if DEBUG
+            if (!UndoBatch.Any())
+                Console.WriteLine($"Finished a batch that didn't have any actions in it?");
+            if (BatchNumber > 1)
+                Console.WriteLine($"Finished nested batch {BatchNumber}, continuing to batch");
+#endif
             BatchNumber--;
             if (BatchNumber == 0 && UndoBatch.Any())
             {
@@ -113,7 +129,7 @@ namespace NbtStudio
                     merged_action = UndoBatch.Single();
                 UndoStack.Push(merged_action);
 #if DEBUG
-                Console.WriteLine($"Merged {UndoBatch.Count} batch actions onto stack as action: \"{description}\". Stack has {UndoStack.Count} items");
+                Console.WriteLine($"Finished batch of {UndoBatch.Count} actions, merged onto stack as action: \"{GetDescription(description)}\". Stack has {UndoStack.Count} items");
 #endif
                 UndoBatch.Clear();
                 Changed?.Invoke(this, EventArgs.Empty);

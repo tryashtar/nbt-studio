@@ -57,12 +57,12 @@ namespace NbtStudio
             }
         }
 
-        private void Data_ActionPerformed(object sender, UndoableAction e)
+        private void Data_ActionPerformed(UndoableAction action)
         {
-            NoticeAction(e);
+            NoticeAction(action);
         }
 
-        private void Data_Changed(object sender, NbtTag e)
+        private void Data_Changed(NbtTag changed)
         {
             RefreshChildren();
         }

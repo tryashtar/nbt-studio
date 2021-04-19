@@ -21,17 +21,17 @@ namespace NbtStudio
             Region.OnSaved += Region_OnSaved;
         }
 
-        private void Region_OnSaved(object sender, EventArgs e)
+        private void Region_OnSaved()
         {
             RefreshChildren();
         }
 
-        private void Region_ActionPerformed(object sender, UndoableAction e)
+        private void Region_ActionPerformed(UndoableAction action)
         {
-            NoticeAction(e);
+            NoticeAction(action);
         }
 
-        private void Region_ChunksChanged(object sender, EventArgs e)
+        private void Region_ChunksChanged()
         {
             RefreshChildren();
         }
