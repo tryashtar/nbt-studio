@@ -12,7 +12,7 @@ namespace NbtStudio
     // the main implementation of INode
     // this node does not wrap an object, but allows derived classes to do so easily
     // type T is the type of the children, e.g. RegionNode is ModelNode<Chunk>
-    public abstract class ModelNode<T> : IModelNode
+    public abstract class ModelNode<T> : IModelNode, IDisposable
     {
         private readonly NbtTreeModel Tree;
         public INode Parent { get; private set; }
@@ -112,6 +112,9 @@ namespace NbtStudio
                 {
                     int minus = ChildNodes[item].DescendantsCount + 1;
                     UpdateDescendantsCount(x => x - minus);
+                    var child = ChildNodes[item];
+                    if (child is IDisposable d)
+                        d.Dispose();
                     ChildNodes.Remove(item);
                 }
                 Tree.NotifyNodesRemoved(path, nodes, indices);
@@ -140,6 +143,17 @@ namespace NbtStudio
             }
             Tree.NotifyNodeChanged(this);
         }
+
+        public void Dispose()
+        {
+            SelfDispose();
+            foreach (var item in Children.OfType<IDisposable>())
+            {
+                item.Dispose();
+            }
+        }
+
+        protected abstract void SelfDispose();
 
         private class OrderLikeList : IComparer<T>
         {

@@ -14,6 +14,9 @@ namespace NbtStudio
             ChildObjects = children.ToList();
         }
 
+        protected override void SelfDispose()
+        { }
+
         public void Add(object obj)
         {
             ChildObjects.Add(obj);

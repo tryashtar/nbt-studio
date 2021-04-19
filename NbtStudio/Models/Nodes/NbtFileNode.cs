@@ -20,6 +20,13 @@ namespace NbtStudio
             File.OnSaved += File_OnSaved;
         }
 
+        protected override void SelfDispose()
+        {
+            File.RootTag.Changed -= RootTag_Changed;
+            File.RootTag.ActionPerformed -= RootTag_ActionPerformed;
+            File.OnSaved -= File_OnSaved;
+        }
+
         private void File_OnSaved()
         {
             NotifyChanged();

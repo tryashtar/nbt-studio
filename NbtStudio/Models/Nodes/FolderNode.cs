@@ -20,6 +20,11 @@ namespace NbtStudio
             Folder.ContentsChanged += Folder_ContentsChanged;
         }
 
+        protected override void SelfDispose()
+        {
+            Folder.ContentsChanged -= Folder_ContentsChanged;
+        }
+
         private void Folder_ContentsChanged(object sender, EventArgs e)
         {
             RefreshChildren();
