@@ -15,13 +15,13 @@ namespace NbtStudio
         public NbtTagNode(NbtTreeModel tree, INode parent, NbtTag tag) : base(tree, parent)
         {
             Tag = tag;
-            Tag.Changed += Tag_Changed;
+            Tag.OnChanged += Tag_Changed;
             Tag.ActionPerformed += Tag_ActionPerformed;
         }
 
         protected override void SelfDispose()
         {
-            Tag.Changed -= Tag_Changed;
+            Tag.OnChanged -= Tag_Changed;
             Tag.ActionPerformed -= Tag_ActionPerformed;
         }
 
@@ -30,9 +30,10 @@ namespace NbtStudio
             NoticeAction(action);
         }
 
-        private void Tag_Changed(NbtTag changed)
+        private void Tag_Changed(NbtTag tag)
         {
-            RefreshChildren();
+            if (Tag == tag)
+                RefreshChildren();
         }
 
         protected override IEnumerable<NbtTag> GetChildren()

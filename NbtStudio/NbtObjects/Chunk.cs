@@ -46,7 +46,7 @@ namespace NbtStudio
         private void SetData(NbtCompound data)
         {
             Data = data;
-            Data.Changed += _ => HasUnsavedChanges = true;
+            Data.OnChanged += _ => HasUnsavedChanges = true;
         }
 
         public byte[] SaveBytes()

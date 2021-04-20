@@ -46,7 +46,7 @@ namespace NbtStudio
         private void SetRoot(NbtTag root)
         {
             RootTag = root;
-            RootTag.Changed += _ => HasUnsavedChanges = true;
+            RootTag.OnChanged += _ => HasUnsavedChanges = true;
         }
 
         private static bool LooksSuspicious(string name)

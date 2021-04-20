@@ -51,7 +51,7 @@ namespace NbtStudio
         {
             if (!HasSetupEvents)
             {
-                Chunk.Data.Changed += Data_Changed;
+                Chunk.Data.OnChanged += Data_Changed;
                 Chunk.Data.ActionPerformed += Data_ActionPerformed;
                 HasSetupEvents = true;
             }
@@ -61,7 +61,7 @@ namespace NbtStudio
         {
             if (HasSetupEvents)
             {
-                Chunk.Data.Changed -= Data_Changed;
+                Chunk.Data.OnChanged -= Data_Changed;
                 Chunk.Data.ActionPerformed -= Data_ActionPerformed;
             }
         }
@@ -71,9 +71,10 @@ namespace NbtStudio
             NoticeAction(action);
         }
 
-        private void Data_Changed(NbtTag changed)
+        private void Data_Changed(NbtTag tag)
         {
-            RefreshChildren();
+            if (Chunk.Data == tag)
+                RefreshChildren();
         }
 
         protected override IEnumerable<NbtTag> GetChildren()

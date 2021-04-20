@@ -288,13 +288,47 @@ namespace NbtStudio
         {
             if (tag is NbtCompound compound)
             {
-                // silly hack but :)
-                string before = compound.ToSnbt(SnbtOptions.JsonLike);
-                compound.Sort(new NbtUtil.TagTypeSorter(), true);
-                string after = compound.ToSnbt(SnbtOptions.JsonLike);
-                if (before == after)
-                    compound.Sort(new NbtUtil.TagNameSorter(), true);
+                var name_sorter = new NbtUtil.TagNameSorter();
+                var tag_sorter = new NbtUtil.TagTypeSorter();
+                var current_sort = FindCurrentSort(compound, name_sorter, tag_sorter);
+                if (current_sort == tag_sorter || current_sort == null)
+                    compound.Sort(name_sorter, true);
+                else
+                    compound.Sort(tag_sorter, true);
             }
+        }
+
+        private static IComparer<NbtTag> FindCurrentSort(NbtCompound compound, params IComparer<NbtTag>[] candidates)
+        {
+            var potential = new List<IComparer<NbtTag>>(candidates.Reverse());
+            var scanning = compound.GetAllTags().OfType<NbtCompound>().Prepend(compound);
+            foreach (var scan in scanning)
+            {
+                for (int i = potential.Count - 1; i >= 0; i--)
+                {
+                    if (!IsSortedBy(scan.Tags, potential[i]))
+                        potential.RemoveAt(i);
+                }
+                if (potential.Count == 0)
+                    return null;
+                if (potential.Count == 1)
+                    return potential.Single();
+            }
+            return null;
+        }
+
+        private static bool IsSortedBy<T>(IEnumerable<T> sequence, IComparer<T> sorter)
+        {
+            T prev = default;
+            bool first = true;
+            foreach (var item in sequence)
+            {
+                if (!first && sorter.Compare(prev, item) > 0)
+                    return false;
+                prev = item;
+                first = false;
+            }
+            return true;
         }
 
         public static IEnumerable<NbtTag> ParseTags(IDataObject data)
