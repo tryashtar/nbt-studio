@@ -8,6 +8,10 @@
     <RootNamespace>NbtStudio</RootNamespace>
     <AssemblyName>NbtStudio</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="..\**\desktop.ini" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
     </ProjectReference>
