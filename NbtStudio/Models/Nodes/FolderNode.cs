@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -74,7 +75,7 @@ namespace NbtStudio
             bool move = drop.HasFlag(DragDropEffects.Move);
             foreach (var item in files)
             {
-                var destination = Util.GetUniqueFilename(System.IO.Path.Combine(Folder.Path, System.IO.Path.GetFileName(item)));
+                var destination = IOUtils.GetUniqueFilename(System.IO.Path.Combine(Folder.Path, System.IO.Path.GetFileName(item)));
                 if (move)
                 {
                     if (Directory.Exists(item))

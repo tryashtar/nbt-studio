@@ -4,7 +4,7 @@ using System.Linq;
 using fNbt;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NbtStudio;
-using NbtStudio.SNBT;
+using TryashtarUtils.Nbt;
 
 namespace NbtStudioTests
 {

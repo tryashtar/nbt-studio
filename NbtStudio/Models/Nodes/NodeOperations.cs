@@ -1,6 +1,5 @@
 ﻿using fNbt;
 using Microsoft.VisualBasic.FileIO;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -10,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -31,7 +32,7 @@ namespace NbtStudio
         {
             if (!nodes.Any()) // none
                 return "0 nodes";
-            if (Util.ExactlyOne(nodes)) // exactly one
+            if (ListUtils.ExactlyOne(nodes)) // exactly one
                 return nodes.Single().Description;
             var results = new Dictionary<Type, int>();
             int unknowns = 0;
@@ -52,10 +53,10 @@ namespace NbtStudio
             foreach (var item in results)
             {
                 var (singular, plural) = NodeTypes[item.Key];
-                strings.Add(Util.Pluralize(item.Value, singular, plural));
+                strings.Add(StringUtils.Pluralize(item.Value, singular, plural));
             }
             if (unknowns > 0)
-                strings.Add(Util.Pluralize(unknowns, "unknown node"));
+                strings.Add(StringUtils.Pluralize(unknowns, "unknown node"));
             return String.Join(", ", strings);
         }
 

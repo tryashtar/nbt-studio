@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -54,7 +55,7 @@ namespace NbtStudio
             if (IsExternal)
             {
                 var data = new byte[Size + 5];
-                var size = Util.GetBytes(1);
+                var size = DataUtils.GetBytes(1);
                 Array.Copy(size, data, 4);
                 data[4] = ExternalCompression;
                 return data;
@@ -74,7 +75,7 @@ namespace NbtStudio
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
             Array.Copy(bytes, 0, with_header, 5, bytes.Length);
-            var length = Util.GetBytes(bytes.Length);
+            var length = DataUtils.GetBytes(bytes.Length);
             Array.Copy(length, with_header, 4);
             if (Compression == NbtCompression.GZip)
                 with_header[4] = 1;

@@ -5,7 +5,6 @@ using Aga.Controls.Tree;
 using fNbt;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NbtStudio;
-using NbtStudio.SNBT;
 using NbtStudio.UI;
 
 namespace NbtStudioTests

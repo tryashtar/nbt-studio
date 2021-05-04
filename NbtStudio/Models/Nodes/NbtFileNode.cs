@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Forms;
 
 namespace NbtStudio
 {
@@ -59,14 +60,14 @@ namespace NbtStudio
         {
             var data1 = NbtNodeOperations.Copy(File.RootTag);
             var data2 = FileNodeOperations.Copy(File.Path);
-            return Util.Merge(data1, data2);
+            return Utils.Merge(data1, data2);
         }
         public override bool CanCut => true;
         public override DataObject Cut()
         {
             var data1 = NbtNodeOperations.Copy(File.RootTag);
             var data2 = FileNodeOperations.Cut(File.Path);
-            return Util.Merge(data1, data2);
+            return Utils.Merge(data1, data2);
         }
         public override bool CanDelete => true;
         public override void Delete()

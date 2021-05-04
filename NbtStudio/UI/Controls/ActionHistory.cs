@@ -82,7 +82,7 @@ namespace NbtStudio.UI
 
             // change selected color from ugly default
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                e = new DrawItemEventArgs(e.Graphics, e.Font, e.Bounds, e.Index, e.State ^ DrawItemState.Selected, e.ForeColor, Util.SelectionColor);
+                e = new DrawItemEventArgs(e.Graphics, e.Font, e.Bounds, e.Index, e.State ^ DrawItemState.Selected, e.ForeColor, Constants.SelectionColor);
 
             e.DrawBackground();
             // draw text using normal ForeColor (black) instead of e.ForeColor (white)

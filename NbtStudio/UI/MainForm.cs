@@ -11,9 +11,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aga.Controls.Tree;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using NbtStudio.SNBT;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using TryashtarUtils.Utility;
+using TryashtarUtils.Nbt;
+using TryashtarUtils.Forms;
 
 namespace NbtStudio.UI
 {
@@ -222,7 +224,7 @@ namespace NbtStudio.UI
             {
                 if (x.Status == TaskStatus.Faulted)
                 {
-                    if (MessageBox.Show(Util.ExceptionMessage(x.Exception) + "\n\n" +
+                    if (MessageBox.Show(Failable.ExceptionMessage(x.Exception) + "\n\n" +
                         "Would you like to go to the update page?\n\n" +
                         "https://github.com/tryashtar/nbt-studio/releases",
                         "Failed to check for updates", MessageBoxButtons.OKCancel) == DialogResult.OK)
@@ -437,7 +439,7 @@ namespace NbtStudio.UI
                 if (errors.Any())
                 {
                     var error = Failable<bool>.AggregateFailure(errors.Select(x => x.exception).ToArray());
-                    string message = $"{Util.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
+                    string message = $"{StringUtils.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
                     message += String.Join("\n", errors.Select(x => x.item).Where(x => x != null).Select(x => Path.GetFileName(x.Path)));
                     var window = new ExceptionWindow("Refresh error", message, error);
                     window.ShowDialog(this);
@@ -550,7 +552,7 @@ namespace NbtStudio.UI
             var objs = NbtTree.SelectedINodes.Where(check).ToList();
             if (objs.Any())
             {
-                var data = objs.Select(perform).Aggregate((x, y) => Util.Merge(x, y));
+                var data = objs.Select(perform).Aggregate((x, y) => Utils.Merge(x, y));
                 Clipboard.SetDataObject(data);
             }
         }
@@ -595,7 +597,7 @@ namespace NbtStudio.UI
         private void Rename()
         {
             var items = NbtTree.SelectedINodes;
-            if (Util.ExactlyOne(items))
+            if (ListUtils.ExactlyOne(items))
                 Rename(items.Single());
             else
                 BulkRename(items.Filter(x => x.GetNbtTag()));
@@ -604,7 +606,7 @@ namespace NbtStudio.UI
         private void Edit()
         {
             var items = NbtTree.SelectedINodes;
-            if (Util.ExactlyOne(items))
+            if (ListUtils.ExactlyOne(items))
                 Edit(items.Single());
             else
                 BulkEdit(items.Filter(x => x.GetNbtTag()));
@@ -714,7 +716,7 @@ namespace NbtStudio.UI
             if (files.Any())
             {
                 DialogResult result;
-                if (Util.ExactlyOne(files))
+                if (ListUtils.ExactlyOne(files))
                 {
                     var file = files.Single();
                     if (file.Path == null)
@@ -741,7 +743,7 @@ namespace NbtStudio.UI
                     else
                         result = MessageBox.Show(
                             $"Are you sure you want to delete {ExtractNodeOperations.Description(file_nodes)}?\n\n" +
-                            $"{Util.Pluralize(saved.Count(), "item")} will be send to the recycle bin. This cannot be undone.",
+                            $"{StringUtils.Pluralize(saved.Count(), "item")} will be send to the recycle bin. This cannot be undone.",
                             $"Really delete these items?",
                             MessageBoxButtons.YesNo);
                 }
@@ -889,7 +891,7 @@ namespace NbtStudio.UI
             var good = files.Where(x => !x.item.Failed);
             if (bad.Any())
             {
-                string message = $"{Util.Pluralize(bad.Count(), "file")} failed to load:\n\n";
+                string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
                 var fail = Failable<IHavePath>.Aggregate(bad.Select(x => x.item).ToArray());
                 var window = new ExceptionWindow("Load failure", message, fail);
@@ -1090,7 +1092,7 @@ namespace NbtStudio.UI
             if (container != null)
             {
                 var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
-                bool single = Util.ExactlyOne(addable);
+                bool single = ListUtils.ExactlyOne(addable);
                 var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
                 var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag_Click(x))).ToArray();
                 if (single)
@@ -1229,7 +1231,7 @@ namespace NbtStudio.UI
             DropDownUndoHistory.DropDown = undo_dropdown;
             var undo_actions = new ActionHistory(undo_history,
                 x => { UndoHistory.Undo(x + 1); MenuEdit.HideDropDown(); },
-                x => $"Undo {Util.Pluralize(x + 1, "action")}",
+                x => $"Undo {StringUtils.Pluralize(x + 1, "action")}",
                 DropDownUndoHistory.Font);
             undo_dropdown.Items.Add(new ToolStripControlHost(undo_actions));
 
@@ -1237,7 +1239,7 @@ namespace NbtStudio.UI
             DropDownRedoHistory.DropDown = redo_dropdown;
             var redo_actions = new ActionHistory(redo_history,
                 x => { UndoHistory.Redo(x + 1); MenuEdit.HideDropDown(); },
-                x => $"Redo {Util.Pluralize(x + 1, "action")}",
+                x => $"Redo {StringUtils.Pluralize(x + 1, "action")}",
                 DropDownRedoHistory.Font);
             redo_dropdown.Items.Add(new ToolStripControlHost(redo_actions));
 

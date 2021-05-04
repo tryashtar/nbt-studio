@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -64,7 +65,7 @@ namespace NbtStudio.UI
             base.OnPaint(e);
             if (SelectedNodes.Any())
             {
-                string text = $"{Util.Pluralize(SelectedNodes.Count, "item")} selected";
+                string text = $"{StringUtils.Pluralize(SelectedNodes.Count, "item")} selected";
                 var size = e.Graphics.MeasureString(text, this.Font).ToSize();
                 var format = new StringFormat { Alignment = StringAlignment.Far };
                 int y_buffer = 5;

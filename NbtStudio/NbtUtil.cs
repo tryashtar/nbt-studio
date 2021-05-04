@@ -1,6 +1,5 @@
 using Aga.Controls.Tree;
 using fNbt;
-using NbtStudio.SNBT;
 using NbtStudio.UI;
 using System;
 using System.Collections;
@@ -10,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TryashtarUtils.Nbt;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -168,7 +169,7 @@ namespace NbtStudio
             switch (type)
             {
                 case NbtTagType.Byte:
-                    return (byte)Util.ParseByte(value);
+                    return (byte)SnbtParser.ParseByte(value);
                 case NbtTagType.Short:
                     return short.Parse(value);
                 case NbtTagType.Int:
@@ -176,9 +177,9 @@ namespace NbtStudio
                 case NbtTagType.Long:
                     return long.Parse(value);
                 case NbtTagType.Float:
-                    return Util.ParseFloat(value);
+                    return DataUtils.ParseFloat(value);
                 case NbtTagType.Double:
-                    return Util.ParseDouble(value);
+                    return DataUtils.ParseDouble(value);
                 case NbtTagType.String:
                     return value;
                 default:
@@ -243,19 +244,19 @@ namespace NbtStudio
         public static string PreviewNbtValue(NbtTag tag)
         {
             if (tag is NbtCompound compound)
-                return $"[{Util.Pluralize(compound.Count, "entry", "entries")}]";
+                return $"[{StringUtils.Pluralize(compound.Count, "entry", "entries")}]";
             else if (tag is NbtList list)
             {
                 if (list.Count == 0)
                     return $"[0 entries]";
-                return $"[{Util.Pluralize(list.Count, TagTypeName(list.ListType).ToLower())}]";
+                return $"[{StringUtils.Pluralize(list.Count, TagTypeName(list.ListType).ToLower())}]";
             }
             else if (tag is NbtByteArray byte_array)
-                return $"[{Util.Pluralize(byte_array.Value.Length, "byte")}]";
+                return $"[{StringUtils.Pluralize(byte_array.Value.Length, "byte")}]";
             else if (tag is NbtIntArray int_array)
-                return $"[{Util.Pluralize(int_array.Value.Length, "int")}]";
+                return $"[{StringUtils.Pluralize(int_array.Value.Length, "int")}]";
             else if (tag is NbtLongArray long_array)
-                return $"[{Util.Pluralize(long_array.Value.Length, "long")}]";
+                return $"[{StringUtils.Pluralize(long_array.Value.Length, "long")}]";
             return tag.ToSnbt(SnbtOptions.Preview);
         }
 
@@ -472,9 +473,9 @@ namespace NbtStudio
         {
             if (!tags.Any()) // none
                 return "0 tags";
-            if (Util.ExactlyOne(tags)) // exactly one
+            if (ListUtils.ExactlyOne(tags)) // exactly one
                 return TagDescription(tags.Single()); // more than one
-            return Util.Pluralize(tags.Count(), "tag");
+            return StringUtils.Pluralize(tags.Count(), "tag");
         }
 
         public static string ChunkDescription(Chunk chunk)
@@ -517,7 +518,7 @@ namespace NbtStudio
         {
             var relevant = NbtExtensions.Where(x => x.Type == type);
             string all_relevant;
-            if (Util.ExactlyOne(relevant))
+            if (ListUtils.ExactlyOne(relevant))
                 all_relevant = "";
             else
                 all_relevant = "|" + AllNbtFiles(relevant);

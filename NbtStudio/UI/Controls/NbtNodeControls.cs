@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -119,7 +120,7 @@ namespace NbtStudio.UI
             // selected nodes are not "active" while dragging
             // hovered nodes are "active" while dragging
             if (context.DrawSelection == DrawSelectionMode.Active || (node.IsSelected && !node.Tree.Focused))
-                context.Graphics.FillRectangle(new SolidBrush(Util.SelectionColor), context.Bounds);
+                context.Graphics.FillRectangle(new SolidBrush(Constants.SelectionColor), context.Bounds);
             else if (node.IsSelected)
                 context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);
         }
@@ -187,15 +188,15 @@ namespace NbtStudio.UI
                 if (folder.HasScanned)
                 {
                     if (folder.Subfolders.Any())
-                        return $"[{Util.Pluralize(folder.Subfolders.Count, "folder")}, {Util.Pluralize(folder.Files.Count, "file")}]";
+                        return $"[{StringUtils.Pluralize(folder.Subfolders.Count, "folder")}, {StringUtils.Pluralize(folder.Files.Count, "file")}]";
                     else
-                        return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+                        return $"[{StringUtils.Pluralize(folder.Files.Count, "file")}]";
                 }
                 else
                     return "(open to load)";
             }
             if (node is RegionFileNode region)
-                return $"[{Util.Pluralize(region.Region.ChunkCount, "chunk")}]";
+                return $"[{StringUtils.Pluralize(region.Region.ChunkCount, "chunk")}]";
             if (node is ChunkNode chunk_node)
             {
                 var chunk = chunk_node.Chunk;

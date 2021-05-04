@@ -13,12 +13,13 @@
     <None Remove="..\**\desktop.ini" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj">
-    </ProjectReference>
     <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj">
     </ProjectReference>
     <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
     </ProjectReference>
+    <ProjectReference Include="..\utils\fNbt\fNbt\fNbt.csproj" />
+    <ProjectReference Include="..\utils\Forms\TryashtarUtils.Forms.csproj" />
+    <ProjectReference Include="..\utils\Nbt\TryashtarUtils.Nbt.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
@@ -26,7 +27,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+    <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.1" />
     <Compile Update="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>

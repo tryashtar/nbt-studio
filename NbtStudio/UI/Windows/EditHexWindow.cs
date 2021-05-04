@@ -1,11 +1,11 @@
 ﻿using Be.Windows.Forms;
 using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -33,7 +33,7 @@ namespace NbtStudio.UI
             HexBox.ByteProvider = Provider;
             HexBox.GroupSize = Provider.BytesPerValue;
             HexBox.GroupSeparatorVisible = Provider.BytesPerValue > 1;
-            HexBox.SelectionBackColor = Util.SelectionColor;
+            HexBox.SelectionBackColor = Constants.SelectionColor;
             HexBox.SelectionForeColor = HexBox.ForeColor;
 
             string tagname;
@@ -175,11 +175,11 @@ namespace NbtStudio.UI
             if (size == sizeof(byte))
                 return String.Join(" ", bytes.Select(x => (sbyte)x));
             if (size == sizeof(short))
-                return String.Join(" ", Util.ToShortArray(bytes));
+                return String.Join(" ", DataUtils.ToShortArray(bytes));
             if (size == sizeof(int))
-                return String.Join(" ", Util.ToIntArray(bytes));
+                return String.Join(" ", DataUtils.ToIntArray(bytes));
             if (size == sizeof(long))
-                return String.Join(" ", Util.ToLongArray(bytes));
+                return String.Join(" ", DataUtils.ToLongArray(bytes));
             throw new ArgumentException($"Can't convert bytes to a numeric type with size {size}");
         }
 
@@ -189,11 +189,11 @@ namespace NbtStudio.UI
             if (size == sizeof(byte))
                 return vals.Select(ParseByte).Select(x => (byte)x).ToArray();
             if (size == sizeof(short))
-                return Util.ToByteArray(vals.Select(ParseShort).ToArray());
+                return DataUtils.ToByteArray(vals.Select(ParseShort).ToArray());
             if (size == sizeof(int))
-                return Util.ToByteArray(vals.Select(ParseInt).ToArray());
+                return DataUtils.ToByteArray(vals.Select(ParseInt).ToArray());
             if (size == sizeof(long))
-                return Util.ToByteArray(vals.Select(ParseLong).ToArray());
+                return DataUtils.ToByteArray(vals.Select(ParseLong).ToArray());
             throw new ArgumentException($"Can't convert bytes to a numeric type with size {size}");
         }
 

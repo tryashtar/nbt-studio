@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -48,8 +49,8 @@ namespace NbtStudio
             var stream = GetStream();
             try
             {
-                Locations = Util.ReadBytes(stream, 4096);
-                Timestamps = Util.ReadBytes(stream, 4096);
+                Locations = IOUtils.ReadBytes(stream, 4096);
+                Timestamps = IOUtils.ReadBytes(stream, 4096);
                 ChunkCount = 0;
                 for (int z = 0; z < Chunks.GetLength(1); z++)
                 {
@@ -191,7 +192,7 @@ namespace NbtStudio
             int location = ChunkDataLocation(x, z);
             byte[] four = new byte[4];
             Array.Copy(Locations, location, four, 1, 3);
-            return 4096 * Util.ToInt32(four);
+            return 4096 * DataUtils.ToInt32(four);
         }
 
         public bool CanSave => Path != null;
@@ -230,7 +231,7 @@ namespace NbtStudio
             int location = ChunkDataLocation(x, z);
             var data = chunk?.SaveBytes() ?? new byte[0];
             byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
-            byte[] offset = CanWriteChunk(chunk) ? Util.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
+            byte[] offset = CanWriteChunk(chunk) ? DataUtils.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
             Locations[location] = offset[1];
             Locations[location + 1] = offset[2];
             Locations[location + 2] = offset[3];
@@ -238,7 +239,7 @@ namespace NbtStudio
             if (update_timestamp)
             {
                 int timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                byte[] time = Util.GetBytes(timestamp);
+                byte[] time = DataUtils.GetBytes(timestamp);
                 Array.Copy(time, 0, Timestamps, location, 4);
             }
             Action<FileStream> result = null;

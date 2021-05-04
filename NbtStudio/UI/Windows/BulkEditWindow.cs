@@ -1,11 +1,11 @@
 using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -26,14 +26,14 @@ namespace NbtStudio.UI
 
             if (purpose == BulkEditPurpose.Rename)
             {
-                this.Text = $"Rename {Util.Pluralize(tags.Count, "tag")}";
+                this.Text = $"Rename {StringUtils.Pluralize(tags.Count, "tag")}";
                 this.Icon = source.GetImage(IconType.Rename).Icon;
                 CurrentColumn.Text = "Current Name";
                 NewColumn.Text = "New Name";
             }
             else
             {
-                this.Text = $"Edit {Util.Pluralize(tags.Count, "tag")}";
+                this.Text = $"Edit {StringUtils.Pluralize(tags.Count, "tag")}";
                 this.Icon = source.GetImage(IconType.Edit).Icon;
                 CurrentColumn.Text = "Current Value";
                 NewColumn.Text = "New Value";
@@ -186,9 +186,9 @@ namespace NbtStudio.UI
         private void UpdateChangeLabel()
         {
             if (Purpose == BulkEditPurpose.Rename)
-                TagsChangingLabel.Text = $"Renaming {Util.Pluralize(ChangingCount, "tag")}";
+                TagsChangingLabel.Text = $"Renaming {StringUtils.Pluralize(ChangingCount, "tag")}";
             else
-                TagsChangingLabel.Text = $"Editing {Util.Pluralize(ChangingCount, "tag")}";
+                TagsChangingLabel.Text = $"Editing {StringUtils.Pluralize(ChangingCount, "tag")}";
             ButtonOk.Enabled = ChangingCount > 0;
         }
 
