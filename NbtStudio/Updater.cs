@@ -64,7 +64,7 @@ namespace NbtStudio
 
         public static Version GetCurrentVersion()
         {
-            return new Version(Assembly.GetExecutingAssembly().GetName().Version);
+            return new Version(Application.ProductVersion);
         }
 
         public static List<GitHubVersion> GetAllVersions(WebClient client)

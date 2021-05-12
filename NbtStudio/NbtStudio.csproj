@@ -4,21 +4,45 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <RootNamespace>NbtStudio</RootNamespace>
     <AssemblyName>NbtStudio</AssemblyName>
     <ApplicationIcon>nbt_studio_icon_256.ico</ApplicationIcon>
+    <Configurations>Debug;Release;PublishNormal;PublishSuperStandalone</Configurations>
+    <Authors>tryashtar</Authors>
+    <Company />
+    <Product>NBT Studio</Product>
+    <Description>Views and modifies NBT files</Description>
+    <Copyright>Copyright © 2020 tryashtar</Copyright>
+    <PackageProjectUrl>https://github.com/tryashtar/nbt-studio</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tryashtar/nbt-studio</RepositoryUrl>
+    <PackageIcon>nbt_studio_icon_256.png</PackageIcon>
+    <AssemblyVersion>1.15.0.0</AssemblyVersion>
+    <FileVersion>1.15.0.0</FileVersion>
+    <SignAssembly>false</SignAssembly>
+    <Version>1.15.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='PublishSuperStandalone'">
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+
   <ItemGroup>
     <None Remove="..\**\desktop.ini" />
+    <None Include="Resources\nbt_studio_icon_256.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj">
