@@ -106,7 +106,7 @@ namespace NbtStudio.UI
 
         public void ApplyValue(object value)
         {
-            if (value == null)
+            if (value is null)
                 NbtUtil.ResetValue(NbtTag);
             else
             {

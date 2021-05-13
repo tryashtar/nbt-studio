@@ -27,7 +27,7 @@ namespace NbtStudio
                 if (!ChildrenReady)
                 {
                     ChildNodes = new OrderedDictionary<T, INode>();
-                    var children = GetChildren().Where(x => x != null);
+                    var children = GetChildren().Where(x => x is not null);
                     foreach (var item in children)
                     {
                         var node = NodeRegistry.CreateNode(Tree, this, item);
@@ -52,7 +52,7 @@ namespace NbtStudio
         private void UpdateDescendantsCount(Func<int, int> apply)
         {
             IModelNode item = this;
-            while (item != null)
+            while (item is not null)
             {
                 item.SetDescendantsCount(apply(item.DescendantsCount));
                 item = item.Parent as IModelNode;
@@ -65,7 +65,7 @@ namespace NbtStudio
             {
                 var path = new List<INode>();
                 INode item = this;
-                while (item != null && !(item is ModelRootNode))
+                while (item is not null && item is not ModelRootNode)
                 {
                     path.Add(item);
                     item = item.Parent;
@@ -92,7 +92,7 @@ namespace NbtStudio
             if (!ChildrenReady)
                 return;
             var path = Path;
-            var new_children = GetChildren().Where(x => x != null).ToList();
+            var new_children = GetChildren().Where(x => x is not null).ToList();
             var remove = ChildNodes.Keys.Except(new_children).ToArray();
             var add = new_children.Except(ChildNodes.Keys).ToArray();
             if (remove.Any())

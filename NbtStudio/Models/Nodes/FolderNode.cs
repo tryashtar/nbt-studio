@@ -67,7 +67,7 @@ namespace NbtStudio
             var children = GetChildren().ToList();
             var files = (string[])data.GetData("FileDrop");
             var drop_effect = (MemoryStream)data.GetData("Preferred DropEffect");
-            if (files == null || drop_effect == null)
+            if (files is null || drop_effect is null)
                 return Enumerable.Empty<INode>();
             var bytes = new byte[4];
             drop_effect.Read(bytes, 0, bytes.Length);
@@ -97,14 +97,14 @@ namespace NbtStudio
         }
         public override bool CanRename => true;
         public override bool CanSort => false;
-        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x.Get<IFile>() != null || x is FolderNode);
+        public override bool CanReceiveDrop(IEnumerable<INode> nodes) => nodes.All(x => x.Get<IFile>() is not null || x is FolderNode);
         public override void ReceiveDrop(IEnumerable<INode> nodes, int index)
         {
             var files = nodes.Filter(x => x.Get<IFile>());
             var folders = nodes.Filter(x => x.Get<NbtFolder>());
             foreach (var file in files)
             {
-                if (file.Path != null)
+                if (file.Path is not null)
                 {
                     var destination = System.IO.Path.Combine(Folder.Path, System.IO.Path.GetFileName(file.Path));
                     FileSystem.MoveFile(file.Path, destination, UIOption.AllDialogs);

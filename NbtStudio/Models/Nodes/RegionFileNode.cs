@@ -48,17 +48,17 @@ namespace NbtStudio
             return Region.AllChunks;
         }
 
-        public override string Description => Region.Path == null ? "unsaved region file" : System.IO.Path.GetFileName(Region.Path);
+        public override string Description => Region.Path is null ? "unsaved region file" : System.IO.Path.GetFileName(Region.Path);
 
-        public override bool CanCopy => Region.Path != null;
+        public override bool CanCopy => Region.Path is not null;
         public override DataObject Copy()
         {
             var data = new DataObject();
-            if (Region.Path != null)
+            if (Region.Path is not null)
                 data.SetFileDropList(new StringCollection { Region.Path });
             return data;
         }
-        public override bool CanCut => Region.Path != null;
+        public override bool CanCut => Region.Path is not null;
         public override DataObject Cut() => FileNodeOperations.Cut(Region.Path);
         public override bool CanDelete => true;
         public override void Delete()
@@ -66,9 +66,9 @@ namespace NbtStudio
             FileNodeOperations.DeleteFile(Region.Path);
             base.Delete();
         }
-        public override bool CanEdit => Region.Path != null;
+        public override bool CanEdit => Region.Path is not null;
         public override bool CanPaste => true;
-        public override bool CanRename => Region.Path != null;
+        public override bool CanRename => Region.Path is not null;
         public override bool CanSort => false;
         public override IEnumerable<INode> Paste(IDataObject data)
         {
@@ -87,7 +87,7 @@ namespace NbtStudio
             var chunks = nodes.Filter(x => x.Get<Chunk>()).ToList();
             foreach (var chunk in chunks)
             {
-                if (Region.GetChunk(chunk.X, chunk.Z) == null)
+                if (Region.GetChunk(chunk.X, chunk.Z) is null)
                     Region.AddChunk(chunk);
             }
         }

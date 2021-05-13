@@ -74,10 +74,10 @@ namespace NbtStudio
         {
             get
             {
-                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<IFile>() != null))
+                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<IFile>() is not null))
                 {
                     var file = item.Get<IFile>();
-                    if (file != null)
+                    if (file is not null)
                         yield return file;
                 }
             }

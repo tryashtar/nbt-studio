@@ -10,8 +10,8 @@ namespace NbtStudio
     public class UndoHistory
     {
         private readonly Func<object, string> DescriptionGenerator;
-        private readonly Stack<UndoableAction> UndoStack = new Stack<UndoableAction>();
-        private readonly Stack<UndoableAction> RedoStack = new Stack<UndoableAction>();
+        private readonly Stack<UndoableAction> UndoStack = new();
+        private readonly Stack<UndoableAction> RedoStack = new();
         public event EventHandler Changed;
 
         public UndoHistory(Func<object, string> description_generator)

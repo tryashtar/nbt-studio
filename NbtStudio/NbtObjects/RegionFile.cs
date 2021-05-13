@@ -19,7 +19,7 @@ namespace NbtStudio
         {
             get
             {
-                if (Path == null)
+                if (Path is null)
                     return null;
                 var match = CoordsRegex.Match(System.IO.Path.GetFileNameWithoutExtension(Path));
                 if (!match.Success)
@@ -36,7 +36,7 @@ namespace NbtStudio
         private byte[] Timestamps;
         public string Path { get; private set; }
         public bool HasChunkChanges { get; private set; } = false;
-        public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x != null && x.HasUnsavedChanges);
+        public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x is not null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
             Path = path;
@@ -116,7 +116,7 @@ namespace NbtStudio
             {
                 for (int z = (x == starting_x ? starting_z : 0); z < ChunkZDimension; z++)
                 {
-                    if (GetChunk(x, z) == null)
+                    if (GetChunk(x, z) is null)
                         yield return (x, z);
                 }
             }
@@ -131,7 +131,7 @@ namespace NbtStudio
 
         public void RemoveChunk(int x, int z)
         {
-            if (Chunks[x, z] != null)
+            if (Chunks[x, z] is not null)
             {
                 HasChunkChanges = true;
                 var chunk = Chunks[x, z];
@@ -161,9 +161,9 @@ namespace NbtStudio
 
         private void DoAddChunk(Chunk chunk)
         {
-            if (Chunks[chunk.X, chunk.Z] != null)
+            if (Chunks[chunk.X, chunk.Z] is not null)
                 throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
-            if (chunk.Region != null)
+            if (chunk.Region is not null)
             {
                 if (!chunk.IsLoaded)
                     chunk.Load();
@@ -195,7 +195,7 @@ namespace NbtStudio
             return 4096 * DataUtils.ToInt32(four);
         }
 
-        public bool CanSave => Path != null;
+        public bool CanSave => Path is not null;
         public bool CanRefresh => CanSave;
         public void Save()
         {
@@ -207,7 +207,7 @@ namespace NbtStudio
                 {
                     var (new_offset, save_action) = SaveChunkInternal(current_offset, x, z);
                     current_offset = new_offset;
-                    if (save_action != null)
+                    if (save_action is not null)
                         chunk_writes.Add(save_action);
                 }
             }
@@ -227,7 +227,7 @@ namespace NbtStudio
         private (int new_offset, Action<FileStream> save_action) SaveChunkInternal(int current_offset, int x, int z)
         {
             var chunk = Chunks[x, z];
-            bool update_timestamp = chunk != null && chunk.IsLoaded;
+            bool update_timestamp = chunk is not null && chunk.IsLoaded;
             int location = ChunkDataLocation(x, z);
             var data = chunk?.SaveBytes() ?? new byte[0];
             byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
@@ -259,7 +259,7 @@ namespace NbtStudio
 
         private bool CanWriteChunk(Chunk chunk)
         {
-            return chunk != null && !chunk.IsCorrupt;
+            return chunk is not null && !chunk.IsCorrupt;
         }
 
         public void SaveAs(string path)
@@ -277,7 +277,7 @@ namespace NbtStudio
 
         public void Move(string path)
         {
-            if (Path != null)
+            if (Path is not null)
             {
                 File.Move(Path, path);
                 Path = path;

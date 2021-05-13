@@ -63,7 +63,7 @@ namespace NbtStudio.UI
             var start = (SearchingView.SelectedNode?.Tag as INode) ?? LastFound;
             var predicate = GetPredicate();
             var find = SearchNodeOperations.SearchFrom(SearchingModel, start, predicate, direction, progress, CancelSource.Token, true);
-            if (find == null)
+            if (find is null)
                 return null;
             else
             {
@@ -84,7 +84,7 @@ namespace NbtStudio.UI
         private Task<IEnumerable<INode>> ActiveSearch;
         private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<INode>> function)
         {
-            if (ActiveSearch != null && !ActiveSearch.IsCompleted)
+            if (ActiveSearch is not null && !ActiveSearch.IsCompleted)
                 return;
             var progress = new Progress<TreeSearchReport>();
             progress.ProgressChanged += Progress_ProgressChanged;
@@ -96,7 +96,7 @@ namespace NbtStudio.UI
             ActiveSearch.ContinueWith(x =>
             {
                 ProgressBar.Visible = false;
-                if (x.Result == null || !x.Result.Any())
+                if (x.Result is null || !x.Result.Any())
                 {
                     FoundResultsLabel.Text = "No results found";
                     FoundResultsLabel.Visible = true;
@@ -113,14 +113,14 @@ namespace NbtStudio.UI
                     foreach (var item in x.Result)
                     {
                         var node = SearchingView.FindNode(item.Path, true);
-                        if (node != null)
+                        if (node is not null)
                         {
                             FastEnsureVisible(node);
                             node.IsSelected = true;
                         }
                     }
                     var scroll = SearchingView.FindNode(LastFound.Path, true);
-                    if (scroll != null)
+                    if (scroll is not null)
                         SearchingView.ScrollTo(scroll);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -135,7 +135,7 @@ namespace NbtStudio.UI
 
         private void FastEnsureVisible(TreeNodeAdv node)
         {
-            while (node != null)
+            while (node is not null)
             {
                 node = node.Parent;
                 node?.Expand();
@@ -146,7 +146,7 @@ namespace NbtStudio.UI
         {
             List<INode> ItemOrNull(INode item)
             {
-                if (item == null)
+                if (item is null)
                     return null;
                 return new List<INode> { item };
             }
@@ -244,7 +244,7 @@ namespace NbtStudio.UI
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing && (components is not null))
             {
                 components.Dispose();
             }

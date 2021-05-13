@@ -17,7 +17,7 @@ namespace NbtStudio.UI
             CompressionBox.Items.Add(new CompressionDisplay("G-Zip", NbtCompression.GZip));
             CompressionBox.Items.Add(new CompressionDisplay("ZLib", NbtCompression.ZLib));
             CompressionBox.SelectedIndex = 0;
-            if (template != null)
+            if (template is not null)
             {
                 RadioSnbt.Checked = template.Snbt;
                 RadioNbt.Checked = !template.Snbt;

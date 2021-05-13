@@ -27,7 +27,7 @@ namespace NbtStudio.UI
             get => _ViewModel;
             set
             {
-                if (_ViewModel != null)
+                if (_ViewModel is not null)
                     _ViewModel.Changed -= ViewModel_Changed;
                 _ViewModel = value;
                 NbtTree.Model = _ViewModel;
@@ -80,9 +80,9 @@ namespace NbtStudio.UI
         public MainForm(string[] args)
         {
             ClickedFiles = args;
-            if (Properties.Settings.Default.RecentFiles == null)
+            if (Properties.Settings.Default.RecentFiles is null)
                 Properties.Settings.Default.RecentFiles = new StringCollection();
-            if (Properties.Settings.Default.CustomIconSets == null)
+            if (Properties.Settings.Default.CustomIconSets is null)
                 Properties.Settings.Default.CustomIconSets = new StringCollection();
 
             // stuff from the designer
@@ -204,7 +204,7 @@ namespace NbtStudio.UI
             UpdateChecker.Start();
             UpdateChecker.ContinueWith(x =>
             {
-                if (x.Status == TaskStatus.RanToCompletion && x.Result != null)
+                if (x.Status == TaskStatus.RanToCompletion && x.Result is not null)
                 {
                     ReadyUpdate = x.Result;
                     ActionUpdate.Visible = true;
@@ -216,7 +216,7 @@ namespace NbtStudio.UI
         private AvailableUpdate ReadyUpdate;
         private void CheckForUpdates()
         {
-            if (UpdateChecker != null && !UpdateChecker.IsCompleted)
+            if (UpdateChecker is not null && !UpdateChecker.IsCompleted)
                 return;
             UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
             UpdateChecker.Start();
@@ -232,7 +232,7 @@ namespace NbtStudio.UI
                 }
                 else if (x.Status == TaskStatus.RanToCompletion)
                 {
-                    if (x.Result == null)
+                    if (x.Result is null)
                     {
                         if (MessageBox.Show("You already seem to have the latest update.\n" +
                             "Would you like to go to the update page?\n\n" +
@@ -264,7 +264,7 @@ namespace NbtStudio.UI
         {
             NbtTree_SelectionChanged(this, EventArgs.Empty);
             ViewModel_Changed(this, EventArgs.Empty);
-            if (ClickedFiles != null && ClickedFiles.Any())
+            if (ClickedFiles is not null && ClickedFiles.Any())
                 OpenFiles(ClickedFiles);
         }
 
@@ -440,7 +440,7 @@ namespace NbtStudio.UI
                 {
                     var error = Failable<bool>.AggregateFailure(errors.Select(x => x.exception).ToArray());
                     string message = $"{StringUtils.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
-                    message += String.Join("\n", errors.Select(x => x.item).Where(x => x != null).Select(x => Path.GetFileName(x.Path)));
+                    message += String.Join("\n", errors.Select(x => x.item).Where(x => x is not null).Select(x => Path.GetFileName(x.Path)));
                     var window = new ExceptionWindow("Refresh error", message, error);
                     window.ShowDialog(this);
                 }
@@ -481,13 +481,13 @@ namespace NbtStudio.UI
                 path = has_path.Path;
             using (var dialog = new SaveFileDialog
             {
-                Title = path == null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
+                Title = path is null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
                 RestoreDirectory = true,
                 FileName = path,
                 Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
             })
             {
-                if (path != null)
+                if (path is not null)
                 {
                     dialog.InitialDirectory = Path.GetDirectoryName(path);
                     dialog.FileName = Path.GetFileName(path);
@@ -521,7 +521,7 @@ namespace NbtStudio.UI
         private void Sort()
         {
             var obj = NbtTree.SelectedINode;
-            if (obj == null || !obj.CanSort) return;
+            if (obj is null || !obj.CanSort) return;
             UndoHistory.StartBatchOperation();
             obj.Sort();
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
@@ -570,7 +570,7 @@ namespace NbtStudio.UI
         private void Paste()
         {
             var parent = NbtTree.SelectedINode;
-            if (parent == null) return;
+            if (parent is null) return;
             Paste(parent);
         }
 
@@ -634,11 +634,11 @@ namespace NbtStudio.UI
             var tag = node.GetNbtTag();
             // batch operation to combine the rename and value change into one undo
             UndoHistory.StartBatchOperation();
-            if (path != null)
+            if (path is not null)
                 RenameFile(path);
-            if (chunk != null)
+            if (chunk is not null)
                 EditChunk(chunk);
-            else if (tag != null)
+            else if (tag is not null)
                 when_tag(tag);
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
@@ -655,7 +655,7 @@ namespace NbtStudio.UI
 
         private void RenameFile(IHavePath item)
         {
-            if (item.Path != null)
+            if (item.Path is not null)
                 RenameFileWindow.RenameFile(IconSource, item);
         }
 
@@ -683,7 +683,7 @@ namespace NbtStudio.UI
         private void EditSnbt()
         {
             var tag = NbtTree.SelectedINode?.GetNbtTag();
-            if (tag == null) return;
+            if (tag is null) return;
             UndoHistory.StartBatchOperation();
             EditSnbtWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0} as SNBT", tag), false);
@@ -692,9 +692,9 @@ namespace NbtStudio.UI
         private void Delete()
         {
             var selected_nodes = NbtTree.SelectedNodes;
-            var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x != null).ToList();
-            var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x != null).ToList();
-            var parents = selected_nodes.Select(x => x.Parent).Where(x => x != null).ToList();
+            var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x is not null).ToList();
+            var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x is not null).ToList();
+            var parents = selected_nodes.Select(x => x.Parent).Where(x => x is not null).ToList();
 
             var selected_objects = NbtTree.SelectedINodes.ToList();
             Delete(selected_objects);
@@ -703,7 +703,7 @@ namespace NbtStudio.UI
             if (selected_nodes.All(x => x.Index == -1))
             {
                 var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
-                if (select_next != null)
+                if (select_next is not null)
                     select_next.IsSelected = true;
             }
         }
@@ -711,7 +711,7 @@ namespace NbtStudio.UI
         private void Delete(IEnumerable<INode> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
-            var file_nodes = nodes.Where(x => x.Get<IHavePath>() != null);
+            var file_nodes = nodes.Where(x => x.Get<IHavePath>() is not null);
             var files = nodes.Filter(x => x.Get<IHavePath>());
             if (files.Any())
             {
@@ -719,7 +719,7 @@ namespace NbtStudio.UI
                 if (ListUtils.ExactlyOne(files))
                 {
                     var file = files.Single();
-                    if (file.Path == null)
+                    if (file.Path is null)
                         result = MessageBox.Show(
                             $"Are you sure you want to remove this item?",
                             $"Really delete this unsaved file?",
@@ -733,8 +733,8 @@ namespace NbtStudio.UI
                 }
                 else
                 {
-                    var unsaved = files.Where(x => x.Path == null);
-                    var saved = files.Where(x => x.Path != null);
+                    var unsaved = files.Where(x => x.Path is null);
+                    var saved = files.Where(x => x.Path is not null);
                     if (!saved.Any())
                         result = MessageBox.Show(
                             $"Are you sure you want to remove {ExtractNodeOperations.Description(file_nodes)}?",
@@ -772,7 +772,7 @@ namespace NbtStudio.UI
         private FindWindow FindWindow;
         private void Find()
         {
-            if (FindWindow == null || FindWindow.IsDisposed)
+            if (FindWindow is null || FindWindow.IsDisposed)
                 FindWindow = new FindWindow(IconSource, ViewModel, NbtTree);
             if (!FindWindow.Visible)
                 FindWindow.Show(this);
@@ -782,7 +782,7 @@ namespace NbtStudio.UI
         private AboutWindow AboutWindow;
         private void About()
         {
-            if (AboutWindow == null || AboutWindow.IsDisposed)
+            if (AboutWindow is null || AboutWindow.IsDisposed)
                 AboutWindow = new AboutWindow(IconSource);
             if (!AboutWindow.Visible)
                 AboutWindow.Show(this);
@@ -792,7 +792,7 @@ namespace NbtStudio.UI
         private IconSetWindow IconSetWindow;
         private void ChangeIcons()
         {
-            if (IconSetWindow == null || IconSetWindow.IsDisposed)
+            if (IconSetWindow is null || IconSetWindow.IsDisposed)
             {
                 IconSetWindow = new IconSetWindow(IconSource);
                 IconSetWindow.FormClosed += IconSetWindow_FormClosed;
@@ -805,9 +805,9 @@ namespace NbtStudio.UI
         private UpdateWindow UpdateWindow;
         private void ShowUpdate()
         {
-            if (ReadyUpdate == null)
+            if (ReadyUpdate is null)
                 return;
-            if (UpdateWindow == null || UpdateWindow.IsDisposed)
+            if (UpdateWindow is null || UpdateWindow.IsDisposed)
                 UpdateWindow = new UpdateWindow(IconSource, ReadyUpdate);
             if (!UpdateWindow.Visible)
                 UpdateWindow.Show(this);
@@ -816,32 +816,32 @@ namespace NbtStudio.UI
 
         private void IconSetWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (IconSetWindow.SelectedSource != null)
+            if (IconSetWindow.SelectedSource is not null)
                 SetIconSource(IconSetWindow.SelectedSource);
         }
 
         private void AddSnbt()
         {
             var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
-            if (parent == null) return;
+            if (parent is null) return;
             var tag = EditSnbtWindow.CreateTag(IconSource, parent);
-            if (tag != null)
+            if (tag is not null)
                 tag.AddTo(parent);
         }
 
         private void AddChunk()
         {
             var parent = NbtTree.SelectedINode?.Get<RegionFile>();
-            if (parent == null) return;
+            if (parent is null) return;
             var chunk = EditChunkWindow.CreateChunk(IconSource, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
-            if (chunk != null)
+            if (chunk is not null)
                 chunk.AddTo(parent);
         }
 
         private void AddTag(NbtTagType type)
         {
             var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
-            if (parent == null) return;
+            if (parent is null) return;
             AddTag(parent, type);
         }
 
@@ -852,7 +852,7 @@ namespace NbtStudio.UI
                 tag = EditHexWindow.CreateTag(IconSource, type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
             else
                 tag = EditTagWindow.CreateTag(IconSource, type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
-            if (tag != null)
+            if (tag is not null)
                 container.Add(tag);
         }
 
@@ -942,21 +942,21 @@ namespace NbtStudio.UI
             var region = obj.Get<RegionFile>();
             foreach (var item in CreateTagButtons)
             {
-                item.Value.Enabled = container != null && container.CanAdd(item.Key);
-                item.Value.Visible = region == null;
+                item.Value.Enabled = container is not null && container.CanAdd(item.Key);
+                item.Value.Visible = region is null;
             }
-            ActionSort.Enabled = obj != null && obj.CanSort;
-            ActionCut.Enabled = obj != null && objs.Any(x => x.CanCut);
-            ActionCopy.Enabled = obj != null && objs.Any(x => x.CanCopy);
-            ActionPaste.Enabled = obj != null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
-            ActionDelete.Enabled = obj != null && objs.Any(x => x.CanDelete);
-            ActionRename.Enabled = obj != null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
-            ActionEdit.Enabled = obj != null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
-            ActionEditSnbt.Enabled = nbt != null;
-            ActionAddSnbt.Enabled = container != null;
+            ActionSort.Enabled = obj is not null && obj.CanSort;
+            ActionCut.Enabled = obj is not null && objs.Any(x => x.CanCut);
+            ActionCopy.Enabled = obj is not null && objs.Any(x => x.CanCopy);
+            ActionPaste.Enabled = obj is not null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
+            ActionDelete.Enabled = obj is not null && objs.Any(x => x.CanDelete);
+            ActionRename.Enabled = obj is not null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
+            ActionEdit.Enabled = obj is not null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
+            ActionEditSnbt.Enabled = nbt is not null;
+            ActionAddSnbt.Enabled = container is not null;
 
-            ActionAddSnbt.Visible = region == null;
-            ActionAddChunk.Visible = region != null;
+            ActionAddSnbt.Visible = region is null;
+            ActionAddChunk.Visible = region is not null;
         }
 
         private void ViewModel_Changed(object sender, EventArgs e)
@@ -996,7 +996,7 @@ namespace NbtStudio.UI
                 var tags = NbtTree.INodesFromDrag(e);
                 var drop = NbtTree.DropINode;
                 if (tags.Any()
-                    && NbtTree.DropINode != null
+                    && NbtTree.DropINode is not null
                     && CanMoveObjects(tags, drop, NbtTree.DropPosition.Position))
                     e.Effect = e.AllowedEffect;
                 else
@@ -1026,14 +1026,14 @@ namespace NbtStudio.UI
         private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
             var (destination, index) = ViewModel.GetInsertionLocation(target, position);
-            if (destination == null) return false;
+            if (destination is null) return false;
             return destination.CanReceiveDrop(nodes);
         }
 
         private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
         {
             var (destination, index) = ViewModel.GetInsertionLocation(target, position);
-            if (destination == null) return;
+            if (destination is null) return;
             UndoHistory.StartBatchOperation();
             destination.ReceiveDrop(nodes, index);
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Move {0} into {1} at position {2}", nodes, destination, index), true);
@@ -1078,18 +1078,18 @@ namespace NbtStudio.UI
                     node_items.Add(new ToolStripMenuItem("Se&lect all Children", null, SelectChildren_Click));
             }
             var saveable = obj.Get<ISaveable>();
-            if (saveable != null && saveable.CanSave)
+            if (saveable is not null && saveable.CanSave)
                 file_items.Add(new ToolStripMenuItem("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click));
-            if (obj.Get<IExportable>() != null)
+            if (obj.Get<IExportable>() is not null)
                 file_items.Add(new ToolStripMenuItem("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click));
             var refresh = obj.Get<IRefreshable>();
-            if (refresh != null && refresh.CanRefresh)
+            if (refresh is not null && refresh.CanRefresh)
                 file_items.Add(new ToolStripMenuItem("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click));
             var path = obj.Get<IHavePath>();
-            if (path != null && path.Path != null)
+            if (path is not null && path.Path is not null)
                 file_items.Add(new ToolStripMenuItem("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click));
             var container = obj.GetNbtTag() as NbtContainerTag;
-            if (container != null)
+            if (container is not null)
             {
                 var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
                 bool single = ListUtils.ExactlyOne(addable);
@@ -1260,7 +1260,7 @@ namespace NbtStudio.UI
             foreach (string path in recents.ToList())
             {
                 var item = RecentEntry(path);
-                if (item == null)
+                if (item is null)
                     recents.Remove(path);
                 else
                     items.Add(item);

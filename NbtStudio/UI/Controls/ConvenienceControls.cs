@@ -31,7 +31,7 @@ namespace NbtStudio.UI
 
         public void HideTooltip()
         {
-            if (Tooltip != null)
+            if (Tooltip is not null)
                 Tooltip.Hide(Control);
         }
 

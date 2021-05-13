@@ -13,20 +13,15 @@ namespace NbtStudio
     public static class IconSourceRegistry
     {
         public static IconSource DefaultSource { get; private set; }
-        private static readonly Dictionary<string, IconSource> Sources = new Dictionary<string, IconSource>();
+        private static readonly Dictionary<string, IconSource> Sources = new();
         public static IEnumerable<KeyValuePair<string, IconSource>> RegisteredSources => Sources.AsEnumerable();
         static IconSourceRegistry()
         {
-            SetDefault(AmberIconSource.Instance);
+            DefaultSource = AmberIconSource.Instance;
             Sources["builtin_amber"] = AmberIconSource.Instance;
             Sources["builtin_yusuke"] = YusukeIconSource.Instance;
             Sources["builtin_mixed"] = MixedIconSource.Instance;
             Sources["builtin_wiki"] = WikiIconSource.Instance;
-        }
-
-        public static void SetDefault(IconSource source)
-        {
-            DefaultSource = source;
         }
 
         public static void Register(string id, IconSource source)
@@ -76,7 +71,7 @@ namespace NbtStudio
             Icon = icon;
         }
 
-        public bool HasNull => Image == null || Icon == null;
+        public bool HasNull => Image is null || Icon is null;
     }
 
     public enum IconType
@@ -193,7 +188,7 @@ namespace NbtStudio
             if (!HasImage(type))
             {
                 var defer = IconSourceRegistry.DefaultSource;
-                if (defer != null)
+                if (defer is not null)
                     return defer.GetImage(type);
             }
             return base.GetImage(type);

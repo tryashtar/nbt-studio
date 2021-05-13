@@ -65,7 +65,7 @@ namespace NbtStudio.UI
         private NameCheckResult CheckNameInternal(out string name)
         {
             name = GetName();
-            if (NbtParent == null)
+            if (NbtParent is null)
                 return NameCheckResult.Valid;
             if (NbtParent is NbtList)
                 return name == "" ? NameCheckResult.Valid : NameCheckResult.InvalidHasName;
@@ -73,7 +73,7 @@ namespace NbtStudio.UI
             {
                 if (name == "")
                     return NameCheckResult.InvalidMissingName;
-                if (compound.Contains(name) && !(NbtTag != null && name == NbtTag.Name))
+                if (compound.Contains(name) && !(NbtTag is not null && name == NbtTag.Name))
                     return NameCheckResult.InvalidDuplicateName;
             }
             return NameCheckResult.Valid;

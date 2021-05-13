@@ -27,9 +27,9 @@ namespace NbtStudio.UI
             set
             {
                 _Enabled = value;
-                if (MenuItem != null)
+                if (MenuItem is not null)
                     MenuItem.Enabled = value;
-                if (Button != null)
+                if (Button is not null)
                     Button.Enabled = value;
             }
         }
@@ -40,9 +40,9 @@ namespace NbtStudio.UI
             set
             {
                 _Visible = value;
-                if (MenuItem != null)
+                if (MenuItem is not null)
                     MenuItem.Visible = value;
-                if (Button != null)
+                if (Button is not null)
                     Button.Visible = value;
             }
         }
@@ -53,12 +53,12 @@ namespace NbtStudio.UI
             set
             {
                 _IconType = value;
-                if (_IconSource != null && _IconType != null)
+                if (_IconSource is not null && _IconType is not null)
                 {
                     var image = _IconSource.GetImage(_IconType.Value).Image;
-                    if (MenuItem != null)
+                    if (MenuItem is not null)
                         MenuItem.Image = image;
-                    if (Button != null)
+                    if (Button is not null)
                         Button.Image = image;
                 }
             }
@@ -70,12 +70,12 @@ namespace NbtStudio.UI
             set
             {
                 _IconSource = value;
-                if (_IconSource != null && _IconType != null)
+                if (_IconSource is not null && _IconType is not null)
                 {
                     var image = _IconSource.GetImage(_IconType.Value).Image;
-                    if (MenuItem != null)
+                    if (MenuItem is not null)
                         MenuItem.Image = image;
-                    if (Button != null)
+                    if (Button is not null)
                         Button.Image = image;
                 }
             }

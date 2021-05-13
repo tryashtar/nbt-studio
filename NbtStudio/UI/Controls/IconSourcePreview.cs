@@ -48,7 +48,7 @@ namespace NbtStudio.UI
 
         private void PreviewButton_Click(object sender, EventArgs e)
         {
-            if (FullDisplayForm == null || FullDisplayForm.IsDisposed)
+            if (FullDisplayForm is null || FullDisplayForm.IsDisposed)
                 FullDisplayForm = new FullIconPreviewWindow(Source);
             if (!FullDisplayForm.Visible)
             {

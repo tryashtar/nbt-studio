@@ -139,14 +139,14 @@ namespace NbtStudio.UI
                 LastDragDestination = DropPosition.Node;
                 LastDragDestinationTime = DateTime.Now;
             }
-            else if (DropPosition.Node != null && DropPosition.Position == NodePosition.Inside)
+            else if (DropPosition.Node is not null && DropPosition.Position == NodePosition.Inside)
             {
                 TimeSpan hover_time = DateTime.Now.Subtract(LastDragDestinationTime);
                 if (hover_time.TotalSeconds > 0.5)
                 {
                     // don't expand the node we're dragging itself
                     var nodes = NodesFromDrag(drgevent);
-                    if (nodes != null && !nodes.Contains(DropPosition.Node))
+                    if (nodes is not null && !nodes.Contains(DropPosition.Node))
                         DropPosition.Node.Expand();
                 }
             }
@@ -185,7 +185,7 @@ namespace NbtStudio.UI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (SelectedNode != null)
+            if (SelectedNode is not null)
             {
                 // space to toggle collapsed/expanded
                 if (keyData == Keys.Space)
@@ -208,7 +208,7 @@ namespace NbtStudio.UI
                 // control-up to select parent
                 if (keyData == (Keys.Up | Keys.Control))
                 {
-                    if (SelectedNode.Parent.Parent != null) // this seems weird but is correct
+                    if (SelectedNode.Parent.Parent is not null) // this seems weird but is correct
                     {
                         SelectedNode = SelectedNode.Parent;
                         return true;

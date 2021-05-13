@@ -21,7 +21,7 @@ namespace NbtStudio
         private readonly int Offset;
         private readonly int Size;
         private NbtCompression Compression;
-        public bool IsLoaded => Data != null;
+        public bool IsLoaded => Data is not null;
         public event EventHandler OnLoaded;
         public bool IsCorrupt { get; private set; } = false;
         public bool IsExternal { get; private set; } = false;
@@ -130,7 +130,7 @@ namespace NbtStudio
 
         public void Remove()
         {
-            if (Region != null)
+            if (Region is not null)
                 Region.RemoveChunk(X, Z);
         }
 
@@ -142,11 +142,11 @@ namespace NbtStudio
         public void Move(int x, int z)
         {
             var region = Region;
-            if (region != null)
+            if (region is not null)
                 region.RemoveChunk(X, Z);
             X = x;
             Z = z;
-            if (region != null)
+            if (region is not null)
                 region.AddChunk(this);
         }
     }

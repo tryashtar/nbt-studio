@@ -141,7 +141,7 @@ namespace NbtStudio.UI
             if (RegexCheck.Checked)
             {
                 FindBox.CheckRegexQuiet(out var find);
-                if (find == null)
+                if (find is null)
                     return x => x;
                 if (find_text == "")
                     find = new Regex(".*");
@@ -161,7 +161,7 @@ namespace NbtStudio.UI
             if (Purpose == BulkEditPurpose.Rename)
             {
                 var existing = ((NbtCompound)tag.Parent)[value];
-                return existing == null || existing == tag;
+                return existing is null || existing == tag;
             }
             else
             {
