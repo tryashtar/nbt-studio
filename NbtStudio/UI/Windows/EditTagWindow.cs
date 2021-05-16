@@ -1,5 +1,4 @@
 using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

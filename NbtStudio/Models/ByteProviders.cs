@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -181,12 +182,12 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            return Util.ToByteArray(Tag.Value);
+            return DataUtils.ToByteArray(Tag.Value);
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
         {
-            Tag.Value = Util.ToIntArray(bytes.ToArray());
+            Tag.Value = DataUtils.ToIntArray(bytes.ToArray());
         }
     }
 
@@ -198,12 +199,12 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            return Util.ToByteArray(Tag.Value);
+            return DataUtils.ToByteArray(Tag.Value);
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
         {
-            Tag.Value = Util.ToLongArray(bytes.ToArray());
+            Tag.Value = DataUtils.ToLongArray(bytes.ToArray());
         }
     }
 
@@ -238,12 +239,12 @@ namespace NbtStudio
         protected override IEnumerable<byte> GetBytesFromTag()
         {
             var shorts = Tag.Cast<NbtShort>().Select(x => x.Value);
-            return Util.ToByteArray(shorts.ToArray());
+            return DataUtils.ToByteArray(shorts.ToArray());
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
         {
-            var shorts = Util.ToShortArray(bytes.ToArray());
+            var shorts = DataUtils.ToShortArray(bytes.ToArray());
             Tag.Clear();
             Tag.AddRange(shorts.Select(x => new NbtShort(x)));
         }
@@ -257,12 +258,12 @@ namespace NbtStudio
         protected override IEnumerable<byte> GetBytesFromTag()
         {
             var ints = Tag.Cast<NbtInt>().Select(x => x.Value);
-            return Util.ToByteArray(ints.ToArray());
+            return DataUtils.ToByteArray(ints.ToArray());
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
         {
-            var ints = Util.ToIntArray(bytes.ToArray());
+            var ints = DataUtils.ToIntArray(bytes.ToArray());
             Tag.Clear();
             Tag.AddRange(ints.Select(x => new NbtInt(x)));
         }
@@ -276,12 +277,12 @@ namespace NbtStudio
         protected override IEnumerable<byte> GetBytesFromTag()
         {
             var longs = Tag.Cast<NbtLong>().Select(x => x.Value);
-            return Util.ToByteArray(longs.ToArray());
+            return DataUtils.ToByteArray(longs.ToArray());
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
         {
-            var longs = Util.ToLongArray(bytes.ToArray());
+            var longs = DataUtils.ToLongArray(bytes.ToArray());
             Tag.Clear();
             Tag.AddRange(longs.Select(x => new NbtLong(x)));
         }

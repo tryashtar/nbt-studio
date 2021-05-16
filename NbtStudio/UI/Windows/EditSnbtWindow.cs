@@ -1,5 +1,4 @@
 ﻿using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -24,7 +23,7 @@ namespace NbtStudio.UI
             InputBox.RequiredType = required;
 
             SettingName = set_name;
-            if (required == null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
+            if (required is null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
             {
                 this.Width = 750;
                 this.Height = 500;
@@ -51,9 +50,9 @@ namespace NbtStudio.UI
 
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
-            if (tag != null)
+            if (tag is not null)
                 InputBox.SetFromTag(tag);
-            if (required == null)
+            if (required is null)
             {
                 this.Icon = source.GetImage(IconType.AddSnbt).Icon;
                 this.Text = "Create Tag as SNBT";
@@ -61,7 +60,7 @@ namespace NbtStudio.UI
             else
             {
                 this.Icon = NbtUtil.TagTypeImage(source, required.Value).Icon;
-                this.Text = tag == null ? $"Create {NbtUtil.TagTypeName(required.Value)} Tag as SNBT" : $"Edit {NbtUtil.TagTypeName(required.Value)} Tag as SNBT";
+                this.Text = tag is null ? $"Create {NbtUtil.TagTypeName(required.Value)} Tag as SNBT" : $"Edit {NbtUtil.TagTypeName(required.Value)} Tag as SNBT";
             }
             if (SettingName && purpose != EditPurpose.EditValue)
             {
@@ -103,7 +102,7 @@ namespace NbtStudio.UI
 
         private NbtTagType? RequiredType()
         {
-            if (WorkingTag == null)
+            if (WorkingTag is null)
             {
                 if (TagParent is NbtList list)
                 {
@@ -125,7 +124,7 @@ namespace NbtStudio.UI
             if (!InputBox.CheckTag(out NbtTag tag))
                 return false;
 
-            if (WorkingTag == null)
+            if (WorkingTag is null)
                 WorkingTag = tag;
             else
                 WorkingTag.SetEqualTo(tag);

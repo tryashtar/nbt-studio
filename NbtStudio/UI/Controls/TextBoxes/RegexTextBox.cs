@@ -42,7 +42,7 @@ namespace NbtStudio.UI
 
         private void SetColor(Exception exception)
         {
-            if (exception == null)
+            if (exception is null)
                 RestoreBackColor();
             else
                 SetBackColor(Color.FromArgb(255, 230, 230));
@@ -50,13 +50,13 @@ namespace NbtStudio.UI
 
         private void ShowTooltip(Exception exception)
         {
-            if (exception != null)
+            if (exception is not null)
             {
                 string message = exception.Message;
                 string redundant = $"\"{this.Text}\" - ";
                 int index = message.IndexOf(redundant);
                 if (index != -1)
-                    message = message.Substring(index + redundant.Length);
+                    message = message[(index + redundant.Length)..];
                 ShowTooltip("Regex Parsing Error", message, TimeSpan.FromSeconds(3));
             }
         }
@@ -65,16 +65,16 @@ namespace NbtStudio.UI
         {
             if (search == "")
                 return true;
-            if (input == null)
+            if (input is null)
                 return false;
             return input.IndexOf(search, StringComparison.OrdinalIgnoreCase) != -1;
         }
 
         public static bool IsMatchRegex(string input, Regex search)
         {
-            if (search == null)
+            if (search is null)
                 return false;
-            if (input == null)
+            if (input is null)
                 return false;
             return search.IsMatch(input);
         }
@@ -83,7 +83,7 @@ namespace NbtStudio.UI
         {
             if (RegexMode)
             {
-                if (LastRegex == null)
+                if (LastRegex is null)
                     CheckRegexInternal(out LastRegex);
                 return IsMatchRegex(input, LastRegex);
             }
@@ -117,7 +117,7 @@ namespace NbtStudio.UI
             }
             var error = CheckRegexInternal(out regex);
             SetColor(error);
-            return error == null;
+            return error is null;
         }
 
         public bool CheckRegex(out Regex regex)
@@ -128,7 +128,7 @@ namespace NbtStudio.UI
                 return true;
             }
             var error = CheckRegexInternal(out regex);
-            bool valid = error == null;
+            bool valid = error is null;
             SetColor(error);
             if (!valid)
             {

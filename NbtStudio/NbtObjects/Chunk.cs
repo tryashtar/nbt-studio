@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -20,7 +21,7 @@ namespace NbtStudio
         private readonly int Offset;
         private readonly int Size;
         private NbtCompression Compression;
-        public bool IsLoaded => Data != null;
+        public bool IsLoaded => Data is not null;
         public event EventHandler OnLoaded;
         public bool IsCorrupt { get; private set; } = false;
         public bool IsExternal { get; private set; } = false;
@@ -54,7 +55,7 @@ namespace NbtStudio
             if (IsExternal)
             {
                 var data = new byte[Size + 5];
-                var size = Util.GetBytes(1);
+                var size = DataUtils.GetBytes(1);
                 Array.Copy(size, data, 4);
                 data[4] = ExternalCompression;
                 return data;
@@ -74,7 +75,7 @@ namespace NbtStudio
             var bytes = file.SaveToBuffer(Compression);
             var with_header = new byte[bytes.Length + 5];
             Array.Copy(bytes, 0, with_header, 5, bytes.Length);
-            var length = Util.GetBytes(bytes.Length);
+            var length = DataUtils.GetBytes(bytes.Length);
             Array.Copy(length, with_header, 4);
             if (Compression == NbtCompression.GZip)
                 with_header[4] = 1;
@@ -129,7 +130,7 @@ namespace NbtStudio
 
         public void Remove()
         {
-            if (Region != null)
+            if (Region is not null)
                 Region.RemoveChunk(X, Z);
         }
 
@@ -141,11 +142,11 @@ namespace NbtStudio
         public void Move(int x, int z)
         {
             var region = Region;
-            if (region != null)
+            if (region is not null)
                 region.RemoveChunk(X, Z);
             X = x;
             Z = z;
-            if (region != null)
+            if (region is not null)
                 region.AddChunk(this);
         }
     }

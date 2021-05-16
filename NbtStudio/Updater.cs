@@ -50,7 +50,7 @@ namespace NbtStudio
             foreach (var version in versions)
             {
                 string log = version.DownloadChangelog(client);
-                if (log != null)
+                if (log is not null)
                 {
                     builder.Append(version.ToString(false) + ":" + Environment.NewLine);
                     builder.Append(log);
@@ -86,7 +86,7 @@ namespace NbtStudio
             T latest = null;
             foreach (var version in versions)
             {
-                if (latest == null || version > latest)
+                if (latest is null || version > latest)
                     latest = version;
             }
             return latest;
@@ -212,11 +212,11 @@ namespace NbtStudio
         public GitHubVersion(JObject json)
         {
             string tag_name = json["tag_name"]?.ToString();
-            if (tag_name == null)
+            if (tag_name is null)
                 throw new InvalidDataException("Couldn't find tag name");
-            ParseDots(tag_name.Substring(1 + tag_name.IndexOf('v')));
+            ParseDots(tag_name[(1 + tag_name.IndexOf('v'))..]);
             var assets = json["assets"] as JArray;
-            if (assets != null)
+            if (assets is not null)
             {
                 foreach (JObject item in assets)
                 {
@@ -232,7 +232,7 @@ namespace NbtStudio
 
         public string DownloadChangelog(WebClient client)
         {
-            if (Changelog == null && ChangelogURL != null)
+            if (Changelog is null && ChangelogURL is not null)
             {
                 var uri = new Uri(ChangelogURL);
                 Changelog = client.DownloadString(uri);

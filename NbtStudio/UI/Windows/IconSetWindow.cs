@@ -1,5 +1,4 @@
 ﻿using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -132,7 +132,7 @@ namespace NbtStudio.UI
             catch (Exception ex)
             {
                 Properties.Settings.Default.CustomIconSets.Remove(path);
-                MessageBox.Show($"The custom icon source at '{path}' failed to load.\n\n{Util.ExceptionMessage(ex)}",
+                MessageBox.Show($"The custom icon source at '{path}' failed to load.\n\n{Failable.ExceptionMessage(ex)}",
                     "Failed to load custom icon source");
                 return false;
             }

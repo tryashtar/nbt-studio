@@ -53,10 +53,10 @@ namespace NbtStudio.UI
             else if (z_out)
                 return CoordCheckResult.InvalidZOutOfBounds;
 
-            if (Region == null)
+            if (Region is null)
                 return CoordCheckResult.Valid;
 
-            if (Region.GetChunk(xval, zval) != null)
+            if (Region.GetChunk(xval, zval) is not null)
                 return CoordCheckResult.InvalidAlreadyTaken;
 
             return CoordCheckResult.Valid;

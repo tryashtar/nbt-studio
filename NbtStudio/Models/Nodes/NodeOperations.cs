@@ -1,6 +1,5 @@
-﻿using fNbt;
+using fNbt;
 using Microsoft.VisualBasic.FileIO;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -10,12 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
     public static class ExtractNodeOperations
     {
-        public static Dictionary<Type, (string singular, string plural)> NodeTypes = new Dictionary<Type, (string, string)>
+        public static Dictionary<Type, (string singular, string plural)> NodeTypes = new()
         {
             { typeof(NbtTagNode), ("tag", "tags") },
             { typeof(NbtFileNode), ("file", "files") },
@@ -31,7 +32,7 @@ namespace NbtStudio
         {
             if (!nodes.Any()) // none
                 return "0 nodes";
-            if (Util.ExactlyOne(nodes)) // exactly one
+            if (ListUtils.ExactlyOne(nodes)) // exactly one
                 return nodes.Single().Description;
             var results = new Dictionary<Type, int>();
             int unknowns = 0;
@@ -52,17 +53,17 @@ namespace NbtStudio
             foreach (var item in results)
             {
                 var (singular, plural) = NodeTypes[item.Key];
-                strings.Add(Util.Pluralize(item.Value, singular, plural));
+                strings.Add(StringUtils.Pluralize(item.Value, singular, plural));
             }
             if (unknowns > 0)
-                strings.Add(Util.Pluralize(unknowns, "unknown node"));
+                strings.Add(StringUtils.Pluralize(unknowns, "unknown node"));
             return String.Join(", ", strings);
         }
 
         // used like Filter(nodes, x=>x.GetNbtTag()) to get NBT for every node that has it
         public static IEnumerable<T> Filter<T>(this IEnumerable<INode> nodes, Func<INode, T> transformer)
         {
-            return nodes.Select(transformer).Where(x => x != null);
+            return nodes.Select(transformer).Where(x => x is not null);
         }
 
         public static T Get<T>(this INode node) where T : class
@@ -114,7 +115,7 @@ namespace NbtStudio
             if (direction == SearchDirection.Forward)
             {
                 var first = model.Root.Children.First();
-                if (start == null)
+                if (start is null)
                     start = first;
                 else
                     start = NextNode(start);
@@ -123,7 +124,7 @@ namespace NbtStudio
             else
             {
                 var last = FinalNode(model.Root);
-                if (start == null)
+                if (start is null)
                     start = last;
                 else
                     start = PreviousNode(start);
@@ -135,11 +136,11 @@ namespace NbtStudio
         {
             var report = new TreeSearchReport();
             report.TotalNodes = model.Root.DescendantsCount;
-            var node = model.Root.Children.First();
-            while (node != null)
+            var node = model.Root.Children[0];
+            while (node is not null)
             {
                 node = NextNode(node);
-                if (node != null && predicate(node))
+                if (node is not null && predicate(node))
                     yield return node;
                 report.NodesSearched++;
                 if (report.NodesSearched % 200 == 0)
@@ -155,7 +156,7 @@ namespace NbtStudio
         {
             var start = node;
             report.TotalNodes = model.Root.DescendantsCount;
-            while (node != null && !predicate(node))
+            while (node is not null && !predicate(node))
             {
                 node = next(node);
                 report.NodesSearched++;
@@ -166,9 +167,9 @@ namespace NbtStudio
                     token.ThrowIfCancellationRequested();
                 }
             }
-            if (node != null && node != model.Root)
+            if (node is not null && node != model.Root)
                 return node;
-            if (wrap_start == null)
+            if (wrap_start is null)
                 return null;
 
             // search again from new starting point, until reaching original starting point
@@ -185,12 +186,12 @@ namespace NbtStudio
             if (children.Count > 0)
                 return children.First();
             INode next = null;
-            while (next == null && node != null)
+            while (next is null && node is not null)
             {
-                if (node.Parent == null)
+                if (node.Parent is null)
                     return null;
                 next = Sibling(node, 1);
-                if (next == null)
+                if (next is null)
                     node = node.Parent;
             }
             return next;
@@ -199,9 +200,9 @@ namespace NbtStudio
         public static INode PreviousNode(INode node)
         {
             var prev = Sibling(node, -1);
-            if (prev == null)
+            if (prev is null)
                 return node.Parent;
-            while (prev != null)
+            while (prev is not null)
             {
                 var children = prev.Children;
                 if (children.Count == 0)
@@ -213,7 +214,7 @@ namespace NbtStudio
 
         private static INode Sibling(INode node, int add)
         {
-            if (node.Parent == null)
+            if (node.Parent is null)
                 return null;
             var children = node.Parent.Children;
             int i;
@@ -276,7 +277,7 @@ namespace NbtStudio
 
         public static bool CanRename(NbtTag tag)
         {
-            return !(tag.Parent is NbtList);
+            return tag.Parent is not NbtList;
         }
 
         public static bool CanSort(NbtTag tag)
@@ -291,7 +292,7 @@ namespace NbtStudio
                 var name_sorter = new NbtUtil.TagNameSorter();
                 var tag_sorter = new NbtUtil.TagTypeSorter();
                 var current_sort = FindCurrentSort(compound, name_sorter, tag_sorter);
-                if (current_sort == tag_sorter || current_sort == null)
+                if (current_sort == tag_sorter || current_sort is null)
                     compound.Sort(name_sorter, true);
                 else
                     compound.Sort(tag_sorter, true);
@@ -334,7 +335,7 @@ namespace NbtStudio
         public static IEnumerable<NbtTag> ParseTags(IDataObject data)
         {
             var text = (string)data.GetData(typeof(string));
-            if (text == null)
+            if (text is null)
                 yield break;
             var snbts = text.Split('\n');
             foreach (var nbt in snbts)
@@ -357,7 +358,7 @@ namespace NbtStudio
 
         public static bool CanReceiveDrop(NbtTag tag, IEnumerable<NbtTag> tags)
         {
-            if (!(tag is NbtContainerTag container))
+            if (tag is not NbtContainerTag container)
                 return false;
             return NbtUtil.CanAddAll(tags, container);
         }
@@ -379,7 +380,7 @@ namespace NbtStudio
 
         public static bool DeleteFile(string path)
         {
-            if (path == null || !File.Exists(path))
+            if (path is null || !File.Exists(path))
                 return true;
             try
             {
@@ -391,7 +392,7 @@ namespace NbtStudio
 
         public static bool DeleteFolder(string path)
         {
-            if (path == null || !Directory.Exists(path))
+            if (path is null || !Directory.Exists(path))
                 return true;
             try
             {
@@ -404,7 +405,7 @@ namespace NbtStudio
         public static DataObject Copy(string path)
         {
             var data = new DataObject();
-            if (path != null)
+            if (path is not null)
             {
                 data.SetFileDropList(new StringCollection { path });
                 data.SetData("Preferred DropEffect", new MemoryStream(BitConverter.GetBytes((int)DragDropEffects.Copy)));
@@ -417,7 +418,7 @@ namespace NbtStudio
         public static DataObject Cut(string path)
         {
             var data = new DataObject();
-            if (path != null)
+            if (path is not null)
             {
                 data.SetFileDropList(new StringCollection { path });
                 data.SetData("Preferred DropEffect", new MemoryStream(BitConverter.GetBytes((int)DragDropEffects.Move)));

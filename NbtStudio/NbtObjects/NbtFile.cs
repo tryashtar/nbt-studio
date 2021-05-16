@@ -1,5 +1,4 @@
 using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TryashtarUtils.Nbt;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
@@ -19,7 +20,7 @@ namespace NbtStudio
         public NbtTag RootTag { get; private set; }
         public T GetRootTag<T>() where T : NbtTag => RootTag as T;
         public ExportSettings ExportSettings { get; private set; }
-        public bool CanSave => Path != null && ExportSettings != null;
+        public bool CanSave => Path is not null && ExportSettings is not null;
         public bool CanRefresh => CanSave;
         public bool HasUnsavedChanges { get; private set; } = false;
 
@@ -35,7 +36,7 @@ namespace NbtStudio
 
         public NbtFile(NbtTag root)
         {
-            if (root.Name == null)
+            if (root.Name is null)
                 root.Name = "";
             SetRoot(root);
             Path = null;
@@ -51,7 +52,7 @@ namespace NbtStudio
 
         private static bool LooksSuspicious(string name)
         {
-            if (name == null)
+            if (name is null)
                 return false;
             foreach (var ch in name)
             {
@@ -123,7 +124,7 @@ namespace NbtStudio
                     throw new FormatException("File did not begin with a '{'");
                 var text = firstchar[0] + reader.ReadToEnd();
                 var tag = SnbtParser.Parse(text, named: false);
-                if (!(tag is NbtCompound compound))
+                if (tag is not NbtCompound compound)
                     throw new FormatException("File did not contain an NBT compound");
                 compound.Name = "";
                 var file = new fNbt.NbtFile(compound);
@@ -157,9 +158,9 @@ namespace NbtStudio
                 }
                 file.LoadFromStream(reader, compression);
             }
-            if (file.RootTag == null)
+            if (file.RootTag is null)
                 throw new FormatException("File had no root tag");
-            if (!(file.RootTag is NbtCompound))
+            if (file.RootTag is not NbtCompound)
                 throw new FormatException("File did not contain an NBT compound");
 
             return new NbtFile(path, file.RootTag, ExportSettings.AsNbt(file.FileCompression, big_endian, bedrock_header));
@@ -194,7 +195,7 @@ namespace NbtStudio
 
         public void Move(string path)
         {
-            if (Path != null)
+            if (Path is not null)
             {
                 File.Move(Path, path);
                 Path = path;

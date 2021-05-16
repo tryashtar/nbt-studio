@@ -1,5 +1,4 @@
 ﻿using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 
 namespace NbtStudio.UI
 {
@@ -68,7 +68,7 @@ namespace NbtStudio.UI
             { tag = ParseTag(); }
             catch (Exception ex)
             { return new SnbtInvalidFormat(ex); }
-            if (RequiredType != null && tag.TagType != RequiredType.Value)
+            if (RequiredType is not null && tag.TagType != RequiredType.Value)
                 return new SnbtInvalidWrongType(RequiredType.Value, tag.TagType);
             return new SnbtValid();
         }
@@ -89,7 +89,7 @@ namespace NbtStudio.UI
         public bool TryMinify(bool minified)
         {
             CheckTag(out var tag); // continue to minify even if the required type is not met
-            if (tag != null)
+            if (tag is not null)
             {
                 var options = SnbtOptions.Default;
                 if (!minified)

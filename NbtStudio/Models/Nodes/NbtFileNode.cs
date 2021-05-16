@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Forms;
 
 namespace NbtStudio
 {
@@ -50,7 +51,7 @@ namespace NbtStudio
             return Enumerable.Empty<NbtTag>();
         }
 
-        public override string Description => File.Path == null ? "unsaved file" : System.IO.Path.GetFileName(File.Path);
+        public override string Description => File.Path is null ? "unsaved file" : System.IO.Path.GetFileName(File.Path);
 
         // file nodes copy as both a file and a compound
         // they can then be pasted as text or into explorer, cool!
@@ -59,14 +60,14 @@ namespace NbtStudio
         {
             var data1 = NbtNodeOperations.Copy(File.RootTag);
             var data2 = FileNodeOperations.Copy(File.Path);
-            return Util.Merge(data1, data2);
+            return Utils.Merge(data1, data2);
         }
         public override bool CanCut => true;
         public override DataObject Cut()
         {
             var data1 = NbtNodeOperations.Copy(File.RootTag);
             var data2 = FileNodeOperations.Cut(File.Path);
-            return Util.Merge(data1, data2);
+            return Utils.Merge(data1, data2);
         }
         public override bool CanDelete => true;
         public override void Delete()
@@ -74,9 +75,9 @@ namespace NbtStudio
             FileNodeOperations.DeleteFile(File.Path);
             base.Delete();
         }
-        public override bool CanEdit => File.Path != null;
+        public override bool CanEdit => File.Path is not null;
         public override bool CanPaste => NbtNodeOperations.CanPaste(File.RootTag);
-        public override bool CanRename => File.Path != null;
+        public override bool CanRename => File.Path is not null;
         public override bool CanSort => NbtNodeOperations.CanSort(File.RootTag);
         public override void Sort() => NbtNodeOperations.Sort(File.RootTag);
         public override IEnumerable<INode> Paste(IDataObject data)

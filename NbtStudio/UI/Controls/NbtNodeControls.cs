@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -21,7 +22,7 @@ namespace NbtStudio.UI
         {
             NbtText.DrawSelection(node, context);
             var image = GetIcon(node);
-            if (image != null)
+            if (image is not null)
             {
                 float ratio = Math.Min((float)context.Bounds.Width / (float)image.Width, (float)context.Bounds.Height / (float)image.Height);
                 var rectangle = new Rectangle();
@@ -41,7 +42,7 @@ namespace NbtStudio.UI
         {
             var image = GetIcon(node);
             int height = node.Tree.RowHeight - 4;
-            return image == null ? Size.Empty : new Size((int)(((float)height / image.Height) * image.Width), height);
+            return image is null ? Size.Empty : new Size((int)(((float)height / image.Height) * image.Width), height);
         }
 
         private Image GetIcon(TreeNodeAdv node)
@@ -51,7 +52,7 @@ namespace NbtStudio.UI
 
         private Image GetImage(INode node)
         {
-            if (IconSource == null)
+            if (IconSource is null)
                 return null;
             if (node is NbtFileNode)
                 return IconSource.GetImage(IconType.File).Image;
@@ -85,7 +86,7 @@ namespace NbtStudio.UI
             var rectangle = context.Bounds;
             var format = TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.PreserveGraphicsTranslateTransform | TextFormatFlags.VerticalCenter;
 
-            if (name != null)
+            if (name is not null)
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, name, boldfont, rectangle, Parent.ForeColor, format);
@@ -93,7 +94,7 @@ namespace NbtStudio.UI
                 size = AppendSizes(size, name_size);
                 rectangle.X += (int)name_size.Width;
             }
-            if (value != null)
+            if (value is not null)
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, value, context.Font, rectangle, Parent.ForeColor, format);
@@ -119,7 +120,7 @@ namespace NbtStudio.UI
             // selected nodes are not "active" while dragging
             // hovered nodes are "active" while dragging
             if (context.DrawSelection == DrawSelectionMode.Active || (node.IsSelected && !node.Tree.Focused))
-                context.Graphics.FillRectangle(new SolidBrush(Util.SelectionColor), context.Bounds);
+                context.Graphics.FillRectangle(new SolidBrush(Constants.SelectionColor), context.Bounds);
             else if (node.IsSelected)
                 context.Graphics.FillRectangle(Brushes.LightYellow, context.Bounds);
         }
@@ -144,10 +145,10 @@ namespace NbtStudio.UI
             {
                 var saveable = inode.Get<ISaveable>();
                 var chunk = inode.Get<Chunk>();
-                if ((saveable != null && saveable.HasUnsavedChanges) || (chunk != null && chunk.HasUnsavedChanges))
+                if ((saveable is not null && saveable.HasUnsavedChanges) || (chunk is not null && chunk.HasUnsavedChanges))
                     prefix = "* ";
             }
-            if (name == null)
+            if (name is null)
                 return (prefix, value);
             return (prefix + name + ":", value);
         }
@@ -167,7 +168,7 @@ namespace NbtStudio.UI
             {
                 string text = $"Chunk [{chunk.Chunk.X}, {chunk.Chunk.Z}]";
                 var coords = chunk.Chunk.Region.Coords;
-                if (coords == null)
+                if (coords is null)
                     return text;
                 var world = coords.WorldChunk(chunk.Chunk);
                 return $"{text} in world at ({world.x}, {world.z})";
@@ -187,15 +188,15 @@ namespace NbtStudio.UI
                 if (folder.HasScanned)
                 {
                     if (folder.Subfolders.Any())
-                        return $"[{Util.Pluralize(folder.Subfolders.Count, "folder")}, {Util.Pluralize(folder.Files.Count, "file")}]";
+                        return $"[{StringUtils.Pluralize(folder.Subfolders.Count, "folder")}, {StringUtils.Pluralize(folder.Files.Count, "file")}]";
                     else
-                        return $"[{Util.Pluralize(folder.Files.Count, "file")}]";
+                        return $"[{StringUtils.Pluralize(folder.Files.Count, "file")}]";
                 }
                 else
                     return "(open to load)";
             }
             if (node is RegionFileNode region)
-                return $"[{Util.Pluralize(region.Region.ChunkCount, "chunk")}]";
+                return $"[{StringUtils.Pluralize(region.Region.ChunkCount, "chunk")}]";
             if (node is ChunkNode chunk_node)
             {
                 var chunk = chunk_node.Chunk;
@@ -216,7 +217,7 @@ namespace NbtStudio.UI
             if (node is ChunkNode chunk)
             {
                 var coords = chunk.Chunk.Region.Coords;
-                if (coords == null)
+                if (coords is null)
                     return null;
                 var blocks = coords.WorldBlocks(chunk.Chunk);
                 return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
@@ -226,7 +227,7 @@ namespace NbtStudio.UI
 
         private static string Flatten(string text)
         {
-            if (text == null) return null;
+            if (text is null) return null;
             return text.Replace("\n", "⏎").Replace("\r", "⏎");
         }
     }

@@ -1,9 +1,9 @@
 ﻿using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -33,22 +33,22 @@ namespace NbtStudio.UI
 
         private void NameLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/tryashtar/nbt-studio");
+            IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio");
         }
 
         private void NbtExplorerLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/jaquadro/NBTExplorer");
+            IOUtils.OpenUrlInBrowser("https://github.com/jaquadro/NBTExplorer");
         }
 
         private void GenericIconLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://p.yusukekamiyamane.com");
+            IOUtils.OpenUrlInBrowser("https://p.yusukekamiyamane.com");
         }
 
         private void NbtIconLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/AmberWat");
+            IOUtils.OpenUrlInBrowser("https://github.com/AmberWat");
         }
     }
 }

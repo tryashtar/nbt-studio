@@ -1,10 +1,10 @@
 ﻿using fNbt;
-using NbtStudio.SNBT;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
@@ -45,7 +45,7 @@ namespace NbtStudio.UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Util.ExceptionMessage(ex), "Update failed!");
+                MessageBox.Show(Failable.ExceptionMessage(ex), "Update failed!");
                 return false;
             }
         }
