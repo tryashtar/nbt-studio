@@ -14,6 +14,7 @@ namespace NbtStudio.UI
         private readonly BulkEditPurpose Purpose;
         private readonly List<NbtTag> ChangedTags = new();
         private int ChangingCount = 0;
+        private readonly decimal[] ColumnRatios = new decimal[2] { 0.48M, 0.48M };
 
         private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
         {
@@ -21,8 +22,9 @@ namespace NbtStudio.UI
 
             Purpose = purpose;
             ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
-            SetMinimumSize();
-            SetColumnSizes();
+            SetSize();
+            FixColumnRatios();
+            this.Height += 200;
 
             if (purpose == BulkEditPurpose.Rename)
             {
@@ -114,7 +116,7 @@ namespace NbtStudio.UI
         }
 
         private static readonly int RealMaxWidth = 1000;
-        private void SetMinimumSize()
+        private void SetSize()
         {
             int width = 0;
             var graphics = ActionList.CreateGraphics();
@@ -129,16 +131,21 @@ namespace NbtStudio.UI
                     break;
                 }
             }
-            ActionList.MinimumSize = new Size(width, 0);
+            this.Width = width;
         }
 
-        private void SetColumnSizes()
+        private void FixColumnRatios()
         {
-            CurrentColumn.Width = ActionList.Width * 9 / 20;
-            NewColumn.Width = ActionList.Width * 9 / 20;
+            ActionList.ColumnWidthChanged -= ActionList_ColumnWidthChanged;
+            for (int i = 0; i < ColumnRatios.Length; i++)
+            {
+                ActionList.Columns[i].Width = (int)(ActionList.Width * ColumnRatios[i]);
+            }
+            ActionList.ColumnWidthChanged += ActionList_ColumnWidthChanged;
         }
 
-        private Func<string, string> GetTransformer()
+        private delegate string Transformer(string value);
+        private Transformer GetTransformer()
         {
             string find_text = FindBox.Text;
             string replace_text = ReplaceBox.Text;
@@ -199,7 +206,7 @@ namespace NbtStudio.UI
         }
 
         // returns true if the transformation is applicable and valid
-        private bool UpdateSinglePreview(ListViewItem item, Func<string, string> transformer)
+        private bool UpdateSinglePreview(ListViewItem item, Transformer transformer)
         {
             string current = item.SubItems[0].Text;
             string transformed = transformer(current);
@@ -228,12 +235,6 @@ namespace NbtStudio.UI
         {
             if (e.IsSelected)
                 e.Item.Selected = false;
-        }
-
-        private void ActionList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
-        {
-            e.NewWidth = ActionList.Width * 9 / 20;
-            e.Cancel = true;
         }
 
         private void RegexCheck_CheckedChanged(object sender, EventArgs e)
@@ -300,6 +301,16 @@ namespace NbtStudio.UI
                 ChangingCount++;
                 UpdateChangeLabel();
             }
+        }
+
+        private void BulkEditWindow_Layout(object sender, LayoutEventArgs e)
+        {
+            FixColumnRatios();
+        }
+
+        private void ActionList_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        {
+            ColumnRatios[e.ColumnIndex] = (decimal)ActionList.Columns[e.ColumnIndex].Width / ActionList.Width;
         }
     }
 
