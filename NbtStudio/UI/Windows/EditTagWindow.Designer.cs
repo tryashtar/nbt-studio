@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.ButtonsPanel = new System.Windows.Forms.Panel();
+            this.WordWrapCheck = new System.Windows.Forms.CheckBox();
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
@@ -36,7 +37,6 @@
             this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ValueLabel = new System.Windows.Forms.Label();
             this.ValueBox = new NbtStudio.UI.TagValueTextBox();
-            this.WordWrapCheck = new System.Windows.Forms.CheckBox();
             this.ButtonsPanel.SuspendLayout();
             this.MainTable.SuspendLayout();
             this.SuspendLayout();
@@ -53,6 +53,20 @@
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(323, 47);
             this.ButtonsPanel.TabIndex = 6;
+            // 
+            // WordWrapCheck
+            // 
+            this.WordWrapCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.WordWrapCheck.AutoSize = true;
+            this.WordWrapCheck.Location = new System.Drawing.Point(12, 14);
+            this.WordWrapCheck.Margin = new System.Windows.Forms.Padding(12);
+            this.WordWrapCheck.Name = "WordWrapCheck";
+            this.WordWrapCheck.Size = new System.Drawing.Size(86, 19);
+            this.WordWrapCheck.TabIndex = 9;
+            this.WordWrapCheck.Text = "Word Wrap";
+            this.WordWrapCheck.UseVisualStyleBackColor = true;
+            this.WordWrapCheck.Visible = false;
+            this.WordWrapCheck.CheckedChanged += new System.EventHandler(this.WordWrapCheck_CheckedChanged);
             // 
             // ButtonOk
             // 
@@ -147,27 +161,12 @@
             this.ValueBox.Size = new System.Drawing.Size(243, 21);
             this.ValueBox.TabIndex = 4;
             // 
-            // WordWrapCheck
-            // 
-            this.WordWrapCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.WordWrapCheck.AutoSize = true;
-            this.WordWrapCheck.Location = new System.Drawing.Point(12, 14);
-            this.WordWrapCheck.Margin = new System.Windows.Forms.Padding(12);
-            this.WordWrapCheck.Name = "WordWrapCheck";
-            this.WordWrapCheck.Size = new System.Drawing.Size(86, 19);
-            this.WordWrapCheck.TabIndex = 9;
-            this.WordWrapCheck.Text = "Word Wrap";
-            this.WordWrapCheck.UseVisualStyleBackColor = true;
-            this.WordWrapCheck.Visible = false;
-            this.WordWrapCheck.CheckedChanged += new System.EventHandler(this.WordWrapCheck_CheckedChanged);
-            // 
             // EditTagWindow
             // 
             this.AcceptButton = this.ButtonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.CancelButton = this.ButtonCancel;
             this.ClientSize = new System.Drawing.Size(323, 131);
             this.Controls.Add(this.MainTable);
@@ -176,6 +175,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(339, 170);
             this.Name = "EditTagWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
