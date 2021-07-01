@@ -84,13 +84,16 @@ namespace NbtStudio.UI
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             SizeF size = SizeF.Empty;
             var rectangle = context.Bounds;
-            var format = TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.PreserveGraphicsTranslateTransform | TextFormatFlags.VerticalCenter;
+            var format = TextFormatFlags.PreserveGraphicsClipping |
+                TextFormatFlags.PreserveGraphicsTranslateTransform |
+                TextFormatFlags.VerticalCenter |
+                TextFormatFlags.NoPrefix;
 
             if (name is not null)
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, name, boldfont, rectangle, Parent.ForeColor, format);
-                var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size);
+                var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size, format);
                 size = AppendSizes(size, name_size);
                 rectangle.X += (int)name_size.Width;
             }
@@ -98,7 +101,7 @@ namespace NbtStudio.UI
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, value, context.Font, rectangle, Parent.ForeColor, format);
-                var value_size = TextRenderer.MeasureText(context.Graphics, value, context.Font, rectangle.Size);
+                var value_size = TextRenderer.MeasureText(context.Graphics, value, context.Font, rectangle.Size, format);
                 size = AppendSizes(size, value_size);
             }
             return size;

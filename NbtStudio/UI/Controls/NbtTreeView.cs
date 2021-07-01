@@ -51,6 +51,7 @@ namespace NbtStudio.UI
 
         private void NbtTreeView_FontChanged(object sender, EventArgs e)
         {
+            // make sure rows are high enough to see tall/low letters
             this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
         }
 
