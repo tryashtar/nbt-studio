@@ -20,13 +20,13 @@ namespace NbtStudio
         public void Add(object obj)
         {
             ChildObjects.Add(obj);
-            RefreshChildren();
+            MarkDirty();
         }
 
         public void AddRange(IEnumerable<object> objects)
         {
             ChildObjects.AddRange(objects);
-            RefreshChildren();
+            MarkDirty();
         }
 
         public void Remove(INode child)
@@ -42,7 +42,7 @@ namespace NbtStudio
                 if (nodes.Contains(sibling.Value))
                     ChildObjects.Remove(sibling.Key);
             }
-            RefreshChildren();
+            MarkDirty();
         }
 
         protected override IEnumerable<object> GetChildren()

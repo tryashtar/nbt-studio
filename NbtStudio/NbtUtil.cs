@@ -162,6 +162,8 @@ namespace NbtStudio
                     child.AddTo(tag_list);
                 }
             }
+            else
+                throw new ArgumentException($"Cant assign {value} ({value.GetType()}) to a {tag.TagType}");
         }
 
         public static object ParseValue(string value, NbtTagType type)

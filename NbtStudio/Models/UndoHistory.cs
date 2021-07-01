@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace NbtStudio
 {
+    public interface IUndoHistory
+    {
+        void SaveAction(UndoableAction action);
+        void Undo();
+        void Redo();
+    }
+
     public class UndoHistory
     {
         private readonly Func<object, string> DescriptionGenerator;

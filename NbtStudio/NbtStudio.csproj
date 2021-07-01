@@ -8,7 +8,7 @@
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <RootNamespace>NbtStudio</RootNamespace>
-    <AssemblyName>NbtStudio</AssemblyName>
+    <AssemblyName>NBT Studio</AssemblyName>
     <ApplicationIcon>nbt_studio_icon_256.ico</ApplicationIcon>
     <Configurations>Debug;Release;PublishNormal;PublishSuperStandalone</Configurations>
     <Authors>tryashtar</Authors>

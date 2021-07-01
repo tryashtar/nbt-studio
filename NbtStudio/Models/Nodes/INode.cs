@@ -22,6 +22,7 @@ namespace NbtStudio
         bool HasChildren { get; } // allows nodes to be expandable without evaluating children yet
         string Description { get; } // appears in undo history
         int DescendantsCount { get; } // total number of descendant nodes, cached
+        void NoticeChange();
 
         // operations to be performed on nodes
         bool CanDelete { get; }

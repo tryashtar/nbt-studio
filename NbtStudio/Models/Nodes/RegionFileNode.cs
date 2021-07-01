@@ -30,7 +30,7 @@ namespace NbtStudio
 
         private void Region_OnSaved()
         {
-            RefreshChildren();
+            MarkDirty();
         }
 
         private void Region_ActionPerformed(UndoableAction action)
@@ -40,7 +40,7 @@ namespace NbtStudio
 
         private void Region_ChunksChanged()
         {
-            RefreshChildren();
+            MarkDirty();
         }
 
         protected override IEnumerable<Chunk> GetChildren()

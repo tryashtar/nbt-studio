@@ -16,32 +16,17 @@ namespace NbtStudio
         public NbtFileNode(NbtTreeModel tree, INode parent, NbtFile file) : base(tree, parent)
         {
             File = file;
-            File.RootTag.OnChanged += RootTag_Changed;
-            File.RootTag.ActionPerformed += RootTag_ActionPerformed;
             File.OnSaved += File_OnSaved;
         }
 
         protected override void SelfDispose()
         {
-            File.RootTag.OnChanged -= RootTag_Changed;
-            File.RootTag.ActionPerformed -= RootTag_ActionPerformed;
             File.OnSaved -= File_OnSaved;
         }
 
         private void File_OnSaved()
         {
             NotifyChanged();
-        }
-
-        private void RootTag_ActionPerformed(UndoableAction action)
-        {
-            NoticeAction(action);
-        }
-
-        private void RootTag_Changed(NbtTag tag)
-        {
-            if (File.RootTag == tag)
-                RefreshChildren();
         }
 
         protected override IEnumerable<NbtTag> GetChildren()

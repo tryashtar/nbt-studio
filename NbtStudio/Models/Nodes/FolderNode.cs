@@ -28,7 +28,7 @@ namespace NbtStudio
 
         private void Folder_ContentsChanged(object sender, EventArgs e)
         {
-            RefreshChildren();
+            MarkDirty();
         }
 
         public override bool HasChildren

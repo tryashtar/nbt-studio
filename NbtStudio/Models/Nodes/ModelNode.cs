@@ -37,6 +37,8 @@ namespace NbtStudio
                     }
                     ChildrenReady = true;
                 }
+                if (IsDirty)
+                    RefreshChildren();
                 return ChildNodes.Values.ToList();
             }
         }
@@ -81,13 +83,24 @@ namespace NbtStudio
             Parent = parent;
         }
 
+        private bool IsDirty = false;
+        protected void MarkDirty()
+        {
+            IsDirty = true;
+        }
+
+        public void NoticeChange()
+        {
+            MarkDirty();
+        }
+
         // allow derived nodes to simply fetch children from their wrapped object
         // they don't have to worry about converting them into INodes
         protected abstract IEnumerable<T> GetChildren();
 
         // derived class should call this when its children change
         // this notifies the model of any added/removed children, which in turn notifies the view
-        protected void RefreshChildren()
+        private void RefreshChildren()
         {
             if (!ChildrenReady)
                 return;
@@ -142,6 +155,7 @@ namespace NbtStudio
                 Tree.NotifyNodesReordered(path);
             }
             Tree.NotifyNodeChanged(this);
+            IsDirty = false;
         }
 
         public void Dispose()

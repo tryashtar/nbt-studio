@@ -13,14 +13,9 @@ namespace NbtStudio
     public class ChunkNode : ModelNode<NbtTag>
     {
         public readonly Chunk Chunk;
-        private bool HasSetupEvents = false;
         public ChunkNode(NbtTreeModel tree, INode parent, Chunk chunk) : base(tree, parent)
         {
             Chunk = chunk;
-            if (Chunk.IsLoaded)
-                SetupEvents();
-            else
-                Chunk.OnLoaded += Chunk_OnLoaded;
         }
 
         public NbtCompound AccessChunkData()
@@ -42,39 +37,8 @@ namespace NbtStudio
             }
         }
 
-        private void Chunk_OnLoaded(object sender, EventArgs e)
-        {
-            SetupEvents();
-        }
-
-        private void SetupEvents()
-        {
-            if (!HasSetupEvents)
-            {
-                Chunk.Data.OnChanged += Data_Changed;
-                Chunk.Data.ActionPerformed += Data_ActionPerformed;
-                HasSetupEvents = true;
-            }
-        }
-
         protected override void SelfDispose()
         {
-            if (HasSetupEvents)
-            {
-                Chunk.Data.OnChanged -= Data_Changed;
-                Chunk.Data.ActionPerformed -= Data_ActionPerformed;
-            }
-        }
-
-        private void Data_ActionPerformed(UndoableAction action)
-        {
-            NoticeAction(action);
-        }
-
-        private void Data_Changed(NbtTag tag)
-        {
-            if (Chunk.Data == tag)
-                RefreshChildren();
         }
 
         protected override IEnumerable<NbtTag> GetChildren()
