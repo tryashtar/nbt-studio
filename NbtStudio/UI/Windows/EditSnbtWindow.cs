@@ -25,18 +25,21 @@ namespace NbtStudio.UI
             SettingName = set_name;
             if (required is null || required.Value == NbtTagType.Compound || required.Value == NbtTagType.List)
             {
+                // change multiline before height, otherwise box doesn't shrink properly when resizing down
+                InputBox.Multiline = true;
                 this.Width = 750;
                 this.Height = 500;
                 MinifyCheck.Visible = true;
-                InputBox.Multiline = true;
+                WordWrapCheck.Visible = true;
             }
             else if (required.Value == NbtTagType.String || NbtUtil.IsArrayType(required.Value))
             {
+                InputBox.Multiline = true;
                 this.Width = 600;
                 this.Height = 300;
-                InputBox.Multiline = true;
-                InputBox.WordWrap = true;
-                InputBox.ScrollBars = ScrollBars.Vertical;
+                WordWrapCheck.Visible = true;
+                // move it up a bit since the minify checkbox isn't there
+                WordWrapCheck.Top -= WordWrapCheck.Height / 2;
             }
             else if (required.Value == NbtTagType.Float || required.Value == NbtTagType.Double)
             {
@@ -47,6 +50,8 @@ namespace NbtStudio.UI
             InputBox.AcceptsReturn = InputBox.Multiline;
             if (InputBox.Multiline)
                 this.FormBorderStyle = FormBorderStyle.Sizable;
+
+            InputBox.Height = InputBox.Height;
 
             NameLabel.Visible = SettingName;
             NameBox.Visible = SettingName;
@@ -161,6 +166,21 @@ namespace NbtStudio.UI
                 MinifyCheck.Checked ^= true;
                 MinifyCheck.CheckedChanged += MinifyCheck_CheckedChanged;
             }
+        }
+
+        private void EditSnbtWindow_Load(object sender, EventArgs e)
+        {
+            WordWrapCheck.Checked = Properties.Settings.Default.TagWordWrap;
+        }
+
+        private void EditSnbtWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.TagWordWrap = WordWrapCheck.Checked;
+        }
+
+        private void WordWrapCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            InputBox.WordWrap = WordWrapCheck.Checked;
         }
     }
 }

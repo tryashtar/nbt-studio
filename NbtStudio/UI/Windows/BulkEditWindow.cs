@@ -264,7 +264,6 @@ namespace NbtStudio.UI
             Properties.Settings.Default.FindRegex = RegexCheck.Checked;
             Properties.Settings.Default.FindText = FindBox.Text;
             Properties.Settings.Default.ReplaceText = ReplaceBox.Text;
-
         }
 
         private void FindBox_TextChanged(object sender, EventArgs e)

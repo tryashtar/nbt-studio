@@ -52,6 +52,22 @@ namespace NbtStudio
             }
         }
 
+        public static bool IsNumericType(NbtTagType type)
+        {
+            switch (type)
+            {
+                case NbtTagType.Byte:
+                case NbtTagType.Short:
+                case NbtTagType.Int:
+                case NbtTagType.Long:
+                case NbtTagType.Float:
+                case NbtTagType.Double:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public static bool IsArrayType(NbtTagType type)
         {
             switch (type)

@@ -8,8 +8,6 @@ namespace NbtStudio.UI
 {
     public partial class EditTagWindow : Form
     {
-        private readonly NbtTag WorkingTag;
-        private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
         private readonly bool SettingValue;
 
@@ -17,10 +15,8 @@ namespace NbtStudio.UI
         {
             InitializeComponent();
 
-            WorkingTag = tag;
-            TagParent = parent;
             NameBox.SetTags(tag, parent);
-            ValueBox.SetTags(tag, parent);
+            ValueBox.SetTags(tag, parent, fill_current_value: purpose != EditPurpose.Create);
 
             SettingName = set_name;
             NameLabel.Visible = SettingName;
@@ -34,8 +30,17 @@ namespace NbtStudio.UI
             {
                 ValueBox.Multiline = true;
                 ValueBox.AcceptsReturn = true;
-                ValueBox.Width *= 2;
-                ValueBox.Height *= 6;
+                ValueBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+                this.AutoSize = false;
+                this.Width = (int)(this.Width * 1.5);
+                this.Height = (int)(this.Height * 1.5);
+                this.FormBorderStyle = FormBorderStyle.Sizable;
+                WordWrapCheck.Visible = true;
+                WordWrapCheck_CheckedChanged(this, EventArgs.Empty);
+            }
+            else if (NbtUtil.IsNumericType(tag.TagType))
+            {
+                ValueBox.PlaceholderText = "0";
             }
             this.Icon = NbtUtil.TagTypeImage(source, tag.TagType).Icon;
             if (purpose == EditPurpose.Create)
@@ -124,12 +129,29 @@ namespace NbtStudio.UI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            // normal enter is handled by the AcceptButton property being OkButton
+            // except when editing a multiline string
             if (keyData == (Keys.Control | Keys.Enter) || keyData == (Keys.Shift | Keys.Enter))
             {
                 Confirm();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void EditTagWindow_Load(object sender, EventArgs e)
+        {
+            WordWrapCheck.Checked = Properties.Settings.Default.TagWordWrap;
+        }
+
+        private void EditTagWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.TagWordWrap = WordWrapCheck.Checked;
+        }
+
+        private void WordWrapCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            ValueBox.WordWrap = WordWrapCheck.Checked;
         }
     }
 
