@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 
 namespace NbtStudio.UI
 {
@@ -56,7 +57,7 @@ namespace NbtStudio.UI
             NbtTag = tag;
             NbtParent = parent;
             if (fill_current_value)
-                this.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
+                this.Text = tag.ToSnbt(SnbtOptions.MultilinePreview);
         }
 
         public string GetValueText()

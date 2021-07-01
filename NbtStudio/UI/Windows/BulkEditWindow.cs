@@ -12,7 +12,7 @@ namespace NbtStudio.UI
     public partial class BulkEditWindow : Form
     {
         private readonly BulkEditPurpose Purpose;
-        private readonly List<NbtTag> ChangedTags = new List<NbtTag>();
+        private readonly List<NbtTag> ChangedTags = new();
         private int ChangingCount = 0;
 
         private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
@@ -113,6 +113,7 @@ namespace NbtStudio.UI
             return true;
         }
 
+        private static readonly int RealMaxWidth = 1000;
         private void SetMinimumSize()
         {
             int width = 0;
@@ -122,6 +123,11 @@ namespace NbtStudio.UI
                 var size = graphics.MeasureString(item.Text, item.Font);
                 int item_width = (int)(size.Width * 2);
                 width = Math.Max(width, item_width);
+                if (width > RealMaxWidth)
+                {
+                    width = RealMaxWidth;
+                    break;
+                }
             }
             ActionList.MinimumSize = new Size(width, 0);
         }

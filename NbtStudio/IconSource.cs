@@ -203,7 +203,7 @@ namespace NbtStudio
     public class NullIconSource : SimpleIconSource
     {
         public override string Name => "Null";
-        public static NullIconSource Instance = new NullIconSource();
+        public static readonly NullIconSource Instance = new();
         private NullIconSource()
         { }
     }
@@ -211,7 +211,7 @@ namespace NbtStudio
     public class MixedIconSource : SimpleIconSource
     {
         public override string Name => "Mixed";
-        public static MixedIconSource Instance = new MixedIconSource();
+        public static readonly MixedIconSource Instance = new();
         private MixedIconSource()
         {
             Add(IconType.File, Properties.Resources.yusuke_file_file);
@@ -261,7 +261,7 @@ namespace NbtStudio
     public class YusukeIconSource : SimpleIconSource
     {
         public override string Name => "NBTExplorer";
-        public static YusukeIconSource Instance = new YusukeIconSource();
+        public static  readonly YusukeIconSource Instance = new();
         private YusukeIconSource()
         {
             Add(IconType.File, Properties.Resources.yusuke_file_chunk);
@@ -311,7 +311,7 @@ namespace NbtStudio
     public class AmberIconSource : SimpleIconSource
     {
         public override string Name => "Amber";
-        public static AmberIconSource Instance = new AmberIconSource();
+        public static readonly AmberIconSource Instance = new();
         private AmberIconSource()
         {
             Add(IconType.File, Properties.Resources.amber_file_file);
@@ -360,7 +360,7 @@ namespace NbtStudio
     public class WikiIconSource : DeferToDefaultIconSource
     {
         public override string Name => "Wiki";
-        public static WikiIconSource Instance = new WikiIconSource();
+        public static readonly WikiIconSource Instance = new();
         private WikiIconSource()
         {
             Add(IconType.ByteTag, Properties.Resources.wiki_tag_byte);

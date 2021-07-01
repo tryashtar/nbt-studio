@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
@@ -78,7 +79,7 @@ namespace NbtStudio.UI
 
         private SizeF DrawOrMeasure(TreeNodeAdv node, DrawContext context, bool draw)
         {
-            var (name, value) = GetText(node);
+            var (name, value) = PreviewNameAndValue(node);
             var boldfont = new Font(context.Font, FontStyle.Bold);
             context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -133,12 +134,6 @@ namespace NbtStudio.UI
             return PreviewTooltip(node.Tag as INode);
         }
 
-        private (string name, string value) GetText(TreeNodeAdv node)
-        {
-            var (name, value) = PreviewNameAndValue(node);
-            return (Flatten(name), Flatten(value));
-        }
-
         private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
         {
             string prefix = null;
@@ -177,7 +172,7 @@ namespace NbtStudio.UI
                 return $"{text} in world at ({world.x}, {world.z})";
             }
             if (node is NbtTagNode tag)
-                return tag.Tag.Name;
+                return Snbt.GetName(tag.Tag, SnbtOptions.Preview);
             return null;
         }
 
@@ -226,12 +221,6 @@ namespace NbtStudio.UI
                 return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
             }
             return null;
-        }
-
-        private static string Flatten(string text)
-        {
-            if (text is null) return null;
-            return text.Replace("\n", "⏎").Replace("\r", "⏎");
         }
     }
 }
