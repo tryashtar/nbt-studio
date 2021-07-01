@@ -220,6 +220,25 @@ namespace NbtStudio.UI
                 var blocks = coords.WorldBlocks(chunk.Chunk);
                 return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
             }
+            if (node is NbtTagNode tag && tag.Tag is NbtString str)
+            {
+                if (str.Value.Contains("\n"))
+                    return str.Value;
+                if (str.Value.Length > 100)
+                {
+                    string result = str.Value;
+                    int spacing = 100;
+                    for (int i = spacing; i < result.Length; i++)
+                    {
+                        if (Char.IsWhiteSpace(result[i]))
+                        {
+                            result = result.Substring(0, i) + "\n" + result.Substring(i + 1);
+                            i += spacing;
+                        }
+                    }
+                    return result;
+                }
+            }
             return null;
         }
     }
