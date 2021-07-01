@@ -88,7 +88,7 @@
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.MainTable.Size = new System.Drawing.Size(336, 149);
+            this.MainTable.Size = new System.Drawing.Size(362, 149);
             this.MainTable.TabIndex = 0;
             // 
             // ActionList
@@ -108,11 +108,10 @@
             this.ActionList.MultiSelect = false;
             this.ActionList.Name = "ActionList";
             this.ActionList.ShowItemToolTips = true;
-            this.ActionList.Size = new System.Drawing.Size(244, 59);
+            this.ActionList.Size = new System.Drawing.Size(270, 59);
             this.ActionList.TabIndex = 5;
             this.ActionList.UseCompatibleStateImageBehavior = false;
             this.ActionList.View = System.Windows.Forms.View.Details;
-            this.ActionList.ColumnWidthChanged += new System.Windows.Forms.ColumnWidthChangedEventHandler(this.ActionList_ColumnWidthChanged);
             this.ActionList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ActionList_ItemCheck);
             this.ActionList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ActionList_ItemChecked);
             this.ActionList.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.ActionList_ItemSelectionChanged);
@@ -163,7 +162,7 @@
             this.ButtonsPanel.Location = new System.Drawing.Point(0, 149);
             this.ButtonsPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ButtonsPanel.Name = "ButtonsPanel";
-            this.ButtonsPanel.Size = new System.Drawing.Size(336, 70);
+            this.ButtonsPanel.Size = new System.Drawing.Size(362, 70);
             this.ButtonsPanel.TabIndex = 9;
             this.ButtonsPanel.Click += new System.EventHandler(this.ButtonOk_Click);
             // 
@@ -185,7 +184,7 @@
             this.TagsChangingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.TagsChangingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.TagsChangingLabel.ForeColor = System.Drawing.Color.Gray;
-            this.TagsChangingLabel.Location = new System.Drawing.Point(142, 10);
+            this.TagsChangingLabel.Location = new System.Drawing.Point(168, 10);
             this.TagsChangingLabel.Margin = new System.Windows.Forms.Padding(12, 12, 6, 0);
             this.TagsChangingLabel.Name = "TagsChangingLabel";
             this.TagsChangingLabel.Size = new System.Drawing.Size(182, 18);
@@ -196,7 +195,7 @@
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ButtonOk.Location = new System.Drawing.Point(142, 31);
+            this.ButtonOk.Location = new System.Drawing.Point(168, 31);
             this.ButtonOk.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(88, 27);
@@ -210,7 +209,7 @@
             this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.ButtonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ButtonCancel.Location = new System.Drawing.Point(236, 31);
+            this.ButtonCancel.Location = new System.Drawing.Point(262, 31);
             this.ButtonCancel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(88, 27);
@@ -224,7 +223,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(336, 219);
+            this.ClientSize = new System.Drawing.Size(362, 219);
             this.Controls.Add(this.MainTable);
             this.Controls.Add(this.ButtonsPanel);
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -236,7 +235,6 @@
             this.Text = "Edit Tags...";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BulkEditWindow_FormClosed);
             this.Load += new System.EventHandler(this.BulkEditWindow_Load);
-            this.Layout += new System.Windows.Forms.LayoutEventHandler(this.BulkEditWindow_Layout);
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
             this.ButtonsPanel.ResumeLayout(false);

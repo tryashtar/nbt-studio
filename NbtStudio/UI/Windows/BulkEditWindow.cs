@@ -14,7 +14,7 @@ namespace NbtStudio.UI
         private readonly BulkEditPurpose Purpose;
         private readonly List<NbtTag> ChangedTags = new();
         private int ChangingCount = 0;
-        private readonly decimal[] ColumnRatios = new decimal[2] { 0.48M, 0.48M };
+        private readonly ColumnConsistinator Consistinator;
 
         private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
         {
@@ -23,7 +23,7 @@ namespace NbtStudio.UI
             Purpose = purpose;
             ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
             SetSize();
-            FixColumnRatios();
+            Consistinator = new(this, ActionList);
             this.Height += 200;
 
             if (purpose == BulkEditPurpose.Rename)
@@ -115,10 +115,11 @@ namespace NbtStudio.UI
             return true;
         }
 
-        private static readonly int RealMaxWidth = 1000;
+        private static readonly int RealMinWidth = 400;
+        private static readonly int RealMaxWidth = 1500;
         private void SetSize()
         {
-            int width = 0;
+            int width = RealMinWidth;
             var graphics = ActionList.CreateGraphics();
             foreach (ListViewItem item in ActionList.Items)
             {
@@ -132,16 +133,6 @@ namespace NbtStudio.UI
                 }
             }
             this.Width = width;
-        }
-
-        private void FixColumnRatios()
-        {
-            ActionList.ColumnWidthChanged -= ActionList_ColumnWidthChanged;
-            for (int i = 0; i < ColumnRatios.Length; i++)
-            {
-                ActionList.Columns[i].Width = (int)(ActionList.Width * ColumnRatios[i]);
-            }
-            ActionList.ColumnWidthChanged += ActionList_ColumnWidthChanged;
         }
 
         private delegate string Transformer(string value);
@@ -301,16 +292,6 @@ namespace NbtStudio.UI
                 ChangingCount++;
                 UpdateChangeLabel();
             }
-        }
-
-        private void BulkEditWindow_Layout(object sender, LayoutEventArgs e)
-        {
-            FixColumnRatios();
-        }
-
-        private void ActionList_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
-        {
-            ColumnRatios[e.ColumnIndex] = (decimal)ActionList.Columns[e.ColumnIndex].Width / ActionList.Width;
         }
     }
 
