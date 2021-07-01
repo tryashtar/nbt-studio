@@ -15,10 +15,15 @@ namespace NbtStudio
         public readonly bool Recursive;
         public bool HasScanned { get; private set; } = false;
         public event EventHandler ContentsChanged;
+        public event EventHandler<IEnumerable<(string path, Failable<IFile> file)>> FilesFailed;
         public IReadOnlyCollection<NbtFolder> Subfolders => SubfolderDict.Values;
+        public IEnumerable<NbtFolder> GetAllSubfolders() => Subfolders.Concat(Subfolders.SelectMany(x => x.GetAllSubfolders()));
         public IReadOnlyCollection<IFile> Files => FileDict.Values;
-        private readonly Dictionary<string, NbtFolder> SubfolderDict = new Dictionary<string, NbtFolder>();
-        private readonly Dictionary<string, IFile> FileDict = new Dictionary<string, IFile>();
+        public IEnumerable<IFile> GetAllFiles() => Files.Concat(Subfolders.SelectMany(x => x.GetAllFiles()));
+        public IEnumerable<(string path, Failable<IFile> file)> FailedFiles => FailedFileDict.Select(x => (x.Key, x.Value));
+        private readonly Dictionary<string, NbtFolder> SubfolderDict = new();
+        private readonly Dictionary<string, IFile> FileDict = new();
+        private readonly Dictionary<string, Failable<IFile>> FailedFileDict = new();
         public bool CanRefresh => true;
         public void Refresh() => Scan();
 
@@ -36,12 +41,15 @@ namespace NbtStudio
                 files = Directory.GetFiles(Path);
             else
                 files = new string[0];
+            var newly_failed = new List<(string path, Failable<IFile> file)>();
             foreach (var path in files)
             {
                 if (!FileDict.ContainsKey(path))
                 {
                     var file = OpenFile(path);
-                    if (!file.Failed)
+                    if (file.Failed)
+                        newly_failed.Add((path, file));
+                    else
                         FileDict.Add(path, file.Result);
                 }
             }
@@ -69,6 +77,14 @@ namespace NbtStudio
                 }
             }
             ContentsChanged?.Invoke(this, EventArgs.Empty);
+            if (newly_failed.Any())
+            {
+                FilesFailed?.Invoke(this, newly_failed);
+                foreach (var item in newly_failed)
+                {
+                    FailedFileDict[item.path] = item.file;
+                }
+            }
         }
 
         public static Failable<IFile> OpenFile(string path)

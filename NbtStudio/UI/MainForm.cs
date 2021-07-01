@@ -28,13 +28,19 @@ namespace NbtStudio.UI
             set
             {
                 if (_ViewModel is not null)
+                {
                     _ViewModel.Changed -= ViewModel_Changed;
+                }
+
                 _ViewModel = value;
                 NbtTree.Model = _ViewModel;
+
                 _ViewModel.Changed += ViewModel_Changed;
+
                 ViewModel_Changed(this, EventArgs.Empty);
             }
         }
+
         private UndoHistory UndoHistory => ViewModel.UndoHistory;
         private IconSource IconSource;
 
@@ -210,6 +216,14 @@ namespace NbtStudio.UI
                     ActionUpdate.Visible = true;
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            NbtTree.NodeAdded += NbtTree_NodeAdded;
+        }
+
+        private void NbtTree_NodeAdded(object sender, TreeNodeAdv e)
+        {
+            if (NbtTree.INodeFromNode(e) is FolderNode folder)
+                folder.Folder.FilesFailed += Folder_FilesFailed;
         }
 
         private Task<AvailableUpdate> UpdateChecker;
@@ -870,20 +884,6 @@ namespace NbtStudio.UI
             return buttons;
         }
 
-        private void OpenFolder(string path, bool skip_confirm = false)
-        {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
-                return;
-            Properties.Settings.Default.RecentFiles.Add(path);
-            ViewModel = new NbtTreeModel(new NbtFolder(path, true));
-        }
-
-        private void ImportFolder(string path)
-        {
-            Properties.Settings.Default.RecentFiles.Add(path);
-            ViewModel.Import(new NbtFolder(path, true));
-        }
-
         private void OpenPathsLike(IEnumerable<string> paths, Action<IEnumerable<IHavePath>> then)
         {
             var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
@@ -900,8 +900,30 @@ namespace NbtStudio.UI
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                then(good.Select(x => x.item.Result));
+                var results = good.Select(x => x.item.Result);
+                then(results);
             }
+        }
+
+        private void Folder_FilesFailed(object sender, IEnumerable<(string path, Failable<IFile> file)> bad)
+        {
+            string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
+            message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
+            var fail = Failable<IFile>.Aggregate(bad.Select(x => x.file).ToArray());
+            var window = new ExceptionWindow("Load failure", message, fail);
+            window.ShowDialog(this);
+        }
+
+        private void OpenFolder(string path, bool skip_confirm = false)
+        {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
+                return;
+            OpenPathsLike(new[] { path }, x => ViewModel = new NbtTreeModel(x));
+        }
+
+        private void ImportFolder(string path)
+        {
+            OpenPathsLike(new[] { path }, x => ViewModel.ImportMany(x));
         }
 
         private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)

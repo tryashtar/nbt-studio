@@ -47,6 +47,10 @@ namespace NbtStudio.UI
         {
             return e.Node.Tag as INode;
         }
+        public INode INodeFromNode(TreeNodeAdv node)
+        {
+            return node.Tag as INode;
+        }
         public INode DropINode => DropPosition.Node?.Tag as INode;
 
         private void NbtTreeView_FontChanged(object sender, EventArgs e)
