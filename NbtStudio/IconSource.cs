@@ -261,7 +261,7 @@ namespace NbtStudio
     public class YusukeIconSource : SimpleIconSource
     {
         public override string Name => "NBTExplorer";
-        public static  readonly YusukeIconSource Instance = new();
+        public static readonly YusukeIconSource Instance = new();
         private YusukeIconSource()
         {
             Add(IconType.File, Properties.Resources.yusuke_file_chunk);

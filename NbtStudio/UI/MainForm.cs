@@ -202,7 +202,9 @@ namespace NbtStudio.UI
 
             foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
             {
-                IconSetWindow.TryImportSource(item);
+                var attempt = IconSetWindow.TryImportSource(item);
+                if (attempt.Failed)
+                    IconSetWindow.ShowImportFailed(item, attempt, this);
             }
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
 
@@ -238,11 +240,16 @@ namespace NbtStudio.UI
             {
                 if (x.Status == TaskStatus.Faulted)
                 {
-                    if (MessageBox.Show(Failable.ExceptionMessage(x.Exception) + "\n\n" +
-                        "Would you like to go to the update page?\n\n" +
+                    var window = new ExceptionWindow("Update check failed",
+                        "Failed to check for updates.",
+                        FailableFactory.Failure(x.Exception, "Check for updates"),
+                        "Would you like to go to the update page?\n" +
                         "https://github.com/tryashtar/nbt-studio/releases",
-                        "Failed to check for updates", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                        Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                        ExceptionWindowButtons.OKCancel
+                    );
+                    window.ShowDialog(this);
+                    if (window.DialogResult == DialogResult.OK)
+                        IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
                 }
                 else if (x.Status == TaskStatus.RanToCompletion)
                 {
@@ -252,7 +259,7 @@ namespace NbtStudio.UI
                             "Would you like to go to the update page?\n\n" +
                             "https://github.com/tryashtar/nbt-studio/releases",
                             "No update found", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                            Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                            IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
                     }
                     else
                     {
@@ -326,7 +333,7 @@ namespace NbtStudio.UI
                         PasteTagLike(attempt2.Result, when_file);
                     else
                     {
-                        var error = Failable<NbtTag>.Aggregate(attempt1, attempt2);
+                        var error = FailableFactory.Aggregate(attempt1, attempt2);
                         var window = new ExceptionWindow("Clipboard error", "Failed to parse SNBT from clipboard.", error);
                         window.ShowDialog(this);
                     }
@@ -452,7 +459,7 @@ namespace NbtStudio.UI
                 UndoHistory.FinishBatchOperation(new DescriptionHolder("Refresh {0}", items.ToArray()), true);
                 if (errors.Any())
                 {
-                    var error = Failable<bool>.AggregateFailure(errors.Select(x => x.exception).ToArray());
+                    var error = FailableFactory.AggregateFailure(errors.Select(x => x.exception).ToArray());
                     string message = $"{StringUtils.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
                     message += String.Join("\n", errors.Select(x => x.item).Where(x => x is not null).Select(x => Path.GetFileName(x.Path)));
                     var window = new ExceptionWindow("Refresh error", message, error);
@@ -600,7 +607,7 @@ namespace NbtStudio.UI
             {
                 if (!(ex is OperationCanceledException))
                 {
-                    var error = Failable<bool>.Failure(ex, "Pasting");
+                    var error = FailableFactory.Failure(ex, "Pasting");
                     var window = new ExceptionWindow("Error while pasting", "An error occurred while pasting:", error);
                     window.ShowDialog(this);
                 }
@@ -776,7 +783,7 @@ namespace NbtStudio.UI
             var relevant = errors.Where(x => !(x is OperationCanceledException)).ToArray();
             if (relevant.Any())
             {
-                var error = Failable<bool>.AggregateFailure(relevant);
+                var error = FailableFactory.AggregateFailure(relevant);
                 var window = new ExceptionWindow("Error while deleting", "An error occurred while deleting:", error);
                 window.ShowDialog(this);
             }
@@ -893,7 +900,7 @@ namespace NbtStudio.UI
             {
                 string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-                var fail = Failable<IHavePath>.Aggregate(bad.Select(x => x.item).ToArray());
+                var fail = FailableFactory.Aggregate(bad.Select(x => x.item).ToArray());
                 var window = new ExceptionWindow("Load failure", message, fail);
                 window.ShowDialog(this);
             }
@@ -905,11 +912,11 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Folder_FilesFailed(object sender, IEnumerable<(string path, Failable<IFile> file)> bad)
+        private void Folder_FilesFailed(object sender, IEnumerable<(string path, IFailable<IFile> file)> bad)
         {
             string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
             message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-            var fail = Failable<IFile>.Aggregate(bad.Select(x => x.file).ToArray());
+            var fail = FailableFactory.Aggregate(bad.Select(x => x.file).ToArray());
             var window = new ExceptionWindow("Load failure", message, fail);
             window.ShowDialog(this);
         }

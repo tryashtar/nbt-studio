@@ -73,9 +73,9 @@ namespace NbtStudio
             return false;
         }
 
-        public static Failable<NbtFile> TryCreate(string path)
+        public static IFailable<NbtFile> TryCreate(string path)
         {
-            var methods = new Func<Failable<NbtFile>>[]
+            var methods = new Func<IFailable<NbtFile>>[]
             {
                 () => TryCreateFromSnbt(path), // SNBT
                 () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: true), // java files
@@ -85,12 +85,12 @@ namespace NbtStudio
             return TryVariousMethods(methods, x => LooksSuspicious(x.RootTag));
         }
 
-        public static Failable<NbtFile> TryVariousMethods(IEnumerable<Func<Failable<NbtFile>>> methods, Predicate<NbtFile> suspicious)
+        public static IFailable<NbtFile> TryVariousMethods(IEnumerable<Func<IFailable<NbtFile>>> methods, Predicate<NbtFile> suspicious)
         {
             // try loading a file a few different ways
             // if loading fails or looks suspicious, try a different way
             // if all loads are suspicious, choose the first that didn't fail
-            var attempted = new List<Failable<NbtFile>>();
+            var attempted = new List<IFailable<NbtFile>>();
             foreach (var method in methods)
             {
                 var result = method();
@@ -105,7 +105,7 @@ namespace NbtStudio
                     return attempt;
             }
             // everything failed, sob!
-            return Failable<NbtFile>.Aggregate(attempted.ToArray());
+            return FailableFactory.Aggregate(attempted.ToArray());
         }
 
         public static Failable<NbtFile> TryCreateFromSnbt(string path)
