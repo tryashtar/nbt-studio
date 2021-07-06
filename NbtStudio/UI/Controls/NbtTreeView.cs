@@ -17,8 +17,8 @@ namespace NbtStudio.UI
 {
     public class NbtTreeView : TreeViewAdv
     {
-        private readonly NbtIcon IconControl = new NbtIcon();
-        private readonly NbtText TextControl = new NbtText();
+        private readonly NbtIcon IconControl = new();
+        private readonly NbtText TextControl = new();
         public NbtTreeView()
         {
             NodeControls.Add(IconControl);
@@ -84,10 +84,8 @@ namespace NbtStudio.UI
         protected override void OnModelChanged()
         {
             base.OnModelChanged();
-            foreach (var item in Root.Children)
-            {
-                item.Expand();
-            }
+            if (Root.Children.Count == 1)
+                Root.Children[0].Expand();
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)

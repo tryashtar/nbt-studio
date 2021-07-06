@@ -36,11 +36,11 @@ namespace NbtStudio
         public void Scan()
         {
             HasScanned = true;
-            string[] files;
+            IEnumerable<string> files;
             if (Directory.Exists(Path))
-                files = Directory.GetFiles(Path);
+                files = Directory.GetFiles(Path).OrderBy(x => x, LogicalStringComparer.Instance);
             else
-                files = new string[0];
+                files = Array.Empty<string>();
             var newly_failed = new List<(string path, IFailable<IFile> file)>();
             foreach (var path in files)
             {

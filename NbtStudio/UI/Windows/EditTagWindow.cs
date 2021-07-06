@@ -19,8 +19,14 @@ namespace NbtStudio.UI
             ValueBox.SetTags(tag, parent, fill_current_value: purpose != EditPurpose.Create);
 
             SettingName = set_name;
-            NameLabel.Visible = SettingName;
-            NameBox.Visible = SettingName;
+            if (!SettingName)
+            {
+                this.MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height - MainTable.GetRowHeights()[0]);
+                this.Height -= MainTable.GetRowHeights()[0];
+                MainTable.RowStyles[0].Height = 0;
+                NameLabel.Visible = false;
+                NameBox.Visible = false;
+            }
 
             SettingValue = set_value;
             if (!SettingValue)
@@ -30,6 +36,7 @@ namespace NbtStudio.UI
                 ValueLabel.Visible = false;
                 ValueBox.Visible = false;
             }
+
             if (tag.TagType == NbtTagType.String)
             {
                 ValueBox.Multiline = true;
