@@ -84,8 +84,15 @@ namespace NbtStudio.UI
         protected override void OnModelChanged()
         {
             base.OnModelChanged();
-            if (Root.Children.Count == 1)
-                Root.Children[0].Expand();
+            var node = Root;
+            for (int i = 0; i < 3; i++)
+            {
+                if (node.Children.Count == 1)
+                {
+                    node = node.Children[0];
+                    node.Expand();
+                }
+            }
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
