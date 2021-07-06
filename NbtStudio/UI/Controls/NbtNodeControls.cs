@@ -131,7 +131,10 @@ namespace NbtStudio.UI
 
         public override string GetToolTip(TreeNodeAdv node)
         {
-            return PreviewTooltip(node.Tag as INode);
+            var tooltip = PreviewTooltip(node.Tag as INode);
+            if (tooltip == null)
+                return null;
+            return WrapTooltip(tooltip, 100);
         }
 
         private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
@@ -220,26 +223,34 @@ namespace NbtStudio.UI
                 var blocks = coords.WorldBlocks(chunk.Chunk);
                 return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
             }
-            if (node is NbtTagNode tag && tag.Tag is NbtString str)
+            if (node is NbtTagNode tag)
             {
-                if (str.Value.Contains("\n"))
-                    return str.Value;
-                if (str.Value.Length > 100)
+                if (tag.Tag is NbtString str)
                 {
-                    string result = str.Value;
-                    int spacing = 100;
-                    for (int i = spacing; i < result.Length; i++)
-                    {
-                        if (Char.IsWhiteSpace(result[i]))
-                        {
-                            result = result.Substring(0, i) + "\n" + result.Substring(i + 1);
-                            i += spacing;
-                        }
-                    }
-                    return result;
+                    if (str.Value.Contains("\n") || str.Value.Length > 100)
+                        return str.Value;
                 }
+                else if (tag.Tag is NbtByteArray ba)
+                    return String.Join(", ", ba.Value);
+                else if (tag.Tag is NbtIntArray ia)
+                    return String.Join(", ", ia.Value);
+                else if (tag.Tag is NbtLongArray la)
+                    return String.Join(", ", la.Value);
             }
             return null;
+        }
+
+        private static string WrapTooltip(string text, int max_width)
+        {
+            for (int i = max_width; i < text.Length; i++)
+            {
+                if (Char.IsWhiteSpace(text[i]))
+                {
+                    text = text.Substring(0, i) + "\n" + text[(i + 1)..];
+                    i += max_width;
+                }
+            }
+            return text;
         }
     }
 }
