@@ -19,7 +19,7 @@ namespace NbtStudio.UI
             Form = form;
             Control = control;
 
-            Form.Layout += Form_Layout;
+            Form.Resize += Form_Resize;
             Control.ColumnWidthChanged += Control_ColumnWidthChanged;
             ColumnRatios = new decimal[control.Columns.Count];
             DetermineColumnRatios();
@@ -37,7 +37,7 @@ namespace NbtStudio.UI
             Changing = false;
         }
 
-        private void Form_Layout(object sender, LayoutEventArgs e)
+        private void Form_Resize(object sender, EventArgs e)
         {
             FixColumnRatios();
         }
