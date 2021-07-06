@@ -23,9 +23,13 @@ namespace NbtStudio.UI
             NameBox.Visible = SettingName;
 
             SettingValue = set_value;
-            ValueLabel.Visible = SettingValue;
-            ValueBox.Visible = SettingValue;
-
+            if (!SettingValue)
+            {
+                this.MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height - MainTable.GetRowHeights()[1]);
+                this.Height -= MainTable.GetRowHeights()[1];
+                ValueLabel.Visible = false;
+                ValueBox.Visible = false;
+            }
             if (tag.TagType == NbtTagType.String)
             {
                 ValueBox.Multiline = true;

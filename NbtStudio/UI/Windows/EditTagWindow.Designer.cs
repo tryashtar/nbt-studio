@@ -33,10 +33,10 @@
             this.ButtonOk = new System.Windows.Forms.Button();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-            this.NameLabel = new System.Windows.Forms.Label();
-            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ValueLabel = new System.Windows.Forms.Label();
             this.ValueBox = new NbtStudio.UI.TagValueTextBox();
+            this.NameLabel = new System.Windows.Forms.Label();
+            this.NameBox = new NbtStudio.UI.TagNameTextBox();
             this.ButtonsPanel.SuspendLayout();
             this.MainTable.SuspendLayout();
             this.SuspendLayout();
@@ -48,7 +48,7 @@
             this.ButtonsPanel.Controls.Add(this.ButtonOk);
             this.ButtonsPanel.Controls.Add(this.ButtonCancel);
             this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ButtonsPanel.Location = new System.Drawing.Point(0, 84);
+            this.ButtonsPanel.Location = new System.Drawing.Point(0, 71);
             this.ButtonsPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ButtonsPanel.Name = "ButtonsPanel";
             this.ButtonsPanel.Size = new System.Drawing.Size(323, 47);
@@ -96,25 +96,45 @@
             // 
             // MainTable
             // 
-            this.MainTable.AutoSize = true;
-            this.MainTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.MainTable.ColumnCount = 2;
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.MainTable.Controls.Add(this.NameLabel, 0, 0);
-            this.MainTable.Controls.Add(this.NameBox, 1, 0);
             this.MainTable.Controls.Add(this.ValueLabel, 0, 1);
             this.MainTable.Controls.Add(this.ValueBox, 1, 1);
+            this.MainTable.Controls.Add(this.NameLabel, 0, 0);
+            this.MainTable.Controls.Add(this.NameBox, 1, 0);
             this.MainTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTable.Location = new System.Drawing.Point(0, 0);
             this.MainTable.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MainTable.Name = "MainTable";
             this.MainTable.RowCount = 2;
+            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.MainTable.Size = new System.Drawing.Size(323, 84);
+            this.MainTable.Size = new System.Drawing.Size(323, 71);
             this.MainTable.TabIndex = 7;
+            // 
+            // ValueLabel
+            // 
+            this.ValueLabel.AutoSize = true;
+            this.ValueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ValueLabel.Location = new System.Drawing.Point(12, 47);
+            this.ValueLabel.Margin = new System.Windows.Forms.Padding(12, 12, 6, 0);
+            this.ValueLabel.Name = "ValueLabel";
+            this.ValueLabel.Size = new System.Drawing.Size(41, 15);
+            this.ValueLabel.TabIndex = 3;
+            this.ValueLabel.Text = "Value:";
+            // 
+            // ValueBox
+            // 
+            this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ValueBox.Location = new System.Drawing.Point(68, 47);
+            this.ValueBox.Margin = new System.Windows.Forms.Padding(6, 12, 12, 0);
+            this.ValueBox.Name = "ValueBox";
+            this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ValueBox.Size = new System.Drawing.Size(243, 21);
+            this.ValueBox.TabIndex = 4;
             // 
             // NameLabel
             // 
@@ -138,44 +158,20 @@
             this.NameBox.Size = new System.Drawing.Size(243, 21);
             this.NameBox.TabIndex = 2;
             // 
-            // ValueLabel
-            // 
-            this.ValueLabel.AutoSize = true;
-            this.ValueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ValueLabel.Location = new System.Drawing.Point(12, 45);
-            this.ValueLabel.Margin = new System.Windows.Forms.Padding(12, 12, 6, 0);
-            this.ValueLabel.Name = "ValueLabel";
-            this.ValueLabel.Size = new System.Drawing.Size(41, 15);
-            this.ValueLabel.TabIndex = 3;
-            this.ValueLabel.Text = "Value:";
-            // 
-            // ValueBox
-            // 
-            this.ValueBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.ValueBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ValueBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ValueBox.Location = new System.Drawing.Point(68, 45);
-            this.ValueBox.Margin = new System.Windows.Forms.Padding(6, 12, 12, 0);
-            this.ValueBox.Name = "ValueBox";
-            this.ValueBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ValueBox.Size = new System.Drawing.Size(243, 21);
-            this.ValueBox.TabIndex = 4;
-            // 
             // EditTagWindow
             // 
             this.AcceptButton = this.ButtonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
             this.CancelButton = this.ButtonCancel;
-            this.ClientSize = new System.Drawing.Size(323, 131);
+            this.ClientSize = new System.Drawing.Size(323, 118);
             this.Controls.Add(this.MainTable);
             this.Controls.Add(this.ButtonsPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(339, 170);
+            this.MinimumSize = new System.Drawing.Size(339, 150);
             this.Name = "EditTagWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -187,7 +183,6 @@
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

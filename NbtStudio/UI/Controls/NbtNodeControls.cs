@@ -131,10 +131,7 @@ namespace NbtStudio.UI
 
         public override string GetToolTip(TreeNodeAdv node)
         {
-            var tooltip = PreviewTooltip(node.Tag as INode);
-            if (tooltip == null)
-                return null;
-            return WrapTooltip(tooltip, 100);
+            return PreviewTooltip(node.Tag as INode);
         }
 
         private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
@@ -227,15 +224,17 @@ namespace NbtStudio.UI
             {
                 if (tag.Tag is NbtString str)
                 {
-                    if (str.Value.Contains("\n") || str.Value.Length > 100)
+                    if (str.Value.Contains("\n"))
                         return str.Value;
+                    if (str.Value.Length > 100)
+                        return WrapTooltip(str.Value, 100);
                 }
                 else if (tag.Tag is NbtByteArray ba)
-                    return String.Join(", ", ba.Value);
+                    return WrapTooltip(String.Join(", ", ba.Value), 100);
                 else if (tag.Tag is NbtIntArray ia)
-                    return String.Join(", ", ia.Value);
+                    return WrapTooltip(String.Join(", ", ia.Value), 100);
                 else if (tag.Tag is NbtLongArray la)
-                    return String.Join(", ", la.Value);
+                    return WrapTooltip(String.Join(", ", la.Value), 100);
             }
             return null;
         }
