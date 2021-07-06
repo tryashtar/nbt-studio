@@ -472,7 +472,8 @@ namespace NbtStudio.UI
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
-                Save(file);
+                if (!Save(file))
+                    break;
             }
         }
 
@@ -480,57 +481,61 @@ namespace NbtStudio.UI
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
-                SaveAs(file);
+                if (!SaveAs(file))
+                    break;
             }
         }
 
-        private void Save(ISaveable file)
+        private bool Save(ISaveable file)
         {
             if (file.CanSave)
             {
                 file.Save();
                 NbtTree.Refresh();
+                return true;
             }
             else if (file is IExportable exp)
-                SaveAs(exp);
+                return SaveAs(exp);
+            return false;
         }
 
-        private void SaveAs(IExportable file)
+        private bool SaveAs(IExportable file)
         {
             string path = null;
             if (file is IHavePath has_path)
                 path = has_path.Path;
-            using (var dialog = new SaveFileDialog
+            using var dialog = new SaveFileDialog
             {
                 Title = path is null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
                 RestoreDirectory = true,
                 FileName = path,
                 Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
-            })
+            };
+            if (path is not null)
             {
-                if (path is not null)
+                dialog.InitialDirectory = Path.GetDirectoryName(path);
+                dialog.FileName = Path.GetFileName(path);
+            }
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (file is NbtFile nbtfile)
                 {
-                    dialog.InitialDirectory = Path.GetDirectoryName(path);
-                    dialog.FileName = Path.GetFileName(path);
-                }
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (file is NbtFile nbtfile)
+                    var export = new ExportWindow(IconSource, nbtfile.ExportSettings, dialog.FileName);
+                    if (export.ShowDialog() == DialogResult.OK)
                     {
-                        var export = new ExportWindow(IconSource, nbtfile.ExportSettings, dialog.FileName);
-                        if (export.ShowDialog() == DialogResult.OK)
-                        {
-                            nbtfile.SaveAs(dialog.FileName, export.GetSettings());
-                            Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
-                        }
-                    }
-                    else
-                    {
-                        file.SaveAs(dialog.FileName);
+                        nbtfile.SaveAs(dialog.FileName, export.GetSettings());
                         Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        return true;
                     }
+                }
+                else
+                {
+                    file.SaveAs(dialog.FileName);
+                    Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        return true;
                 }
             }
+            return false;
         }
 
         private void OpenInExplorer(IHavePath file)
