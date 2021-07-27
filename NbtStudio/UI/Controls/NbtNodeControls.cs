@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
@@ -78,19 +79,22 @@ namespace NbtStudio.UI
 
         private SizeF DrawOrMeasure(TreeNodeAdv node, DrawContext context, bool draw)
         {
-            var (name, value) = GetText(node);
+            var (name, value) = PreviewNameAndValue(node);
             var boldfont = new Font(context.Font, FontStyle.Bold);
             context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             SizeF size = SizeF.Empty;
             var rectangle = context.Bounds;
-            var format = TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.PreserveGraphicsTranslateTransform | TextFormatFlags.VerticalCenter;
+            var format = TextFormatFlags.PreserveGraphicsClipping |
+                TextFormatFlags.PreserveGraphicsTranslateTransform |
+                TextFormatFlags.VerticalCenter |
+                TextFormatFlags.NoPrefix;
 
             if (name is not null)
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, name, boldfont, rectangle, Parent.ForeColor, format);
-                var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size);
+                var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size, format);
                 size = AppendSizes(size, name_size);
                 rectangle.X += (int)name_size.Width;
             }
@@ -98,7 +102,7 @@ namespace NbtStudio.UI
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, value, context.Font, rectangle, Parent.ForeColor, format);
-                var value_size = TextRenderer.MeasureText(context.Graphics, value, context.Font, rectangle.Size);
+                var value_size = TextRenderer.MeasureText(context.Graphics, value, context.Font, rectangle.Size, format);
                 size = AppendSizes(size, value_size);
             }
             return size;
@@ -128,12 +132,6 @@ namespace NbtStudio.UI
         public override string GetToolTip(TreeNodeAdv node)
         {
             return PreviewTooltip(node.Tag as INode);
-        }
-
-        private (string name, string value) GetText(TreeNodeAdv node)
-        {
-            var (name, value) = PreviewNameAndValue(node);
-            return (Flatten(name), Flatten(value));
         }
 
         private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
@@ -174,7 +172,7 @@ namespace NbtStudio.UI
                 return $"{text} in world at ({world.x}, {world.z})";
             }
             if (node is NbtTagNode tag)
-                return tag.Tag.Name;
+                return Snbt.GetName(tag.Tag, SnbtOptions.Preview);
             return null;
         }
 
@@ -222,13 +220,36 @@ namespace NbtStudio.UI
                 var blocks = coords.WorldBlocks(chunk.Chunk);
                 return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
             }
+            if (node is NbtTagNode tag)
+            {
+                if (tag.Tag is NbtString str)
+                {
+                    if (str.Value.Contains("\n"))
+                        return str.Value;
+                    if (str.Value.Length > 100)
+                        return WrapTooltip(str.Value, 100);
+                }
+                else if (tag.Tag is NbtByteArray ba)
+                    return WrapTooltip(String.Join(", ", ba.Value), 100);
+                else if (tag.Tag is NbtIntArray ia)
+                    return WrapTooltip(String.Join(", ", ia.Value), 100);
+                else if (tag.Tag is NbtLongArray la)
+                    return WrapTooltip(String.Join(", ", la.Value), 100);
+            }
             return null;
         }
 
-        private static string Flatten(string text)
+        private static string WrapTooltip(string text, int max_width)
         {
-            if (text is null) return null;
-            return text.Replace("\n", "⏎").Replace("\r", "⏎");
+            for (int i = max_width; i < text.Length; i++)
+            {
+                if (Char.IsWhiteSpace(text[i]))
+                {
+                    text = text.Substring(0, i) + "\n" + text[(i + 1)..];
+                    i += max_width;
+                }
+            }
+            return text;
         }
     }
 }

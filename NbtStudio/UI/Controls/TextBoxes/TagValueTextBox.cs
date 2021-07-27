@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 
 namespace NbtStudio.UI
 {
@@ -51,11 +52,12 @@ namespace NbtStudio.UI
                 ShowTooltip("Unknown Error", "There was an unknown error attempting to parse the value", TimeSpan.FromSeconds(2));
         }
 
-        public void SetTags(NbtTag tag, NbtContainerTag parent)
+        public void SetTags(NbtTag tag, NbtContainerTag parent, bool fill_current_value)
         {
             NbtTag = tag;
             NbtParent = parent;
-            this.Text = NbtUtil.PreviewNbtValue(tag).Replace("\r", "").Replace("\n", Environment.NewLine);
+            if (fill_current_value)
+                this.Text = tag.ToSnbt(SnbtOptions.MultilinePreview);
         }
 
         public string GetValueText()

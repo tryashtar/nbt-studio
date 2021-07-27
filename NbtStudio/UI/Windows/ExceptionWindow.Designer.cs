@@ -28,60 +28,76 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.OKPanel = new System.Windows.Forms.Panel();
+            this.ButtonsPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.ButtonCancel = new System.Windows.Forms.Button();
+            this.ButtonOk = new System.Windows.Forms.Button();
             this.ButtonCopy = new System.Windows.Forms.Button();
             this.ButtonDetails = new System.Windows.Forms.Button();
-            this.ButtonOk = new System.Windows.Forms.Button();
             this.MessageLabel = new System.Windows.Forms.Label();
             this.MessagePanel = new System.Windows.Forms.Panel();
             this.ExtraInfoPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.ExtraInfoLabel = new System.Windows.Forms.Label();
-            this.OKPanel.SuspendLayout();
+            this.ButtonsPanel.SuspendLayout();
             this.MessagePanel.SuspendLayout();
             this.ExtraInfoPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // OKPanel
+            // ButtonsPanel
             // 
-            this.OKPanel.BackColor = System.Drawing.SystemColors.Control;
-            this.OKPanel.Controls.Add(this.ButtonCopy);
-            this.OKPanel.Controls.Add(this.ButtonDetails);
-            this.OKPanel.Controls.Add(this.ButtonOk);
-            this.OKPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.OKPanel.Location = new System.Drawing.Point(0, 59);
-            this.OKPanel.Name = "OKPanel";
-            this.OKPanel.Size = new System.Drawing.Size(317, 58);
-            this.OKPanel.TabIndex = 0;
+            this.ButtonsPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.ButtonsPanel.Controls.Add(this.ButtonCancel);
+            this.ButtonsPanel.Controls.Add(this.ButtonOk);
+            this.ButtonsPanel.Controls.Add(this.ButtonCopy);
+            this.ButtonsPanel.Controls.Add(this.ButtonDetails);
+            this.ButtonsPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ButtonsPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
+            this.ButtonsPanel.Location = new System.Drawing.Point(0, 59);
+            this.ButtonsPanel.Name = "ButtonsPanel";
+            this.ButtonsPanel.Padding = new System.Windows.Forms.Padding(10, 10, 0, 10);
+            this.ButtonsPanel.Size = new System.Drawing.Size(385, 58);
+            this.ButtonsPanel.TabIndex = 0;
             // 
-            // ButtonCopy
+            // ButtonCancel
             // 
-            this.ButtonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonCopy.Location = new System.Drawing.Point(13, 13);
-            this.ButtonCopy.Name = "ButtonCopy";
-            this.ButtonCopy.Size = new System.Drawing.Size(93, 35);
-            this.ButtonCopy.TabIndex = 3;
-            this.ButtonCopy.Text = "Copy";
-            this.ButtonCopy.Click += new System.EventHandler(this.ButtonCopy_Click);
-            // 
-            // ButtonDetails
-            // 
-            this.ButtonDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonDetails.Location = new System.Drawing.Point(113, 13);
-            this.ButtonDetails.Name = "ButtonDetails";
-            this.ButtonDetails.Size = new System.Drawing.Size(93, 35);
-            this.ButtonDetails.TabIndex = 2;
-            this.ButtonDetails.Text = "More Details";
-            this.ButtonDetails.Click += new System.EventHandler(this.ButtonDetails_Click);
+            this.ButtonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonCancel.Location = new System.Drawing.Point(279, 13);
+            this.ButtonCancel.Name = "ButtonCancel";
+            this.ButtonCancel.Size = new System.Drawing.Size(93, 35);
+            this.ButtonCancel.TabIndex = 4;
+            this.ButtonCancel.Text = "Cancel";
+            this.ButtonCancel.Visible = false;
+            this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
             // 
             // ButtonOk
             // 
             this.ButtonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOk.Location = new System.Drawing.Point(213, 13);
+            this.ButtonOk.Location = new System.Drawing.Point(180, 13);
             this.ButtonOk.Name = "ButtonOk";
             this.ButtonOk.Size = new System.Drawing.Size(93, 35);
             this.ButtonOk.TabIndex = 1;
             this.ButtonOk.Text = "OK";
             this.ButtonOk.Click += new System.EventHandler(this.OKButton_Click);
+            // 
+            // ButtonCopy
+            // 
+            this.ButtonCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonCopy.Location = new System.Drawing.Point(81, 13);
+            this.ButtonCopy.Name = "ButtonCopy";
+            this.ButtonCopy.Size = new System.Drawing.Size(93, 35);
+            this.ButtonCopy.TabIndex = 3;
+            this.ButtonCopy.Text = "Copy";
+            this.ButtonCopy.Visible = false;
+            this.ButtonCopy.Click += new System.EventHandler(this.ButtonCopy_Click);
+            // 
+            // ButtonDetails
+            // 
+            this.ButtonDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonDetails.Location = new System.Drawing.Point(279, 54);
+            this.ButtonDetails.Name = "ButtonDetails";
+            this.ButtonDetails.Size = new System.Drawing.Size(93, 35);
+            this.ButtonDetails.TabIndex = 2;
+            this.ButtonDetails.Text = "More Details";
+            this.ButtonDetails.Click += new System.EventHandler(this.ButtonDetails_Click);
             // 
             // MessageLabel
             // 
@@ -102,7 +118,7 @@
             this.MessagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MessagePanel.Location = new System.Drawing.Point(0, 0);
             this.MessagePanel.Name = "MessagePanel";
-            this.MessagePanel.Size = new System.Drawing.Size(317, 0);
+            this.MessagePanel.Size = new System.Drawing.Size(385, 0);
             this.MessagePanel.TabIndex = 2;
             // 
             // ExtraInfoPanel
@@ -113,7 +129,7 @@
             this.ExtraInfoPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ExtraInfoPanel.Location = new System.Drawing.Point(0, -30);
             this.ExtraInfoPanel.Name = "ExtraInfoPanel";
-            this.ExtraInfoPanel.Size = new System.Drawing.Size(317, 89);
+            this.ExtraInfoPanel.Size = new System.Drawing.Size(385, 89);
             this.ExtraInfoPanel.TabIndex = 3;
             this.ExtraInfoPanel.Visible = false;
             // 
@@ -133,11 +149,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(317, 117);
+            this.CancelButton = this.ButtonCancel;
+            this.ClientSize = new System.Drawing.Size(385, 117);
             this.Controls.Add(this.MessagePanel);
             this.Controls.Add(this.ExtraInfoPanel);
-            this.Controls.Add(this.OKPanel);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Controls.Add(this.ButtonsPanel);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(581, 802);
@@ -147,7 +164,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Load += new System.EventHandler(this.ExceptionWindow_Load);
-            this.OKPanel.ResumeLayout(false);
+            this.ButtonsPanel.ResumeLayout(false);
             this.MessagePanel.ResumeLayout(false);
             this.MessagePanel.PerformLayout();
             this.ExtraInfoPanel.ResumeLayout(false);
@@ -159,7 +176,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Panel OKPanel;
+        private System.Windows.Forms.FlowLayoutPanel ButtonsPanel;
         private System.Windows.Forms.Button ButtonOk;
         private System.Windows.Forms.Label MessageLabel;
         private System.Windows.Forms.Panel MessagePanel;
@@ -167,5 +184,6 @@
         private System.Windows.Forms.FlowLayoutPanel ExtraInfoPanel;
         private System.Windows.Forms.Label ExtraInfoLabel;
         private System.Windows.Forms.Button ButtonCopy;
+        private System.Windows.Forms.Button ButtonCancel;
     }
 }

@@ -58,7 +58,7 @@ namespace NbtStudio
                 var file = new fNbt.NbtFile();
                 file.BigEndian = BigEndian;
                 file.RootTag = root;
-                using (var writer = File.OpenWrite(path))
+                using (var writer = File.Create(path))
                 {
                     if (BedrockHeader)
                         writer.Seek(8, SeekOrigin.Begin);

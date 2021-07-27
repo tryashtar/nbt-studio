@@ -100,10 +100,14 @@ namespace NbtStudio
 
         // derived class should call this when its children change
         // this notifies the model of any added/removed children, which in turn notifies the view
-        private void RefreshChildren()
+        private bool IsRefreshingChildren = false;
+        protected void RefreshChildren()
         {
             if (!ChildrenReady)
                 return;
+            if (IsRefreshingChildren)
+                return;
+            IsRefreshingChildren = true;
             var path = Path;
             var new_children = GetChildren().Where(x => x is not null).ToList();
             var remove = ChildNodes.Keys.Except(new_children).ToArray();
@@ -156,6 +160,7 @@ namespace NbtStudio
             }
             Tree.NotifyNodeChanged(this);
             IsDirty = false;
+            IsRefreshingChildren = false;
         }
 
         public void Dispose()

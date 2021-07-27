@@ -10,26 +10,21 @@ namespace NbtStudio.UI
 {
     public partial class ExceptionWindow : Form
     {
-        public readonly Failable Error;
+        public readonly IFailable Error;
         public bool Expanded { get; private set; } = false;
-        public ExceptionWindow(string title, string message, Failable failable)
+        public ExceptionWindow(string title, string message, IFailable failable, string after = null, ExceptionWindowButtons buttons = ExceptionWindowButtons.OK)
         {
             InitializeComponent();
             Error = failable;
-            MessageLabel.Text = message + "\n\n" + failable.ToStringSimple();
+            MessageLabel.Text = message + "\n\n" + failable.ToStringSimple() + (after != null ? "\n\n" + after : "");
             ExtraInfoLabel.Text = failable.ToStringDetailed();
             Text = title;
             this.Icon = SystemIcons.Warning;
-        }
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == Keys.Escape)
+            if (buttons == ExceptionWindowButtons.OKCancel)
             {
-                this.Close();
-                return true;
+                ButtonCancel.Visible = true;
+                this.Width += ButtonCancel.Width;
             }
-            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void ExceptionWindow_Load(object sender, EventArgs e)
@@ -39,6 +34,13 @@ namespace NbtStudio.UI
 
         private void OKButton_Click(object sender, EventArgs e)
         {
+            this.DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
             Close();
         }
 
@@ -53,17 +55,19 @@ namespace NbtStudio.UI
             if (expanded)
             {
                 ExtraInfoPanel.Height = 300;
-                this.Width += 100;
+                this.Width += 130 + ButtonCopy.Width;
                 ExtraInfoPanel.Visible = true;
                 ButtonDetails.Text = "Less Details";
+                ButtonCopy.Visible = true;
             }
             else
             {
                 ExtraInfoPanel.Visible = false;
                 ExtraInfoPanel.Height = 300;
                 this.Height -= ExtraInfoPanel.Height;
-                this.Width -= 100;
+                this.Width -= 130 + ButtonCopy.Width;
                 ButtonDetails.Text = "More Details";
+                ButtonCopy.Visible = false;
             }
         }
 
@@ -71,5 +75,11 @@ namespace NbtStudio.UI
         {
             Clipboard.SetText(MessageLabel.Text + "\n\n" + ExtraInfoLabel.Text);
         }
+    }
+
+    public enum ExceptionWindowButtons
+    {
+        OK,
+        OKCancel
     }
 }

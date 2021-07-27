@@ -17,8 +17,8 @@ namespace NbtStudio.UI
 {
     public class NbtTreeView : TreeViewAdv
     {
-        private readonly NbtIcon IconControl = new NbtIcon();
-        private readonly NbtText TextControl = new NbtText();
+        private readonly NbtIcon IconControl = new();
+        private readonly NbtText TextControl = new();
         public NbtTreeView()
         {
             NodeControls.Add(IconControl);
@@ -47,10 +47,15 @@ namespace NbtStudio.UI
         {
             return e.Node.Tag as INode;
         }
+        public INode INodeFromNode(TreeNodeAdv node)
+        {
+            return node.Tag as INode;
+        }
         public INode DropINode => DropPosition.Node?.Tag as INode;
 
         private void NbtTreeView_FontChanged(object sender, EventArgs e)
         {
+            // make sure rows are high enough to see tall/low letters
             this.RowHeight = TextRenderer.MeasureText("fyWM", this.Font).Height + 6;
         }
 
@@ -79,9 +84,14 @@ namespace NbtStudio.UI
         protected override void OnModelChanged()
         {
             base.OnModelChanged();
-            foreach (var item in Root.Children)
+            var node = Root;
+            for (int i = 0; i < 3; i++)
             {
-                item.Expand();
+                if (node.Children.Count == 1)
+                {
+                    node = node.Children[0];
+                    node.Expand();
+                }
             }
         }
 

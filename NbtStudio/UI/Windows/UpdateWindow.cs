@@ -45,7 +45,8 @@ namespace NbtStudio.UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Failable.ExceptionMessage(ex), "Update failed!");
+                var window = new ExceptionWindow("Update error", "Failed to update the application.", FailableFactory.Failure(ex, "Updating"));
+                window.ShowDialog(this);
                 return false;
             }
         }

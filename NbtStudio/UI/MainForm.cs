@@ -28,13 +28,19 @@ namespace NbtStudio.UI
             set
             {
                 if (_ViewModel is not null)
+                {
                     _ViewModel.Changed -= ViewModel_Changed;
+                }
+
                 _ViewModel = value;
                 NbtTree.Model = _ViewModel;
+
                 _ViewModel.Changed += ViewModel_Changed;
+
                 ViewModel_Changed(this, EventArgs.Empty);
             }
         }
+
         private UndoHistory UndoHistory => ViewModel.UndoHistory;
         private IconSource IconSource;
 
@@ -196,7 +202,9 @@ namespace NbtStudio.UI
 
             foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
             {
-                IconSetWindow.TryImportSource(item);
+                var attempt = IconSetWindow.TryImportSource(item);
+                if (attempt.Failed)
+                    IconSetWindow.ShowImportFailed(item, attempt, this);
             }
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
 
@@ -210,6 +218,14 @@ namespace NbtStudio.UI
                     ActionUpdate.Visible = true;
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            NbtTree.NodeAdded += NbtTree_NodeAdded;
+        }
+
+        private void NbtTree_NodeAdded(object sender, TreeNodeAdv e)
+        {
+            if (NbtTree.INodeFromNode(e) is FolderNode folder)
+                folder.Folder.FilesFailed += Folder_FilesFailed;
         }
 
         private Task<AvailableUpdate> UpdateChecker;
@@ -224,11 +240,16 @@ namespace NbtStudio.UI
             {
                 if (x.Status == TaskStatus.Faulted)
                 {
-                    if (MessageBox.Show(Failable.ExceptionMessage(x.Exception) + "\n\n" +
-                        "Would you like to go to the update page?\n\n" +
+                    var window = new ExceptionWindow("Update check failed",
+                        "Failed to check for updates.",
+                        FailableFactory.Failure(x.Exception, "Check for updates"),
+                        "Would you like to go to the update page?\n" +
                         "https://github.com/tryashtar/nbt-studio/releases",
-                        "Failed to check for updates", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                        Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                        ExceptionWindowButtons.OKCancel
+                    );
+                    window.ShowDialog(this);
+                    if (window.DialogResult == DialogResult.OK)
+                        IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
                 }
                 else if (x.Status == TaskStatus.RanToCompletion)
                 {
@@ -238,7 +259,7 @@ namespace NbtStudio.UI
                             "Would you like to go to the update page?\n\n" +
                             "https://github.com/tryashtar/nbt-studio/releases",
                             "No update found", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                            Process.Start("https://github.com/tryashtar/nbt-studio/releases");
+                            IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
                     }
                     else
                     {
@@ -312,7 +333,7 @@ namespace NbtStudio.UI
                         PasteTagLike(attempt2.Result, when_file);
                     else
                     {
-                        var error = Failable<NbtTag>.Aggregate(attempt1, attempt2);
+                        var error = FailableFactory.Aggregate(attempt1, attempt2);
                         var window = new ExceptionWindow("Clipboard error", "Failed to parse SNBT from clipboard.", error);
                         window.ShowDialog(this);
                     }
@@ -438,7 +459,7 @@ namespace NbtStudio.UI
                 UndoHistory.FinishBatchOperation(new DescriptionHolder("Refresh {0}", items.ToArray()), true);
                 if (errors.Any())
                 {
-                    var error = Failable<bool>.AggregateFailure(errors.Select(x => x.exception).ToArray());
+                    var error = FailableFactory.AggregateFailure(errors.Select(x => x.exception).ToArray());
                     string message = $"{StringUtils.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
                     message += String.Join("\n", errors.Select(x => x.item).Where(x => x is not null).Select(x => Path.GetFileName(x.Path)));
                     var window = new ExceptionWindow("Refresh error", message, error);
@@ -451,7 +472,8 @@ namespace NbtStudio.UI
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
-                Save(file);
+                if (!Save(file))
+                    break;
             }
         }
 
@@ -459,57 +481,61 @@ namespace NbtStudio.UI
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
-                SaveAs(file);
+                if (!SaveAs(file))
+                    break;
             }
         }
 
-        private void Save(ISaveable file)
+        private bool Save(ISaveable file)
         {
             if (file.CanSave)
             {
                 file.Save();
                 NbtTree.Refresh();
+                return true;
             }
             else if (file is IExportable exp)
-                SaveAs(exp);
+                return SaveAs(exp);
+            return false;
         }
 
-        private void SaveAs(IExportable file)
+        private bool SaveAs(IExportable file)
         {
             string path = null;
             if (file is IHavePath has_path)
                 path = has_path.Path;
-            using (var dialog = new SaveFileDialog
+            using var dialog = new SaveFileDialog
             {
                 Title = path is null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
                 RestoreDirectory = true,
                 FileName = path,
                 Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
-            })
+            };
+            if (path is not null)
             {
-                if (path is not null)
+                dialog.InitialDirectory = Path.GetDirectoryName(path);
+                dialog.FileName = Path.GetFileName(path);
+            }
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (file is NbtFile nbtfile)
                 {
-                    dialog.InitialDirectory = Path.GetDirectoryName(path);
-                    dialog.FileName = Path.GetFileName(path);
-                }
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (file is NbtFile nbtfile)
+                    var export = new ExportWindow(IconSource, nbtfile.ExportSettings, dialog.FileName);
+                    if (export.ShowDialog() == DialogResult.OK)
                     {
-                        var export = new ExportWindow(IconSource, nbtfile.ExportSettings, dialog.FileName);
-                        if (export.ShowDialog() == DialogResult.OK)
-                        {
-                            nbtfile.SaveAs(dialog.FileName, export.GetSettings());
-                            Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
-                        }
-                    }
-                    else
-                    {
-                        file.SaveAs(dialog.FileName);
+                        nbtfile.SaveAs(dialog.FileName, export.GetSettings());
                         Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        return true;
                     }
+                }
+                else
+                {
+                    file.SaveAs(dialog.FileName);
+                    Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        return true;
                 }
             }
+            return false;
         }
 
         private void OpenInExplorer(IHavePath file)
@@ -586,7 +612,7 @@ namespace NbtStudio.UI
             {
                 if (!(ex is OperationCanceledException))
                 {
-                    var error = Failable<bool>.Failure(ex, "Pasting");
+                    var error = FailableFactory.Failure(ex, "Pasting");
                     var window = new ExceptionWindow("Error while pasting", "An error occurred while pasting:", error);
                     window.ShowDialog(this);
                 }
@@ -762,7 +788,7 @@ namespace NbtStudio.UI
             var relevant = errors.Where(x => !(x is OperationCanceledException)).ToArray();
             if (relevant.Any())
             {
-                var error = Failable<bool>.AggregateFailure(relevant);
+                var error = FailableFactory.AggregateFailure(relevant);
                 var window = new ExceptionWindow("Error while deleting", "An error occurred while deleting:", error);
                 window.ShowDialog(this);
             }
@@ -870,20 +896,6 @@ namespace NbtStudio.UI
             return buttons;
         }
 
-        private void OpenFolder(string path, bool skip_confirm = false)
-        {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
-                return;
-            Properties.Settings.Default.RecentFiles.Add(path);
-            ViewModel = new NbtTreeModel(new NbtFolder(path, true));
-        }
-
-        private void ImportFolder(string path)
-        {
-            Properties.Settings.Default.RecentFiles.Add(path);
-            ViewModel.Import(new NbtFolder(path, true));
-        }
-
         private void OpenPathsLike(IEnumerable<string> paths, Action<IEnumerable<IHavePath>> then)
         {
             var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
@@ -893,15 +905,37 @@ namespace NbtStudio.UI
             {
                 string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
                 message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-                var fail = Failable<IHavePath>.Aggregate(bad.Select(x => x.item).ToArray());
+                var fail = FailableFactory.Aggregate(bad.Select(x => x.item).ToArray());
                 var window = new ExceptionWindow("Load failure", message, fail);
                 window.ShowDialog(this);
             }
             if (good.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                then(good.Select(x => x.item.Result));
+                var results = good.Select(x => x.item.Result);
+                then(results);
             }
+        }
+
+        private void Folder_FilesFailed(object sender, IEnumerable<(string path, IFailable<IFile> file)> bad)
+        {
+            string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
+            message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
+            var fail = FailableFactory.Aggregate(bad.Select(x => x.file).ToArray());
+            var window = new ExceptionWindow("Load failure", message, fail);
+            window.ShowDialog(this);
+        }
+
+        private void OpenFolder(string path, bool skip_confirm = false)
+        {
+            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
+                return;
+            OpenPathsLike(new[] { path }, x => ViewModel = new NbtTreeModel(x));
+        }
+
+        private void ImportFolder(string path)
+        {
+            OpenPathsLike(new[] { path }, x => ViewModel.ImportMany(x));
         }
 
         private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
