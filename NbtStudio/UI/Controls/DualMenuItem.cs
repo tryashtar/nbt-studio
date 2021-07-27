@@ -157,6 +157,7 @@ namespace NbtStudio.UI
 
     public class DualItemCollection
     {
+        private IconSource Source;
         private readonly List<DualMenuItem> Items;
         public DualItemCollection(params DualMenuItem[] items)
         {
@@ -166,10 +167,21 @@ namespace NbtStudio.UI
         public void AddRange(IEnumerable<DualMenuItem> items)
         {
             Items.AddRange(items);
+            foreach (var item in items)
+            {
+                item.IconSource = Source;
+            }
+        }
+
+        public void Add(DualMenuItem item)
+        {
+            Items.Add(item);
+            item.IconSource = Source;
         }
 
         public void SetIconSource(IconSource source)
         {
+            Source = source;
             foreach (var item in Items)
             {
                 item.IconSource = source;

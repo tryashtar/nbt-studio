@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -94,7 +95,7 @@ namespace NbtStudio.UI
         public Regex ReparseRegex()
         {
 #if DEBUG
-            Console.WriteLine($"Parsing new regex: \"{this.Text}\"");
+            Debug.WriteLine($"Parsing new regex: \"{this.Text}\"");
 #endif
             return new Regex(this.Text, RegexOptions.IgnoreCase);
         }

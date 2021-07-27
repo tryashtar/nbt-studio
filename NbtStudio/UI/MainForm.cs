@@ -16,6 +16,8 @@ using System.Diagnostics;
 using TryashtarUtils.Utility;
 using TryashtarUtils.Nbt;
 using TryashtarUtils.Forms;
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
 
 namespace NbtStudio.UI
 {
@@ -43,6 +45,8 @@ namespace NbtStudio.UI
 
         private UndoHistory UndoHistory => ViewModel.UndoHistory;
         private IconSource IconSource;
+        private readonly ScriptEngine PythonEngine;
+
 
         private readonly Dictionary<NbtTagType, DualMenuItem> CreateTagButtons;
         private readonly string[] ClickedFiles;
@@ -83,6 +87,7 @@ namespace NbtStudio.UI
         private readonly DualMenuItem ActionAddChunk = DualMenuItem.SingleButton("Add Chunk", IconType.Chunk);
         private readonly DualMenuItem ActionUpdate = DualMenuItem.SingleMenuItem("&Update", null, Keys.None);
         private readonly DualMenuItem ActionCheckUpdates = DualMenuItem.SingleMenuItem("Check for &Updates", null, Keys.Control | Keys.U);
+        private readonly DualMenuItem ActionImportScript = DualMenuItem.SingleMenuItem("&Import New Script", IconType.OpenFile, Keys.None);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -90,6 +95,8 @@ namespace NbtStudio.UI
                 Properties.Settings.Default.RecentFiles = new StringCollection();
             if (Properties.Settings.Default.CustomIconSets is null)
                 Properties.Settings.Default.CustomIconSets = new StringCollection();
+            if (Properties.Settings.Default.CustomScripts is null)
+                Properties.Settings.Default.CustomScripts = new StringCollection();
 
             // stuff from the designer
             InitializeComponent();
@@ -126,6 +133,7 @@ namespace NbtStudio.UI
             ActionAddChunk.Click += (s, e) => AddChunk();
             ActionUpdate.Click += (s, e) => ShowUpdate();
             ActionCheckUpdates.Click += (s, e) => CheckForUpdates();
+            ActionImportScript.Click += (s, e) => ImportScript();
 
             ActionNew.AddTo(Tools, MenuFile);
             ActionNewRegion.AddToMenuItem(MenuFile);
@@ -171,6 +179,7 @@ namespace NbtStudio.UI
             ActionUpdate.AddToMenuStrip(MenuStrip);
             MenuHelp.DropDownItems.Add(new ToolStripSeparator());
             ActionCheckUpdates.AddToMenuItem(MenuHelp);
+            ActionImportScript.AddToMenuItem(MenuAutomate);
 
             CreateTagButtons = MakeCreateTagButtons();
             foreach (var item in CreateTagButtons.Values)
@@ -196,7 +205,8 @@ namespace NbtStudio.UI
                 ActionEdit, ActionEditSnbt, ActionDelete,
                 DropDownUndoHistory, DropDownRedoHistory, ActionClearUndoHistory,
                 ActionFind, ActionAbout, ActionAddSnbt, ActionAddChunk,
-                ActionChangeIcons, ActionUpdate, ActionCheckUpdates
+                ActionChangeIcons, ActionUpdate, ActionCheckUpdates,
+                ActionImportScript
             );
             ItemCollection.AddRange(CreateTagButtons.Values);
 
@@ -220,6 +230,9 @@ namespace NbtStudio.UI
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
             NbtTree.NodeAdded += NbtTree_NodeAdded;
+
+            PythonEngine = Python.CreateEngine();
+            ImportScripts(Properties.Settings.Default.CustomScripts.Cast<string>());
         }
 
         private void NbtTree_NodeAdded(object sender, TreeNodeAdv e)
@@ -289,26 +302,26 @@ namespace NbtStudio.UI
                 OpenFiles(ClickedFiles);
         }
 
-        private void New()
+        public void New()
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
             OpenFile(new NbtFile(), skip_confirm: true);
         }
 
-        private void ImportNew()
+        public void ImportNew()
         {
             ViewModel.Import(new NbtFile());
         }
 
-        private void NewRegion()
+        public void NewRegion()
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
             OpenFile(RegionFile.EmptyRegion(), skip_confirm: true);
         }
 
-        private void ImportNewRegion()
+        public void ImportNewRegion()
         {
             ViewModel.Import(RegionFile.EmptyRegion());
         }
@@ -354,12 +367,12 @@ namespace NbtStudio.UI
             }
         }
 
-        private void NewPaste()
+        public void NewPaste()
         {
             PasteLike(x => OpenFiles(x), x => OpenFile(x));
         }
 
-        private void ImportClipboard()
+        public void ImportClipboard()
         {
             PasteLike(x => ImportFiles(x), x => ImportFile(x));
         }
@@ -394,50 +407,50 @@ namespace NbtStudio.UI
             }
         }
 
-        private void OpenFile()
+        public void OpenFile()
         {
             if (!ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
             BrowseFileLike(x => OpenFiles(x, skip_confirm: true));
         }
 
-        private void OpenFile(ISaveable file, bool skip_confirm = false)
+        public void OpenFile(ISaveable file, bool skip_confirm = false)
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
             ViewModel = new NbtTreeModel(file);
         }
 
-        private void ImportFile()
+        public void ImportFile()
         {
             BrowseFileLike(x => ImportFiles(x));
         }
 
-        private void ImportFile(ISaveable file)
+        public void ImportFile(ISaveable file)
         {
             ViewModel.Import(file);
         }
 
-        private void OpenFolder()
+        public void OpenFolder()
         {
             if (!ConfirmIfUnsaved("Open a new folder anyway?"))
                 return;
             BrowseFolderLike(x => OpenFolder(x, skip_confirm: true));
         }
 
-        private void ImportFolder()
+        public void ImportFolder()
         {
             BrowseFolderLike(x => ImportFolder(x));
         }
 
-        private void Discard(IEnumerable<INode> nodes)
+        public void Discard(IEnumerable<INode> nodes)
         {
             var unsaved = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
             if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 ViewModel.RemoveMany(nodes);
         }
 
-        private void RefreshItems(IEnumerable<IRefreshable> items)
+        public void RefreshItems(IEnumerable<IRefreshable> items)
         {
             items = items.Where(x => x.CanRefresh);
             var unsaved = items.OfType<ISaveable>().Where(x => x.HasUnsavedChanges);
@@ -468,7 +481,56 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Save()
+        private void ImportScript()
+        {
+            using (var dialog = new OpenFileDialog
+            {
+                Title = "Select Python script",
+                RestoreDirectory = true,
+                Multiselect = true,
+                Filter = "Python files|*.py|All files|*"
+            })
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                    ImportScripts(dialog.FileNames);
+            }
+        }
+
+        private void ImportScripts(IEnumerable<string> files)
+        {
+            foreach (var file in files)
+            {
+                if (!Properties.Settings.Default.CustomScripts.Contains(file))
+                    Properties.Settings.Default.CustomScripts.Add(file);
+                var action = DualMenuItem.SingleMenuItem(Path.GetFileNameWithoutExtension(file), IconType.NbtStudio, Keys.None);
+                ItemCollection.Add(action);
+                action.AddToMenuItem(MenuAutomate);
+                action.Click += (s, e) => RunScript(file);
+            }
+        }
+
+        private void RunScript(string path)
+        {
+            var io = PythonEngine.Runtime.IO;
+            var script = PythonEngine.CreateScriptSourceFromFile(path);
+            var errors = new MemoryStream();
+            var results = new MemoryStream();
+            io.SetErrorOutput(errors, Encoding.Default);
+            io.SetOutput(results, Encoding.Default);
+            var scope = PythonEngine.CreateScope();
+            scope.SetVariable("tree", ViewModel);
+            scope.SetVariable("form", this);
+            script.Execute(scope);
+#if DEBUG
+            Debug.WriteLine($"Just ran script {path}");
+            var reader = new StreamReader(results);
+            Debug.WriteLine($"Results: {reader.ReadToEnd()}");
+            reader = new StreamReader(errors);
+            Debug.WriteLine($"Errors: {reader.ReadToEnd()}");
+#endif
+        }
+
+        public void Save()
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
@@ -477,7 +539,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void SaveAs()
+        public void SaveAs()
         {
             foreach (var file in ViewModel.OpenedFiles)
             {
@@ -486,7 +548,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private bool Save(ISaveable file)
+        public bool Save(ISaveable file)
         {
             if (file.CanSave)
             {
@@ -499,7 +561,7 @@ namespace NbtStudio.UI
             return false;
         }
 
-        private bool SaveAs(IExportable file)
+        public bool SaveAs(IExportable file)
         {
             string path = null;
             if (file is IHavePath has_path)
@@ -538,13 +600,13 @@ namespace NbtStudio.UI
             return false;
         }
 
-        private void OpenInExplorer(IHavePath file)
+        public void OpenInExplorer(IHavePath file)
         {
             var info = new ProcessStartInfo { FileName = "explorer", Arguments = $"/select, \"{file.Path}\"" };
             Process.Start(info);
         }
 
-        private void Sort()
+        public void Sort()
         {
             var obj = NbtTree.SelectedINode;
             if (obj is null || !obj.CanSort) return;
@@ -553,22 +615,22 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
         }
 
-        private void RefreshAll()
+        public void RefreshAll()
         {
             RefreshItems(ViewModel.OpenedFiles);
         }
 
-        private void Undo()
+        public void Undo()
         {
             UndoHistory.Undo();
         }
 
-        private void Redo()
+        public void Redo()
         {
             UndoHistory.Redo();
         }
 
-        private void ClearUndoHistory()
+        public void ClearUndoHistory()
         {
             UndoHistory.Clear();
         }
@@ -583,24 +645,24 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Cut()
+        public void Cut()
         {
             CopyLike(x => x.CanCut, x => x.Cut());
         }
 
-        private void Copy()
+        public void Copy()
         {
             CopyLike(x => x.CanCopy, x => x.Copy());
         }
 
-        private void Paste()
+        public void Paste()
         {
             var parent = NbtTree.SelectedINode;
             if (parent is null) return;
             Paste(parent);
         }
 
-        private void Paste(INode node)
+        public void Paste(INode node)
         {
             if (!node.CanPaste)
                 return;
@@ -620,7 +682,7 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Paste {0} into {1}", results, node), true);
         }
 
-        private void Rename()
+        public void Rename()
         {
             var items = NbtTree.SelectedINodes;
             if (ListUtils.ExactlyOne(items))
@@ -629,7 +691,7 @@ namespace NbtStudio.UI
                 BulkRename(items.Filter(x => x.GetNbtTag()));
         }
 
-        private void Edit()
+        public void Edit()
         {
             var items = NbtTree.SelectedINodes;
             if (ListUtils.ExactlyOne(items))
@@ -638,21 +700,21 @@ namespace NbtStudio.UI
                 BulkEdit(items.Filter(x => x.GetNbtTag()));
         }
 
-        private void BulkRename(IEnumerable<NbtTag> tags)
+        public void BulkRename(IEnumerable<NbtTag> tags)
         {
             UndoHistory.StartBatchOperation();
             var changed = BulkEditWindow.BulkRename(IconSource, tags);
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", changed), false);
         }
 
-        private void BulkEdit(IEnumerable<NbtTag> tags)
+        public void BulkEdit(IEnumerable<NbtTag> tags)
         {
             UndoHistory.StartBatchOperation();
             var changed = BulkEditWindow.BulkEdit(IconSource, tags);
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", changed), false);
         }
 
-        private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
+        public void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
         {
             if (!check(node)) return;
             var chunk = node.Get<Chunk>();
@@ -669,23 +731,23 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
 
-        private void Rename(INode node)
+        public void Rename(INode node)
         {
             EditLike(node, x => x.CanRename, RenameTag);
         }
 
-        private void Edit(INode node)
+        public void Edit(INode node)
         {
             EditLike(node, x => x.CanEdit, EditTag);
         }
 
-        private void RenameFile(IHavePath item)
+        public void RenameFile(IHavePath item)
         {
             if (item.Path is not null)
                 RenameFileWindow.RenameFile(IconSource, item);
         }
 
-        private void EditTag(NbtTag tag)
+        public void EditTag(NbtTag tag)
         {
             if (ByteProviders.HasProvider(tag))
                 EditHexWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
@@ -693,12 +755,12 @@ namespace NbtStudio.UI
                 EditTagWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
         }
 
-        private void EditChunk(Chunk chunk)
+        public void EditChunk(Chunk chunk)
         {
             EditChunkWindow.MoveChunk(IconSource, chunk);
         }
 
-        private void RenameTag(NbtTag tag)
+        public void RenameTag(NbtTag tag)
         {
             // likewise
             UndoHistory.StartBatchOperation();
@@ -706,7 +768,7 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Rename {0}", tag), false);
         }
 
-        private void EditSnbt()
+        public void EditSnbt()
         {
             var tag = NbtTree.SelectedINode?.GetNbtTag();
             if (tag is null) return;
@@ -715,7 +777,7 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0} as SNBT", tag), false);
         }
 
-        private void Delete()
+        public void Delete()
         {
             var selected_nodes = NbtTree.SelectedNodes;
             var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x is not null).ToList();
@@ -734,7 +796,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Delete(IEnumerable<INode> nodes)
+        public void Delete(IEnumerable<INode> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
             var file_nodes = nodes.Where(x => x.Get<IHavePath>() is not null);
@@ -796,7 +858,7 @@ namespace NbtStudio.UI
         }
 
         private FindWindow FindWindow;
-        private void Find()
+        public void Find()
         {
             if (FindWindow is null || FindWindow.IsDisposed)
                 FindWindow = new FindWindow(IconSource, ViewModel, NbtTree);
@@ -806,7 +868,7 @@ namespace NbtStudio.UI
         }
 
         private AboutWindow AboutWindow;
-        private void About()
+        public void About()
         {
             if (AboutWindow is null || AboutWindow.IsDisposed)
                 AboutWindow = new AboutWindow(IconSource);
@@ -816,7 +878,7 @@ namespace NbtStudio.UI
         }
 
         private IconSetWindow IconSetWindow;
-        private void ChangeIcons()
+        public void ChangeIcons()
         {
             if (IconSetWindow is null || IconSetWindow.IsDisposed)
             {
@@ -846,7 +908,7 @@ namespace NbtStudio.UI
                 SetIconSource(IconSetWindow.SelectedSource);
         }
 
-        private void AddSnbt()
+        public void AddSnbt()
         {
             var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
             if (parent is null) return;
@@ -855,7 +917,7 @@ namespace NbtStudio.UI
                 tag.AddTo(parent);
         }
 
-        private void AddChunk()
+        public void AddChunk()
         {
             var parent = NbtTree.SelectedINode?.Get<RegionFile>();
             if (parent is null) return;
@@ -864,14 +926,14 @@ namespace NbtStudio.UI
                 chunk.AddTo(parent);
         }
 
-        private void AddTag(NbtTagType type)
+        public void AddTag(NbtTagType type)
         {
             var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
             if (parent is null) return;
             AddTag(parent, type);
         }
 
-        private void AddTag(NbtContainerTag container, NbtTagType type)
+        public void AddTag(NbtContainerTag container, NbtTagType type)
         {
             NbtTag tag;
             if (NbtUtil.IsArrayType(type))
@@ -926,31 +988,31 @@ namespace NbtStudio.UI
             window.ShowDialog(this);
         }
 
-        private void OpenFolder(string path, bool skip_confirm = false)
+        public void OpenFolder(string path, bool skip_confirm = false)
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
                 return;
             OpenPathsLike(new[] { path }, x => ViewModel = new NbtTreeModel(x));
         }
 
-        private void ImportFolder(string path)
+        public void ImportFolder(string path)
         {
             OpenPathsLike(new[] { path }, x => ViewModel.ImportMany(x));
         }
 
-        private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
+        public void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
         {
             if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
                 return;
             OpenPathsLike(paths, x => ViewModel = new NbtTreeModel(x));
         }
 
-        private void ImportFiles(IEnumerable<string> paths)
+        public void ImportFiles(IEnumerable<string> paths)
         {
             OpenPathsLike(paths, x => ViewModel.ImportMany(x));
         }
 
-        private void OpenRecentFile()
+        public void OpenRecentFile()
         {
             UpdateRecentFiles();
             var files = Properties.Settings.Default.RecentFiles;
@@ -1081,7 +1143,7 @@ namespace NbtStudio.UI
 #endif
         }
 
-        private void SetAllSelected(IEnumerable<TreeNodeAdv> nodes, bool selected)
+        public void SetAllSelected(IEnumerable<TreeNodeAdv> nodes, bool selected)
         {
             foreach (var node in nodes)
             {

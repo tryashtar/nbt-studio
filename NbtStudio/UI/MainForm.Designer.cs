@@ -35,6 +35,7 @@
             this.MenuSearch = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.NbtTree = new NbtStudio.UI.NbtTreeView();
+            this.MenuAutomate = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,7 +43,7 @@
             // 
             this.Tools.Location = new System.Drawing.Point(0, 24);
             this.Tools.Name = "Tools";
-            this.Tools.Size = new System.Drawing.Size(800, 25);
+            this.Tools.Size = new System.Drawing.Size(933, 25);
             this.Tools.TabIndex = 1;
             this.Tools.Text = "toolStrip1";
             // 
@@ -52,10 +53,12 @@
             this.MenuFile,
             this.MenuEdit,
             this.MenuSearch,
+            this.MenuAutomate,
             this.MenuHelp});
             this.MenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip.Name = "MenuStrip";
-            this.MenuStrip.Size = new System.Drawing.Size(800, 24);
+            this.MenuStrip.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            this.MenuStrip.Size = new System.Drawing.Size(933, 24);
             this.MenuStrip.TabIndex = 2;
             this.MenuStrip.Text = "menuStrip1";
             // 
@@ -93,16 +96,18 @@
             this.NbtTree.DefaultToolTipProvider = null;
             this.NbtTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.NbtTree.DragDropMarkColor = System.Drawing.Color.Black;
-            this.NbtTree.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NbtTree.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.NbtTree.LineColor = System.Drawing.SystemColors.ControlDark;
             this.NbtTree.LoadOnDemand = true;
             this.NbtTree.Location = new System.Drawing.Point(0, 49);
+            this.NbtTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.NbtTree.Model = null;
             this.NbtTree.Name = "NbtTree";
             this.NbtTree.RowHeight = 20;
             this.NbtTree.SelectedNode = null;
             this.NbtTree.SelectionMode = Aga.Controls.Tree.TreeSelectionMode.Multi;
-            this.NbtTree.Size = new System.Drawing.Size(800, 401);
+            this.NbtTree.ShowNodeToolTips = true;
+            this.NbtTree.Size = new System.Drawing.Size(933, 470);
             this.NbtTree.TabIndex = 3;
             this.NbtTree.Text = "NBT Tree";
             this.NbtTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.NbtTree_ItemDrag);
@@ -112,16 +117,23 @@
             this.NbtTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragDrop);
             this.NbtTree.DragOver += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragOver);
             // 
+            // MenuAutomate
+            // 
+            this.MenuAutomate.Name = "MenuAutomate";
+            this.MenuAutomate.Size = new System.Drawing.Size(72, 20);
+            this.MenuAutomate.Text = "&Automate";
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(933, 519);
             this.Controls.Add(this.NbtTree);
             this.Controls.Add(this.Tools);
             this.Controls.Add(this.MenuStrip);
             this.KeyPreview = true;
             this.MainMenuStrip = this.MenuStrip;
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "MainForm";
             this.Text = "NBT Studio";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -143,6 +155,7 @@
         private System.Windows.Forms.ToolStripMenuItem MenuSearch;
         private System.Windows.Forms.ToolStripMenuItem MenuHelp;
         private NbtTreeView NbtTree;
+        private System.Windows.Forms.ToolStripMenuItem MenuAutomate;
     }
 }
 

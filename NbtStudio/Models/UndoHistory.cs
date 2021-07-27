@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,9 +39,9 @@ namespace NbtStudio
                 UndoBatch.Add(action);
 #if DEBUG
             if (BatchNumber == 0)
-                Console.WriteLine($"Added action to main stack: \"{GetDescription(action.Description)}\". Undo stack has {UndoStack.Count} items");
+                Debug.WriteLine($"Added action to main stack: \"{GetDescription(action.Description)}\". Undo stack has {UndoStack.Count} items");
             else
-                Console.WriteLine($"Added action to batch: \"{GetDescription(action.Description)}\". Batch has {UndoBatch.Count} items");
+                Debug.WriteLine($"Added action to batch: \"{GetDescription(action.Description)}\". Batch has {UndoBatch.Count} items");
 #endif
         }
 
@@ -52,7 +53,7 @@ namespace NbtStudio
                 RedoStack.Push(action);
                 action.Undo();
 #if DEBUG
-                Console.WriteLine($"Performed undo of action \"{action.Description}\". Undo stack has {UndoStack.Count} items. Redo stack has {RedoStack.Count} items");
+                Debug.WriteLine($"Performed undo of action \"{action.Description}\". Undo stack has {UndoStack.Count} items. Redo stack has {RedoStack.Count} items");
 #endif
             }
             Changed?.Invoke(this, EventArgs.Empty);
@@ -66,7 +67,7 @@ namespace NbtStudio
                 UndoStack.Push(action);
                 action.Do();
 #if DEBUG
-                Console.WriteLine($"Performed redo of action \"{action.Description}\". Redo stack has {RedoStack.Count} items. Undo stack has {UndoStack.Count} items");
+                Debug.WriteLine($"Performed redo of action \"{action.Description}\". Redo stack has {RedoStack.Count} items. Undo stack has {UndoStack.Count} items");
 #endif
             }
             Changed?.Invoke(this, EventArgs.Empty);
@@ -98,9 +99,9 @@ namespace NbtStudio
         {
             BatchNumber++;
 #if DEBUG
-            Console.WriteLine($"Starting a batch operation");
+            Debug.WriteLine($"Starting a batch operation");
             if (BatchNumber > 1)
-                Console.WriteLine($"It's nested (batch {BatchNumber}), that's a bit unusual");
+                Debug.WriteLine($"It's nested (batch {BatchNumber}), that's a bit unusual");
 #endif
         }
 
@@ -109,15 +110,15 @@ namespace NbtStudio
             if (BatchNumber == 0)
             {
 #if DEBUG
-                Console.WriteLine($"Told to finish a batch operation but we aren't currently doing one?");
+                Debug.WriteLine($"Told to finish a batch operation but we aren't currently doing one?");
 #endif
                 return;
             }
 #if DEBUG
             if (!UndoBatch.Any())
-                Console.WriteLine($"Finished a batch that didn't have any actions in it?");
+                Debug.WriteLine($"Finished a batch that didn't have any actions in it?");
             if (BatchNumber > 1)
-                Console.WriteLine($"Finished nested batch {BatchNumber}, continuing to batch");
+                Debug.WriteLine($"Finished nested batch {BatchNumber}, continuing to batch");
 #endif
             BatchNumber--;
             if (BatchNumber == 0 && UndoBatch.Any())
@@ -129,7 +130,7 @@ namespace NbtStudio
                     merged_action = UndoBatch.Single();
                 UndoStack.Push(merged_action);
 #if DEBUG
-                Console.WriteLine($"Finished batch of {UndoBatch.Count} actions, merged onto stack as action: \"{GetDescription(description)}\". Stack has {UndoStack.Count} items");
+                Debug.WriteLine($"Finished batch of {UndoBatch.Count} actions, merged onto stack as action: \"{GetDescription(description)}\". Stack has {UndoStack.Count} items");
 #endif
                 UndoBatch.Clear();
                 Changed?.Invoke(this, EventArgs.Empty);

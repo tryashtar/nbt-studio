@@ -54,6 +54,7 @@
     <ProjectReference Include="..\utils\Nbt\TryashtarUtils.Nbt.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="IronPython" Version="2.7.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.1" />
     <EmbeddedResource Update="Properties\Resources.resx">
