@@ -14,7 +14,7 @@ namespace NbtStudio
     {
         public const int ChunkXDimension = 32;
         public const int ChunkZDimension = 32;
-        private static readonly Regex CoordsRegex = new Regex(@"^r\.(?<x>-?[0-9]+)\.(?<z>-?[0-9]+)");
+        public static readonly Regex CoordsRegex = new(@"^r\.(?<x>-?[0-9]+)\.(?<z>-?[0-9]+)");
         public RegionCoords Coords
         {
             get
@@ -30,13 +30,10 @@ namespace NbtStudio
         public int ChunkCount { get; private set; }
         public event Action ChunksChanged;
         public event Action OnSaved;
-        public event Action<UndoableAction> ActionPerformed;
-        private Chunk[,] Chunks;
+        private ChunkEntry[,] ChunkEntries;
         private byte[] Locations;
         private byte[] Timestamps;
         public string Path { get; private set; }
-        public bool HasChunkChanges { get; private set; } = false;
-        public bool HasUnsavedChanges => HasChunkChanges || AllChunks.Any(x => x is not null && x.HasUnsavedChanges);
         public RegionFile(string path)
         {
             Path = path;
@@ -45,50 +42,44 @@ namespace NbtStudio
 
         private void Load()
         {
-            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
-            var stream = GetStream();
-            try
+            ChunkEntries = new ChunkEntry[ChunkXDimension, ChunkZDimension];
+            using var stream = GetStream();
+            Locations = IOUtils.ReadBytes(stream, 4096);
+            Timestamps = IOUtils.ReadBytes(stream, 4096);
+            ChunkCount = 0;
+            for (int z = 0; z < ChunkEntries.GetLength(1); z++)
             {
-                Locations = IOUtils.ReadBytes(stream, 4096);
-                Timestamps = IOUtils.ReadBytes(stream, 4096);
-                ChunkCount = 0;
-                for (int z = 0; z < Chunks.GetLength(1); z++)
+                for (int x = 0; x < ChunkEntries.GetLength(0); x++)
                 {
-                    for (int x = 0; x < Chunks.GetLength(0); x++)
+                    int offset = ChunkOffset(x, z);
+                    int size = ChunkSize(x, z);
+                    if (offset > 0 && offset < 8192)
+                        throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
+                    if (offset > stream.Length)
+                        throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {stream.Length} long");
+                    if (size > 0)
                     {
-                        int offset = ChunkOffset(x, z);
-                        int size = ChunkSize(x, z);
-                        if (offset > 0 && offset < 8192)
-                            throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
-                        if (offset > stream.Length)
-                            throw new FormatException($"Invalid region file, thinks there's a {size}-long chunk at position {offset} but file is only {stream.Length} long");
-                        if (size > 0)
-                        {
-                            ChunkCount++;
-                            Chunks[x, z] = new Chunk(this, x, z, offset, size);
-                            if (ChunkCount == 1)
-                                Chunks[x, z].Load(); // load the first one to check if this is really a region file
-                        }
+                        ChunkCount++;
+                        ChunkEntries[x, z] = new ChunkEntry(this, x, z, offset, size);
+                        if (ChunkCount == 1)
+                            ChunkEntries[x, z].Load(); // load the first one to check if this is really a region file
                     }
                 }
-                if (ChunkCount == 0)
-                    throw new FormatException($"Region doesn't contain any chunks");
             }
-            finally
-            {
-                stream.Dispose();
-            }
+            if (ChunkCount == 0)
+                throw new FormatException($"Region doesn't contain any chunks");
         }
 
         private RegionFile()
         {
-            Chunks = new Chunk[ChunkXDimension, ChunkZDimension];
+            ChunkEntries = new ChunkEntry[ChunkXDimension, ChunkZDimension];
             Path = null;
             Locations = new byte[4096];
             Timestamps = new byte[4096];
             ChunkCount = 0;
         }
-        public static RegionFile EmptyRegion()
+
+        public static RegionFile Empty()
         {
             return new RegionFile();
         }
@@ -120,13 +111,6 @@ namespace NbtStudio
                         yield return (x, z);
                 }
             }
-        }
-
-        private void PerformAction(DescriptionHolder holder, Action action, Action undo)
-        {
-            var undoable = new UndoableAction(holder, action, undo);
-            undoable.Do();
-            ActionPerformed?.Invoke(undoable);
         }
 
         public void RemoveChunk(int x, int z)

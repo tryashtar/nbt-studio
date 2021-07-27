@@ -74,7 +74,7 @@ namespace NbtStudio
         {
             var tags = NbtNodeOperations.ParseTags(data).OfType<NbtCompound>().ToList();
             var available = Region.GetAvailableCoords();
-            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.EmptyChunk(tag, slot.x, slot.z)).ToList();
+            var chunks = Enumerable.Zip(available, tags, (slot, tag) => Chunk.Empty(tag, slot.x, slot.z)).ToList();
             foreach (var chunk in chunks)
             {
                 Region.AddChunk(chunk);

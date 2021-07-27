@@ -98,12 +98,7 @@ namespace NbtStudio
 
         private IEnumerable<INode> BreadthFirstSearch(Predicate<INode> predicate)
         {
-            var queue = new Queue<INode>();
-            foreach (var item in Root.Children)
-            {
-                // don't just enqueue Root directly because the predicate might not match it
-                queue.Enqueue(item);
-            }
+            var queue = new Queue<INode>(Root.Children);
             while (queue.Any())
             {
                 var item = queue.Dequeue();

@@ -32,7 +32,7 @@ namespace NbtStudio.UI
 
         public static Chunk CreateChunk(IconSource source, RegionFile parent, bool bypass_window = false, NbtCompound data = null)
         {
-            var chunk = Chunk.EmptyChunk(data);
+            var chunk = Chunk.Empty(data);
 
             if (bypass_window)
             {

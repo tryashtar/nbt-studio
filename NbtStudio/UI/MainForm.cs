@@ -305,12 +305,12 @@ namespace NbtStudio.UI
         {
             if (!ConfirmIfUnsaved("Create a new file anyway?"))
                 return;
-            OpenFile(RegionFile.EmptyRegion(), skip_confirm: true);
+            OpenFile(RegionFile.Empty(), skip_confirm: true);
         }
 
         private void ImportNewRegion()
         {
-            ViewModel.Import(RegionFile.EmptyRegion());
+            ViewModel.Import(RegionFile.Empty());
         }
 
         private void PasteLike(Action<IEnumerable<string>> when_paths, Action<NbtFile> when_file)
