@@ -20,71 +20,24 @@ namespace NbtStudio
         public event EventHandler<TreeModelEventArgs> NodesInserted;
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
         public event EventHandler<TreePathEventArgs> StructureChanged;
-        public event EventHandler Changed;
 
-        public readonly ModelRootNode Root;
+        private readonly List<Node> Roots;
+        public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
         public readonly UndoHistory UndoHistory;
 
         public NbtTreeModel(IEnumerable<object> roots)
         {
             UndoHistory = new UndoHistory(GetDescription);
             UndoHistory.Changed += UndoHistory_Changed;
-            Root = new ModelRootNode(this, roots);
+            Roots = roots.Select(x => NodeFactory.Create(null, x)).ToList();
         }
         public NbtTreeModel(object root) : this(new[] { root }) { }
         public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
 
-        public void Import(object obj)
-        {
-            Root.Add(obj);
-        }
-
-        public void ImportMany(IEnumerable<object> objects)
-        {
-            Root.AddRange(objects);
-        }
-
-        public void RemoveMany(IEnumerable<INode> nodes)
-        {
-            Root.RemoveNodes(nodes);
-        }
-
-        private void UndoHistory_Changed(object sender, EventArgs e)
-        {
-            Changed?.Invoke(this, EventArgs.Empty);
-        }
-
-        public static string GetDescription(object obj)
-        {
-            if (obj is INode node)
-                return node.Description;
-            if (obj is IEnumerable<INode> nodes)
-                return ExtractNodeOperations.Description(nodes);
-            if (obj is NbtTag tag)
-                return NbtUtil.TagDescription(tag);
-            if (obj is IEnumerable<NbtTag> tags)
-                return NbtUtil.TagDescription(tags);
-            return obj.ToString();
-        }
-
-        public bool HasAnyUnsavedChanges => OpenedFiles.Any(x => x.HasUnsavedChanges);
-        public IEnumerable<IFile> OpenedFiles
-        {
-            get
-            {
-                foreach (var item in BreadthFirstSearch(x => (x is FolderNode folder && folder.Folder.HasScanned) || x.Get<IFile>() is not null))
-                {
-                    var file = item.Get<IFile>();
-                    if (file is not null)
-                        yield return file;
-                }
-            }
-        }
-
-        public (INode destination, int index) GetInsertionLocation(INode target, NodePosition position)
+        public (Node destination, int index) GetInsertionLocation(Node target, NodePosition position)
         {
             if (position == NodePosition.Inside)
-                return (target, target.Children.Count());
+                return (target, target.Children.Count);
             else
             {
                 var parent = target.Parent;
@@ -96,39 +49,20 @@ namespace NbtStudio
             }
         }
 
-        private IEnumerable<INode> BreadthFirstSearch(Predicate<INode> predicate)
-        {
-            var queue = new Queue<INode>(Root.Children);
-            while (queue.Any())
-            {
-                var item = queue.Dequeue();
-                if (!predicate(item))
-                    continue;
-                yield return item;
-                foreach (var sub in item.Children)
-                {
-                    queue.Enqueue(sub);
-                }
-            }
-        }
-
         public void NotifyNodesAdded(TreePath path, INode[] nodes, int[] indices)
         {
             NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NotifyNodesRemoved(TreePath path, INode[] nodes, int[] indices)
         {
             NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NotifyNodeChanged(INode node)
         {
             var path = node.Parent?.Path ?? new TreePath();
             NodesChanged?.Invoke(this, new TreeModelEventArgs(path, new object[] { node }));
-            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         public void NotifyNodesReordered(TreePath path)
@@ -140,14 +74,14 @@ namespace NbtStudio
         public IEnumerable<object> GetChildren(TreePath treePath)
         {
             if (treePath.IsEmpty())
-                return Root.Children;
+                return Roots;
             else
-                return ((INode)treePath.LastNode).Children;
+                return ((Node)treePath.LastNode).Children;
         }
 
         public bool IsLeaf(TreePath treePath)
         {
-            return !((INode)treePath.LastNode).HasChildren;
+            return !((Node)treePath.LastNode).HasChildren;
         }
     }
 }

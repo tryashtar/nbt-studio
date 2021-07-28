@@ -45,28 +45,6 @@ namespace NbtStudio.UI
             int height = node.Tree.RowHeight - 4;
             return image is null ? Size.Empty : new Size((int)(((float)height / image.Height) * image.Width), height);
         }
-
-        private Image GetIcon(TreeNodeAdv node)
-        {
-            return GetImage(node.Tag as INode);
-        }
-
-        private Image GetImage(INode node)
-        {
-            if (IconSource is null)
-                return null;
-            if (node is NbtFileNode)
-                return IconSource.GetImage(IconType.File).Image;
-            if (node is FolderNode)
-                return IconSource.GetImage(IconType.Folder).Image;
-            if (node is RegionFileNode)
-                return IconSource.GetImage(IconType.Region).Image;
-            if (node is ChunkNode)
-                return IconSource.GetImage(IconType.Chunk).Image;
-            if (node is NbtTagNode tag)
-                return NbtUtil.TagTypeImage(IconSource, tag.Tag.TagType).Image;
-            return null;
-        }
     }
 
     public class NbtText : NodeControl
@@ -79,7 +57,7 @@ namespace NbtStudio.UI
 
         private SizeF DrawOrMeasure(TreeNodeAdv node, DrawContext context, bool draw)
         {
-            var (name, value) = PreviewNameAndValue(node);
+            var (name, value) = ((Node)node.Tag).Preview();
             var boldfont = new Font(context.Font, FontStyle.Bold);
             context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -131,125 +109,7 @@ namespace NbtStudio.UI
 
         public override string GetToolTip(TreeNodeAdv node)
         {
-            return PreviewTooltip(node.Tag as INode);
-        }
-
-        private (string name, string value) PreviewNameAndValue(TreeNodeAdv node)
-        {
-            string prefix = null;
-            string name = PreviewName(node);
-            string value = PreviewValue(node);
-            if (node.Tag is INode inode)
-            {
-                var saveable = inode.Get<ISaveable>();
-                var chunk = inode.Get<Chunk>();
-                if ((saveable is not null && saveable.HasUnsavedChanges) || (chunk is not null && chunk.HasUnsavedChanges))
-                    prefix = "* ";
-            }
-            if (name is null)
-                return (prefix, value);
-            return (prefix + name + ":", value);
-        }
-
-        public static string PreviewName(TreeNodeAdv node) => PreviewName(node.Tag as INode);
-        public static string PreviewValue(TreeNodeAdv node) => PreviewValue(node.Tag as INode);
-
-        public static string PreviewName(INode node)
-        {
-            if (node is NbtFileNode file)
-                return Path.GetFileName(file.File.Path);
-            if (node is FolderNode folder)
-                return Path.GetFileName(folder.Folder.Path);
-            if (node is RegionFileNode region)
-                return Path.GetFileName(region.Region.Path);
-            if (node is ChunkNode chunk)
-            {
-                string text = $"Chunk [{chunk.Chunk.X}, {chunk.Chunk.Z}]";
-                var coords = chunk.Chunk.Region.Coords;
-                if (coords is null)
-                    return text;
-                var world = coords.WorldChunk(chunk.Chunk);
-                return $"{text} in world at ({world.x}, {world.z})";
-            }
-            if (node is NbtTagNode tag)
-                return Snbt.GetName(tag.Tag, SnbtOptions.Preview);
-            return null;
-        }
-
-        public static string PreviewValue(INode node)
-        {
-            if (node is NbtFileNode file)
-                return NbtUtil.PreviewNbtValue(file.File.RootTag);
-            if (node is FolderNode folder_node)
-            {
-                var folder = folder_node.Folder;
-                if (folder.HasScanned)
-                {
-                    if (folder.Subfolders.Any())
-                        return $"[{StringUtils.Pluralize(folder.Subfolders.Count, "folder")}, {StringUtils.Pluralize(folder.Files.Count, "file")}]";
-                    else
-                        return $"[{StringUtils.Pluralize(folder.Files.Count, "file")}]";
-                }
-                else
-                    return "(open to load)";
-            }
-            if (node is RegionFileNode region)
-                return $"[{StringUtils.Pluralize(region.Region.ChunkCount, "chunk")}]";
-            if (node is ChunkNode chunk_node)
-            {
-                var chunk = chunk_node.Chunk;
-                if (chunk.IsLoaded)
-                    return NbtUtil.PreviewNbtValue(chunk.Data);
-                else if (chunk.IsExternal)
-                    return "(saved externally)";
-                else
-                    return "(open to load)";
-            }
-            if (node is NbtTagNode tag)
-                return NbtUtil.PreviewNbtValue(tag.Tag);
-            return null;
-        }
-
-        private static string PreviewTooltip(INode node)
-        {
-            if (node is ChunkNode chunk)
-            {
-                var coords = chunk.Chunk.Region.Coords;
-                if (coords is null)
-                    return null;
-                var blocks = coords.WorldBlocks(chunk.Chunk);
-                return $"Contains blocks between ({blocks.x_min}, {blocks.z_min}) and ({blocks.x_max}, {blocks.z_max})";
-            }
-            if (node is NbtTagNode tag)
-            {
-                if (tag.Tag is NbtString str)
-                {
-                    if (str.Value.Contains("\n"))
-                        return str.Value;
-                    if (str.Value.Length > 100)
-                        return WrapTooltip(str.Value, 100);
-                }
-                else if (tag.Tag is NbtByteArray ba)
-                    return WrapTooltip(String.Join(", ", ba.Value), 100);
-                else if (tag.Tag is NbtIntArray ia)
-                    return WrapTooltip(String.Join(", ", ia.Value), 100);
-                else if (tag.Tag is NbtLongArray la)
-                    return WrapTooltip(String.Join(", ", la.Value), 100);
-            }
-            return null;
-        }
-
-        private static string WrapTooltip(string text, int max_width)
-        {
-            for (int i = max_width; i < text.Length; i++)
-            {
-                if (Char.IsWhiteSpace(text[i]))
-                {
-                    text = text.Substring(0, i) + "\n" + text[(i + 1)..];
-                    i += max_width;
-                }
-            }
-            return text;
+            return ((Node)node.Tag).GetTooltip();
         }
     }
 }

@@ -94,7 +94,7 @@ namespace NbtStudio
             return File.OpenRead(Path);
         }
 
-        public IEnumerable<Chunk> AllChunks => Chunks.Cast<Chunk>();
+        public IEnumerable<ChunkEntry> AllChunks => ChunkEntries.Cast<ChunkEntry>();
 
         public Chunk GetChunk(int x, int z)
         {

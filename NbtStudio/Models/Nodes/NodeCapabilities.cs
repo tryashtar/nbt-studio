@@ -9,7 +9,12 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class NewNbtTagNode : Node
+    public class NodeCapabilities
+    {
+        public bool CanDo(NodeOperation)
+    }
+
+    public enum NodeOperation
     {
 
     }

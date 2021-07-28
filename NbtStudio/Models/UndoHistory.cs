@@ -16,19 +16,20 @@ namespace NbtStudio
 
     public class UndoHistory
     {
-        private readonly Func<object, string> DescriptionGenerator;
+        public delegate string DescriptionGetter(object obj);
+        private readonly DescriptionGetter DescriptionSource;
         private readonly Stack<UndoableAction> UndoStack = new();
         private readonly Stack<UndoableAction> RedoStack = new();
         public event EventHandler Changed;
 
-        public UndoHistory(Func<object, string> description_generator)
+        public UndoHistory(DescriptionGetter description_generator)
         {
-            DescriptionGenerator = description_generator;
+            DescriptionSource = description_generator;
         }
 
         public string GetDescription(DescriptionHolder holder)
         {
-            return holder.Convert(DescriptionGenerator);
+            return holder.Convert(DescriptionSource);
         }
 
         public void SaveAction(UndoableAction action)
