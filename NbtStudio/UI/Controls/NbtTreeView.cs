@@ -36,22 +36,22 @@ namespace NbtStudio.UI
             IconControl.IconSource = source;
         }
 
-        public INode SelectedINode => SelectedNode?.Tag as INode;
-        public IEnumerable<INode> SelectedINodes => this.SelectedNodes.Select(x => x.Tag).OfType<INode>();
+        public Node SelectedModelNode => SelectedNode?.Tag as Node;
+        public IEnumerable<Node> SelectedModelNodes => this.SelectedNodes.Select(x => x.Tag).OfType<Node>();
 
-        public IEnumerable<INode> INodesFromDrag(DragEventArgs e)
+        public IEnumerable<Node> ModelNodesFromDrag(DragEventArgs e)
         {
-            return NodesFromDrag(e).Select(x => x.Tag).OfType<INode>();
+            return NodesFromDrag(e).Select(x => x.Tag).OfType<Node>();
         }
-        public INode INodeFromClick(TreeNodeAdvMouseEventArgs e)
+        public Node ModelNodeFromClick(TreeNodeAdvMouseEventArgs e)
         {
-            return e.Node.Tag as INode;
+            return e.Node.Tag as Node;
         }
-        public INode INodeFromNode(TreeNodeAdv node)
+        public Node ModelNodeFromNode(TreeNodeAdv node)
         {
-            return node.Tag as INode;
+            return node.Tag as Node;
         }
-        public INode DropINode => DropPosition.Node?.Tag as INode;
+        public Node DropModelNode => DropPosition.Node?.Tag as Node;
 
         private void NbtTreeView_FontChanged(object sender, EventArgs e)
         {

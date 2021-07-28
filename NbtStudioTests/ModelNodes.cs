@@ -83,7 +83,7 @@ namespace NbtStudioTests
         private void AssertSynchronized(NbtTreeView view, NbtTreeModel model)
         {
             var view_queue = new Queue<TreeNodeAdv>();
-            var model_queue = new Queue<INode>();
+            var model_queue = new Queue<Node>();
             foreach (var root in view.Root.Children)
             {
                 view_queue.Enqueue(root);
@@ -110,7 +110,7 @@ namespace NbtStudioTests
             }
         }
 
-        private void AssertChildStructure(INode node)
+        private void AssertChildStructure(Node node)
         {
             var children = node.Children;
             foreach (var child in children)

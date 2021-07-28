@@ -28,11 +28,8 @@ namespace NbtStudio
             }
         }
         public int ChunkCount { get; private set; }
-        public event Action ChunksChanged;
         public event Action OnSaved;
         private ChunkEntry[,] ChunkEntries;
-        private byte[] Locations;
-        private byte[] Timestamps;
         public string Path { get; private set; }
         public RegionFile(string path)
         {
@@ -44,15 +41,16 @@ namespace NbtStudio
         {
             ChunkEntries = new ChunkEntry[ChunkXDimension, ChunkZDimension];
             using var stream = GetStream();
-            Locations = IOUtils.ReadBytes(stream, 4096);
-            Timestamps = IOUtils.ReadBytes(stream, 4096);
+            var locations = IOUtils.ReadBytes(stream, 4096);
+            // reading timestamps isn't important
+            // var timestamps = IOUtils.ReadBytes(stream, 4096);
             ChunkCount = 0;
             for (int z = 0; z < ChunkEntries.GetLength(1); z++)
             {
                 for (int x = 0; x < ChunkEntries.GetLength(0); x++)
                 {
-                    int offset = ChunkOffset(x, z);
-                    int size = ChunkSize(x, z);
+                    int offset = ChunkOffset(locations, x, z);
+                    int size = ChunkSize(locations, x, z);
                     if (offset > 0 && offset < 8192)
                         throw new FormatException($"Invalid region file, thinks there's a chunk at position {offset} but the header tables are there");
                     if (offset > stream.Length)
@@ -74,8 +72,6 @@ namespace NbtStudio
         {
             ChunkEntries = new ChunkEntry[ChunkXDimension, ChunkZDimension];
             Path = null;
-            Locations = new byte[4096];
-            Timestamps = new byte[4096];
             ChunkCount = 0;
         }
 
@@ -96,9 +92,9 @@ namespace NbtStudio
 
         public IEnumerable<ChunkEntry> AllChunks => ChunkEntries.Cast<ChunkEntry>();
 
-        public Chunk GetChunk(int x, int z)
+        public ChunkEntry GetChunk(int x, int z)
         {
-            return Chunks[x, z];
+            return ChunkEntries[x, z];
         }
 
         public IEnumerable<(int x, int z)> GetAvailableCoords(int starting_x = 0, int starting_z = 0)
@@ -115,49 +111,19 @@ namespace NbtStudio
 
         public void RemoveChunk(int x, int z)
         {
-            if (Chunks[x, z] is not null)
+            if (ChunkEntries[x, z] is not null)
             {
-                HasChunkChanges = true;
-                var chunk = Chunks[x, z];
-                PerformAction(new DescriptionHolder("Remove {0} from {1}", chunk, this),
-                    () => DoRemoveChunk(x, z),
-                    () => DoAddChunk(chunk)
-                );
+                ChunkEntries[x, z] = null;
+                ChunkCount--;
             }
         }
 
-        public void AddChunk(Chunk chunk)
+        public void AddChunk(Chunk chunk, int x, int z)
         {
-            HasChunkChanges = true;
-            PerformAction(new DescriptionHolder("Add {0} to {1}", chunk, this),
-                () => DoAddChunk(chunk),
-                () => DoRemoveChunk(chunk.X, chunk.Z)
-            );
-        }
-
-        private void DoRemoveChunk(int x, int z)
-        {
-            Chunks[x, z].Region = null;
-            Chunks[x, z] = null;
-            ChunkCount--;
-            ChunksChanged?.Invoke();
-        }
-
-        private void DoAddChunk(Chunk chunk)
-        {
-            if (Chunks[chunk.X, chunk.Z] is not null)
-                throw new InvalidOperationException($"There is already a chunk at coordinates {chunk.X}, {chunk.Z}");
-            if (chunk.Region is not null)
-            {
-                if (!chunk.IsLoaded)
-                    chunk.Load();
-                chunk.Region.RemoveChunk(chunk.X, chunk.Z);
-            }
-            Chunks[chunk.X, chunk.Z] = chunk;
-            chunk.Region = this;
+            if (ChunkEntries[x, z] is not null)
+                throw new InvalidOperationException($"There is already a chunk at coordinates {x}, {z}");
+            ChunkEntries[x, z] = new ChunkEntry(this, x, z, chunk);
             ChunkCount++;
-            HasChunkChanges = true;
-            ChunksChanged?.Invoke();
         }
 
         private static int ChunkDataLocation(int x, int z)
@@ -165,17 +131,17 @@ namespace NbtStudio
             return (x % ChunkXDimension + (z % ChunkZDimension) * ChunkZDimension) * 4;
         }
 
-        private int ChunkSize(int x, int z)
+        private static int ChunkSize(byte[] locations, int x, int z)
         {
             int location = ChunkDataLocation(x, z);
-            return 4096 * Locations[location + 3];
+            return 4096 * locations[location + 3];
         }
 
-        private int ChunkOffset(int x, int z)
+        private static int ChunkOffset(byte[] locations, int x, int z)
         {
             int location = ChunkDataLocation(x, z);
             byte[] four = new byte[4];
-            Array.Copy(Locations, location, four, 1, 3);
+            Array.Copy(locations, location, four, 1, 3);
             return 4096 * DataUtils.ToInt32(four);
         }
 
@@ -183,13 +149,15 @@ namespace NbtStudio
         public bool CanRefresh => CanSave;
         public void Save()
         {
-            int current_offset = 8192;
+            var locations = new byte[4096];
+            var timestamps = new byte[4096];
+            int current_offset = locations.Length + timestamps.Length;
             var chunk_writes = new List<Action<FileStream>>();
-            for (int z = 0; z < Chunks.GetLength(1); z++)
+            for (int z = 0; z < ChunkEntries.GetLength(1); z++)
             {
-                for (int x = 0; x < Chunks.GetLength(0); x++)
+                for (int x = 0; x < ChunkEntries.GetLength(0); x++)
                 {
-                    var (new_offset, save_action) = SaveChunkInternal(current_offset, x, z);
+                    var (new_offset, save_action) = SaveChunkInternal(locations, timestamps, current_offset, x, z);
                     current_offset = new_offset;
                     if (save_action is not null)
                         chunk_writes.Add(save_action);
@@ -197,34 +165,33 @@ namespace NbtStudio
             }
             using (var writer = File.OpenWrite(Path))
             {
-                writer.Write(Locations, 0, Locations.Length);
-                writer.Write(Timestamps, 0, Locations.Length);
+                writer.Write(locations, 0, locations.Length);
+                writer.Write(timestamps, 0, timestamps.Length);
                 foreach (var action in chunk_writes)
                 {
                     action(writer);
                 }
             }
-            HasChunkChanges = false;
             OnSaved?.Invoke();
         }
 
-        private (int new_offset, Action<FileStream> save_action) SaveChunkInternal(int current_offset, int x, int z)
+        private (int new_offset, Action<FileStream> save_action) SaveChunkInternal(byte[] locations, byte[] timestamps, int current_offset, int x, int z)
         {
-            var chunk = Chunks[x, z];
+            var chunk = ChunkEntries[x, z];
             bool update_timestamp = chunk is not null && chunk.IsLoaded;
             int location = ChunkDataLocation(x, z);
-            var data = chunk?.SaveBytes() ?? new byte[0];
+            var data = chunk?.Save() ?? Array.Empty<byte>();
             byte size = (byte)Math.Ceiling((decimal)data.Length / 4096);
             byte[] offset = CanWriteChunk(chunk) ? DataUtils.GetBytes(current_offset / 4096) : new byte[] { 0, 0, 0, 0 };
-            Locations[location] = offset[1];
-            Locations[location + 1] = offset[2];
-            Locations[location + 2] = offset[3];
-            Locations[location + 3] = size;
+            locations[location] = offset[1];
+            locations[location + 1] = offset[2];
+            locations[location + 2] = offset[3];
+            locations[location + 3] = size;
             if (update_timestamp)
             {
                 int timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 byte[] time = DataUtils.GetBytes(timestamp);
-                Array.Copy(time, 0, Timestamps, location, 4);
+                Array.Copy(time, 0, timestamps, location, 4);
             }
             Action<FileStream> result = null;
             if (CanWriteChunk(chunk))
@@ -241,9 +208,9 @@ namespace NbtStudio
             return (current_offset, result);
         }
 
-        private bool CanWriteChunk(Chunk chunk)
+        private bool CanWriteChunk(ChunkEntry chunk)
         {
-            return chunk is not null && !chunk.IsCorrupt;
+            return chunk is not null && chunk.Status != ChunkStatus.Corrupt;
         }
 
         public void SaveAs(string path)
@@ -255,17 +222,6 @@ namespace NbtStudio
         public void Refresh()
         {
             Load();
-            HasChunkChanges = false;
-            ChunksChanged?.Invoke();
-        }
-
-        public void Move(string path)
-        {
-            if (Path is not null)
-            {
-                File.Move(Path, path);
-                Path = path;
-            }
         }
     }
 
@@ -279,12 +235,12 @@ namespace NbtStudio
             Z = z;
         }
 
-        public (int x, int z) WorldChunk(Chunk chunk)
+        public (int x, int z) WorldChunk(ChunkEntry chunk)
         {
             return (RegionFile.ChunkXDimension * X + chunk.X, RegionFile.ChunkZDimension * Z + chunk.Z);
         }
 
-        public (int x_min, int x_max, int z_min, int z_max) WorldBlocks(Chunk chunk)
+        public (int x_min, int x_max, int z_min, int z_max) WorldBlocks(ChunkEntry chunk)
         {
             var (chunk_x, chunk_z) = WorldChunk(chunk);
             int block_x = Chunk.BlocksXDimension * chunk_x;

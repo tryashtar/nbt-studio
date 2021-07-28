@@ -9,13 +9,9 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class NodeCapabilities
+    public class CapabilityContext
     {
-        public bool CanDo(NodeOperation)
-    }
-
-    public enum NodeOperation
-    {
-
+        public readonly IDataObject ClipboardData;
+        public readonly IEnumerable<Node> DropNodes;
     }
 }

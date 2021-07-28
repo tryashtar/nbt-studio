@@ -13,7 +13,7 @@ namespace NbtStudio.UI
 {
     public partial class FindWindow : Form
     {
-        private INode LastFound;
+        private Node LastFound;
         private NbtTreeModel SearchingModel;
         private NbtTreeView SearchingView;
 
@@ -27,21 +27,21 @@ namespace NbtStudio.UI
             UpdateButtons();
         }
 
-        private static bool Matches(INode node, string name_search, string value_search)
+        private static bool Matches(Node node, string name_search, string value_search)
         {
-            string name = NbtText.PreviewName(node);
-            string value = NbtText.PreviewValue(node);
+            string name = node.PreviewName();
+            string value = node.PreviewValue();
             return RegexTextBox.IsMatch(name, name_search) && RegexTextBox.IsMatch(value, value_search);
         }
 
-        private static bool MatchesRegex(INode node, Regex name_search, Regex value_search)
+        private static bool MatchesRegex(Node node, Regex name_search, Regex value_search)
         {
-            string name = NbtText.PreviewName(node);
-            string value = NbtText.PreviewValue(node);
+            string name = node.PreviewName();
+            string value = node.PreviewValue();
             return RegexTextBox.IsMatchRegex(name, name_search) && RegexTextBox.IsMatchRegex(value, value_search);
         }
 
-        private Predicate<INode> GetPredicate()
+        private Predicate<Node> GetPredicate()
         {
             if (RegexCheck.Checked)
             {
@@ -57,10 +57,10 @@ namespace NbtStudio.UI
             }
         }
 
-        private INode DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
+        private Node DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
-            var start = (SearchingView.SelectedNode?.Tag as INode) ?? LastFound;
+            var start = (SearchingView.SelectedNode?.Tag as Node) ?? LastFound;
             var predicate = GetPredicate();
             var find = SearchNodeOperations.SearchFrom(SearchingModel, start, predicate, direction, progress, CancelSource.Token, true);
             if (find is null)
@@ -72,7 +72,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private List<INode> DoSearchAll(IProgress<TreeSearchReport> progress)
+        private List<Node> DoSearchAll(IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
             var predicate = GetPredicate();
@@ -81,14 +81,14 @@ namespace NbtStudio.UI
         }
 
         private readonly CancellationTokenSource CancelSource = new CancellationTokenSource();
-        private Task<IEnumerable<INode>> ActiveSearch;
-        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<INode>> function)
+        private Task<IEnumerable<Node>> ActiveSearch;
+        private void StartActiveSearch(Func<IProgress<TreeSearchReport>, List<Node>> function)
         {
             if (ActiveSearch is not null && !ActiveSearch.IsCompleted)
                 return;
             var progress = new Progress<TreeSearchReport>();
             progress.ProgressChanged += Progress_ProgressChanged;
-            ActiveSearch = new Task<IEnumerable<INode>>(() => function(progress));
+            ActiveSearch = new Task<IEnumerable<Node>>(() => function(progress));
             ActiveSearch.Start();
             ProgressBar.Visible = true;
             FoundResultsLabel.Visible = false;
@@ -144,11 +144,11 @@ namespace NbtStudio.UI
 
         public void Search(SearchDirection direction)
         {
-            List<INode> ItemOrNull(INode item)
+            List<Node> ItemOrNull(Node item)
             {
                 if (item is null)
                     return null;
-                return new List<INode> { item };
+                return new List<Node> { item };
             }
             StartActiveSearch(x => ItemOrNull(DoSearch(direction, x)));
         }

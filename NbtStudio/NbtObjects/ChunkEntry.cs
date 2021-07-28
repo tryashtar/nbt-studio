@@ -42,6 +42,16 @@ namespace NbtStudio
             Size = size;
         }
 
+        public ChunkEntry(RegionFile region, int x, int z, Chunk loaded)
+        {
+            Region = region;
+            X = x;
+            Z = z;
+            LoadedChunk = loaded;
+            Status = ChunkStatus.Loaded;
+            LocalCompression = NbtCompression.ZLib;
+        }
+
         public void Load()
         {
 #if DEBUG
@@ -70,7 +80,7 @@ namespace NbtStudio
             {
                 file.LoadFromStream(stream, NbtCompression.AutoDetect);
                 LocalCompression = file.FileCompression;
-                LoadedChunk = new Chunk(file.GetRootTag<NbtCompound>(), Region, X, Z);
+                LoadedChunk = new Chunk(file.GetRootTag<NbtCompound>());
             }
             catch
             {

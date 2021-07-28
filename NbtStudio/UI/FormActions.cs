@@ -12,7 +12,7 @@ namespace NbtStudio.UI
     {
         private void AddActions()
         {
-            var sort = new 
+
         }
     }
 }

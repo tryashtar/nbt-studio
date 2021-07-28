@@ -224,7 +224,7 @@ namespace NbtStudio.UI
 
         private void NbtTree_NodeAdded(object sender, TreeNodeAdv e)
         {
-            if (NbtTree.INodeFromNode(e) is FolderNode folder)
+            if (NbtTree.NodeFromNode(e) is FolderNode folder)
                 folder.Folder.FilesFailed += Folder_FilesFailed;
         }
 
@@ -430,7 +430,7 @@ namespace NbtStudio.UI
             BrowseFolderLike(x => ImportFolder(x));
         }
 
-        private void Discard(IEnumerable<INode> nodes)
+        private void Discard(IEnumerable<Node> nodes)
         {
             var unsaved = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
             if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
@@ -546,7 +546,7 @@ namespace NbtStudio.UI
 
         private void Sort()
         {
-            var obj = NbtTree.SelectedINode;
+            var obj = NbtTree.SelectedNode;
             if (obj is null || !obj.CanSort) return;
             UndoHistory.StartBatchOperation();
             obj.Sort();
@@ -573,9 +573,9 @@ namespace NbtStudio.UI
             UndoHistory.Clear();
         }
 
-        private void CopyLike(Func<INode, bool> check, Func<INode, DataObject> perform)
+        private void CopyLike(Func<Node, bool> check, Func<Node, DataObject> perform)
         {
-            var objs = NbtTree.SelectedINodes.Where(check).ToList();
+            var objs = NbtTree.SelectedNodes.Where(check).ToList();
             if (objs.Any())
             {
                 var data = objs.Select(perform).Aggregate((x, y) => Utils.Merge(x, y));
@@ -595,16 +595,16 @@ namespace NbtStudio.UI
 
         private void Paste()
         {
-            var parent = NbtTree.SelectedINode;
+            var parent = NbtTree.SelectedNode;
             if (parent is null) return;
             Paste(parent);
         }
 
-        private void Paste(INode node)
+        private void Paste(Node node)
         {
             if (!node.CanPaste)
                 return;
-            IEnumerable<INode> results = Enumerable.Empty<INode>();
+            IEnumerable<Node> results = Enumerable.Empty<Node>();
             UndoHistory.StartBatchOperation();
             try
             { results = node.Paste(Clipboard.GetDataObject()); }
@@ -622,7 +622,7 @@ namespace NbtStudio.UI
 
         private void Rename()
         {
-            var items = NbtTree.SelectedINodes;
+            var items = NbtTree.SelectedNodes;
             if (ListUtils.ExactlyOne(items))
                 Rename(items.Single());
             else
@@ -631,7 +631,7 @@ namespace NbtStudio.UI
 
         private void Edit()
         {
-            var items = NbtTree.SelectedINodes;
+            var items = NbtTree.SelectedNodes;
             if (ListUtils.ExactlyOne(items))
                 Edit(items.Single());
             else
@@ -652,7 +652,7 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", changed), false);
         }
 
-        private void EditLike(INode node, Predicate<INode> check, Action<NbtTag> when_tag)
+        private void EditLike(Node node, Predicate<Node> check, Action<NbtTag> when_tag)
         {
             if (!check(node)) return;
             var chunk = node.Get<Chunk>();
@@ -669,12 +669,12 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
 
-        private void Rename(INode node)
+        private void Rename(Node node)
         {
             EditLike(node, x => x.CanRename, RenameTag);
         }
 
-        private void Edit(INode node)
+        private void Edit(Node node)
         {
             EditLike(node, x => x.CanEdit, EditTag);
         }
@@ -708,7 +708,7 @@ namespace NbtStudio.UI
 
         private void EditSnbt()
         {
-            var tag = NbtTree.SelectedINode?.GetNbtTag();
+            var tag = NbtTree.SelectedNode?.GetNbtTag();
             if (tag is null) return;
             UndoHistory.StartBatchOperation();
             EditSnbtWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
@@ -722,7 +722,7 @@ namespace NbtStudio.UI
             var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x is not null).ToList();
             var parents = selected_nodes.Select(x => x.Parent).Where(x => x is not null).ToList();
 
-            var selected_objects = NbtTree.SelectedINodes.ToList();
+            var selected_objects = NbtTree.SelectedNodes.ToList();
             Delete(selected_objects);
 
             // Index == -1 checks whether this node has been removed from the tree
@@ -734,7 +734,7 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Delete(IEnumerable<INode> nodes)
+        private void Delete(IEnumerable<Node> nodes)
         {
             nodes = nodes.Where(x => x.CanDelete);
             var file_nodes = nodes.Where(x => x.Get<IHavePath>() is not null);
@@ -848,7 +848,7 @@ namespace NbtStudio.UI
 
         private void AddSnbt()
         {
-            var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
+            var parent = NbtTree.SelectedNode?.GetNbtTag() as NbtContainerTag;
             if (parent is null) return;
             var tag = EditSnbtWindow.CreateTag(IconSource, parent);
             if (tag is not null)
@@ -857,7 +857,7 @@ namespace NbtStudio.UI
 
         private void AddChunk()
         {
-            var parent = NbtTree.SelectedINode?.Get<RegionFile>();
+            var parent = NbtTree.SelectedNode?.Get<RegionFile>();
             if (parent is null) return;
             var chunk = EditChunkWindow.CreateChunk(IconSource, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (chunk is not null)
@@ -866,7 +866,7 @@ namespace NbtStudio.UI
 
         private void AddTag(NbtTagType type)
         {
-            var parent = NbtTree.SelectedINode?.GetNbtTag() as NbtContainerTag;
+            var parent = NbtTree.SelectedNode?.GetNbtTag() as NbtContainerTag;
             if (parent is null) return;
             AddTag(parent, type);
         }
@@ -969,8 +969,8 @@ namespace NbtStudio.UI
         {
             if (InvokeRequired) // only run on UI thread
                 return;
-            var obj = NbtTree.SelectedINode;
-            var objs = NbtTree.SelectedINodes;
+            var obj = NbtTree.SelectedNode;
+            var objs = NbtTree.SelectedNodes;
             var nbt = obj.GetNbtTag();
             var container = nbt as NbtContainerTag;
             var region = obj.Get<RegionFile>();
@@ -1011,7 +1011,7 @@ namespace NbtStudio.UI
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = NbtTree.INodeFromClick(e);
+            var tag = NbtTree.NodeFromClick(e);
             if (!e.Node.CanExpand && tag.CanEdit)
                 Edit(tag);
         }
@@ -1027,10 +1027,10 @@ namespace NbtStudio.UI
                 e.Effect = Control.ModifierKeys == Keys.Shift ? DragDropEffects.Copy : DragDropEffects.Move;
             else
             {
-                var tags = NbtTree.INodesFromDrag(e);
-                var drop = NbtTree.DropINode;
+                var tags = NbtTree.NodesFromDrag(e);
+                var drop = NbtTree.DropNode;
                 if (tags.Any()
-                    && NbtTree.DropINode is not null
+                    && NbtTree.DropNode is not null
                     && CanMoveObjects(tags, drop, NbtTree.DropPosition.Position))
                     e.Effect = e.AllowedEffect;
                 else
@@ -1050,21 +1050,21 @@ namespace NbtStudio.UI
             }
             else
             {
-                var tags = NbtTree.INodesFromDrag(e);
-                var drop = NbtTree.DropINode;
+                var tags = NbtTree.NodesFromDrag(e);
+                var drop = NbtTree.DropNode;
                 if (tags.Any())
                     MoveObjects(tags, drop, NbtTree.DropPosition.Position);
             }
         }
 
-        private bool CanMoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
+        private bool CanMoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
             var (destination, index) = ViewModel.GetInsertionLocation(target, position);
             if (destination is null) return false;
             return destination.CanReceiveDrop(nodes);
         }
 
-        private void MoveObjects(IEnumerable<INode> nodes, INode target, NodePosition position)
+        private void MoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
             var (destination, index) = ViewModel.GetInsertionLocation(target, position);
             if (destination is null) return;
@@ -1092,7 +1092,7 @@ namespace NbtStudio.UI
         private ContextMenuStrip CreateContextMenu(TreeNodeAdvMouseEventArgs e)
         {
             var menu = new ContextMenuStrip();
-            var obj = NbtTree.INodeFromClick(e);
+            var obj = NbtTree.NodeFromClick(e);
             var root_items = new List<ToolStripItem>();
             var node_items = new List<ToolStripItem>();
             var file_items = new List<ToolStripItem>();
@@ -1155,7 +1155,7 @@ namespace NbtStudio.UI
 
         private void Discard_Click(object sender, EventArgs e)
         {
-            var selected_roots = NbtTree.SelectedINodes.Where(x => x.Parent is ModelRootNode);
+            var selected_roots = NbtTree.SelectedNodes.Where(x => x.Parent is ModelRootNode);
             Discard(selected_roots);
         }
 
@@ -1197,7 +1197,7 @@ namespace NbtStudio.UI
 
         private void Save_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<ISaveable>());
+            var selected = NbtTree.SelectedNodes.Filter(x => x.Get<ISaveable>());
             foreach (var item in selected)
             {
                 Save(item);
@@ -1206,7 +1206,7 @@ namespace NbtStudio.UI
 
         private void SaveAs_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IExportable>());
+            var selected = NbtTree.SelectedNodes.Filter(x => x.Get<IExportable>());
             foreach (var item in selected)
             {
                 SaveAs(item);
@@ -1215,7 +1215,7 @@ namespace NbtStudio.UI
 
         private void OpenInExplorer_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IHavePath>());
+            var selected = NbtTree.SelectedNodes.Filter(x => x.Get<IHavePath>());
             foreach (var item in selected)
             {
                 OpenInExplorer(item);
@@ -1224,13 +1224,13 @@ namespace NbtStudio.UI
 
         private void Refresh_Click(object sender, EventArgs e)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.Get<IRefreshable>());
+            var selected = NbtTree.SelectedNodes.Filter(x => x.Get<IRefreshable>());
             RefreshItems(selected);
         }
 
         private void AddTag_Click(NbtTagType type)
         {
-            var selected = NbtTree.SelectedINodes.Filter(x => x.GetNbtTag()).OfType<NbtContainerTag>();
+            var selected = NbtTree.SelectedNodes.Filter(x => x.GetNbtTag()).OfType<NbtContainerTag>();
             foreach (var item in selected)
             {
                 AddTag(item, type);

@@ -26,7 +26,7 @@ namespace NbtStudio
                 return new TreePath(path.ToArray());
             }
         }
-        public ICollection<Node> Children
+        public IReadOnlyList<Node> Children
         {
             get
             {
@@ -35,6 +35,7 @@ namespace NbtStudio
                 return ChildNodes.Values;
             }
         }
+        public virtual bool HasChildren => GetChildren().Any();
 
         private readonly OrderedDictionary<object, Node> ChildNodes = new();
         // start off true since child nodes aren't ready yet
@@ -45,6 +46,11 @@ namespace NbtStudio
             Parent = parent;
         }
 
+        public (string name, string value) Preview()
+        {
+            return (PreviewName(), PreviewValue());
+        }
+
         protected void MarkDirty()
         {
             IsDirty = true;
@@ -52,9 +58,10 @@ namespace NbtStudio
 
         protected abstract IEnumerable<object> GetChildren();
         protected abstract Node MakeChild(object item);
-        public abstract string GetTooltip();
-        public abstract (string name, string value) Preview();
-        public abstract ImageIcon GetIcon();
+        public virtual string GetTooltip() => null;
+        public abstract string PreviewName();
+        public abstract string PreviewValue();
+        public abstract IconType GetIcon();
 
         private void RefreshChildren()
         {
