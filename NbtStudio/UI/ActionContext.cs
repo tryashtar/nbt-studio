@@ -13,14 +13,20 @@ namespace NbtStudio.UI
     public delegate void ErrorHandler(Exception exception);
     public delegate bool UnsavedWarningHandler();
     public delegate bool DeleteFileWarningHandler(IEnumerable<IHavePath> files);
+    public delegate void TreeSetter(NbtTreeModel new_tree);
+    public delegate NbtTreeModel TreeGetter();
+    public delegate NbtTag TagGetter();
+    public delegate IEnumerable<IFile> FilesGetter();
     public class ActionContext
     {
         public IEnumerable<Node> SelectedNodes;
-        public IEnumerable<IHavePath> ImportingFiles;
-        public NbtTag AddingTag;
+        public TagGetter TagSource;
         public ErrorHandler ErrorHandler;
-        public UnsavedWarningHandler UnsavedWarningHandler;
-        public DeleteFileWarningHandler DeleteFileWarningHandler;
+        public UnsavedWarningHandler UnsavedWarningCheck;
+        public DeleteFileWarningHandler DeleteFileWarning;
+        public TreeSetter TreeSetter;
+        public TreeGetter TreeGetter;
+        public FilesGetter FilesGetter;
         public IEnumerable<NbtTag> SelectedNbt()
         {
             return SelectedNodes.Select(x => x.GetNbtTagLens()).Where(x => x != null).Select(x => x.Item);

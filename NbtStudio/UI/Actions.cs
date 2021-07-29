@@ -13,47 +13,25 @@ namespace NbtStudio.UI
     public class Actions
     {
         // returns false if the user cancels the action
-        public bool New(ActionContext context)
+        public bool OpenFiles(ActionContext context)
         {
-            if (!ConfirmIfUnsaved(context, "Create a new file anyway?"))
+            if (!context.UnsavedWarningCheck())
                 return false;
-            OpenFile(new NbtFile(), skip_confirm: true);
+            context.TreeSetter(new NbtTreeModel(context.FilesGetter()));
             return true;
         }
 
-        private bool ConfirmIfUnsaved(ActionContext context, string message)
+        public void ImportFiles(ActionContext context)
         {
-            if (!ViewModel.HasAnyUnsavedChanges || context.BypassSaveWarning)
-                return true;
-            bool answer = MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
-            if (answer)
-                context.BypassSaveWarning = true;
-            return answer;
-        }
-
-        public bool NewRegion(ActionContext context)
-        {
-            if (!ConfirmIfUnsaved(context, "Create a new file anyway?"))
-                return false;
-            OpenFile(RegionFile.Empty(), skip_confirm: true);
-            return true;
-        }
-
-        public void ImportNew(ActionContext context)
-        {
-            ViewModel.Import(new NbtFile());
-        }
-
-        public void ImportNewRegion(ActionContext context)
-        {
-            ViewModel.Import(RegionFile.Empty());
+            context.TreeGetter().Import(context.FilesGetter());
         }
 
         public void AddTag(ActionContext context)
         {
-            foreach (var node in context.SelectedNbt())
+            var tag = context.TagSource();
+            foreach (var node in context.SelectedNbt().OfType<NbtContainerTag>())
             {
-                context.AddingTag.AddTo(node);
+                tag.AddTo(node);
             }
         }
 

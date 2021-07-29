@@ -163,6 +163,11 @@ namespace NbtStudio.UI
             Items = items.ToList();
         }
 
+        public void Add(DualMenuItem item)
+        {
+            Items.Add(item);
+        }
+
         public void AddRange(IEnumerable<DualMenuItem> items)
         {
             Items.AddRange(items);

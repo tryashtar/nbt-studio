@@ -44,45 +44,8 @@ namespace NbtStudio.UI
         private UndoHistory UndoHistory => ViewModel.UndoHistory;
         private IconSource IconSource;
 
-        private readonly Dictionary<NbtTagType, DualMenuItem> CreateTagButtons;
         private readonly string[] ClickedFiles;
 
-        private readonly DualItemCollection ItemCollection;
-        private readonly DualMenuItem ActionNew = new DualMenuItem("&New", "New File", IconType.NewFile, Keys.Control | Keys.N);
-        private readonly DualMenuItem ActionNewClipboard = DualMenuItem.SingleMenuItem("New from &Clipboard", IconType.Paste, Keys.Control | Keys.Alt | Keys.V);
-        private readonly DualMenuItem ActionNewRegion = DualMenuItem.SingleMenuItem("New &Region File", IconType.Region, Keys.Control | Keys.Alt | Keys.R);
-        private readonly DualMenuItem ActionOpenFile = new DualMenuItem("&Open File", "Open File", IconType.OpenFile, Keys.Control | Keys.O);
-        private readonly DualMenuItem ActionOpenFolder = new DualMenuItem("Open &Folder", "Open Folder", IconType.OpenFolder, Keys.Control | Keys.Shift | Keys.O);
-        private readonly DualMenuItem ActionSave = new DualMenuItem("&Save", "Save", IconType.Save, Keys.Control | Keys.S);
-        private readonly DualMenuItem ActionSaveAs = DualMenuItem.SingleMenuItem("Save &As", IconType.Save, Keys.Control | Keys.Shift | Keys.S);
-        private readonly DualMenuItem DropDownRecent = DualMenuItem.SingleMenuItem("&Recent...", null, Keys.None);
-        private readonly DualMenuItem DropDownImport = DualMenuItem.SingleMenuItem("&Import...", null, Keys.None);
-        private readonly DualMenuItem ActionImportFile = DualMenuItem.SingleMenuItem("&File", IconType.OpenFile, Keys.Control | Keys.I);
-        private readonly DualMenuItem ActionImportFolder = DualMenuItem.SingleMenuItem("F&older", IconType.OpenFolder, Keys.Control | Keys.Shift | Keys.I);
-        private readonly DualMenuItem ActionImportNew = DualMenuItem.SingleMenuItem("&New File", IconType.NewFile, Keys.Control | Keys.Alt | Keys.N);
-        private readonly DualMenuItem ActionImportNewRegion = DualMenuItem.SingleMenuItem("New &Region File", IconType.Region, Keys.None);
-        private readonly DualMenuItem ActionImportClipboard = DualMenuItem.SingleMenuItem("From &Clipboard", IconType.Paste, Keys.Control | Keys.Alt | Keys.I);
-        private readonly DualMenuItem ActionSort = DualMenuItem.SingleButton("Sort", IconType.Sort);
-        private readonly DualMenuItem ActionRefresh = DualMenuItem.SingleButton("Refresh", IconType.Refresh);
-        private readonly DualMenuItem ActionUndo = DualMenuItem.SingleMenuItem("&Undo", IconType.Undo, Keys.Control | Keys.Z);
-        private readonly DualMenuItem ActionRedo = DualMenuItem.SingleMenuItem("&Redo", IconType.Redo, Keys.Control | Keys.Shift | Keys.Z);
-        private readonly DualMenuItem ActionCut = new DualMenuItem("Cu&t", "Cut", IconType.Cut, Keys.Control | Keys.X);
-        private readonly DualMenuItem ActionCopy = new DualMenuItem("&Copy", "Copy", IconType.Copy, Keys.Control | Keys.C);
-        private readonly DualMenuItem ActionPaste = new DualMenuItem("&Paste", "Paste", IconType.Paste, Keys.Control | Keys.V);
-        private readonly DualMenuItem ActionRename = new DualMenuItem("Re&name", "Rename", IconType.Rename, Keys.F2);
-        private readonly DualMenuItem ActionEdit = new DualMenuItem("&Edit Value", "Edit", IconType.Edit, Keys.Control | Keys.E);
-        private readonly DualMenuItem ActionEditSnbt = new DualMenuItem("Edit as &SNBT", "Edit as SNBT", IconType.EditSnbt, Keys.Control | Keys.Shift | Keys.E);
-        private readonly DualMenuItem ActionDelete = new DualMenuItem("&Delete", "Delete", IconType.Delete, Keys.Delete);
-        private readonly DualMenuItem DropDownUndoHistory = DualMenuItem.SingleMenuItem("Undo History...", IconType.Undo, Keys.None);
-        private readonly DualMenuItem DropDownRedoHistory = DualMenuItem.SingleMenuItem("Redo History...", IconType.Redo, Keys.None);
-        private readonly DualMenuItem ActionClearUndoHistory = DualMenuItem.SingleMenuItem("Clear Undo History", null, Keys.None);
-        private readonly DualMenuItem ActionFind = new DualMenuItem("&Find", "Find", IconType.Search, Keys.Control | Keys.F);
-        private readonly DualMenuItem ActionAbout = DualMenuItem.SingleMenuItem("&About", IconType.NbtStudio, Keys.Shift | Keys.F1);
-        private readonly DualMenuItem ActionChangeIcons = DualMenuItem.SingleMenuItem("&Change Icons", IconType.Refresh, Keys.Control | Keys.I);
-        private readonly DualMenuItem ActionAddSnbt = DualMenuItem.SingleButton("Add as SNBT", IconType.AddSnbt);
-        private readonly DualMenuItem ActionAddChunk = DualMenuItem.SingleButton("Add Chunk", IconType.Chunk);
-        private readonly DualMenuItem ActionUpdate = DualMenuItem.SingleMenuItem("&Update", null, Keys.None);
-        private readonly DualMenuItem ActionCheckUpdates = DualMenuItem.SingleMenuItem("Check for &Updates", null, Keys.Control | Keys.U);
         public MainForm(string[] args)
         {
             ClickedFiles = args;
@@ -94,111 +57,8 @@ namespace NbtStudio.UI
             // stuff from the designer
             InitializeComponent();
 
-            // stuff excluded from the designer for cleaner/less duplicated code
-            ActionNew.Click += (s, e) => New();
-            ActionNewClipboard.Click += (s, e) => NewPaste();
-            ActionNewRegion.Click += (s, e) => NewRegion();
-            ActionOpenFile.Click += (s, e) => OpenFile();
-            ActionOpenFolder.Click += (s, e) => OpenFolder();
-            ActionImportFile.Click += (s, e) => ImportFile();
-            ActionImportFolder.Click += (s, e) => ImportFolder();
-            ActionImportNew.Click += (s, e) => ImportNew();
-            ActionImportNewRegion.Click += (s, e) => ImportNewRegion();
-            ActionImportClipboard.Click += (s, e) => ImportClipboard();
-            ActionSave.Click += (s, e) => Save();
-            ActionSaveAs.Click += (s, e) => SaveAs();
-            ActionSort.Click += (s, e) => Sort();
-            ActionRefresh.Click += (s, e) => RefreshAll();
-            ActionUndo.Click += (s, e) => Undo();
-            ActionRedo.Click += (s, e) => Redo();
-            ActionClearUndoHistory.Click += (s, e) => ClearUndoHistory();
-            ActionCut.Click += (s, e) => Cut();
-            ActionCopy.Click += (s, e) => Copy();
-            ActionPaste.Click += (s, e) => Paste();
-            ActionRename.Click += (s, e) => Rename();
-            ActionEdit.Click += (s, e) => Edit();
-            ActionEditSnbt.Click += (s, e) => EditSnbt();
-            ActionDelete.Click += (s, e) => Delete();
-            ActionFind.Click += (s, e) => Find();
-            ActionAbout.Click += (s, e) => About();
-            ActionChangeIcons.Click += (s, e) => ChangeIcons();
-            ActionAddSnbt.Click += (s, e) => AddSnbt();
-            ActionAddChunk.Click += (s, e) => AddChunk();
-            ActionUpdate.Click += (s, e) => ShowUpdate();
-            ActionCheckUpdates.Click += (s, e) => CheckForUpdates();
-
-            ActionNew.AddTo(Tools, MenuFile);
-            ActionNewRegion.AddToMenuItem(MenuFile);
-            ActionNewClipboard.AddToMenuItem(MenuFile);
-            MenuFile.DropDownItems.Add(new ToolStripSeparator());
-            ActionOpenFile.AddTo(Tools, MenuFile);
-            ActionOpenFolder.AddTo(Tools, MenuFile);
-            DropDownImport.AddToMenuItem(MenuFile);
-            ActionImportFile.AddToDual(DropDownImport);
-            ActionImportFolder.AddToDual(DropDownImport);
-            ActionImportNew.AddToDual(DropDownImport);
-            ActionImportNewRegion.AddToDual(DropDownImport);
-            ActionImportClipboard.AddToDual(DropDownImport);
-            MenuFile.DropDownItems.Add(new ToolStripSeparator());
-            ActionSave.AddTo(Tools, MenuFile);
-            ActionSaveAs.AddToMenuItem(MenuFile);
-            MenuFile.DropDownItems.Add(new ToolStripSeparator());
-            DropDownRecent.AddToMenuItem(MenuFile);
-            ActionRefresh.AddToToolStrip(Tools);
-            Tools.Items.Add(new ToolStripSeparator());
-            ActionUndo.AddToMenuItem(MenuEdit);
-            ActionRedo.AddToMenuItem(MenuEdit);
-            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
-            ActionCut.AddTo(Tools, MenuEdit);
-            ActionCopy.AddTo(Tools, MenuEdit);
-            ActionPaste.AddTo(Tools, MenuEdit);
-            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
-            Tools.Items.Add(new ToolStripSeparator());
-            ActionRename.AddTo(Tools, MenuEdit);
-            ActionEdit.AddTo(Tools, MenuEdit);
-            ActionEditSnbt.AddTo(Tools, MenuEdit);
-            ActionDelete.AddTo(Tools, MenuEdit);
-            ActionSort.AddToToolStrip(Tools);
-            MenuEdit.DropDownItems.Add(new ToolStripSeparator());
-            DropDownUndoHistory.AddToMenuItem(MenuEdit);
-            DropDownRedoHistory.AddToMenuItem(MenuEdit);
-            ActionClearUndoHistory.AddToMenuItem(MenuEdit);
-            Tools.Items.Add(new ToolStripSeparator());
-            ActionAddChunk.AddToToolStrip(Tools);
-            ActionAbout.AddToMenuItem(MenuHelp);
-            ActionChangeIcons.AddToMenuItem(MenuHelp);
-            ActionUpdate.Visible = false;
-            ActionUpdate.AddToMenuStrip(MenuStrip);
-            MenuHelp.DropDownItems.Add(new ToolStripSeparator());
-            ActionCheckUpdates.AddToMenuItem(MenuHelp);
-
-            CreateTagButtons = MakeCreateTagButtons();
-            foreach (var item in CreateTagButtons.Values)
-            {
-                item.AddToToolStrip(Tools);
-            }
-            ActionAddSnbt.AddToToolStrip(Tools);
-
-            Tools.Items.Add(new ToolStripSeparator());
-            ActionFind.AddTo(Tools, MenuSearch);
-
             ViewModel = new NbtTreeModel();
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
-
-            ItemCollection = new DualItemCollection(
-                ActionNew, ActionNewClipboard, ActionNewRegion,
-                ActionOpenFile, ActionOpenFolder, DropDownImport,
-                ActionImportFile, ActionImportFolder, ActionImportClipboard,
-                ActionImportNew, ActionImportNewRegion, ActionSave,
-                ActionSaveAs, DropDownRecent, ActionSort, ActionRefresh,
-                ActionUndo, ActionRedo, ActionCut,
-                ActionCopy, ActionPaste, ActionRename,
-                ActionEdit, ActionEditSnbt, ActionDelete,
-                DropDownUndoHistory, DropDownRedoHistory, ActionClearUndoHistory,
-                ActionFind, ActionAbout, ActionAddSnbt, ActionAddChunk,
-                ActionChangeIcons, ActionUpdate, ActionCheckUpdates
-            );
-            ItemCollection.AddRange(CreateTagButtons.Values);
 
             foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
             {
@@ -789,20 +649,6 @@ namespace NbtStudio.UI
                 tag = EditTagWindow.CreateTag(IconSource, type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
             if (tag is not null)
                 container.Add(tag);
-        }
-
-        private Dictionary<NbtTagType, DualMenuItem> MakeCreateTagButtons()
-        {
-            var buttons = new Dictionary<NbtTagType, DualMenuItem>();
-            foreach (var type in NbtUtil.NormalTagTypes())
-            {
-                var button = DualMenuItem.SingleButton(
-                    hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
-                    icon: NbtUtil.TagIconType(type));
-                button.Click += (s, e) => AddTag(type);
-                buttons.Add(type, button);
-            }
-            return buttons;
         }
 
         private void OpenPathsLike(IEnumerable<string> paths, Action<IEnumerable<IHavePath>> then)
