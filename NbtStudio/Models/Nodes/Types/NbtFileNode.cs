@@ -25,6 +25,8 @@ namespace NbtStudio
             return new NbtTagNode(this, obj);
         }
 
+        protected override NbtTag GetNbtTag() => WrappedObject.RootTag;
+
         public override IconType GetIcon() => IconType.File;
         public override string PreviewName() => System.IO.Path.GetFileName(WrappedObject.Path);
         public override string PreviewValue() => NbtUtil.PreviewNbtValue(WrappedObject.RootTag);

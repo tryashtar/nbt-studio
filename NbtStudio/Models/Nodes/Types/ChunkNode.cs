@@ -13,17 +13,26 @@ namespace NbtStudio
     {
         public ChunkNode(Node parent, ChunkEntry wrapped) : base(parent, wrapped) { }
 
+        private Chunk GetChunk()
+        {
+            if (!WrappedObject.IsLoaded)
+                WrappedObject.Load();
+            return WrappedObject.Chunk;
+        }
+
         protected override IEnumerable<NbtTag> GetTypedChildren()
         {
-            if (WrappedObject.IsLoaded)
-                return WrappedObject.Chunk.Data;
-            return null;
+            return GetChunk().Data;
         }
+
+        public override bool HasChildren => !WrappedObject.IsLoaded || base.HasChildren;
 
         protected override Node MakeTypedChild(NbtTag obj)
         {
             return new NbtTagNode(this, obj);
         }
+
+        protected override NbtTag GetNbtTag() => GetChunk().Data;
 
         public override IconType GetIcon() => IconType.Chunk;
 

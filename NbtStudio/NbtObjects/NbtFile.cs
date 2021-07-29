@@ -192,14 +192,5 @@ namespace NbtStudio
             RootTag.SetEqualTo(current);
             HasUnsavedChanges = false;
         }
-
-        public void Move(string path)
-        {
-            if (Path is not null)
-            {
-                File.Move(Path, path);
-                Path = path;
-            }
-        }
     }
 }

@@ -105,12 +105,6 @@ namespace NbtStudio
             return OpenFile(path);
         }
 
-        public void Move(string path)
-        {
-            Directory.Move(Path, path);
-            Path = path;
-        }
-
         public void Dispose()
         {
 

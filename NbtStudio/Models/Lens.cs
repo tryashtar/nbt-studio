@@ -1,6 +1,7 @@
 ﻿using fNbt;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,12 +24,18 @@ namespace NbtStudio
         private bool Disposed = false;
         public Lens(T item, Action callback)
         {
+#if DEBUG
+            Debug.WriteLine($"Lens created: {item}");
+#endif
             InternalItem = item;
             Callback = callback;
         }
 
         public void Dispose()
         {
+#if DEBUG
+            Debug.WriteLine($"Lens disposed: {InternalItem}");
+#endif
             if (!Disposed)
             {
                 Disposed = true;

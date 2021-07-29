@@ -81,5 +81,14 @@ namespace NbtStudio
                 return result;
             return MakeChild(obj);
         }
+
+        protected virtual NbtTag GetNbtTag() => null;
+        public Lens<NbtTag> GetNbtTagLens()
+        {
+            var nbt = GetNbtTag();
+            if (nbt == null)
+                return null;
+            return new Lens<NbtTag>(nbt, MarkDirty);
+        }
     }
 }

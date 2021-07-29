@@ -472,37 +472,6 @@ namespace NbtStudio
             return ancestors;
         }
 
-        public static string TagDescription(this NbtTag tag)
-        {
-            string type = NbtUtil.TagTypeName(tag.TagType).ToLower();
-            if (!String.IsNullOrEmpty(tag.Name))
-                return $"'{tag.Name}' {type}";
-            int index = tag.GetIndex();
-            if (index != -1)
-            {
-                if (!String.IsNullOrEmpty(tag.Parent?.Name))
-                    return $"{type} at index {index} in '{tag.Parent.Name}'";
-                else if (tag.Parent?.TagType is not null)
-                    return $"{type} at index {index} in a {NbtUtil.TagTypeName(tag.Parent.TagType).ToLower()}";
-            }
-            return type;
-        }
-        public static string TagDescription(IEnumerable<NbtTag> tags)
-        {
-            if (!tags.Any()) // none
-                return "0 tags";
-            if (ListUtils.ExactlyOne(tags)) // exactly one
-                return TagDescription(tags.Single()); // more than one
-            return StringUtils.Pluralize(tags.Count(), "tag");
-        }
-
-        public static string ChunkDescription(Chunk chunk)
-        {
-            if (chunk.Region is null)
-                return $"chunk at ({chunk.X}, {chunk.Z})";
-            return $"chunk at ({chunk.X}, {chunk.Z}) in '{Path.GetFileName(chunk.Region.Path)}'";
-        }
-
         private class FileExtension
         {
             public readonly string Extension;

@@ -9,7 +9,6 @@ namespace NbtStudio
     public interface IHavePath
     {
         string Path { get; }
-        void Move(string path);
     }
 
     public interface ISaveable
