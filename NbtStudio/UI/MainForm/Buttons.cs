@@ -16,6 +16,8 @@ namespace NbtStudio.UI
 
         private void AddDefaultActions()
         {
+            bool has_files() => ViewModel.GetSaveables().Any();
+
             AddButton(
                 action: () => New(),
                 text: "&New",
@@ -103,6 +105,8 @@ namespace NbtStudio.UI
                 hover: "Save",
                 icon: IconType.Save,
                 shortcut: Keys.Control | Keys.S,
+                enabled_when: has_files,
+                enable_trigger: EnableTrigger.TreeChanged,
                 strip: Tools,
                 menu: MenuFile
             );
@@ -111,6 +115,8 @@ namespace NbtStudio.UI
                 text: "Save &As",
                 icon: IconType.Save,
                 shortcut: Keys.Control | Keys.Shift | Keys.S,
+                enabled_when: has_files,
+                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuFile
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
@@ -122,6 +128,8 @@ namespace NbtStudio.UI
                 action: Refresh,
                 hover: "Refresh",
                 icon: IconType.Refresh,
+                enabled_when: has_files,
+                enable_trigger: EnableTrigger.TreeChanged,
                 strip: Tools
             );
             Tools.Items.Add(new ToolStripSeparator());
@@ -130,6 +138,8 @@ namespace NbtStudio.UI
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
+                enabled_when: () => UndoHistory.CanUndo,
+                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuEdit
             );
             AddButton(
@@ -137,6 +147,8 @@ namespace NbtStudio.UI
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
+                enabled_when: () => UndoHistory.CanRedo,
+                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuEdit
             );
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
@@ -299,7 +311,23 @@ namespace NbtStudio.UI
             return buttons;
         }
 
-        private DualMenuItem AddButton(Action action = null, string text = null, string hover = null, IconType? icon = null, Keys? shortcut = null, ToolStrip strip = null, ToolStripMenuItem menu = null, DualMenuItem parent = null)
+        private readonly Dictionary<EnableTrigger, Action> EnableTriggers = new()
+        {
+            { EnableTrigger.SelectionChanged, () => { } },
+            { EnableTrigger.TreeChanged, () => { } }
+        };
+        private DualMenuItem AddButton(
+            Action action = null,
+            string text = null,
+            string hover = null,
+            IconType? icon = null,
+            Keys? shortcut = null,
+            ToolStrip strip = null,
+            ToolStripMenuItem menu = null,
+            DualMenuItem parent = null,
+            Func<bool> enabled_when = null,
+            EnableTrigger? enable_trigger = null
+            )
         {
             var button = new DualMenuItem(text, hover, icon, shortcut ?? Keys.None);
             if (action != null)
@@ -310,8 +338,18 @@ namespace NbtStudio.UI
                 button.AddToMenuItem(menu);
             if (parent != null)
                 button.AddToDual(parent);
+            if (enable_trigger.HasValue && enabled_when != null)
+            {
+                EnableTriggers[enable_trigger.Value] += () => button.Enabled = enabled_when();
+            }
             ItemCollection.Add(button);
             return button;
+        }
+
+        private enum EnableTrigger
+        {
+            TreeChanged,
+            SelectionChanged
         }
     }
 }

@@ -587,6 +587,9 @@ namespace NbtStudio.UI
         {
             if (InvokeRequired) // only run on UI thread
                 return;
+
+            EnableTriggers[EnableTrigger.SelectionChanged]();
+
             var obj = NbtTree.SelectedModelNode;
             var objs = NbtTree.SelectedModelNodes;
             var nbt = obj.GetNbtTag();
@@ -615,6 +618,9 @@ namespace NbtStudio.UI
         {
             if (InvokeRequired) // only run on UI thread
                 return;
+
+            EnableTriggers[EnableTrigger.TreeChanged]();
+
             ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
             ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
             ActionRefresh.Enabled = ViewModel.OpenedFiles.Any();

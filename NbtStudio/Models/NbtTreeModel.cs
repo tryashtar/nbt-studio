@@ -31,6 +31,27 @@ namespace NbtStudio
             UndoHistory.Changed += UndoHistory_Changed;
         }
 
+        public IEnumerable<ISaveable> GetSaveables()
+        {
+            
+        }
+
+        private IEnumerable<Node> BreadthFirstSearch(Predicate<Node> predicate)
+        {
+            var queue = new Queue<Node>(Roots);
+            while (queue.Any())
+            {
+                var item = queue.Dequeue();
+                if (!predicate(item))
+                    continue;
+                yield return item;
+                foreach (var sub in item.Children)
+                {
+                    queue.Enqueue(sub);
+                }
+            }
+        }
+
         public (Node destination, int index) GetInsertionLocation(Node target, NodePosition position)
         {
             if (position == NodePosition.Inside)

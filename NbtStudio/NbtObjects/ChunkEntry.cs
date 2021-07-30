@@ -120,13 +120,12 @@ namespace NbtStudio
             return with_header;
         }
     }
-}
 
-public enum ChunkStatus
-{
-    NotLoaded,
-    Loaded,
-    Corrupt,
-    External
+    public enum ChunkStatus
+    {
+        NotLoaded,
+        Loaded,
+        Corrupt,
+        External
+    }
 }
-
