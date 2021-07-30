@@ -16,20 +16,36 @@ namespace NbtStudio.UI
         {
             if (!context.UnsavedWarningCheck())
                 return null;
-            var files = context.FilesGetter();
-            if (files == null)
-                return null;
-            var bad = files.Where(x => x.Failed).ToArray();
-            var good = files.Where(x => !x.Failed).ToArray();
-            if (bad.Any())
-                context.FileErrorHandler(FailableFactory.Aggregate(bad));
-            if (good.Any())
+            IHavePath[] loadable;
+            if (context.AdvancedFilesGetter != null)
+            {
+                var files = context.AdvancedFilesGetter();
+                // can be null when the user cancels a file browse, for example
+                if (files == null)
+                    return null;
+                var bad = files.Where(x => x.file.Failed).ToArray();
+                loadable = files.Where(x => !x.file.Failed).Select(x => x.file.Result).ToArray();
+                if (bad.Any())
+                    context.AdvancedFileErrorHandler(bad);
+            }
+            else
+            {
+                var files = context.FilesGetter();
+                // can be null when the user cancels a file browse, for example
+                if (files == null)
+                    return null;
+                var bad = files.Where(x => x.Failed).ToArray();
+                loadable = files.Where(x => !x.Failed).Select(x => x.Result).ToArray();
+                if (bad.Any())
+                    context.FileErrorHandler(FailableFactory.Aggregate(bad));
+            }
+            if (loadable.Any())
             {
                 if (open)
-                    context.TreeSetter(new NbtTreeModel(good));
+                    context.TreeSetter(new NbtTreeModel(loadable));
                 else
-                    context.TreeGetter.Import(good);
-                return good.Select(x => x.Result);
+                    context.TreeGetter().Import(loadable);
+                return loadable;
             }
             return null;
         }
@@ -44,13 +60,22 @@ namespace NbtStudio.UI
             return OpenOrImport(context, false);
         }
 
-        public static void AddTag(ActionContext context)
+        public static NbtTag AddTag(ActionContext context)
         {
             var tag = context.TagSource();
+            if (tag.Failed)
+            {
+                context.TagErrorHandler(tag);
+                return null;
+            }
+            bool has_original = true;
             foreach (var node in context.SelectedNbt().OfType<NbtContainerTag>())
             {
-                tag.AddTo(node);
+                var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
+                adding.AddTo(node);
+                has_original = false;
             }
+            return tag.Result;
         }
 
         public static void Delete(ActionContext context)

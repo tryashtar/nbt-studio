@@ -12,6 +12,7 @@ namespace NbtStudio
     public abstract class Node
     {
         public readonly Node Parent;
+        public int DescendantsCount { get; private set; }
         public TreePath Path
         {
             get
@@ -26,7 +27,7 @@ namespace NbtStudio
                 return new TreePath(path.ToArray());
             }
         }
-        public IReadOnlyList<Node> Children
+        public IList<Node> Children
         {
             get
             {
@@ -65,11 +66,13 @@ namespace NbtStudio
 
         private void RefreshChildren()
         {
-            var new_children = GetChildren().ToList();
+            // make sure to reuse existing nodes
             var new_nodes = GetChildren().Select(x => KeyValuePair.Create(x, GetOrCreateChild(x))).ToList();
             ChildNodes.Clear();
+            DescendantsCount = 0;
             foreach (var node in new_nodes)
             {
+                DescendantsCount += node.Value.DescendantsCount + 1; // +1 for the node itself
                 ChildNodes.Add(node);
             }
             IsDirty = false;

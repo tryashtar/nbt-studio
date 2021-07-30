@@ -79,7 +79,16 @@ namespace NbtStudio.UI
             window.ShowDialog(this);
         }
 
-        private IEnumerable<IFailable<IFile>> BrowseFiles(string title, string filter)
+        private void ShowFileError(IEnumerable<(string path, IFailable<IHavePath> file)> failures, string title)
+        {
+            string message = $"{StringUtils.Pluralize(failures.Count(), "file")} failed to load:\n\n";
+            message += String.Join(Environment.NewLine, failures.Select(x => Path.GetFileName(x.path)));
+
+            var window = new ExceptionWindow(title, message, FailableFactory.Aggregate(failures.Select(x => x.file).ToArray()));
+            window.ShowDialog(this);
+        }
+
+        private IEnumerable<(string path, IFailable<IFile> file)> BrowseFiles(string title, string filter)
         {
             using (var dialog = new OpenFileDialog
             {
@@ -90,7 +99,7 @@ namespace NbtStudio.UI
             })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
-                    return dialog.FileNames.Select(x => NbtFolder.OpenFile(x));
+                    return dialog.FileNames.Select(x => (path: x, file: NbtFolder.OpenFile(x)));
             }
             return null;
         }
@@ -128,8 +137,8 @@ namespace NbtStudio.UI
         public IEnumerable<IHavePath> OpenFile()
         {
             var context = FormContext(unsaved_message: "Open a new file anyway?");
-            context.FilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
-            context.FileErrorHandler = x => ShowError(x, "Load failure", message);
+            context.AdvancedFilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
+            context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
             return Actions.OpenFiles(context);
         }
 
@@ -140,15 +149,13 @@ namespace NbtStudio.UI
             return Actions.OpenFiles(context);
         }
 
-        public IEnumerable<IFile> NewPaste()
+        public IEnumerable<IHavePath> NewPaste()
         {
             var context = FormContext(unsaved_message: "Open a new file anyway?");
             if (Clipboard.ContainsFileDropList())
             {
-                context.FilesGetter = FilesFromClipboard;
-                string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
-                message += String.Join(Environment.NewLine, bad.Select(x => Path.GetFileName(x.path)));
-                context.ErrorHandler = x => ShowError(x, "Load failure", message);
+                context.AdvancedFilesGetter = FilesFromClipboard;
+                context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
             }
             else if (Clipboard.ContainsText())
             {
@@ -175,8 +182,8 @@ namespace NbtStudio.UI
         public IEnumerable<IHavePath> ImportFile()
         {
             var context = FormContext();
-            context.FilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
-            context.FileErrorHandler = x => ShowError(x, "Load failure", message);
+            context.AdvancedFilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
+            context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
             return Actions.ImportFiles(context);
         }
 
@@ -187,10 +194,10 @@ namespace NbtStudio.UI
             return Actions.ImportFiles(context);
         }
 
-        public IEnumerable<IFailable<IHavePath>> FilesFromClipboard()
+        public IEnumerable<(string path, IFailable<IHavePath> file)> FilesFromClipboard()
         {
             var paths = Clipboard.GetFileDropList().Cast<string>();
-            return paths.Distinct().Select(x => NbtFolder.OpenFileOrFolder(Path.GetFullPath(x)));
+            return paths.Distinct().Select(x => (path: x, file: NbtFolder.OpenFileOrFolder(Path.GetFullPath(x))));
         }
 
         public IFailable<NbtTag> SnbtFromClipboard()

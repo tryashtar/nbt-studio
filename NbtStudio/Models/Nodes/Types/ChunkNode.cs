@@ -50,17 +50,13 @@ namespace NbtStudio
         {
             if (WrappedObject.IsLoaded)
                 return NbtUtil.PreviewNbtValue(WrappedObject.Chunk.Data);
-            switch (WrappedObject.Status)
+            return WrappedObject.Status switch
             {
-                case ChunkStatus.NotLoaded:
-                    return "(open to load)";
-                case ChunkStatus.Corrupt:
-                    return "(corrupt!)";
-                case ChunkStatus.External:
-                    return "(saved externally)";
-                default:
-                    throw new ArgumentException();
-            }
+                ChunkStatus.NotLoaded => "(open to load)",
+                ChunkStatus.Corrupt => "(corrupt!)",
+                ChunkStatus.External => "(saved externally)",
+                _ => throw new ArgumentException(),
+            };
         }
     }
 }

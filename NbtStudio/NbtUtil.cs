@@ -522,7 +522,7 @@ namespace NbtStudio
         }
         public static string OpenFilter()
         {
-            return $"{AllFiles}|{AllNbtFiles(NbtExtensions)}|{IndividualNbtFiles(NbtExtensions)}";
+            return $"{AllNbtFiles(NbtExtensions)}|{AllFiles}|{IndividualNbtFiles(NbtExtensions)}";
         }
         public static bool? BinaryExtension(string extension)
         {

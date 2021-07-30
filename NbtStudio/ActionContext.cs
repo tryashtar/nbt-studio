@@ -11,12 +11,14 @@ using TryashtarUtils.Utility;
 namespace NbtStudio.UI
 {
     public delegate void ErrorHandler(IFailable failure);
+    public delegate void AdvancedFileErrorHandler(IEnumerable<(string path, IFailable<IHavePath> file)> failures);
     public delegate bool UnsavedWarningHandler();
     public delegate bool DeleteFileWarningHandler(IEnumerable<IHavePath> files);
     public delegate void TreeSetter(NbtTreeModel new_tree);
     public delegate NbtTreeModel TreeGetter();
     public delegate IFailable<NbtTag> TagGetter();
     public delegate IEnumerable<IFailable<IHavePath>> FilesGetter();
+    public delegate IEnumerable<(string path, IFailable<IHavePath> file)> AdvancedFilesGetter();
     public class ActionContext
     {
         public IEnumerable<Node> SelectedNodes;
@@ -27,7 +29,9 @@ namespace NbtStudio.UI
         public TreeSetter TreeSetter;
         public TreeGetter TreeGetter;
         public FilesGetter FilesGetter;
+        public AdvancedFilesGetter AdvancedFilesGetter;
         public ErrorHandler FileErrorHandler;
+        public AdvancedFileErrorHandler AdvancedFileErrorHandler;
         public IEnumerable<NbtTag> SelectedNbt()
         {
             return SelectedNodes.Select(x => x.GetNbtTagLens()).Where(x => x != null).Select(x => x.Item);

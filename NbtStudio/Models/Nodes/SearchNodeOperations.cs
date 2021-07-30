@@ -12,33 +12,38 @@ namespace NbtStudio
 {
     public static class SearchNodeOperations
     {
-        public static Node SearchFrom(NbtTreeModel model, Node start, Predicate<Node> predicate, SearchDirection direction, IProgress<TreeSearchReport> progress, CancellationToken token, bool wrap)
+        public static Node SearchFrom(NbtTreeModel model, Node start, Predicate<Node> predicate, SearchDirection direction, bool wrap, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
             if (direction == SearchDirection.Forward)
             {
-                var first = model.Root.Children.First();
+                var first = model.RootNodes[0];
                 if (start is null)
                     start = first;
                 else
                     start = NextNode(start);
-                return SearchFromNext(model, start, predicate, NextNode, progress, token, new TreeSearchReport(), wrap ? first : null);
+                return SearchFromNext(model, start, predicate, NextNode, new TreeSearchReport(), wrap ? first : null, progress, token);
             }
             else
             {
-                var last = FinalNode(model.Root);
+                var last = FinalNode(model.RootNodes[^1]);
                 if (start is null)
                     start = last;
                 else
                     start = PreviousNode(start);
-                return SearchFromNext(model, start, predicate, PreviousNode, progress, token, new TreeSearchReport(), wrap ? last : null);
+                return SearchFromNext(model, start, predicate, PreviousNode, new TreeSearchReport(), wrap ? last : null, progress, token);
             }
+        }
+
+        private static int TotalNodes(NbtTreeModel model)
+        {
+            return model.RootNodes.Sum(x => x.DescendantsCount);
         }
 
         public static IEnumerable<Node> SearchAll(NbtTreeModel model, Predicate<Node> predicate, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
             var report = new TreeSearchReport();
-            report.TotalNodes = model.Root.DescendantsCount;
-            var node = model.Root.Children[0];
+            report.TotalNodes = TotalNodes(model);
+            var node = model.RootNodes[0];
             while (node is not null)
             {
                 node = NextNode(node);
@@ -47,35 +52,35 @@ namespace NbtStudio
                 report.NodesSearched++;
                 if (report.NodesSearched % 200 == 0)
                 {
-                    report.TotalNodes = model.Root.DescendantsCount;
+                    report.TotalNodes = TotalNodes(model);
                     progress.Report(report);
                     token.ThrowIfCancellationRequested();
                 }
             }
         }
 
-        private static Node SearchFromNext(NbtTreeModel model, Node node, Predicate<Node> predicate, Func<Node, Node> next, IProgress<TreeSearchReport> progress, CancellationToken token, TreeSearchReport report, Node wrap_start)
+        private static Node SearchFromNext(NbtTreeModel model, Node node, Predicate<Node> predicate, Func<Node, Node> next, TreeSearchReport report, Node wrap_start, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
             var start = node;
-            report.TotalNodes = model.Root.DescendantsCount;
+            report.TotalNodes = TotalNodes(model);
             while (node is not null && !predicate(node))
             {
                 node = next(node);
                 report.NodesSearched++;
                 if (report.NodesSearched % 200 == 0)
                 {
-                    report.TotalNodes = model.Root.DescendantsCount;
+                    report.TotalNodes = TotalNodes(model);
                     progress.Report(report);
                     token.ThrowIfCancellationRequested();
                 }
             }
-            if (node is not null && node != model.Root)
+            if (node is not null)
                 return node;
             if (wrap_start is null)
                 return null;
 
             // search again from new starting point, until reaching original starting point
-            node = SearchFromNext(model, wrap_start, x => x == start || predicate(x), next, progress, token, report, null);
+            node = SearchFromNext(model, wrap_start, x => x == start || predicate(x), next, report, null, progress, token);
             if (node == start)
                 return null;
             else
@@ -86,7 +91,7 @@ namespace NbtStudio
         {
             var children = node.Children;
             if (children.Count > 0)
-                return children.First();
+                return children[0];
             Node next = null;
             while (next is null && node is not null)
             {
@@ -109,7 +114,7 @@ namespace NbtStudio
                 var children = prev.Children;
                 if (children.Count == 0)
                     return prev;
-                prev = children[children.Count - 1];
+                prev = children[^1];
             }
             return null;
         }
@@ -139,7 +144,7 @@ namespace NbtStudio
                 var children = current.Children;
                 if (children.Count == 0)
                     return current;
-                current = current.Children.Last();
+                current = current.Children[^1];
             }
         }
     }
