@@ -64,7 +64,7 @@ namespace NbtStudio
                 if (Directory.Exists(Path))
                     folders = Directory.GetDirectories(Path, "*", SearchOption.TopDirectoryOnly);
                 else
-                    folders = new string[0];
+                    folders = Array.Empty<string>();
                 foreach (var path in folders)
                 {
                     if (!SubfolderDict.ContainsKey(path))
@@ -80,9 +80,9 @@ namespace NbtStudio
             if (newly_failed.Any())
             {
                 FilesFailed?.Invoke(this, newly_failed);
-                foreach (var item in newly_failed)
+                foreach (var (path, file) in newly_failed)
                 {
-                    FailedFileDict[item.path] = item.file;
+                    FailedFileDict[path] = file;
                 }
             }
         }

@@ -41,16 +41,14 @@ namespace NbtStudio
                 return true;
             if (tag is NbtList list)
             {
-                switch (list.ListType)
+                return list.ListType switch
                 {
-                    case NbtTagType.Byte:
-                    case NbtTagType.Short:
-                    case NbtTagType.Int:
-                    case NbtTagType.Long:
-                        return true;
-                    default:
-                        return false;
-                }
+                    NbtTagType.Byte or
+                    NbtTagType.Short or
+                    NbtTagType.Int or
+                    NbtTagType.Long => true,
+                    _ => false,
+                };
             }
             return false;
         }
@@ -69,7 +67,7 @@ namespace NbtStudio
     public abstract class NbtByteProvider : IByteTransformer
     {
         protected readonly NbtTag Tag;
-        private readonly List<byte> Bytes = new List<byte>();
+        private readonly List<byte> Bytes = new();
         public IEnumerable<byte> CurrentBytes => Bytes.AsReadOnly();
         private bool HasChanged = false;
         public NbtByteProvider(NbtTag tag)

@@ -10,26 +10,31 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
-    public delegate void ErrorHandler(Exception exception);
+    public delegate void ErrorHandler(IFailable failure);
     public delegate bool UnsavedWarningHandler();
     public delegate bool DeleteFileWarningHandler(IEnumerable<IHavePath> files);
     public delegate void TreeSetter(NbtTreeModel new_tree);
     public delegate NbtTreeModel TreeGetter();
-    public delegate NbtTag TagGetter();
-    public delegate IEnumerable<IFile> FilesGetter();
+    public delegate IFailable<NbtTag> TagGetter();
+    public delegate IEnumerable<IFailable<IHavePath>> FilesGetter();
     public class ActionContext
     {
         public IEnumerable<Node> SelectedNodes;
         public TagGetter TagSource;
-        public ErrorHandler ErrorHandler;
+        public ErrorHandler TagErrorHandler;
         public UnsavedWarningHandler UnsavedWarningCheck;
         public DeleteFileWarningHandler DeleteFileWarning;
         public TreeSetter TreeSetter;
         public TreeGetter TreeGetter;
         public FilesGetter FilesGetter;
+        public ErrorHandler FileErrorHandler;
         public IEnumerable<NbtTag> SelectedNbt()
         {
             return SelectedNodes.Select(x => x.GetNbtTagLens()).Where(x => x != null).Select(x => x.Item);
+        }
+        public static FilesGetter SingleFile(IHavePath file)
+        {
+            return () => new IFailable<IHavePath>[] { FailableFactory.Success(file, null) };
         }
     }
 }

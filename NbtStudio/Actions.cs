@@ -10,23 +10,41 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
-    public class Actions
+    public static class Actions
     {
-        // returns false if the user cancels the action
-        public bool OpenFiles(ActionContext context)
+        private static IEnumerable<IHavePath> OpenOrImport(ActionContext context, bool open)
         {
             if (!context.UnsavedWarningCheck())
-                return false;
-            context.TreeSetter(new NbtTreeModel(context.FilesGetter()));
-            return true;
+                return null;
+            var files = context.FilesGetter();
+            if (files == null)
+                return null;
+            var bad = files.Where(x => x.Failed).ToArray();
+            var good = files.Where(x => !x.Failed).ToArray();
+            if (bad.Any())
+                context.FileErrorHandler(FailableFactory.Aggregate(bad));
+            if (good.Any())
+            {
+                if (open)
+                    context.TreeSetter(new NbtTreeModel(good));
+                else
+                    context.TreeGetter.Import(good);
+                return good.Select(x => x.Result);
+            }
+            return null;
         }
 
-        public void ImportFiles(ActionContext context)
+        public static IEnumerable<IHavePath> OpenFiles(ActionContext context)
         {
-            context.TreeGetter().Import(context.FilesGetter());
+            return OpenOrImport(context, true);
         }
 
-        public void AddTag(ActionContext context)
+        public static IEnumerable<IHavePath> ImportFiles(ActionContext context)
+        {
+            return OpenOrImport(context, false);
+        }
+
+        public static void AddTag(ActionContext context)
         {
             var tag = context.TagSource();
             foreach (var node in context.SelectedNbt().OfType<NbtContainerTag>())
@@ -35,7 +53,7 @@ namespace NbtStudio.UI
             }
         }
 
-        public void Delete(ActionContext context)
+        public static void Delete(ActionContext context)
         {
             var nodes = context.SelectedNodes.Where(x => x.CanDelete);
             var file_nodes = nodes.Where(x => x.Get<IHavePath>() is not null);

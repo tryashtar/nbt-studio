@@ -208,7 +208,7 @@ namespace NbtStudio
     {
         private readonly string ChangelogURL;
         public string Changelog { get; private set; }
-        private readonly List<(string name, string url)> Assets = new List<(string, string)>();
+        private readonly List<(string name, string url)> Assets = new();
         public GitHubVersion(JObject json)
         {
             string tag_name = json["tag_name"]?.ToString();

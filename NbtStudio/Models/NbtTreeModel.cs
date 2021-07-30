@@ -25,14 +25,11 @@ namespace NbtStudio
         public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
         public readonly UndoHistory UndoHistory;
 
-        public NbtTreeModel(IEnumerable<object> roots)
+        public NbtTreeModel()
         {
             UndoHistory = new UndoHistory(GetDescription);
             UndoHistory.Changed += UndoHistory_Changed;
-            Roots = roots.Select(x => NodeFactory.Create(null, x)).ToList();
         }
-        public NbtTreeModel(object root) : this(new[] { root }) { }
-        public NbtTreeModel() : this(Enumerable.Empty<object>()) { }
 
         public (Node destination, int index) GetInsertionLocation(Node target, NodePosition position)
         {

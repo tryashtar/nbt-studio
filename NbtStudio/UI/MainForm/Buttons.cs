@@ -17,7 +17,7 @@ namespace NbtStudio.UI
         private void AddDefaultActions()
         {
             AddButton(
-                action: New,
+                action: () => New(),
                 text: "&New",
                 hover: "New File",
                 icon: IconType.NewFile,
@@ -26,14 +26,14 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: NewPaste,
+                action: () => NewPaste(),
                 text: "New from &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.V,
                 menu: MenuFile
             );
             AddButton(
-                action: NewRegion,
+                action: () => NewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 shortcut: Keys.Control | Keys.Alt | Keys.R,
@@ -41,7 +41,7 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                action: OpenFile,
+                action: () => OpenFile(),
                 text: "&Open File",
                 hover: "Open File",
                 icon: IconType.OpenFile,
@@ -50,7 +50,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: OpenFolder,
+                action: () => OpenFolder(),
                 text: "Open &Folder",
                 hover: "Open Folder",
                 icon: IconType.OpenFolder,
@@ -63,34 +63,34 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: ImportFile,
+                action: () => ImportFile(),
                 text: "&File",
                 icon: IconType.OpenFile,
                 shortcut: Keys.Control | Keys.I,
                 parent: import
             );
             AddButton(
-                action: ImportFolder,
+                action: () => ImportFolder(),
                 text: "F&older",
                 icon: IconType.OpenFolder,
                 shortcut: Keys.Control | Keys.Shift | Keys.I,
                 parent: import
             );
             AddButton(
-                action: ImportNew,
+                action: () => ImportNew(),
                 text: "&New File",
                 icon: IconType.NewFile,
                 shortcut: Keys.Control | Keys.Alt | Keys.N,
                 parent: import
             );
             AddButton(
-                action: ImportNewRegion,
+                action: () => ImportNewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 parent: import
             );
             AddButton(
-                action: ImportClipboard,
+                action: () => ImportClipboard(),
                 text: "From &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.I,

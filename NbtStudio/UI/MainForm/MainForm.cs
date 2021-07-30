@@ -184,82 +184,6 @@ namespace NbtStudio.UI
             }
         }
 
-        private void NewPaste()
-        {
-            PasteLike(x => OpenFiles(x), x => OpenFile(x));
-        }
-
-        private void ImportClipboard()
-        {
-            PasteLike(x => ImportFiles(x), x => ImportFile(x));
-        }
-
-        private void BrowseFileLike(Action<string[]> then)
-        {
-            using (var dialog = new OpenFileDialog
-            {
-                Title = "Select NBT files",
-                RestoreDirectory = true,
-                Multiselect = true,
-                Filter = NbtUtil.OpenFilter()
-            })
-            {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                    then(dialog.FileNames);
-            }
-        }
-
-        private void BrowseFolderLike(Action<string> then)
-        {
-            using (var dialog = new CommonOpenFileDialog
-            {
-                Title = "Select a folder that contains NBT files",
-                RestoreDirectory = true,
-                Multiselect = false,
-                IsFolderPicker = true
-            })
-            {
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    then(dialog.FileName);
-            }
-        }
-
-        private void OpenFile()
-        {
-            if (!ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
-            BrowseFileLike(x => OpenFiles(x, skip_confirm: true));
-        }
-
-        private void OpenFile(ISaveable file, bool skip_confirm = false)
-        {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
-            ViewModel = new NbtTreeModel(file);
-        }
-
-        private void ImportFile()
-        {
-            BrowseFileLike(x => ImportFiles(x));
-        }
-
-        private void ImportFile(ISaveable file)
-        {
-            ViewModel.Import(file);
-        }
-
-        private void OpenFolder()
-        {
-            if (!ConfirmIfUnsaved("Open a new folder anyway?"))
-                return;
-            BrowseFolderLike(x => OpenFolder(x, skip_confirm: true));
-        }
-
-        private void ImportFolder()
-        {
-            BrowseFolderLike(x => ImportFolder(x));
-        }
-
         private void Discard(IEnumerable<Node> nodes)
         {
             var unsaved = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
@@ -290,7 +214,7 @@ namespace NbtStudio.UI
                 if (errors.Any())
                 {
                     var error = FailableFactory.AggregateFailure(errors.Select(x => x.exception).ToArray());
-                    string message = $"{StringUtils.Pluralize(errors.Count(), "file")} failed to refresh:\n\n";
+                    string message = $"{StringUtils.Pluralize(errors.Count, "file")} failed to refresh:\n\n";
                     message += String.Join("\n", errors.Select(x => x.item).Where(x => x is not null).Select(x => Path.GetFileName(x.Path)));
                     var window = new ExceptionWindow("Refresh error", message, error);
                     window.ShowDialog(this);
@@ -651,73 +575,12 @@ namespace NbtStudio.UI
                 container.Add(tag);
         }
 
-        private void OpenPathsLike(IEnumerable<string> paths, Action<IEnumerable<IHavePath>> then)
-        {
-            var files = paths.Distinct().Select(path => (path, item: NbtFolder.OpenFileOrFolder(Path.GetFullPath(path)))).ToList();
-            var bad = files.Where(x => x.item.Failed);
-            var good = files.Where(x => !x.item.Failed);
-            if (bad.Any())
-            {
-                string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
-                message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-                var fail = FailableFactory.Aggregate(bad.Select(x => x.item).ToArray());
-                var window = new ExceptionWindow("Load failure", message, fail);
-                window.ShowDialog(this);
-            }
-            if (good.Any())
-            {
-                Properties.Settings.Default.RecentFiles.AddRange(good.Select(x => x.path).ToArray());
-                var results = good.Select(x => x.item.Result);
-                then(results);
-            }
-        }
-
-        private void Folder_FilesFailed(object sender, IEnumerable<(string path, IFailable<IFile> file)> bad)
-        {
-            string message = $"{StringUtils.Pluralize(bad.Count(), "file")} failed to load:\n\n";
-            message += String.Join("\n", bad.Select(x => Path.GetFileName(x.path)));
-            var fail = FailableFactory.Aggregate(bad.Select(x => x.file).ToArray());
-            var window = new ExceptionWindow("Load failure", message, fail);
-            window.ShowDialog(this);
-        }
-
-        private void OpenFolder(string path, bool skip_confirm = false)
-        {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new folder anyway?"))
-                return;
-            OpenPathsLike(new[] { path }, x => ViewModel = new NbtTreeModel(x));
-        }
-
-        private void ImportFolder(string path)
-        {
-            OpenPathsLike(new[] { path }, x => ViewModel.ImportMany(x));
-        }
-
-        private void OpenFiles(IEnumerable<string> paths, bool skip_confirm = false)
-        {
-            if (!skip_confirm && !ConfirmIfUnsaved("Open a new file anyway?"))
-                return;
-            OpenPathsLike(paths, x => ViewModel = new NbtTreeModel(x));
-        }
-
-        private void ImportFiles(IEnumerable<string> paths)
-        {
-            OpenPathsLike(paths, x => ViewModel.ImportMany(x));
-        }
-
         private void OpenRecentFile()
         {
             UpdateRecentFiles();
             var files = Properties.Settings.Default.RecentFiles;
             if (files.Count >= 1)
                 OpenFiles(Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Take(1));
-        }
-
-        private bool ConfirmIfUnsaved(string message)
-        {
-            if (!ViewModel.HasAnyUnsavedChanges)
-                return true;
-            return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
         }
 
         private void NbtTree_SelectionChanged(object sender, EventArgs e)
@@ -905,7 +768,7 @@ namespace NbtStudio.UI
                 if (sources[i].Any())
                     collection.Add(new ToolStripSeparator());
             }
-            collection.AddRange(sources[sources.Length - 1].ToArray());
+            collection.AddRange(sources[^1].ToArray());
         }
 
         private void Discard_Click(object sender, EventArgs e)
