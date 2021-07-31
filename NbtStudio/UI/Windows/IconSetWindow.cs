@@ -111,20 +111,27 @@ namespace NbtStudio.UI
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (var file in dialog.FileNames)
-                    {
-                        var attempt = TryImportSource(file);
-                        if (attempt.Failed)
-                            ShowImportFailed(file, attempt, this);
-                    }
+                    TryImportSources(dialog.FileNames, this);
                     RefreshIcons();
                 }
             }
         }
 
-        public static void ShowImportFailed(string path, IFailable import, IWin32Window owner)
+        public static void TryImportSources(IEnumerable<string> files, IWin32Window error_window)
         {
-            var window = new ExceptionWindow("Failed to load icons", $"The custom icon source at '{path}' failed to load.", import);
+            var attempts = new LoadFileAttempts();
+            foreach (var item in files)
+            {
+                var attempt = IconSetWindow.TryImportSource(item);
+                attempts.AddAttempt(item, attempt);
+            }
+            if (attempts.AnyFailed())
+                IconSetWindow.ShowImportsFailed(attempts, error_window);
+        }
+
+        public static void ShowImportsFailed(LoadFileAttempts failures, IWin32Window owner)
+        {
+            var window = new ExceptionWindow("Failed to load icons", $"The following custom icon sources failed to load:\n\n{String.Join(Environment.NewLine, failures.FailedPaths)}", failures.Failable);
             window.ShowDialog(owner);
         }
 

@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NbtStudio.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="RecentFiles" Type="System.Collections.Specialized.StringCollection" Scope="User">
+    <Setting Name="RecentFiles" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="FindRegex" Type="System.Boolean" Scope="User">
@@ -26,7 +26,7 @@
     <Setting Name="IconSet" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="CustomIconSets" Type="System.Collections.Specialized.StringCollection" Scope="User">
+    <Setting Name="CustomIconSets" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TagWordWrap" Type="System.Boolean" Scope="User">

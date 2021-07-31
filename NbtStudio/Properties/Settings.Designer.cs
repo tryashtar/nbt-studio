@@ -25,9 +25,9 @@ namespace NbtStudio.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection RecentFiles {
+        public global::System.Collections.Generic.List<System.String> RecentFiles {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["RecentFiles"]));
+                return ((global::System.Collections.Generic.List<System.String>)(this["RecentFiles"]));
             }
             set {
                 this["RecentFiles"] = value;
@@ -120,9 +120,9 @@ namespace NbtStudio.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection CustomIconSets {
+        public global::System.Collections.Generic.List<System.String> CustomIconSets {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["CustomIconSets"]));
+                return ((global::System.Collections.Generic.List<System.String>)(this["CustomIconSets"]));
             }
             set {
                 this["CustomIconSets"] = value;

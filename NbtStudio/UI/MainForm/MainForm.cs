@@ -1,17 +1,13 @@
 using fNbt;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aga.Controls.Tree;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using TryashtarUtils.Utility;
 using TryashtarUtils.Nbt;
@@ -21,108 +17,82 @@ namespace NbtStudio.UI
 {
     public partial class MainForm : Form
     {
-        private NbtTreeModel _ViewModel;
-        private NbtTreeModel ViewModel
-        {
-            get => _ViewModel;
-            set
-            {
-                if (_ViewModel is not null)
-                {
-                    _ViewModel.Changed -= ViewModel_Changed;
-                }
-
-                _ViewModel = value;
-                NbtTree.Model = _ViewModel;
-
-                _ViewModel.Changed += ViewModel_Changed;
-
-                ViewModel_Changed(this, EventArgs.Empty);
-            }
-        }
-
-        private UndoHistory UndoHistory => ViewModel.UndoHistory;
         private IconSource IconSource;
 
+        private readonly NbtStudio Application;
         private readonly string[] ClickedFiles;
+        private readonly Updater UpdateChecker = new();
 
-        public MainForm(string[] args)
+        public MainForm(NbtStudio application, string[] args)
         {
+            Application = application;
             ClickedFiles = args;
-            if (Properties.Settings.Default.RecentFiles is null)
-                Properties.Settings.Default.RecentFiles = new StringCollection();
-            if (Properties.Settings.Default.CustomIconSets is null)
-                Properties.Settings.Default.CustomIconSets = new StringCollection();
 
-            // stuff from the designer
+            // add controls
             InitializeComponent();
+            AddDefaultActions();
 
-            ViewModel = new NbtTreeModel();
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
+            NbtTree.Model = Application.Tree;
 
-            foreach (var item in Properties.Settings.Default.CustomIconSets.Cast<string>().ToList())
-            {
-                var attempt = IconSetWindow.TryImportSource(item);
-                if (attempt.Failed)
-                    IconSetWindow.ShowImportFailed(item, attempt, this);
-            }
+            IconSetWindow.TryImportSources(Properties.Settings.Default.CustomIconSets, this);
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
-
-            UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
-            UpdateChecker.Start();
-            UpdateChecker.ContinueWith(x =>
-            {
-                if (x.Status == TaskStatus.RanToCompletion && x.Result is not null)
-                {
-                    ReadyUpdate = x.Result;
-                    ActionUpdate.Visible = true;
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-
-            NbtTree.NodeAdded += NbtTree_NodeAdded;
+#if !DEBUG
+            CheckForUpdatesInBackground();
+#endif
         }
 
-        private Task<AvailableUpdate> UpdateChecker;
-        private AvailableUpdate ReadyUpdate;
-        private void CheckForUpdates()
+        private void MainForm_Load(object sender, EventArgs e)
         {
-            if (UpdateChecker is not null && !UpdateChecker.IsCompleted)
-                return;
-            UpdateChecker = new Task<AvailableUpdate>(() => Updater.CheckForUpdates());
-            UpdateChecker.Start();
+            if (ClickedFiles is not null && ClickedFiles.Any())
+                OpenFiles(ClickedFiles);
+        }
+
+        private void CheckForUpdatesInBackground()
+        {
+            UpdateChecker.StartCheckingAsync();
             UpdateChecker.ContinueWith(x =>
             {
-                if (x.Status == TaskStatus.Faulted)
+                if (!x.Failed)
+                    UpdateButton.Visible = true;
+            });
+        }
+
+        private void CheckForUpdates()
+        {
+            // TO DO: calling this repeatedly shouldn't spam the window multiple times (likewise for CheckForUpdatesInBackground)
+            UpdateChecker.StartCheckingAsync();
+            UpdateChecker.ContinueWith(x =>
+            {
+                if (x.Failed)
                 {
                     var window = new ExceptionWindow("Update check failed",
-                        "Failed to check for updates.",
-                        FailableFactory.Failure(x.Exception, "Check for updates"),
+                        "Failed to check for updates.", x,
                         "Would you like to go to the update page?\n" +
-                        "https://github.com/tryashtar/nbt-studio/releases",
+                        Updater.GitHubUrl(),
                         ExceptionWindowButtons.OKCancel
                     );
                     window.ShowDialog(this);
                     if (window.DialogResult == DialogResult.OK)
-                        IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
+                        IOUtils.OpenUrlInBrowser(Updater.GitHubUrl());
                 }
-                else if (x.Status == TaskStatus.RanToCompletion)
+                else
                 {
                     if (x.Result is null)
                     {
                         if (MessageBox.Show("You already seem to have the latest update.\n" +
                             "Would you like to go to the update page?\n\n" +
-                            "https://github.com/tryashtar/nbt-studio/releases",
+                            Updater.GitHubUrl(),
                             "No update found", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                            IOUtils.OpenUrlInBrowser("https://github.com/tryashtar/nbt-studio/releases");
+                            IOUtils.OpenUrlInBrowser(Updater.GitHubUrl());
                     }
                     else
                     {
-                        ReadyUpdate = x.Result;
-                        ActionUpdate.Visible = true;
-                        ShowUpdate();
+                        UpdateButton.Visible = true;
+                        ShowUpdate(x.Result);
                     }
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
         private void SetIconSource(IconSource source)
@@ -133,42 +103,6 @@ namespace NbtStudio.UI
             NbtTree.Refresh();
             this.Icon = source.GetImage(IconType.NbtStudio).Icon;
             Properties.Settings.Default.IconSet = IconSourceRegistry.GetID(source);
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            NbtTree_SelectionChanged(this, EventArgs.Empty);
-            ViewModel_Changed(this, EventArgs.Empty);
-            if (ClickedFiles is not null && ClickedFiles.Any())
-                OpenFiles(ClickedFiles);
-        }
-
-        private void PasteLike(Action<IEnumerable<string>> when_paths, Action<NbtFile> when_file)
-        {
-            if (Clipboard.ContainsFileDropList())
-            {
-                var files = Clipboard.GetFileDropList();
-                when_paths(files.Cast<string>());
-            }
-            else if (Clipboard.ContainsText())
-            {
-                var text = Clipboard.GetText();
-                var attempt1 = SnbtParser.TryParse(text, named: false);
-                if (!attempt1.Failed)
-                    PasteTagLike(attempt1.Result, when_file);
-                else
-                {
-                    var attempt2 = SnbtParser.TryParse(text, named: true);
-                    if (!attempt2.Failed)
-                        PasteTagLike(attempt2.Result, when_file);
-                    else
-                    {
-                        var error = FailableFactory.Aggregate(attempt1, attempt2);
-                        var window = new ExceptionWindow("Clipboard error", "Failed to parse SNBT from clipboard.", error);
-                        window.ShowDialog(this);
-                    }
-                }
-            }
         }
 
         private void PasteTagLike(NbtTag tag, Action<NbtFile> when_file)
@@ -286,7 +220,7 @@ namespace NbtStudio.UI
                 {
                     file.SaveAs(dialog.FileName);
                     Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
-                        return true;
+                    return true;
                 }
             }
             return false;
@@ -511,23 +445,19 @@ namespace NbtStudio.UI
         private IconSetWindow IconSetWindow;
         private void ChangeIcons()
         {
-            if (IconSetWindow is null || IconSetWindow.IsDisposed)
+            IconSetWindow = Utils.ShowForm(this, IconSetWindow, () =>
             {
-                IconSetWindow = new IconSetWindow(IconSource);
-                IconSetWindow.FormClosed += IconSetWindow_FormClosed;
-            }
-            if (!IconSetWindow.Visible)
-                IconSetWindow.Show(this);
-            IconSetWindow.Focus();
+                var form = new IconSetWindow(IconSource);
+                form.FormClosed += IconSetWindow_FormClosed;
+                return form;
+            });
         }
 
         private UpdateWindow UpdateWindow;
-        private void ShowUpdate()
+        private void ShowUpdate(AvailableUpdate update)
         {
-            if (ReadyUpdate is null)
-                return;
             if (UpdateWindow is null || UpdateWindow.IsDisposed)
-                UpdateWindow = new UpdateWindow(IconSource, ReadyUpdate);
+                UpdateWindow = new UpdateWindow(IconSource, update);
             if (!UpdateWindow.Visible)
                 UpdateWindow.Show(this);
             UpdateWindow.Focus();

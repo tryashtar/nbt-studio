@@ -11,7 +11,7 @@ using TryashtarUtils.Utility;
 namespace NbtStudio.UI
 {
     public delegate void ErrorHandler(IFailable failure);
-    public delegate void AdvancedFileErrorHandler(IEnumerable<(string path, IFailable<IHavePath> file)> failures);
+    public delegate void AdvancedFileErrorHandler(LoadFileAttempts failures);
     public delegate bool UnsavedWarningHandler();
     public delegate bool DeleteFileWarningHandler(IEnumerable<IHavePath> files);
     public delegate void TreeSetter(NbtTreeModel new_tree);

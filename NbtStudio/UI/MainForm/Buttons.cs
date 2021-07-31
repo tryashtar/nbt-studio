@@ -13,6 +13,8 @@ namespace NbtStudio.UI
     public partial class MainForm
     {
         private readonly DualItemCollection ItemCollection = new();
+        // TO DO: a bit annoying that this is required to be a field
+        private DualMenuItem UpdateButton;
 
         private void AddDefaultActions()
         {
@@ -282,12 +284,12 @@ namespace NbtStudio.UI
                 menu: MenuHelp
             );
             MenuHelp.DropDownItems.Add(new ToolStripSeparator());
-            var update = AddButton(
+            UpdateButton = AddButton(
                 action: Update,
                 text: "&Update",
                 strip: MenuStrip
             );
-            update.Visible = false;
+            UpdateButton.Visible = false;
             AddButton(
                 action: CheckForUpdates,
                 text: "Check for &Updates",

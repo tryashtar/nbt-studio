@@ -45,6 +45,11 @@ namespace NbtStudio.UI
             int height = node.Tree.RowHeight - 4;
             return image is null ? Size.Empty : new Size((int)(((float)height / image.Height) * image.Width), height);
         }
+
+        private Image GetIcon(TreeNodeAdv node)
+        {
+            return IconSource.GetImage(((Node)node.Tag).GetIcon()).Image;
+        }
     }
 
     public class NbtText : NodeControl
