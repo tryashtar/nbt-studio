@@ -12,7 +12,7 @@ namespace NbtStudio.UI
 {
     public partial class MainForm
     {
-        private readonly DualItemCollection ItemCollection = new();
+        private readonly DualItemCollection ButtonsCollection = new();
         // TO DO: a bit annoying that this is required to be a field
         private DualMenuItem UpdateButton;
 
@@ -308,7 +308,7 @@ namespace NbtStudio.UI
                     icon: NbtUtil.TagIconType(type));
                 button.Click += (s, e) => AddTag(type);
                 buttons.Add(button);
-                ItemCollection.Add(button);
+                ButtonsCollection.Add(button);
             }
             return buttons;
         }
@@ -344,7 +344,7 @@ namespace NbtStudio.UI
             {
                 EnableTriggers[enable_trigger.Value] += () => button.Enabled = enabled_when();
             }
-            ItemCollection.Add(button);
+            ButtonsCollection.Add(button);
             return button;
         }
 

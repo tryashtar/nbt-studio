@@ -16,7 +16,7 @@ namespace NbtStudio
         [STAThread]
         static void Main(string[] args)
         {
-            var studio = new NbtStudio(args);
+            var studio = new Studio(args);
             studio.LaunchForm();
         }
     }

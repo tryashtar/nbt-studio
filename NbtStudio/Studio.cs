@@ -9,14 +9,14 @@ using NbtStudio.UI;
 
 namespace NbtStudio
 {
-    public class NbtStudio
+    public class Studio
     {
         public MainForm Form { get; private set; }
         public readonly NbtTreeModel Tree = new();
 
         private readonly string[] CommandLineArguments;
 
-        public NbtStudio(string[] args)
+        public Studio(string[] args)
         {
             CommandLineArguments = args;
             if (Properties.Settings.Default.RecentFiles is null)
@@ -30,10 +30,10 @@ namespace NbtStudio
             // https://stackoverflow.com/a/13228495
             if (Environment.OSVersion.Version.Major >= 6)
                 SetProcessDPIAware();
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
             Form = new MainForm(this, CommandLineArguments);
-            Application.Run(Form);
+            System.Windows.Forms.Application.Run(Form);
         }
 
         [DllImport("user32.dll")]

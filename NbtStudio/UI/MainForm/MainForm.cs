@@ -18,12 +18,11 @@ namespace NbtStudio.UI
     public partial class MainForm : Form
     {
         private IconSource IconSource;
-
-        private readonly NbtStudio Application;
+        private readonly Studio Application;
         private readonly string[] ClickedFiles;
         private readonly Updater UpdateChecker = new();
 
-        public MainForm(NbtStudio application, string[] args)
+        public MainForm(Studio application, string[] args)
         {
             Application = application;
             ClickedFiles = args;
@@ -98,7 +97,7 @@ namespace NbtStudio.UI
         private void SetIconSource(IconSource source)
         {
             IconSource = source;
-            ItemCollection.SetIconSource(source);
+            ButtonsCollection.SetIconSource(source);
             NbtTree.SetIconSource(source);
             NbtTree.Refresh();
             this.Icon = source.GetImage(IconType.NbtStudio).Icon;
@@ -241,26 +240,6 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
         }
 
-        private void RefreshAll()
-        {
-            RefreshItems(ViewModel.OpenedFiles);
-        }
-
-        private void Undo()
-        {
-            UndoHistory.Undo();
-        }
-
-        private void Redo()
-        {
-            UndoHistory.Redo();
-        }
-
-        private void ClearUndoHistory()
-        {
-            UndoHistory.Clear();
-        }
-
         private void CopyLike(Func<Node, bool> check, Func<Node, DataObject> perform)
         {
             var objs = NbtTree.SelectedModelNodes.Where(check).ToList();
@@ -269,23 +248,6 @@ namespace NbtStudio.UI
                 var data = objs.Select(perform).Aggregate((x, y) => Utils.Merge(x, y));
                 Clipboard.SetDataObject(data);
             }
-        }
-
-        private void Cut()
-        {
-            CopyLike(x => x.CanCut, x => x.Cut());
-        }
-
-        private void Copy()
-        {
-            CopyLike(x => x.CanCopy, x => x.Copy());
-        }
-
-        private void Paste()
-        {
-            var parent = NbtTree.SelectedModelNode;
-            if (parent is null) return;
-            Paste(parent);
         }
 
         private void Paste(Node node)
@@ -357,16 +319,6 @@ namespace NbtStudio.UI
             UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
         }
 
-        private void Rename(Node node)
-        {
-            EditLike(node, x => x.CanRename, RenameTag);
-        }
-
-        private void Edit(Node node)
-        {
-            EditLike(node, x => x.CanEdit, EditTag);
-        }
-
         private void RenameFile(IHavePath item)
         {
             if (item.Path is not null)
@@ -422,45 +374,34 @@ namespace NbtStudio.UI
             }
         }
 
-        private FindWindow FindWindow;
         private void Find()
         {
-            if (FindWindow is null || FindWindow.IsDisposed)
-                FindWindow = new FindWindow(IconSource, ViewModel, NbtTree);
-            if (!FindWindow.Visible)
-                FindWindow.Show(this);
-            FindWindow.Focus();
+            // TO DO: don't show multiple windows. not sure why I reverted this
+            var window = new FindWindow(IconSource, Application.Tree, NbtTree);
+            window.Show(this);
+            window.Focus();
         }
 
-        private AboutWindow AboutWindow;
         private void About()
         {
-            if (AboutWindow is null || AboutWindow.IsDisposed)
-                AboutWindow = new AboutWindow(IconSource);
-            if (!AboutWindow.Visible)
-                AboutWindow.Show(this);
-            AboutWindow.Focus();
+            var window = new AboutWindow(IconSource);
+            window.Show(this);
+            window.Focus();
         }
 
-        private IconSetWindow IconSetWindow;
         private void ChangeIcons()
         {
-            IconSetWindow = Utils.ShowForm(this, IconSetWindow, () =>
-            {
-                var form = new IconSetWindow(IconSource);
-                form.FormClosed += IconSetWindow_FormClosed;
-                return form;
-            });
+            var window = new IconSetWindow(IconSource);
+            window.FormClosed += IconSetWindow_FormClosed;
+            window.Show(this);
+            window.Focus();
         }
 
-        private UpdateWindow UpdateWindow;
         private void ShowUpdate(AvailableUpdate update)
         {
-            if (UpdateWindow is null || UpdateWindow.IsDisposed)
-                UpdateWindow = new UpdateWindow(IconSource, update);
-            if (!UpdateWindow.Visible)
-                UpdateWindow.Show(this);
-            UpdateWindow.Focus();
+            var window = new UpdateWindow(IconSource, update);
+            window.Show(this);
+            window.Focus();
         }
 
         private void IconSetWindow_FormClosed(object sender, FormClosedEventArgs e)

@@ -14,24 +14,10 @@ namespace NbtStudio
     {
         public static Node SearchFrom(NbtTreeModel model, Node start, Predicate<Node> predicate, SearchDirection direction, bool wrap, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
-            if (direction == SearchDirection.Forward)
-            {
-                var first = model.RootNodes[0];
-                if (start is null)
-                    start = first;
-                else
-                    start = NextNode(start);
-                return SearchFromNext(model, start, predicate, NextNode, new TreeSearchReport(), wrap ? first : null, progress, token);
-            }
-            else
-            {
-                var last = FinalNode(model.RootNodes[^1]);
-                if (start is null)
-                    start = last;
-                else
-                    start = PreviousNode(start);
-                return SearchFromNext(model, start, predicate, PreviousNode, new TreeSearchReport(), wrap ? last : null, progress, token);
-            }
+            var very_first = direction == SearchDirection.Forward ? model.RootNodes[0] : model.RootNodes[^1];
+            Func<Node, Node> next_function = direction == SearchDirection.Forward ? NextNode : PreviousNode;
+            start = start is null ? very_first : next_function(start);
+            return SearchFromNext(model, start, predicate, next_function, new TreeSearchReport(), wrap ? very_first : null, progress, token);
         }
 
         private static int TotalNodes(NbtTreeModel model)
@@ -81,10 +67,7 @@ namespace NbtStudio
 
             // search again from new starting point, until reaching original starting point
             node = SearchFromNext(model, wrap_start, x => x == start || predicate(x), next, report, null, progress, token);
-            if (node == start)
-                return null;
-            else
-                return node;
+            return node == start ? null : node;
         }
 
         public static Node NextNode(Node node)

@@ -1,5 +1,4 @@
 ﻿using Aga.Controls.Tree;
-using fNbt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +61,7 @@ namespace NbtStudio.UI
             if (!ValidateRegex()) return null;
             var start = (SearchingView.SelectedNode?.Tag as Node) ?? LastFound;
             var predicate = GetPredicate();
-            var find = SearchNodeOperations.SearchFrom(SearchingModel, start, predicate, direction, progress, CancelSource.Token, true);
+            var find = SearchNodeOperations.SearchFrom(SearchingModel, start, predicate, direction, true, progress, CancelSource.Token);
             if (find is null)
                 return null;
             else
