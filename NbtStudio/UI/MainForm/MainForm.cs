@@ -18,13 +18,13 @@ namespace NbtStudio.UI
     public partial class MainForm : Form
     {
         private IconSource IconSource;
-        private readonly Studio Application;
+        private readonly Studio App;
         private readonly string[] ClickedFiles;
         private readonly Updater UpdateChecker = new();
 
         public MainForm(Studio application, string[] args)
         {
-            Application = application;
+            App = application;
             ClickedFiles = args;
 
             // add controls
@@ -32,7 +32,7 @@ namespace NbtStudio.UI
             AddDefaultActions();
 
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
-            NbtTree.Model = Application.Tree;
+            NbtTree.Model = App.Tree;
 
             IconSetWindow.TryImportSources(Properties.Settings.Default.CustomIconSets, this);
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
@@ -377,7 +377,7 @@ namespace NbtStudio.UI
         private void Find()
         {
             // TO DO: don't show multiple windows. not sure why I reverted this
-            var window = new FindWindow(IconSource, Application.Tree, NbtTree);
+            var window = new FindWindow(IconSource, App.Tree, NbtTree);
             window.Show(this);
             window.Focus();
         }

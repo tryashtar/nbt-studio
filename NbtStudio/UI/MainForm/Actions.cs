@@ -15,20 +15,6 @@ namespace NbtStudio.UI
 {
     public partial class MainForm
     {
-        public ActionContext FormContext(string unsaved_message = null)
-        {
-            var context = new ActionContext
-            {
-                SelectedNodes = NbtTree.SelectedModelNodes,
-                DeleteFileWarning = ShowDeleteWarning,
-                TreeSetter = x => ViewModel = x,
-                TreeGetter = () => ViewModel
-            };
-            if (unsaved_message != null)
-                context.UnsavedWarningCheck = () => ConfirmIfUnsaved(unsaved_message);
-            return context;
-        }
-
         private bool ConfirmIfUnsaved(string message)
         {
             if (!ViewModel.HasAnyUnsavedChanges)
@@ -122,6 +108,11 @@ namespace NbtStudio.UI
 
         public IEnumerable<IHavePath> New()
         {
+            var action = new OpenFileAction()
+            {
+                ErrorHandler = ,
+                
+            };
             var context = FormContext(unsaved_message: "Create a new file anyway?");
             context.FilesGetter = ActionContext.SingleFile(new NbtFile());
             return Actions.OpenFiles(context);
