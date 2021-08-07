@@ -16,7 +16,7 @@ namespace NbtStudio.UI
 
         private IEnumerable<IHavePath> OpenOrImportPaths(bool open)
         {
-            if (!UnsavedWarningCheck())
+            if (open && !UnsavedWarningCheck())
                 return null;
             IHavePath[] loadable;
             var files = PathsGetter();

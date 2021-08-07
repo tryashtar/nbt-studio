@@ -16,12 +16,19 @@ namespace NbtStudio.UI
         public FilesGetter FilesGetter;
         public ErrorHandler ErrorHandler;
 
+        public OpenFileAction() { }
+
+        public OpenFileAction(IHavePath literal)
+        {
+            FilesGetter = () => new[] { FailableFactory.Success(literal, null) };
+        }
+
         public IEnumerable<IHavePath> Open() => OpenOrImportFiles(true);
         public IEnumerable<IHavePath> Import() => OpenOrImportFiles(false);
 
         private IEnumerable<IHavePath> OpenOrImportFiles(bool open)
         {
-            if (!UnsavedWarningCheck())
+            if (open && !UnsavedWarningCheck())
                 return null;
             IHavePath[] loadable;
             var files = FilesGetter();

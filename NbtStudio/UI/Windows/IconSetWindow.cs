@@ -119,12 +119,10 @@ namespace NbtStudio.UI
 
         public static void TryImportSources(IEnumerable<string> files, IWin32Window error_window)
         {
-            var attempts = new LoadFileAttempts<Unit>();
+            var attempts = new LoadFileAttempts();
             foreach (var item in files)
             {
                 attempts.AddAttempt(item, TryImportSource);
-                var attempt = IconSetWindow.TryImportSource(item);
-                attempts.AddAttempt(item, attempt);
             }
             if (attempts.AnyFailed())
                 IconSetWindow.ShowImportsFailed(attempts, error_window);

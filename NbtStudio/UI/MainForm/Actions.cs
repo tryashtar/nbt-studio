@@ -15,11 +15,14 @@ namespace NbtStudio.UI
 {
     public partial class MainForm
     {
-        private bool ConfirmIfUnsaved(string message)
+        private UnsavedWarningHandler ConfirmIfUnsaved(string message)
         {
-            if (!ViewModel.HasAnyUnsavedChanges)
-                return true;
-            return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+            return () =>
+            {
+                if (!App.Tree.HasAnyUnsavedChanges)
+                    return true;
+                return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
+            };
         }
 
         private bool ShowDeleteWarning(IEnumerable<IHavePath> files)
@@ -59,136 +62,179 @@ namespace NbtStudio.UI
             return result == DialogResult.Yes;
         }
 
-        private void ShowError(IFailable failure, string title, string message)
+        private ErrorHandler ShowError(string title, string message)
         {
-            var window = new ExceptionWindow(title, message, failure);
-            window.ShowDialog(this);
+            return x =>
+            {
+                var window = new ExceptionWindow(title, message, x);
+                window.ShowDialog(this);
+            };
         }
 
-        private void ShowFileError(IEnumerable<(string path, IFailable<IHavePath> file)> failures, string title)
+        private PathsErrorHandler ShowPathsError(string title)
         {
-            string message = $"{StringUtils.Pluralize(failures.Count(), "file")} failed to load:\n\n";
-            message += String.Join(Environment.NewLine, failures.Select(x => Path.GetFileName(x.path)));
+            return x =>
+            {
+                string message = $"{StringUtils.Pluralize(x.FailedPaths.Count(), "file")} failed to load:\n\n";
+                message += String.Join(Environment.NewLine, x.FailedPaths.Select(x => Path.GetFileName(x)));
 
-            var window = new ExceptionWindow(title, message, FailableFactory.Aggregate(failures.Select(x => x.file).ToArray()));
-            window.ShowDialog(this);
+                var window = new ExceptionWindow(title, message, x.Failable);
+                window.ShowDialog(this);
+            };
         }
 
-        private IEnumerable<(string path, IFailable<IFile> file)> BrowseFiles(string title, string filter)
+        private PathsGetter BrowseFiles(string title, string filter)
         {
-            using (var dialog = new OpenFileDialog
+            return () =>
             {
-                Title = title,
-                RestoreDirectory = true,
-                Multiselect = true,
-                Filter = filter
-            })
-            {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                    return dialog.FileNames.Select(x => (path: x, file: NbtFolder.OpenFile(x)));
-            }
-            return null;
+                using (var dialog = new OpenFileDialog
+                {
+                    Title = title,
+                    RestoreDirectory = true,
+                    Multiselect = true,
+                    Filter = filter
+                })
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var attempts = new LoadFileAttempts<IHavePath>();
+                        attempts.AddMany(dialog.FileNames, NbtFolder.OpenFile);
+                    }
+                }
+                return null;
+            };
         }
 
-        private NbtFolder BrowseFolder(string title)
+        private PathsGetter BrowseFolder(string title)
         {
-            using (var dialog = new CommonOpenFileDialog
+            return () =>
             {
-                Title = title,
-                RestoreDirectory = true,
-                Multiselect = false,
-                IsFolderPicker = true
-            })
-            {
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    return new NbtFolder(dialog.FileName, true);
-            }
-            return null;
+                using (var dialog = new CommonOpenFileDialog
+                {
+                    Title = title,
+                    RestoreDirectory = true,
+                    Multiselect = false,
+                    IsFolderPicker = true
+                })
+                {
+                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        var attempts = new LoadFileAttempts<IHavePath>();
+                        attempts.AddAttempt(dialog.FileName, x => new NbtFolder(x, true));
+                    }
+                }
+                return null;
+            };
         }
 
         public IEnumerable<IHavePath> New()
         {
-            var action = new OpenFileAction()
+            return new OpenFileAction(new NbtFile())
             {
-                ErrorHandler = ,
-                
-            };
-            var context = FormContext(unsaved_message: "Create a new file anyway?");
-            context.FilesGetter = ActionContext.SingleFile(new NbtFile());
-            return Actions.OpenFiles(context);
+                TreeGetter = () => App.Tree,
+                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
+            }.Open();
         }
 
         public IEnumerable<IHavePath> NewRegion()
         {
-            var context = FormContext(unsaved_message: "Create a new file anyway?");
-            context.FilesGetter = ActionContext.SingleFile(RegionFile.Empty());
-            return Actions.OpenFiles(context);
+            return new OpenFileAction(RegionFile.Empty())
+            {
+                TreeGetter = () => App.Tree,
+                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
+            }.Open();
         }
 
         public IEnumerable<IHavePath> OpenFile()
         {
-            var context = FormContext(unsaved_message: "Open a new file anyway?");
-            context.AdvancedFilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
-            context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
-            return Actions.OpenFiles(context);
+            return new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new file anyway?"),
+                PathsGetter = BrowseFiles("Select NBT files", NbtUtil.OpenFilter()),
+                ErrorHandler = ShowPathsError("Load failure")
+            }.Open();
         }
 
         public IEnumerable<IHavePath> OpenFolder()
         {
-            var context = FormContext(unsaved_message: "Open a new folder anyway?");
-            context.FilesGetter = ActionContext.SingleFile(BrowseFolder("Select a folder that contains NBT files"));
-            return Actions.OpenFiles(context);
+            return new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new folder anyway?"),
+                PathsGetter = BrowseFolder("Select a folder that contains NBT files"),
+                ErrorHandler = ShowPathsError("Load failure")
+            }.Open();
         }
 
         public IEnumerable<IHavePath> NewPaste()
         {
-            var context = FormContext(unsaved_message: "Open a new file anyway?");
             if (Clipboard.ContainsFileDropList())
             {
-                context.AdvancedFilesGetter = FilesFromClipboard;
-                context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
+                return new OpenPathsAction()
+                {
+                    TreeGetter = () => App.Tree,
+                    UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
+                    PathsGetter = FilesFromClipboard,
+                    ErrorHandler = ShowPathsError("Load failure")
+                }.Open();
             }
             else if (Clipboard.ContainsText())
             {
-                context.FilesGetter = SnbtFromClipboard;
-                context.ErrorHandler = x => ShowError(x, "Clipboard error", "Failed to parse SNBT from clipboard.");
+                return new OpenFileAction()
+                {
+                    TreeGetter = () => App.Tree,
+                    UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
+                    FilesGetter = SnbtFromClipboard,
+                    ErrorHandler = ShowError("Clipboard error", "Failed to parse SNBT from clipboard.")
+                }.Open();
             }
-            return Actions.OpenFiles(context);
+            else
+                return null;
         }
 
         public IEnumerable<IHavePath> ImportNew()
         {
-            var context = FormContext();
-            context.FilesGetter = ActionContext.SingleFile(new NbtFile());
-            return Actions.ImportFiles(context);
+            return new OpenFileAction(new NbtFile())
+            {
+                TreeGetter = () => App.Tree
+            }.Import();
         }
 
         public IEnumerable<IHavePath> ImportNewRegion()
         {
-            var context = FormContext();
-            context.FilesGetter = ActionContext.SingleFile(RegionFile.Empty());
-            return Actions.ImportFiles(context);
+            return new OpenFileAction(RegionFile.Empty())
+            {
+                TreeGetter = () => App.Tree
+            }.Import();
         }
 
         public IEnumerable<IHavePath> ImportFile()
         {
-            var context = FormContext();
-            context.AdvancedFilesGetter = () => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
-            context.AdvancedFileErrorHandler = x => ShowFileError(x, "Load failure");
-            return Actions.ImportFiles(context);
+            return new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                PathsGetter = BrowseFiles("Select NBT files", NbtUtil.OpenFilter()),
+                ErrorHandler = ShowPathsError("Load failure")
+            }.Import();
         }
 
         public IEnumerable<IHavePath> ImportFolder()
         {
-            var context = FormContext();
-            context.FilesGetter = ActionContext.SingleFile(BrowseFolder("Select a folder that contains NBT files"));
-            return Actions.ImportFiles(context);
+            return new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                PathsGetter = BrowseFolder("Select a folder that contains NBT files"),
+                ErrorHandler = ShowPathsError("Load failure")
+            }.Import();
         }
 
-        public IEnumerable<(string path, IFailable<IHavePath> file)> FilesFromClipboard()
+        public LoadFileAttempts<IHavePath> FilesFromClipboard()
         {
-            var paths = Clipboard.GetFileDropList().Cast<string>();
-            return paths.Distinct().Select(x => (path: x, file: NbtFolder.OpenFileOrFolder(Path.GetFullPath(x))));
+            var paths = Clipboard.GetFileDropList().Cast<string>().Select(Path.GetFullPath).Distinct();
+            var attempts = new LoadFileAttempts<IHavePath>();
+            attempts.AddMany(paths, NbtFolder.OpenFileOrFolder);
+            return attempts;
         }
 
         public IFailable<NbtTag> SnbtFromClipboard()
