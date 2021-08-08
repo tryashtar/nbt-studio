@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TryashtarUtils.Utility;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public class AddTagAction
     {
@@ -20,18 +20,19 @@ namespace NbtStudio.UI
                 return null;
             }
             bool has_original = true;
-            foreach (var node in SelectedNbt().OfType<NbtContainerTag>())
+            foreach (var node in SelectedNodes)
             {
-                var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
-                adding.AddTo(node);
-                has_original = false;
+                node.ModifyNbt(x =>
+                {
+                    if (x is NbtContainerTag container)
+                    {
+                        var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
+                        adding.AddTo(container);
+                        has_original = false;
+                    }
+                });
             }
             return tag.Result;
-        }
-
-        private IEnumerable<NbtTag> SelectedNbt()
-        {
-            return SelectedNodes.Select(x => x.GetNbtTagLens()).Where(x => x != null).Select(x => x.Item);
         }
     }
 }

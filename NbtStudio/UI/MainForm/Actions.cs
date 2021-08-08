@@ -156,6 +156,22 @@ namespace NbtStudio.UI
             }.Open();
         }
 
+        public IEnumerable<IHavePath> OpenFiles(params string[] paths)
+        {
+            return new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new file anyway?"),
+                PathsGetter = () =>
+                {
+                    var attempts = new LoadFileAttempts<IHavePath>();
+                    attempts.AddMany(paths, NbtFolder.OpenFile);
+                    return attempts;
+                },
+                ErrorHandler = ShowPathsError("Load failure")
+            }.Open();
+        }
+
         public IEnumerable<IHavePath> OpenFolder()
         {
             return new OpenPathsAction()
@@ -251,6 +267,34 @@ namespace NbtStudio.UI
                 else
                     return FailableFactory.Aggregate(attempt1, attempt2);
             }
+        }
+
+        public void Edit()
+        {
+            var action = new EditorAction();
+            // hex editor
+            action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
+                x => ByteProviders.HasProvider(x.GetReadableNbt()),
+                x => x.ModifyNbt(tag => EditHexWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue))
+            ));
+            // tag editor
+            action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
+                x => true,
+                x => x.ModifyNbt(tag => EditTagWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue))
+            ));
+            // bulk tag editor
+            action.AddEditor(new AdHocMultipleEditor<NbtTagNode>(
+               x => true,
+               x =>
+               {
+                   foreach (var item in x)
+                   {
+                       // what to do 🤔
+                       item.ModifyNbt()
+                   }
+               }
+            ));
+            action.Edit();
         }
     }
 }

@@ -86,12 +86,18 @@ namespace NbtStudio
         }
 
         protected virtual NbtTag GetNbtTag() => null;
-        public Lens<NbtTag> GetNbtTagLens()
+        public void ModifyNbt(Action<NbtTag> action)
         {
             var nbt = GetNbtTag();
-            if (nbt == null)
-                return null;
-            return new Lens<NbtTag>(nbt, MarkDirty);
+            if (nbt != null)
+            {
+                action(nbt);
+                MarkDirty();
+            }
+        }
+        public ReadOnlyNbtTag GetReadableNbt()
+        {
+            return GetNbtTag()?.AsReadOnly();
         }
     }
 }

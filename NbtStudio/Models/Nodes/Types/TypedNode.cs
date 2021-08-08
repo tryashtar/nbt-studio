@@ -25,7 +25,7 @@ namespace NbtStudio
         protected abstract Node MakeTypedChild(ChildType obj);
         protected abstract IEnumerable<ChildType> GetTypedChildren();
 
-        protected override Node MakeChild(object item) => MakeTypedChild((ChildType)item);
-        protected override IEnumerable<object> GetChildren() => GetTypedChildren() ?? Array.Empty<ChildType>();
+        protected sealed override Node MakeChild(object item) => MakeTypedChild((ChildType)item);
+        protected sealed override IEnumerable<object> GetChildren() => GetTypedChildren() ?? Array.Empty<ChildType>();
     }
 }

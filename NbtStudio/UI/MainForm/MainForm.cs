@@ -19,13 +19,11 @@ namespace NbtStudio.UI
     {
         private IconSource IconSource;
         private readonly Studio App;
-        private readonly string[] ClickedFiles;
         private readonly Updater UpdateChecker = new();
 
-        public MainForm(Studio application, string[] args)
+        public MainForm(Studio application)
         {
             App = application;
-            ClickedFiles = args;
 
             // add controls
             InitializeComponent();
@@ -39,12 +37,6 @@ namespace NbtStudio.UI
 #if !DEBUG
             CheckForUpdatesInBackground();
 #endif
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            if (ClickedFiles is not null && ClickedFiles.Any())
-                OpenFiles(ClickedFiles);
         }
 
         private void CheckForUpdatesInBackground()
@@ -104,411 +96,67 @@ namespace NbtStudio.UI
             Properties.Settings.Default.IconSet = IconSourceRegistry.GetID(source);
         }
 
-        private void PasteTagLike(NbtTag tag, Action<NbtFile> when_file)
-        {
-            if (tag is NbtCompound compound)
-                when_file(new NbtFile(compound));
-            else
-            {
-                var root = new NbtCompound();
-                tag.Name = NbtUtil.GetAutomaticName(tag, root);
-                root.Add(tag);
-                when_file(new NbtFile(root));
-            }
-        }
-
-        private void Discard(IEnumerable<Node> nodes)
-        {
-            var unsaved = nodes.Filter(x => x.Get<ISaveable>()).Where(x => x.HasUnsavedChanges);
-            if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-                ViewModel.RemoveMany(nodes);
-        }
-
-        private void RefreshItems(IEnumerable<IRefreshable> items)
-        {
-            items = items.Where(x => x.CanRefresh);
-            var unsaved = items.OfType<ISaveable>().Where(x => x.HasUnsavedChanges);
-            if (!unsaved.Any() || MessageBox.Show($"You currently have unsaved changes.\n\nAre you sure you would like to discard the changes to these files?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-            {
-                UndoHistory.StartBatchOperation();
-                var errors = new List<(IHavePath item, Exception exception)>();
-                foreach (var item in items)
-                {
-                    try
-                    {
-                        item.Refresh();
-                    }
-                    catch (Exception ex)
-                    {
-                        errors.Add((item as IHavePath, ex));
-                    }
-                }
-                UndoHistory.FinishBatchOperation(new DescriptionHolder("Refresh {0}", items.ToArray()), true);
-                if (errors.Any())
-                {
-                    var error = FailableFactory.AggregateFailure(errors.Select(x => x.exception).ToArray());
-                    string message = $"{StringUtils.Pluralize(errors.Count, "file")} failed to refresh:\n\n";
-                    message += String.Join("\n", errors.Select(x => x.item).Where(x => x is not null).Select(x => Path.GetFileName(x.Path)));
-                    var window = new ExceptionWindow("Refresh error", message, error);
-                    window.ShowDialog(this);
-                }
-            }
-        }
-
-        private void Save()
-        {
-            foreach (var file in ViewModel.OpenedFiles)
-            {
-                if (!Save(file))
-                    break;
-            }
-        }
-
-        private void SaveAs()
-        {
-            foreach (var file in ViewModel.OpenedFiles)
-            {
-                if (!SaveAs(file))
-                    break;
-            }
-        }
-
-        private bool Save(ISaveable file)
-        {
-            if (file.CanSave)
-            {
-                file.Save();
-                NbtTree.Refresh();
-                return true;
-            }
-            else if (file is IExportable exp)
-                return SaveAs(exp);
-            return false;
-        }
-
-        private bool SaveAs(IExportable file)
-        {
-            string path = null;
-            if (file is IHavePath has_path)
-                path = has_path.Path;
-            using var dialog = new SaveFileDialog
-            {
-                Title = path is null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
-                RestoreDirectory = true,
-                FileName = path,
-                Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
-            };
-            if (path is not null)
-            {
-                dialog.InitialDirectory = Path.GetDirectoryName(path);
-                dialog.FileName = Path.GetFileName(path);
-            }
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                if (file is NbtFile nbtfile)
-                {
-                    var export = new ExportWindow(IconSource, nbtfile.ExportSettings, dialog.FileName);
-                    if (export.ShowDialog() == DialogResult.OK)
-                    {
-                        nbtfile.SaveAs(dialog.FileName, export.GetSettings());
-                        Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
-                        return true;
-                    }
-                }
-                else
-                {
-                    file.SaveAs(dialog.FileName);
-                    Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void OpenInExplorer(IHavePath file)
-        {
-            var info = new ProcessStartInfo { FileName = "explorer", Arguments = $"/select, \"{file.Path}\"" };
-            Process.Start(info);
-        }
-
-        private void Sort()
-        {
-            var obj = NbtTree.SelectedModelNode;
-            if (obj is null || !obj.CanSort) return;
-            UndoHistory.StartBatchOperation();
-            obj.Sort();
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Sort {0}", obj), true);
-        }
-
-        private void CopyLike(Func<Node, bool> check, Func<Node, DataObject> perform)
-        {
-            var objs = NbtTree.SelectedModelNodes.Where(check).ToList();
-            if (objs.Any())
-            {
-                var data = objs.Select(perform).Aggregate((x, y) => Utils.Merge(x, y));
-                Clipboard.SetDataObject(data);
-            }
-        }
-
-        private void Paste(Node node)
-        {
-            if (!node.CanPaste)
-                return;
-            IEnumerable<Node> results = Enumerable.Empty<Node>();
-            UndoHistory.StartBatchOperation();
-            try
-            { results = node.Paste(Clipboard.GetDataObject()); }
-            catch (Exception ex)
-            {
-                if (!(ex is OperationCanceledException))
-                {
-                    var error = FailableFactory.Failure(ex, "Pasting");
-                    var window = new ExceptionWindow("Error while pasting", "An error occurred while pasting:", error);
-                    window.ShowDialog(this);
-                }
-            }
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Paste {0} into {1}", results, node), true);
-        }
-
-        private void Rename()
-        {
-            var items = NbtTree.SelectedModelNodes;
-            if (ListUtils.ExactlyOne(items))
-                Rename(items.Single());
-            else
-                BulkRename(items.Filter(x => x.GetNbtTag()));
-        }
-
-        private void Edit()
-        {
-            var items = NbtTree.SelectedModelNodes;
-            if (ListUtils.ExactlyOne(items))
-                Edit(items.Single());
-            else
-                BulkEdit(items.Filter(x => x.GetNbtTag()));
-        }
-
-        private void BulkRename(IEnumerable<NbtTag> tags)
-        {
-            UndoHistory.StartBatchOperation();
-            var changed = BulkEditWindow.BulkRename(IconSource, tags);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk rename {0}", changed), false);
-        }
-
-        private void BulkEdit(IEnumerable<NbtTag> tags)
-        {
-            UndoHistory.StartBatchOperation();
-            var changed = BulkEditWindow.BulkEdit(IconSource, tags);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Bulk edit {0}", changed), false);
-        }
-
-        private void EditLike(Node node, Predicate<Node> check, Action<NbtTag> when_tag)
-        {
-            if (!check(node)) return;
-            var chunk = node.Get<Chunk>();
-            var path = node.Get<IHavePath>();
-            var tag = node.GetNbtTag();
-            // batch operation to combine the rename and value change into one undo
-            UndoHistory.StartBatchOperation();
-            if (path is not null)
-                RenameFile(path);
-            if (chunk is not null)
-                EditChunk(chunk);
-            else if (tag is not null)
-                when_tag(tag);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0}", node), false);
-        }
-
-        private void RenameFile(IHavePath item)
-        {
-            if (item.Path is not null)
-                RenameFileWindow.RenameFile(IconSource, item);
-        }
-
-        private void EditTag(NbtTag tag)
-        {
-            if (ByteProviders.HasProvider(tag))
-                EditHexWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
-            else
-                EditTagWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
-        }
-
-        private void EditChunk(Chunk chunk)
-        {
-            EditChunkWindow.MoveChunk(IconSource, chunk);
-        }
-
-        private void RenameTag(NbtTag tag)
-        {
-            // likewise
-            UndoHistory.StartBatchOperation();
-            EditTagWindow.ModifyTag(IconSource, tag, EditPurpose.Rename);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Rename {0}", tag), false);
-        }
-
-        private void EditSnbt()
-        {
-            var tag = NbtTree.SelectedModelNode?.GetNbtTag();
-            if (tag is null) return;
-            UndoHistory.StartBatchOperation();
-            EditSnbtWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Edit {0} as SNBT", tag), false);
-        }
-
-        private void Delete()
-        {
-            var selected_nodes = NbtTree.SelectedModelNodes;
-            var nexts = selected_nodes.Select(x => x.NextNode).Where(x => x is not null).ToList();
-            var prevs = selected_nodes.Select(x => x.PreviousNode).Where(x => x is not null).ToList();
-            var parents = selected_nodes.Select(x => x.Parent).Where(x => x is not null).ToList();
-
-            var selected_objects = NbtTree.SelectedModelNodes.ToList();
-            Delete(selected_objects);
-
-            // Index == -1 checks whether this node has been removed from the tree
-            if (selected_nodes.All(x => x.Index == -1))
-            {
-                var select_next = nexts.FirstOrDefault(x => x.Index != -1) ?? prevs.FirstOrDefault(x => x.Index != -1) ?? parents.FirstOrDefault(x => x.Index != -1);
-                if (select_next is not null)
-                    select_next.IsSelected = true;
-            }
-        }
-
+        private FindWindow FindWindow;
         private void Find()
         {
-            // TO DO: don't show multiple windows. not sure why I reverted this
-            var window = new FindWindow(IconSource, App.Tree, NbtTree);
-            window.Show(this);
-            window.Focus();
+            if (FindWindow is null || FindWindow.IsDisposed)
+                FindWindow = new FindWindow(IconSource, App.Tree, NbtTree);
+            if (!FindWindow.Visible)
+                FindWindow.Show(this);
+            FindWindow.Focus();
         }
 
+        private AboutWindow AboutWindow;
         private void About()
         {
-            var window = new AboutWindow(IconSource);
-            window.Show(this);
-            window.Focus();
+            if (AboutWindow is null || AboutWindow.IsDisposed)
+                AboutWindow = new AboutWindow(IconSource);
+            if (!AboutWindow.Visible)
+                AboutWindow.Show(this);
+            AboutWindow.Focus();
         }
 
+        private IconSetWindow IconSetWindow;
         private void ChangeIcons()
         {
-            var window = new IconSetWindow(IconSource);
-            window.FormClosed += IconSetWindow_FormClosed;
-            window.Show(this);
-            window.Focus();
+            if (IconSetWindow == null || IconSetWindow.IsDisposed)
+            {
+                IconSetWindow = new IconSetWindow(IconSource);
+                IconSetWindow.FormClosed += (s, e) =>
+                {
+                    if (IconSetWindow.SelectedSource is not null)
+                        SetIconSource(IconSetWindow.SelectedSource);
+                };
+            }
+            if (!IconSetWindow.Visible)
+                IconSetWindow.Show(this);
+            IconSetWindow.Focus();
         }
 
+        private UpdateWindow UpdateWindow;
         private void ShowUpdate(AvailableUpdate update)
         {
-            var window = new UpdateWindow(IconSource, update);
-            window.Show(this);
-            window.Focus();
-        }
-
-        private void IconSetWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (IconSetWindow.SelectedSource is not null)
-                SetIconSource(IconSetWindow.SelectedSource);
-        }
-
-        private void AddSnbt()
-        {
-            var parent = NbtTree.SelectedModelNode?.GetNbtTag() as NbtContainerTag;
-            if (parent is null) return;
-            var tag = EditSnbtWindow.CreateTag(IconSource, parent);
-            if (tag is not null)
-                tag.AddTo(parent);
-        }
-
-        private void AddChunk()
-        {
-            var parent = NbtTree.SelectedModelNode?.Get<RegionFile>();
-            if (parent is null) return;
-            var chunk = EditChunkWindow.CreateChunk(IconSource, parent, bypass_window: Control.ModifierKeys == Keys.Shift);
-            if (chunk is not null)
-                chunk.AddTo(parent);
-        }
-
-        private void AddTag(NbtTagType type)
-        {
-            var parent = NbtTree.SelectedModelNode?.GetNbtTag() as NbtContainerTag;
-            if (parent is null) return;
-            AddTag(parent, type);
-        }
-
-        private void AddTag(NbtContainerTag container, NbtTagType type)
-        {
-            NbtTag tag;
-            if (NbtUtil.IsArrayType(type))
-                tag = EditHexWindow.CreateTag(IconSource, type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
-            else
-                tag = EditTagWindow.CreateTag(IconSource, type, container, bypass_window: Control.ModifierKeys == Keys.Shift);
-            if (tag is not null)
-                container.Add(tag);
+            if (update is null)
+                return;
+            if (UpdateWindow is null || UpdateWindow.IsDisposed)
+                UpdateWindow = new UpdateWindow(IconSource, update);
+            if (!UpdateWindow.Visible)
+                UpdateWindow.Show(this);
+            UpdateWindow.Focus();
         }
 
         private void OpenRecentFile()
         {
-            UpdateRecentFiles();
             var files = Properties.Settings.Default.RecentFiles;
             if (files.Count >= 1)
-                OpenFiles(Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Take(1));
-        }
-
-        private void NbtTree_SelectionChanged(object sender, EventArgs e)
-        {
-            if (InvokeRequired) // only run on UI thread
-                return;
-
-            EnableTriggers[EnableTrigger.SelectionChanged]();
-
-            var obj = NbtTree.SelectedModelNode;
-            var objs = NbtTree.SelectedModelNodes;
-            var nbt = obj.GetNbtTag();
-            var container = nbt as NbtContainerTag;
-            var region = obj.Get<RegionFile>();
-            foreach (var item in CreateTagButtons)
-            {
-                item.Value.Enabled = container is not null && container.CanAdd(item.Key);
-                item.Value.Visible = region is null;
-            }
-            ActionSort.Enabled = obj is not null && obj.CanSort;
-            ActionCut.Enabled = obj is not null && objs.Any(x => x.CanCut);
-            ActionCopy.Enabled = obj is not null && objs.Any(x => x.CanCopy);
-            ActionPaste.Enabled = obj is not null && obj.CanPaste; // don't check for Clipboard.ContainsText() because listening for clipboard events (to re-enable) is ugly
-            ActionDelete.Enabled = obj is not null && objs.Any(x => x.CanDelete);
-            ActionRename.Enabled = obj is not null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
-            ActionEdit.Enabled = obj is not null && (objs.Any(x => x.CanRename) || objs.Any(x => x.CanEdit));
-            ActionEditSnbt.Enabled = nbt is not null;
-            ActionAddSnbt.Enabled = container is not null;
-
-            ActionAddSnbt.Visible = region is null;
-            ActionAddChunk.Visible = region is not null;
-        }
-
-        private void ViewModel_Changed(object sender, EventArgs e)
-        {
-            if (InvokeRequired) // only run on UI thread
-                return;
-
-            EnableTriggers[EnableTrigger.TreeChanged]();
-
-            ActionSave.Enabled = ViewModel.HasAnyUnsavedChanges;
-            ActionSaveAs.Enabled = ViewModel.OpenedFiles.Any();
-            ActionRefresh.Enabled = ViewModel.OpenedFiles.Any();
-            bool multiple_files = ViewModel.OpenedFiles.Skip(1).Any();
-            var save_image = multiple_files ? IconType.SaveAll : IconType.Save;
-            ActionSave.IconType = save_image;
-            ActionSaveAs.IconType = save_image;
-            ActionUndo.Enabled = UndoHistory.CanUndo;
-            ActionRedo.Enabled = UndoHistory.CanRedo;
-            NbtTree_SelectionChanged(sender, e);
+                OpenFiles(files.GetFirst());
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
-            var tag = NbtTree.NodeFromClick(e);
-            if (!e.Node.CanExpand && tag.CanEdit)
-                Edit(tag);
+            var node = NbtTree.ModelNodeFromClick(e);
+            if (!e.Node.CanExpand && node.CanEdit)
+                Edit(node);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -545,10 +193,10 @@ namespace NbtStudio.UI
             }
             else
             {
-                var tags = NbtTree.NodesFromDrag(e);
-                var drop = NbtTree.DropNode;
-                if (tags.Any())
-                    MoveObjects(tags, drop, NbtTree.DropPosition.Position);
+                var nodes = NbtTree.NodesFromDrag(e);
+                var drop = NbtTree.DropModelNode;
+                if (nodes.Any())
+                    MoveObjects(nodes, drop, NbtTree.DropPosition.Position);
             }
         }
 
@@ -690,48 +338,6 @@ namespace NbtStudio.UI
             }
         }
 
-        private void Save_Click(object sender, EventArgs e)
-        {
-            var selected = NbtTree.SelectedModelNodes.Filter(x => x.Get<ISaveable>());
-            foreach (var item in selected)
-            {
-                Save(item);
-            }
-        }
-
-        private void SaveAs_Click(object sender, EventArgs e)
-        {
-            var selected = NbtTree.SelectedModelNodes.Filter(x => x.Get<IExportable>());
-            foreach (var item in selected)
-            {
-                SaveAs(item);
-            }
-        }
-
-        private void OpenInExplorer_Click(object sender, EventArgs e)
-        {
-            var selected = NbtTree.SelectedModelNodes.Filter(x => x.Get<IHavePath>());
-            foreach (var item in selected)
-            {
-                OpenInExplorer(item);
-            }
-        }
-
-        private void Refresh_Click(object sender, EventArgs e)
-        {
-            var selected = NbtTree.SelectedModelNodes.Filter(x => x.Get<IRefreshable>());
-            RefreshItems(selected);
-        }
-
-        private void AddTag_Click(NbtTagType type)
-        {
-            var selected = NbtTree.SelectedModelNodes.Filter(x => x.GetNbtTag()).OfType<NbtContainerTag>();
-            foreach (var item in selected)
-            {
-                AddTag(item, type);
-            }
-        }
-
         private void NbtTree_NodeMouseClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -775,29 +381,6 @@ namespace NbtStudio.UI
             DropDownUndoHistory.Enabled = undo_history.Any();
             DropDownRedoHistory.Enabled = redo_history.Any();
             ActionClearUndoHistory.Enabled = undo_history.Any() || redo_history.Any();
-        }
-
-        private void UpdateRecentFiles()
-        {
-            // remove duplicates of recent files and limit to 20 most recent
-            var distinct = Properties.Settings.Default.RecentFiles.Cast<string>().Reverse().Distinct();
-            var recents = distinct.Take(20).ToList();
-
-            DropDownRecent.Enabled = recents.Count > 0;
-            DropDownRecent.DropDownItems.Clear();
-            var items = new List<ToolStripMenuItem>();
-            foreach (string path in recents.ToList())
-            {
-                var item = RecentEntry(path);
-                if (item is null)
-                    recents.Remove(path);
-                else
-                    items.Add(item);
-            }
-            DropDownRecent.DropDownItems.AddRange(items.ToArray());
-
-            Properties.Settings.Default.RecentFiles.Clear();
-            Properties.Settings.Default.RecentFiles.AddRange(recents.AsEnumerable().Reverse().ToArray());
         }
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)

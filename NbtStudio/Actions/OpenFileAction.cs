@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public class OpenFileAction
     {

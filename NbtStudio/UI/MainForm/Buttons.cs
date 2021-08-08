@@ -18,7 +18,7 @@ namespace NbtStudio.UI
 
         private void AddDefaultActions()
         {
-            bool has_files() => ViewModel.GetSaveables().Any();
+            bool has_files() => App.Tree.GetSaveables().Any();
 
             AddButton(
                 action: () => New(),
@@ -193,7 +193,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                action: Rename,
+                action: Edit,
                 text: "&Edit Value",
                 hover: "Edit",
                 icon: IconType.Edit,
@@ -202,7 +202,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                action: Rename,
+                action: EditSnbt,
                 text: "Edit as &SNBT",
                 hover: "Edit as SNBT",
                 icon: IconType.EditSnbt,

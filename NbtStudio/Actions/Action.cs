@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public delegate void ErrorHandler(IFailable failure);
     public delegate bool UnsavedWarningHandler();
@@ -19,7 +19,7 @@ namespace NbtStudio.UI
     public delegate LoadFileAttempts<IHavePath> PathsGetter();
     public delegate void PathsErrorHandler(LoadFileAttempts<IHavePath> attempts);
 
-    public abstract class Action
+    public abstract class AbstractAction
     {
         public static ErrorHandler Throw()
         {

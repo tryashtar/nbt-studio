@@ -21,22 +21,21 @@ namespace NbtStudio
             CommandLineArguments = args;
             if (Properties.Settings.Default.RecentFiles is null)
                 Properties.Settings.Default.RecentFiles = new();
+            Properties.Settings.Default.RecentFiles.MaxSize = 20;
             if (Properties.Settings.Default.CustomIconSets is null)
                 Properties.Settings.Default.CustomIconSets = new();
         }
 
         public void LaunchForm()
         {
-            // https://stackoverflow.com/a/13228495
-            if (Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            Form = new MainForm(this, CommandLineArguments);
-            System.Windows.Forms.Application.Run(Form);
+            Form = new MainForm(this);
+            Form.Load += Form_Load;
         }
 
-        [DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
+        private void Form_Load(object sender, EventArgs e)
+        {
+            if (CommandLineArguments is not null && CommandLineArguments.Any())
+                Form.OpenFiles(CommandLineArguments);
+        }
     }
 }

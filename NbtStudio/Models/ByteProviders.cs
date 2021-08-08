@@ -35,13 +35,13 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get a byte provider from {tag.TagType}");
         }
 
-        public static bool HasProvider(NbtTag tag)
+        public static bool HasProvider(IReadableNbt tag)
         {
             if (NbtUtil.IsArrayType(tag.TagType))
                 return true;
-            if (tag is NbtList list)
+            if (tag.IsList)
             {
-                return list.ListType switch
+                return tag.ListType switch
                 {
                     NbtTagType.Byte or
                     NbtTagType.Short or

@@ -2,7 +2,7 @@
 using System.Linq;
 using TryashtarUtils.Utility;
 
-namespace NbtStudio.UI
+namespace NbtStudio
 {
     public class OpenPathsAction
     {
@@ -29,6 +29,7 @@ namespace NbtStudio.UI
                 ErrorHandler(files);
             if (loadable.Any())
             {
+                Properties.Settings.Default.RecentFiles.AddMany(files.SucceededPaths);
                 if (open)
                     TreeGetter().Replace(loadable);
                 else
