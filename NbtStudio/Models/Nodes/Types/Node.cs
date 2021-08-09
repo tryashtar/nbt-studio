@@ -95,6 +95,17 @@ namespace NbtStudio
                 MarkDirty();
             }
         }
+        
+        public static void ModifyManyNbt(IEnumerable<Node> nodes, Action<IEnumerable<NbtTag>> action)
+        {
+            var tags = nodes.Select(x => x.GetNbtTag()).Where(x => x != null);
+            action(tags);
+            foreach (var node in nodes)
+            {
+                node.MarkDirty();
+            }
+        }
+
         public ReadOnlyNbtTag GetReadableNbt()
         {
             return GetNbtTag()?.AsReadOnly();

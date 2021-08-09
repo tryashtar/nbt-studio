@@ -19,7 +19,7 @@ namespace NbtStudio.UI
         {
             return () =>
             {
-                if (!App.Tree.HasAnyUnsavedChanges)
+                if (!App.Tree.HasUnsavedChanges)
                     return true;
                 return MessageBox.Show($"You currently have unsaved changes.\n\n{message}", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
             };
@@ -83,6 +83,7 @@ namespace NbtStudio.UI
             };
         }
 
+        private PathsGetter DefaultBrowseFiles() => BrowseFiles("Select NBT files", NbtUtil.OpenFilter());
         private PathsGetter BrowseFiles(string title, string filter)
         {
             return () =>
@@ -104,7 +105,7 @@ namespace NbtStudio.UI
                 return null;
             };
         }
-
+        private PathsGetter DefaultBrowseFolder() => BrowseFolder("Select a folder that contains NBT files");
         private PathsGetter BrowseFolder(string title)
         {
             return () =>
@@ -147,53 +148,39 @@ namespace NbtStudio.UI
 
         public IEnumerable<IHavePath> OpenFile()
         {
-            return new OpenPathsAction()
+            return OpenOrImport(true, DefaultBrowseFiles());
+        }
+
+        public PathsGetter FromPaths(string[] paths)
+        {
+            return () =>
             {
-                TreeGetter = () => App.Tree,
-                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new file anyway?"),
-                PathsGetter = BrowseFiles("Select NBT files", NbtUtil.OpenFilter()),
-                ErrorHandler = ShowPathsError("Load failure")
-            }.Open();
+                var attempts = new LoadFileAttempts<IHavePath>();
+                attempts.AddMany(paths, NbtFolder.OpenFile);
+                return attempts;
+            };
         }
 
         public IEnumerable<IHavePath> OpenFiles(params string[] paths)
         {
-            return new OpenPathsAction()
-            {
-                TreeGetter = () => App.Tree,
-                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new file anyway?"),
-                PathsGetter = () =>
-                {
-                    var attempts = new LoadFileAttempts<IHavePath>();
-                    attempts.AddMany(paths, NbtFolder.OpenFile);
-                    return attempts;
-                },
-                ErrorHandler = ShowPathsError("Load failure")
-            }.Open();
+            return OpenOrImport(true, FromPaths(paths));
+        }
+
+        public IEnumerable<IHavePath> ImportFiles(params string[] paths)
+        {
+            return OpenOrImport(false, FromPaths(paths));
         }
 
         public IEnumerable<IHavePath> OpenFolder()
         {
-            return new OpenPathsAction()
-            {
-                TreeGetter = () => App.Tree,
-                UnsavedWarningCheck = ConfirmIfUnsaved("Open a new folder anyway?"),
-                PathsGetter = BrowseFolder("Select a folder that contains NBT files"),
-                ErrorHandler = ShowPathsError("Load failure")
-            }.Open();
+            return OpenOrImport(true, DefaultBrowseFolder(), "Open a new folder anyway?");
         }
 
         public IEnumerable<IHavePath> NewPaste()
         {
             if (Clipboard.ContainsFileDropList())
             {
-                return new OpenPathsAction()
-                {
-                    TreeGetter = () => App.Tree,
-                    UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
-                    PathsGetter = FilesFromClipboard,
-                    ErrorHandler = ShowPathsError("Load failure")
-                }.Open();
+                return OpenOrImport(true, FilesFromClipboard, "Create a new file anyway?");
             }
             else if (Clipboard.ContainsText())
             {
@@ -207,6 +194,19 @@ namespace NbtStudio.UI
             }
             else
                 return null;
+        }
+
+        public IEnumerable<IHavePath> OpenOrImport(bool open, PathsGetter getter, string confirm_message = "Open a new file anyway?")
+        {
+            var action = new OpenPathsAction()
+            {
+                TreeGetter = () => App.Tree,
+                ErrorHandler = ShowPathsError("Load failure")
+            };
+            action.PathsGetter = getter;
+            if (open)
+                action.UnsavedWarningCheck = ConfirmIfUnsaved(confirm_message);
+            return action.Open();
         }
 
         public IEnumerable<IHavePath> ImportNew()
@@ -227,22 +227,12 @@ namespace NbtStudio.UI
 
         public IEnumerable<IHavePath> ImportFile()
         {
-            return new OpenPathsAction()
-            {
-                TreeGetter = () => App.Tree,
-                PathsGetter = BrowseFiles("Select NBT files", NbtUtil.OpenFilter()),
-                ErrorHandler = ShowPathsError("Load failure")
-            }.Import();
+            return OpenOrImport(false, BrowseFiles("Select NBT files", NbtUtil.OpenFilter()));
         }
 
         public IEnumerable<IHavePath> ImportFolder()
         {
-            return new OpenPathsAction()
-            {
-                TreeGetter = () => App.Tree,
-                PathsGetter = BrowseFolder("Select a folder that contains NBT files"),
-                ErrorHandler = ShowPathsError("Load failure")
-            }.Import();
+            return OpenOrImport(false, BrowseFolder("Select a folder that contains NBT files"));
         }
 
         public LoadFileAttempts<IHavePath> FilesFromClipboard()
@@ -271,7 +261,15 @@ namespace NbtStudio.UI
 
         public void Edit()
         {
-            var action = new EditorAction();
+            Edit(NbtTree.SelectedModelNodes.ToArray());
+        }
+
+        public void Edit(params Node[] nodes)
+        {
+            var action = new EditorAction()
+            {
+                Nodes = nodes
+            };
             // hex editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
                 x => ByteProviders.HasProvider(x.GetReadableNbt()),
@@ -285,14 +283,12 @@ namespace NbtStudio.UI
             // bulk tag editor
             action.AddEditor(new AdHocMultipleEditor<NbtTagNode>(
                x => true,
-               x =>
-               {
-                   foreach (var item in x)
-                   {
-                       // what to do 🤔
-                       item.ModifyNbt()
-                   }
-               }
+               x => Node.ModifyManyNbt(x, tags => BulkEditWindow.BulkEdit(IconSource, tags))
+            ));
+            // chunk editor
+            action.AddEditor(new AdHocSingleEditor<ChunkNode>(
+                x => true,
+                x => x.ModifyObject(chunk => EditChunkWindow.MoveChunk(IconSource, chunk.Chunk))
             ));
             action.Edit();
         }

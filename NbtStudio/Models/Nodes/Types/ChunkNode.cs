@@ -42,8 +42,8 @@ namespace NbtStudio
             var coords = WrappedObject.Region.Coords;
             if (coords is null)
                 return text;
-            var world = coords.WorldChunk(WrappedObject);
-            return $"{text} in world at ({world.x}, {world.z})";
+            var (x, z) = coords.WorldChunk(WrappedObject);
+            return $"{text} in world at ({x}, {z})";
         }
 
         public override string PreviewValue()

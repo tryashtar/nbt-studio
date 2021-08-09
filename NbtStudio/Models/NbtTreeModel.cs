@@ -21,19 +21,39 @@ namespace NbtStudio
         public event EventHandler<TreeModelEventArgs> NodesRemoved;
         public event EventHandler<TreePathEventArgs> StructureChanged;
 
-        private readonly List<Node> Roots;
+        private readonly List<Node> Roots = new();
         public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
         public readonly UndoHistory UndoHistory;
 
         public NbtTreeModel()
         {
             UndoHistory = new UndoHistory(GetDescription);
-            UndoHistory.Changed += UndoHistory_Changed;
         }
 
+        public bool HasUnsavedChanges => GetSaveables().Any(x => x.HasUnsavedChanges);
         public IEnumerable<ISaveable> GetSaveables()
         {
-            
+
+        }
+
+        public void Replace(params IHavePath[] paths)
+        {
+            Roots.Clear();
+            Import(paths);
+        }
+
+        public void Import(params IHavePath[] paths)
+        {
+            Roots.AddRange(paths.Select(MakeNode));
+        }
+
+        private Node MakeNode(IHavePath item)
+        {
+            if (item is NbtFile file)
+                return new NbtFileNode(null, file);
+            if (item is RegionFile region)
+                return new RegionFileNode(null, region);
+            throw new ArgumentException();
         }
 
         private IEnumerable<Node> BreadthFirstSearch(Predicate<Node> predicate)

@@ -17,8 +17,7 @@ namespace NbtStudio
     {
         public string Path { get; private set; }
         public event Action OnSaved;
-        public NbtTag RootTag { get; private set; }
-        public T GetRootTag<T>() where T : NbtTag => RootTag as T;
+        private NbtTag RootTag;
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path is not null && ExportSettings is not null;
         public bool CanRefresh => CanSave;
@@ -47,7 +46,6 @@ namespace NbtStudio
         private void SetRoot(NbtTag root)
         {
             RootTag = root;
-            RootTag.OnChanged += _ => HasUnsavedChanges = true;
         }
 
         private static bool LooksSuspicious(string name)
@@ -115,21 +113,19 @@ namespace NbtStudio
 
         public static NbtFile CreateFromSnbt(string path)
         {
-            using (var stream = File.OpenRead(path))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                char[] firstchar = new char[1];
-                reader.ReadBlock(firstchar, 0, 1);
-                if (firstchar[0] != '{') // optimization to not load in huge files
-                    throw new FormatException("File did not begin with a '{'");
-                var text = firstchar[0] + reader.ReadToEnd();
-                var tag = SnbtParser.Parse(text, named: false);
-                if (tag is not NbtCompound compound)
-                    throw new FormatException("File did not contain an NBT compound");
-                compound.Name = "";
-                var file = new fNbt.NbtFile(compound);
-                return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
-            }
+            using var stream = File.OpenRead(path);
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+            char[] firstchar = new char[1];
+            reader.ReadBlock(firstchar, 0, 1);
+            if (firstchar[0] != Snbt.COMPOUND_OPEN) // optimization to not load in huge files
+                throw new FormatException($"File did not begin with a '{Snbt.COMPOUND_OPEN}'");
+            var text = firstchar[0] + reader.ReadToEnd();
+            var tag = SnbtParser.Parse(text, named: false);
+            if (tag is not NbtCompound compound)
+                throw new FormatException("File did not contain an NBT compound");
+            compound.Name = "";
+            var file = new fNbt.NbtFile(compound);
+            return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
         }
 
         public static Failable<NbtFile> TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)

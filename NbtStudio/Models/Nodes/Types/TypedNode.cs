@@ -17,9 +17,10 @@ namespace NbtStudio
             WrappedObject = wrapped;
         }
 
-        public Lens<WrappedType> GetLens()
+        public void ModifyObject(Action<WrappedType> action)
         {
-            return new Lens<WrappedType>(WrappedObject, MarkDirty);
+            action(WrappedObject);
+            MarkDirty();
         }
 
         protected abstract Node MakeTypedChild(ChildType obj);

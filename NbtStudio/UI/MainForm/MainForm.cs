@@ -155,7 +155,7 @@ namespace NbtStudio.UI
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var node = NbtTree.ModelNodeFromClick(e);
-            if (!e.Node.CanExpand && node.CanEdit)
+            if (!e.Node.CanExpand)
                 Edit(node);
         }
 
@@ -170,10 +170,10 @@ namespace NbtStudio.UI
                 e.Effect = Control.ModifierKeys == Keys.Shift ? DragDropEffects.Copy : DragDropEffects.Move;
             else
             {
-                var tags = NbtTree.NodesFromDrag(e);
-                var drop = NbtTree.DropNode;
+                var tags = NbtTree.ModelNodesFromDrag(e);
+                var drop = NbtTree.DropModelNode;
                 if (tags.Any()
-                    && NbtTree.DropNode is not null
+                    && NbtTree.DropModelNode is not null
                     && CanMoveObjects(tags, drop, NbtTree.DropPosition.Position))
                     e.Effect = e.AllowedEffect;
                 else
@@ -193,7 +193,7 @@ namespace NbtStudio.UI
             }
             else
             {
-                var nodes = NbtTree.NodesFromDrag(e);
+                var nodes = NbtTree.ModelNodesFromDrag(e);
                 var drop = NbtTree.DropModelNode;
                 if (nodes.Any())
                     MoveObjects(nodes, drop, NbtTree.DropPosition.Position);
@@ -202,14 +202,14 @@ namespace NbtStudio.UI
 
         private bool CanMoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
-            var (destination, index) = ViewModel.GetInsertionLocation(target, position);
+            var (destination, index) = App.Tree.GetInsertionLocation(target, position);
             if (destination is null) return false;
             return destination.CanReceiveDrop(nodes);
         }
 
         private void MoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
-            var (destination, index) = ViewModel.GetInsertionLocation(target, position);
+            var (destination, index) = App.Tree.GetInsertionLocation(target, position);
             if (destination is null) return;
             UndoHistory.StartBatchOperation();
             destination.ReceiveDrop(nodes, index);

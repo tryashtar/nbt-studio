@@ -10,14 +10,12 @@ namespace NbtStudio.UI
 {
     public class ChunkCoordsEditControls
     {
-        public readonly Chunk Chunk;
-        public readonly RegionFile Region;
+        public readonly ChunkEntry Chunk;
         public readonly ChunkCoordEditControl XBox;
         public readonly ChunkCoordEditControl ZBox;
-        public ChunkCoordsEditControls(Chunk chunk, RegionFile region, ChunkCoordEditControl xbox, ChunkCoordEditControl zbox)
+        public ChunkCoordsEditControls(ChunkEntry chunk, ChunkCoordEditControl xbox, ChunkCoordEditControl zbox)
         {
             Chunk = chunk;
-            Region = region;
             XBox = xbox;
             ZBox = zbox;
             XBox.Maximum = RegionFile.ChunkXDimension - 1;
@@ -26,7 +24,7 @@ namespace NbtStudio.UI
             ZBox.Value = Math.Min(Math.Max(chunk.Z, ZBox.Minimum), ZBox.Maximum);
             if (CheckCoordsInternal() != CoordCheckResult.Valid)
             {
-                var auto = region.GetAvailableCoords();
+                var auto = chunk.Region.GetAvailableCoords();
                 if (auto.Any())
                 {
                     var (x, y) = auto.First();
@@ -53,10 +51,10 @@ namespace NbtStudio.UI
             else if (z_out)
                 return CoordCheckResult.InvalidZOutOfBounds;
 
-            if (Region is null)
+            if (Chunk.Region is null)
                 return CoordCheckResult.Valid;
 
-            if (Region.GetChunk(xval, zval) is not null)
+            if (Chunk.Region.GetChunk(xval, zval) is not null)
                 return CoordCheckResult.InvalidAlreadyTaken;
 
             return CoordCheckResult.Valid;

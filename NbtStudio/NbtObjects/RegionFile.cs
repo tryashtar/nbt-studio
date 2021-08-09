@@ -31,6 +31,7 @@ namespace NbtStudio
         public event Action OnSaved;
         private ChunkEntry[,] ChunkEntries;
         public string Path { get; private set; }
+        public bool HasUnsavedChanges { get; private set; } = false;
         public RegionFile(string path)
         {
             Path = path;
