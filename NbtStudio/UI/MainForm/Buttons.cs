@@ -15,6 +15,8 @@ namespace NbtStudio.UI
         private readonly DualItemCollection ButtonsCollection = new();
         // TO DO: a bit annoying that this is required to be a field
         private DualMenuItem UpdateButton;
+        private DualMenuItem DropDownUndoHistory;
+        private DualMenuItem DropDownRedoHistory;
 
         private void AddDefaultActions()
         {
@@ -127,7 +129,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: Refresh,
+                action: RefreshFiles,
                 hover: "Refresh",
                 icon: IconType.Refresh,
                 enabled_when: has_files,
@@ -227,12 +229,12 @@ namespace NbtStudio.UI
             );
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             Tools.Items.Add(new ToolStripSeparator());
-            AddButton(
+            DropDownUndoHistory = AddButton(
                 text: "Undo History...",
                 icon: IconType.Undo,
                 menu: MenuEdit
             );
-            AddButton(
+            DropDownRedoHistory = AddButton(
                 text: "Redo History...",
                 icon: IconType.Redo,
                 menu: MenuEdit

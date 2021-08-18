@@ -266,6 +266,23 @@ namespace NbtStudio.UI
 
         public void Edit(params Node[] nodes)
         {
+            EditOrRename(true, nodes);
+        }
+
+        public void Rename()
+        {
+            Rename(NbtTree.SelectedModelNodes.ToArray());
+        }
+
+        public void Rename(params Node[] nodes)
+        {
+            EditOrRename(false, nodes);
+        }
+
+        public void EditOrRename(bool edit, params Node[] nodes)
+        {
+            var purpose = edit ? EditPurpose.EditValue : EditPurpose.Rename;
+            Action<IEnumerable<NbtTag>> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(IconSource, x) : x => BulkEditWindow.BulkRename(IconSource, x);
             var action = new EditorAction()
             {
                 Nodes = nodes
@@ -273,23 +290,24 @@ namespace NbtStudio.UI
             // hex editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
                 x => ByteProviders.HasProvider(x.GetReadableNbt()),
-                x => x.ModifyNbt(tag => EditHexWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue))
+                x => x.ModifyNbt(tag => EditHexWindow.ModifyTag(IconSource, tag, purpose))
             ));
             // tag editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
                 x => true,
-                x => x.ModifyNbt(tag => EditTagWindow.ModifyTag(IconSource, tag, EditPurpose.EditValue))
+                x => x.ModifyNbt(tag => EditTagWindow.ModifyTag(IconSource, tag, purpose))
             ));
             // bulk tag editor
             action.AddEditor(new AdHocMultipleEditor<NbtTagNode>(
                x => true,
-               x => Node.ModifyManyNbt(x, tags => BulkEditWindow.BulkEdit(IconSource, tags))
+               x => Node.ModifyManyNbt(x, bulk_editor)
             ));
             // chunk editor
             action.AddEditor(new AdHocSingleEditor<ChunkNode>(
                 x => true,
                 x => x.ModifyObject(chunk => EditChunkWindow.MoveChunk(IconSource, chunk.Chunk))
             ));
+            // TO DO: file renamer
             action.Edit();
         }
     }

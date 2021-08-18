@@ -20,6 +20,7 @@ namespace NbtStudio.UI
         private IconSource IconSource;
         private readonly Studio App;
         private readonly Updater UpdateChecker = new();
+        private UndoHistory UndoHistory => App.Tree.UndoHistory;
 
         public MainForm(Studio application)
         {
@@ -235,12 +236,12 @@ namespace NbtStudio.UI
         private ContextMenuStrip CreateContextMenu(TreeNodeAdvMouseEventArgs e)
         {
             var menu = new ContextMenuStrip();
-            var obj = NbtTree.NodeFromClick(e);
+            var obj = NbtTree.ModelNodeFromClick(e);
             var root_items = new List<ToolStripItem>();
             var node_items = new List<ToolStripItem>();
             var file_items = new List<ToolStripItem>();
             var nbt_items = new List<ToolStripItem>();
-            if (obj.Parent is ModelRootNode)
+            if (App.Tree.RootNodes.Contains(obj))
                 root_items.Add(new ToolStripMenuItem("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click));
             if (e.Node.CanExpand)
             {
@@ -386,7 +387,6 @@ namespace NbtStudio.UI
         private void MenuFile_DropDownOpening(object sender, EventArgs e)
         {
             ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
-            UpdateRecentFiles();
         }
 
         private ToolStripMenuItem RecentEntry(string path)

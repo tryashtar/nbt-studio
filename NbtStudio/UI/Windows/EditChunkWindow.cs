@@ -9,17 +9,15 @@ namespace NbtStudio.UI
 {
     public partial class EditChunkWindow : Form
     {
-        private readonly Chunk WorkingChunk;
-        private readonly RegionFile ChunkRegion;
+        private readonly ChunkEntry WorkingChunk;
         private readonly ChunkCoordsEditControls Manager;
 
-        private EditChunkWindow(IconSource source, Chunk chunk, RegionFile region, ChunkEditPurpose purpose)
+        private EditChunkWindow(IconSource source, ChunkEntry chunk, ChunkEditPurpose purpose)
         {
             InitializeComponent();
 
             WorkingChunk = chunk;
-            ChunkRegion = region;
-            Manager = new ChunkCoordsEditControls(chunk, region, XBox, ZBox);
+            Manager = new ChunkCoordsEditControls(chunk, XBox, ZBox);
 
             this.Icon = source.GetImage(IconType.Chunk).Icon;
             if (purpose == ChunkEditPurpose.Create)
@@ -32,7 +30,7 @@ namespace NbtStudio.UI
 
         public static Chunk CreateChunk(IconSource source, RegionFile parent, bool bypass_window = false, NbtCompound data = null)
         {
-            var chunk = Chunk.Empty(data);
+            var chunk = new Chunk(data);
 
             if (bypass_window)
             {
