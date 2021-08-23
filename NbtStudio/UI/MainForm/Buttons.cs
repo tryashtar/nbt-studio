@@ -23,7 +23,7 @@ namespace NbtStudio.UI
             bool has_files() => App.Tree.GetSaveables().Any();
 
             AddButton(
-                //action: () => New(),
+                action: () => Actions.New(),
                 text: "&New",
                 hover: "New File",
                 icon: IconType.NewFile,
@@ -32,14 +32,14 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                //action: () => NewPaste(),
+                action: () => Actions.NewPaste(),
                 text: "New from &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.V,
                 menu: MenuFile
             );
             AddButton(
-                //action: () => NewRegion(),
+                action: () => Actions.NewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 shortcut: Keys.Control | Keys.Alt | Keys.R,
@@ -47,7 +47,7 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                //action: () => OpenFile(),
+                action: () => Actions.OpenFile(),
                 text: "&Open File",
                 hover: "Open File",
                 icon: IconType.OpenFile,
@@ -56,7 +56,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                //action: () => OpenFolder(),
+                action: () => Actions.OpenFolder(),
                 text: "Open &Folder",
                 hover: "Open Folder",
                 icon: IconType.OpenFolder,
@@ -65,32 +65,32 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             var import = AddButton(
-                //text: "&Import...",
+                text: "&Import...",
                 menu: MenuFile
             );
             AddButton(
-                //action: () => ImportFile(),
+                action: () => Actions.ImportFile(),
                 text: "&File",
                 icon: IconType.OpenFile,
                 shortcut: Keys.Control | Keys.I,
                 parent: import
             );
             AddButton(
-                //action: () => ImportFolder(),
+                action: () => Actions.ImportFolder(),
                 text: "F&older",
                 icon: IconType.OpenFolder,
                 shortcut: Keys.Control | Keys.Shift | Keys.I,
                 parent: import
             );
             AddButton(
-                //action: () => ImportNew(),
+                action: () => Actions.ImportNew(),
                 text: "&New File",
                 icon: IconType.NewFile,
                 shortcut: Keys.Control | Keys.Alt | Keys.N,
                 parent: import
             );
             AddButton(
-                //action: () => ImportNewRegion(),
+                action: () => Actions.ImportNewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 parent: import
@@ -195,7 +195,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Edit,
+                action: Actions.Edit,
                 text: "&Edit Value",
                 hover: "Edit",
                 icon: IconType.Edit,

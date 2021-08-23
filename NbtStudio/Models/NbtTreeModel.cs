@@ -49,15 +49,19 @@ namespace NbtStudio
 
         public void ImportNodes(params Node[] nodes)
         {
+            if (nodes.Any(x => x.Parent is not null))
+                throw new InvalidOperationException($"One or more specified nodes already have a parent.");
             Roots.AddRange(nodes);
         }
 
         private Node MakeNode(IHavePath item)
         {
             if (item is NbtFile file)
-                return new NbtFileNode(null, file);
+                return new NbtFileNode(file);
             if (item is RegionFile region)
-                return new RegionFileNode(null, region);
+                return new RegionFileNode(region);
+            if (item is NbtFolder folder)
+                return new FolderNode(folder);
             throw new ArgumentException();
         }
 

@@ -12,7 +12,7 @@ namespace NbtStudio
 {
     public class RegionFileNode : Node<RegionFile, ChunkEntry>
     {
-        public RegionFileNode(Node parent, RegionFile wrapped) : base(parent, wrapped) { }
+        public RegionFileNode(RegionFile file) : base(file) { }
 
         protected override IEnumerable<ChunkEntry> GetTypedChildren()
         {
@@ -21,7 +21,7 @@ namespace NbtStudio
 
         protected override Node MakeTypedChild(ChunkEntry obj)
         {
-            return new ChunkNode(this, obj);
+            return new ChunkNode(obj);
         }
 
         public override IconType GetIcon() => IconType.Region;

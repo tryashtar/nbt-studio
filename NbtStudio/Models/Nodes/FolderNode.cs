@@ -13,7 +13,7 @@ namespace NbtStudio
 {
     public class FolderNode : Node<NbtFolder, IHavePath>
     {
-        public FolderNode(Node parent, NbtFolder wrapped) : base(parent, wrapped) { }
+        public FolderNode(NbtFolder wrapped) : base(wrapped) { }
 
         protected override IEnumerable<IHavePath> GetTypedChildren()
         {
@@ -23,9 +23,9 @@ namespace NbtStudio
         protected override Node MakeTypedChild(IHavePath obj)
         {
             if (obj is NbtFolder folder)
-                return new FolderNode(this, folder);
+                return new FolderNode(folder);
             if (obj is NbtFile file)
-                return new NbtFileNode(this, file);
+                return new NbtFileNode(file);
             throw new ArgumentException();
         }
 

@@ -11,9 +11,9 @@ namespace NbtStudio
 {
     public class ChunkNode : Node<ChunkEntry, NbtTag>
     {
-        public ChunkEntry Chunk => WrappedObject;
+        public ChunkNode(ChunkEntry wrapped) : base(wrapped) { }
 
-        public ChunkNode(Node parent, ChunkEntry wrapped) : base(parent, wrapped) { }
+        public ChunkEntry Chunk => WrappedObject;
 
         private Chunk GetChunk()
         {
@@ -31,7 +31,7 @@ namespace NbtStudio
 
         protected override Node MakeTypedChild(NbtTag obj)
         {
-            return new NbtTagNode(this, obj);
+            return new NbtTagNode(obj);
         }
 
         public override NbtTag GetNbtTag() => GetChunk().Data;

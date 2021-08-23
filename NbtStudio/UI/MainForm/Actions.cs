@@ -106,21 +106,21 @@ namespace NbtStudio.UI
         {
             return () =>
             {
-                using (var dialog = new OpenFileDialog
+                using var dialog = new OpenFileDialog
                 {
                     Title = title,
                     RestoreDirectory = true,
                     Multiselect = true,
                     Filter = filter
-                })
+                };
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        var attempts = new LoadFileAttempts<IHavePath>();
-                        attempts.AddMany(dialog.FileNames, NbtFolder.OpenFile);
-                    }
+                    var attempts = new LoadFileAttempts<IHavePath>();
+                    attempts.AddMany(dialog.FileNames, NbtFolder.OpenFile);
+                    return attempts;
                 }
-                return null;
+                else
+                    return null;
             };
         }
         private PathsGetter DefaultBrowseFolder() => BrowseFolder("Select a folder that contains NBT files");

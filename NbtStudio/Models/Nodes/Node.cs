@@ -11,7 +11,7 @@ namespace NbtStudio
 {
     public abstract class Node
     {
-        public readonly Node Parent;
+        public Node Parent { get; private set; }
         public int DescendantsCount { get; private set; }
         public TreePath Path
         {
@@ -42,11 +42,6 @@ namespace NbtStudio
         // start off true since child nodes aren't ready yet
         private bool IsDirty = true;
 
-        public Node(Node parent)
-        {
-            Parent = parent;
-        }
-
         public (string name, string value) Preview()
         {
             return (PreviewName(), PreviewValue());
@@ -68,6 +63,12 @@ namespace NbtStudio
         {
             // make sure to reuse existing nodes
             var new_nodes = GetChildren().Select(x => KeyValuePair.Create(x, GetOrCreateChild(x))).ToList();
+            // clear the parent, might not be necessary but could help the GC
+            var removing_nodes = ChildNodes.Values.Except(new_nodes.Select(x => x.Value));
+            foreach (var item in removing_nodes)
+            {
+                item.Parent = null;
+            }
             ChildNodes.Clear();
             DescendantsCount = 0;
             foreach (var node in new_nodes)
@@ -82,7 +83,9 @@ namespace NbtStudio
         {
             if (ChildNodes.TryGetValue(obj, out var result))
                 return result;
-            return MakeChild(obj);
+            var child = MakeChild(obj);
+            child.Parent = this;
+            return child;
         }
 
         public virtual NbtTag GetNbtTag() => null;

@@ -12,7 +12,8 @@ namespace NbtStudio
     public abstract class Node<WrappedType, ChildType> : Node where WrappedType : class where ChildType : class
     {
         protected readonly WrappedType WrappedObject;
-        public Node(Node parent, WrappedType wrapped) : base(parent)
+
+        public Node(WrappedType wrapped)
         {
             WrappedObject = wrapped;
         }

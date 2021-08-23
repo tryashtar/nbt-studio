@@ -11,7 +11,7 @@ namespace NbtStudio
 {
     public class NbtFileNode : Node<NbtFile, NbtTag>
     {
-        public NbtFileNode(Node parent, NbtFile wrapped) : base(parent, wrapped)
+        public NbtFileNode(NbtFile wrapped) : base(wrapped)
         {
             if (WrappedObject.RootTag is NbtContainerTag container)
                 container.ChildrenChanged += tag => MarkDirty();
@@ -26,7 +26,7 @@ namespace NbtStudio
 
         protected override Node MakeTypedChild(NbtTag obj)
         {
-            return new NbtTagNode(this, obj);
+            return new NbtTagNode(obj);
         }
 
         public override NbtTag GetNbtTag() => WrappedObject.RootTag;
