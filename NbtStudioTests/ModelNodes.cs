@@ -24,7 +24,7 @@ namespace NbtStudioTests
                     new NbtString("grandchild", "")
                 }
             };
-            var root = new NbtTagNode(new NbtTreeModel(), null, compound);
+            var root = new NbtTagNode(null, compound);
             AssertChildStructure(root);
         }
 
@@ -40,14 +40,14 @@ namespace NbtStudioTests
                     new NbtString("grandchild", "")
                 }
             };
-            var root = new NbtTagNode(new NbtTreeModel(), null, compound);
-            Assert.AreEqual(root.Children.Count(), 3);
+            var root = new NbtTagNode(null, compound);
+            Assert.AreEqual(root.Children.Count, 3);
             compound.Add(new NbtInt("more1"));
             compound.Add(new NbtInt("more2"));
             compound.Add(new NbtInt("more3"));
-            Assert.AreEqual(root.Children.Count(), 6);
+            Assert.AreEqual(root.Children.Count, 6);
             compound.Remove("more1");
-            Assert.AreEqual(root.Children.Count(), 5);
+            Assert.AreEqual(root.Children.Count, 5);
         }
 
         [TestMethod]
@@ -55,9 +55,11 @@ namespace NbtStudioTests
         {
             var root = new NbtCompound("test");
             var view = new NbtTreeView();
-            var model = new NbtTreeModel((object)root);
+            var model = new NbtTreeModel();
+            var root_node = new NbtTagNode(null, root);
+            model.ImportNodes(root_node);
             view.Model = model;
-            Assert.AreEqual(model.Root.Children.Count(), 1);
+            Assert.AreEqual(model.RootNodes.Count, 1);
             Assert.AreEqual(view.Root.Children.Count, 1);
             AssertSynchronized(view, model);
             root.Add(new NbtByte("test1"));
@@ -67,14 +69,14 @@ namespace NbtStudioTests
             root.Add(new NbtCompound("test3"));
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Add(new NbtShort("test4"));
-            Assert.AreEqual(view.Root.DescendantsCount, 5);
-            Assert.AreEqual(model.Root.DescendantsCount, 5);
+            Assert.AreEqual(view.Root.Children[0].DescendantsCount, 4);
+            Assert.AreEqual(model.RootNodes[0].DescendantsCount, 4);
             AssertSynchronized(view, model);
             root.Remove("test2");
             AssertSynchronized(view, model);
             root.Get<NbtCompound>("test3").Clear();
-            Assert.AreEqual(view.Root.DescendantsCount, 3);
-            Assert.AreEqual(model.Root.DescendantsCount, 3);
+            Assert.AreEqual(view.Root.Children[0].DescendantsCount, 2);
+            Assert.AreEqual(model.RootNodes[0].DescendantsCount, 2);
             AssertSynchronized(view, model);
             root.Clear();
             AssertSynchronized(view, model);
@@ -83,12 +85,12 @@ namespace NbtStudioTests
         private void AssertSynchronized(NbtTreeView view, NbtTreeModel model)
         {
             var view_queue = new Queue<TreeNodeAdv>();
-            var model_queue = new Queue<Node>();
+            var model_queue = new Queue<NbtStudio.Node>();
             foreach (var root in view.Root.Children)
             {
                 view_queue.Enqueue(root);
             }
-            foreach (var root in model.Root.Children)
+            foreach (var root in model.RootNodes)
             {
                 model_queue.Enqueue(root);
             }
@@ -110,7 +112,7 @@ namespace NbtStudioTests
             }
         }
 
-        private void AssertChildStructure(Node node)
+        private void AssertChildStructure(NbtStudio.Node node)
         {
             var children = node.Children;
             foreach (var child in children)

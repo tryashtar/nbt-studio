@@ -47,6 +47,11 @@ namespace NbtStudio
             Roots.AddRange(paths.Select(MakeNode));
         }
 
+        public void ImportNodes(params Node[] nodes)
+        {
+            Roots.AddRange(nodes);
+        }
+
         private Node MakeNode(IHavePath item)
         {
             if (item is NbtFile file)

@@ -48,6 +48,8 @@ namespace NbtStudio.UI
 
         private Image GetIcon(TreeNodeAdv node)
         {
+            if (IconSource == null)
+                return null;
             return IconSource.GetImage(((Node)node.Tag).GetIcon()).Image;
         }
     }

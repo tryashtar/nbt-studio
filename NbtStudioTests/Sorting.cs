@@ -25,8 +25,7 @@ namespace NbtStudioTests
                 }
             };
             var original = (NbtCompound)compound.Clone();
-            UndoableAction action = null;
-            compound.ActionPerformed += a => action = a;
+            AssertIdentical(compound, original);
 
             compound.Sort(new AlphabeticalSorter(), true);
 
@@ -36,10 +35,6 @@ namespace NbtStudioTests
             Assert.AreEqual(compound["bbb"][0].Name, "aaa");
             Assert.AreEqual(compound["bbb"][1].Name, "bbb");
             Assert.AreEqual(compound["bbb"][2].Name, "ccc");
-
-            action.Undo();
-
-            AssertIdentical(compound, original);
         }
 
         private class AlphabeticalSorter : IComparer<NbtTag>
