@@ -22,13 +22,16 @@ namespace NbtStudio.UI
         private readonly Updater UpdateChecker = new();
         private UndoHistory UndoHistory => App.Tree.UndoHistory;
 
+        public readonly MainFormActions Actions;
+
         public MainForm(Studio application)
         {
             App = application;
+            Actions = new(() => App, () => this, () => NbtTree, () => IconSource);
 
             // add controls
             InitializeComponent();
-            AddDefaultActions();
+            AddActionButtons();
 
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
             NbtTree.Model = App.Tree;
@@ -97,67 +100,18 @@ namespace NbtStudio.UI
             Properties.Settings.Default.IconSet = IconSourceRegistry.GetID(source);
         }
 
-        private FindWindow FindWindow;
-        private void Find()
-        {
-            if (FindWindow is null || FindWindow.IsDisposed)
-                FindWindow = new FindWindow(IconSource, App.Tree, NbtTree);
-            if (!FindWindow.Visible)
-                FindWindow.Show(this);
-            FindWindow.Focus();
-        }
-
-        private AboutWindow AboutWindow;
-        private void About()
-        {
-            if (AboutWindow is null || AboutWindow.IsDisposed)
-                AboutWindow = new AboutWindow(IconSource);
-            if (!AboutWindow.Visible)
-                AboutWindow.Show(this);
-            AboutWindow.Focus();
-        }
-
-        private IconSetWindow IconSetWindow;
-        private void ChangeIcons()
-        {
-            if (IconSetWindow == null || IconSetWindow.IsDisposed)
-            {
-                IconSetWindow = new IconSetWindow(IconSource);
-                IconSetWindow.FormClosed += (s, e) =>
-                {
-                    if (IconSetWindow.SelectedSource is not null)
-                        SetIconSource(IconSetWindow.SelectedSource);
-                };
-            }
-            if (!IconSetWindow.Visible)
-                IconSetWindow.Show(this);
-            IconSetWindow.Focus();
-        }
-
-        private UpdateWindow UpdateWindow;
-        private void ShowUpdate(AvailableUpdate update)
-        {
-            if (update is null)
-                return;
-            if (UpdateWindow is null || UpdateWindow.IsDisposed)
-                UpdateWindow = new UpdateWindow(IconSource, update);
-            if (!UpdateWindow.Visible)
-                UpdateWindow.Show(this);
-            UpdateWindow.Focus();
-        }
-
         private void OpenRecentFile()
         {
             var files = Properties.Settings.Default.RecentFiles;
             if (files.Count >= 1)
-                OpenFiles(files.GetFirst());
+                Actions.OpenFiles(files.GetFirst());
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var node = NbtTree.ModelNodeFromClick(e);
             if (!e.Node.CanExpand)
-                Edit(node);
+                Actions.Edit(node);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -188,9 +142,9 @@ namespace NbtStudio.UI
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (e.Effect == DragDropEffects.Move)
-                    OpenFiles(files);
+                    Actions.OpenFiles(files);
                 else if (e.Effect == DragDropEffects.Copy)
-                    ImportFiles(files);
+                    Actions.ImportFiles(files);
             }
             else
             {
@@ -203,18 +157,20 @@ namespace NbtStudio.UI
 
         private bool CanMoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
-            var (destination, index) = App.Tree.GetInsertionLocation(target, position);
-            if (destination is null) return false;
-            return destination.CanReceiveDrop(nodes);
+            return false;
+
+            // var (destination, index) = App.Tree.GetInsertionLocation(target, position);
+            // if (destination is null) return false;
+            // return destination.CanReceiveDrop(nodes);
         }
 
         private void MoveObjects(IEnumerable<Node> nodes, Node target, NodePosition position)
         {
-            var (destination, index) = App.Tree.GetInsertionLocation(target, position);
-            if (destination is null) return;
-            UndoHistory.StartBatchOperation();
-            destination.ReceiveDrop(nodes, index);
-            UndoHistory.FinishBatchOperation(new DescriptionHolder("Move {0} into {1} at position {2}", nodes, destination, index), true);
+            //var (destination, index) = App.Tree.GetInsertionLocation(target, position);
+            //if (destination is null) return;
+            //UndoHistory.StartBatchOperation();
+            //destination.ReceiveDrop(nodes, index);
+            //UndoHistory.FinishBatchOperation(new DescriptionHolder("Move {0} into {1} at position {2}", nodes, destination, index), true);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -413,7 +369,7 @@ namespace NbtStudio.UI
         {
             if (keyData == Keys.Enter)
             {
-                Edit();
+                Actions.Edit();
                 return true;
             }
             if (keyData == (Keys.Control | Keys.Shift | Keys.T))

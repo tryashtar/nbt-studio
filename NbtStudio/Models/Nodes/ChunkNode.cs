@@ -11,6 +11,8 @@ namespace NbtStudio
 {
     public class ChunkNode : Node<ChunkEntry, NbtTag>
     {
+        public ChunkEntry Chunk => WrappedObject;
+
         public ChunkNode(Node parent, ChunkEntry wrapped) : base(parent, wrapped) { }
 
         private Chunk GetChunk()
@@ -32,7 +34,7 @@ namespace NbtStudio
             return new NbtTagNode(this, obj);
         }
 
-        protected override NbtTag GetNbtTag() => GetChunk().Data;
+        public override NbtTag GetNbtTag() => GetChunk().Data;
 
         public override IconType GetIcon() => IconType.Chunk;
 

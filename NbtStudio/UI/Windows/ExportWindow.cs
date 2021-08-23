@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using TryashtarUtils.Nbt;
 
 namespace NbtStudio.UI
 {
@@ -22,8 +23,8 @@ namespace NbtStudio.UI
                 RadioSnbt.Checked = template.Snbt;
                 RadioNbt.Checked = !template.Snbt;
                 CompressionBox.SelectedItem = CompressionBox.Items.Cast<CompressionDisplay>().FirstOrDefault(x => x.Compression == template.Compression);
-                CheckMinify.Checked = template.Minified;
-                CheckJson.Checked = template.Json;
+                CheckMinify.Checked = template.SnbtOptions.Minified;
+                CheckJson.Checked = template.SnbtOptions.IsJsonLike;
                 CheckLittleEndian.Checked = !template.BigEndian;
                 CheckBedrockHeader.Checked = template.BedrockHeader;
             }
@@ -45,9 +46,17 @@ namespace NbtStudio.UI
         public ExportSettings GetSettings()
         {
             if (RadioSnbt.Checked)
-                return ExportSettings.AsSnbt(CheckMinify.Checked, CheckJson.Checked);
+                return ExportSettings.AsSnbt(GetSnbtOptions());
             else
                 return ExportSettings.AsNbt(((CompressionDisplay)CompressionBox.SelectedItem).Compression, !CheckLittleEndian.Checked, CheckBedrockHeader.Checked);
+        }
+
+        private SnbtOptions GetSnbtOptions()
+        {
+            var options = CheckJson.Checked ? SnbtOptions.JsonLike : SnbtOptions.Default;
+            if (!CheckMinify.Checked)
+                options = options.Expanded();
+            return options;
         }
 
         private void Apply()

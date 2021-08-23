@@ -12,12 +12,18 @@ namespace NbtStudio
 {
     public class NbtTagNode : Node<NbtTag, NbtTag>
     {
-        public NbtTagNode(Node parent, NbtTag wrapped) : base(parent, wrapped) { }
+        public NbtTag Tag => WrappedObject;
+
+        public NbtTagNode(Node parent, NbtTag wrapped) : base(parent, wrapped)
+        {
+            if (wrapped is NbtContainerTag container)
+                container.ChildrenChanged += tag => MarkDirty();
+        }
 
         protected override IEnumerable<NbtTag> GetTypedChildren()
         {
             if (WrappedObject is NbtContainerTag container)
-                return container;
+                return container.Tags;
             return null;
         }
 
@@ -26,7 +32,7 @@ namespace NbtStudio
             return new NbtTagNode(this, obj);
         }
 
-        protected override NbtTag GetNbtTag() => WrappedObject;
+        public override NbtTag GetNbtTag() => WrappedObject;
 
         public override IconType GetIcon() => NbtUtil.TagIconType(WrappedObject.TagType);
         public override string PreviewName() => Snbt.GetName(WrappedObject, SnbtOptions.Preview);

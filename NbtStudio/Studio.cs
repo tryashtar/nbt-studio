@@ -34,8 +34,8 @@ namespace NbtStudio
 
         private void Form_Load(object sender, EventArgs e)
         {
-            if (CommandLineArguments is not null && CommandLineArguments.Any())
-                Form.OpenFiles(CommandLineArguments);
+            if (CommandLineArguments.Length > 0)
+                Form.Actions.OpenFiles(CommandLineArguments);
         }
     }
 }

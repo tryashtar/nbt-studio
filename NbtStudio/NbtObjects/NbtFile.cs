@@ -17,7 +17,7 @@ namespace NbtStudio
     {
         public string Path { get; private set; }
         public event Action OnSaved;
-        private NbtTag RootTag;
+        public readonly NbtTag RootTag;
         public ExportSettings ExportSettings { get; private set; }
         public bool CanSave => Path is not null && ExportSettings is not null;
         public bool CanRefresh => CanSave;
@@ -26,7 +26,8 @@ namespace NbtStudio
         private NbtFile(string path, NbtTag root, ExportSettings settings)
         {
             Path = path;
-            SetRoot(root);
+            RootTag = root;
+            root.SomethingChanged += (t, o) => HasUnsavedChanges = true;
             ExportSettings = settings;
         }
 
@@ -37,15 +38,11 @@ namespace NbtStudio
         {
             if (root.Name is null)
                 root.Name = "";
-            SetRoot(root);
+            RootTag = root;
+            root.SomethingChanged += (t, o) => HasUnsavedChanges = true;
             Path = null;
             ExportSettings = null;
             HasUnsavedChanges = true;
-        }
-
-        private void SetRoot(NbtTag root)
-        {
-            RootTag = root;
         }
 
         private static bool LooksSuspicious(string name)
@@ -66,7 +63,7 @@ namespace NbtStudio
                 return true;
             if (tag is NbtString str && LooksSuspicious(str.Value))
                 return true;
-            if (tag is NbtContainerTag container && container.Any(x => LooksSuspicious(x.Name)))
+            if (tag is NbtContainerTag container && container.Tags.Any(x => LooksSuspicious(x.Name)))
                 return true;
             return false;
         }
@@ -125,7 +122,15 @@ namespace NbtStudio
                 throw new FormatException("File did not contain an NBT compound");
             compound.Name = "";
             var file = new fNbt.NbtFile(compound);
-            return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(!text.Contains("\n"), System.IO.Path.GetExtension(path) == ".json"));
+            return new NbtFile(path, file.RootTag, ExportSettings.AsSnbt(GuessSnbtOptions(text, path)));
+        }
+
+        private static SnbtOptions GuessSnbtOptions(string text, string path)
+        {
+            var options = System.IO.Path.GetExtension(path) == ".json" ? SnbtOptions.JsonLike : SnbtOptions.Default;
+            if (text.Contains("\n"))
+                options = options.Expanded();
+            return options;
         }
 
         public static Failable<NbtFile> TryCreateFromNbt(string path, NbtCompression compression, bool big_endian = true, bool bedrock_header = false)

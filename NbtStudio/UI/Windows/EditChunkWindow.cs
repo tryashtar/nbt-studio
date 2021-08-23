@@ -28,31 +28,16 @@ namespace NbtStudio.UI
             XBox.Select();
         }
 
-        public static Chunk CreateChunk(IconSource source, RegionFile parent, bool bypass_window = false, NbtCompound data = null)
+        public static Chunk CreateChunk(IconSource source, RegionFile parent, NbtCompound data = null)
         {
             var chunk = new Chunk(data);
-
-            if (bypass_window)
-            {
-                // find first available slot
-                var available = parent.GetAvailableCoords();
-                if (!available.Any())
-                    return null;
-                var (x, y) = available.First();
-                chunk.Move(x, y);
-                return chunk;
-            }
-            else
-            {
-                var window = new EditChunkWindow(source, chunk, parent, ChunkEditPurpose.Create);
-                return window.ShowDialog() == DialogResult.OK ? chunk : null;
-            }
+            var window = new EditChunkWindow(source, chunk, ChunkEditPurpose.Create);
+            return window.ShowDialog() == DialogResult.OK ? chunk : null;
         }
 
-        public static bool MoveChunk(IconSource source, Chunk existing)
+        public static bool MoveChunk(IconSource source, ChunkEntry existing)
         {
-            var region = existing.Region;
-            var window = new EditChunkWindow(source, existing, region, ChunkEditPurpose.Move);
+            var window = new EditChunkWindow(source, existing, ChunkEditPurpose.Move);
             return window.ShowDialog() == DialogResult.OK; // window moves the chunk by itself
         }
 

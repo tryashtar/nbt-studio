@@ -18,7 +18,7 @@ namespace NbtStudio.UI
         private DualMenuItem DropDownUndoHistory;
         private DualMenuItem DropDownRedoHistory;
 
-        private void AddDefaultActions()
+        private void AddActionButtons()
         {
             bool has_files() => App.Tree.GetSaveables().Any();
 
@@ -354,6 +354,55 @@ namespace NbtStudio.UI
         {
             TreeChanged,
             SelectionChanged
+        }
+
+        private FindWindow FindWindow;
+        private void Find()
+        {
+            if (FindWindow is null || FindWindow.IsDisposed)
+                FindWindow = new FindWindow(IconSource, App.Tree, NbtTree);
+            if (!FindWindow.Visible)
+                FindWindow.Show(this);
+            FindWindow.Focus();
+        }
+
+        private AboutWindow AboutWindow;
+        private void About()
+        {
+            if (AboutWindow is null || AboutWindow.IsDisposed)
+                AboutWindow = new AboutWindow(IconSource);
+            if (!AboutWindow.Visible)
+                AboutWindow.Show(this);
+            AboutWindow.Focus();
+        }
+
+        private IconSetWindow IconSetWindow;
+        private void ChangeIcons()
+        {
+            if (IconSetWindow == null || IconSetWindow.IsDisposed)
+            {
+                IconSetWindow = new IconSetWindow(IconSource);
+                IconSetWindow.FormClosed += (s, e) =>
+                {
+                    if (IconSetWindow.SelectedSource is not null)
+                        SetIconSource(IconSetWindow.SelectedSource);
+                };
+            }
+            if (!IconSetWindow.Visible)
+                IconSetWindow.Show(this);
+            IconSetWindow.Focus();
+        }
+
+        private UpdateWindow UpdateWindow;
+        private void ShowUpdate(AvailableUpdate update)
+        {
+            if (update is null)
+                return;
+            if (UpdateWindow is null || UpdateWindow.IsDisposed)
+                UpdateWindow = new UpdateWindow(IconSource, update);
+            if (!UpdateWindow.Visible)
+                UpdateWindow.Show(this);
+            UpdateWindow.Focus();
         }
     }
 }

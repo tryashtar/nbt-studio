@@ -35,13 +35,13 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get a byte provider from {tag.TagType}");
         }
 
-        public static bool HasProvider(IReadableNbt tag)
+        public static bool HasProvider(NbtTag tag)
         {
             if (NbtUtil.IsArrayType(tag.TagType))
                 return true;
-            if (tag.IsList)
+            if (tag is NbtList list)
             {
-                return tag.ListType switch
+                return list.ListType switch
                 {
                     NbtTagType.Byte or
                     NbtTagType.Short or
@@ -219,7 +219,7 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            return Tag.Cast<NbtByte>().Select(x => x.Value);
+            return Tag.Tags.Cast<NbtByte>().Select(x => x.Value);
         }
 
         protected override void SetBytesToTag(List<byte> bytes)
@@ -236,7 +236,7 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var shorts = Tag.Cast<NbtShort>().Select(x => x.Value);
+            var shorts = Tag.Tags.Cast<NbtShort>().Select(x => x.Value);
             return DataUtils.ToByteArray(shorts.ToArray());
         }
 
@@ -255,7 +255,7 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var ints = Tag.Cast<NbtInt>().Select(x => x.Value);
+            var ints = Tag.Tags.Cast<NbtInt>().Select(x => x.Value);
             return DataUtils.ToByteArray(ints.ToArray());
         }
 
@@ -274,7 +274,7 @@ namespace NbtStudio
 
         protected override IEnumerable<byte> GetBytesFromTag()
         {
-            var longs = Tag.Cast<NbtLong>().Select(x => x.Value);
+            var longs = Tag.Tags.Cast<NbtLong>().Select(x => x.Value);
             return DataUtils.ToByteArray(longs.ToArray());
         }
 

@@ -13,8 +13,26 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI
 {
-    public partial class MainForm
+    public delegate T Getter<T>();
+    public class MainFormActions
     {
+        private readonly Getter<Studio> GetApp;
+        private readonly Getter<MainForm> GetForm;
+        private readonly Getter<NbtTreeView> GetView;
+        private readonly Getter<IconSource> GetIcons;
+        private Studio App => GetApp();
+        private MainForm Form => GetForm();
+        private NbtTreeView View => GetView();
+        private IconSource Icons => GetIcons();
+
+        public MainFormActions(Getter<Studio> app, Getter<MainForm> form, Getter<NbtTreeView> view, Getter<IconSource> icons)
+        {
+            GetApp = app;
+            GetForm = form;
+            GetView = view;
+            GetIcons = icons;
+        }
+
         private UnsavedWarningHandler ConfirmIfUnsaved(string message)
         {
             return () =>
@@ -67,7 +85,7 @@ namespace NbtStudio.UI
             return x =>
             {
                 var window = new ExceptionWindow(title, message, x);
-                window.ShowDialog(this);
+                window.ShowDialog(Form);
             };
         }
 
@@ -79,7 +97,7 @@ namespace NbtStudio.UI
                 message += String.Join(Environment.NewLine, x.FailedPaths.Select(x => Path.GetFileName(x)));
 
                 var window = new ExceptionWindow(title, message, x.Failable);
-                window.ShowDialog(this);
+                window.ShowDialog(Form);
             };
         }
 
@@ -188,7 +206,7 @@ namespace NbtStudio.UI
                 {
                     TreeGetter = () => App.Tree,
                     UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
-                    FilesGetter = SnbtFromClipboard,
+                    FilesGetter = ParseSnbtFromClipboard,
                     ErrorHandler = ShowError("Clipboard error", "Failed to parse SNBT from clipboard.")
                 }.Open();
             }
@@ -243,15 +261,14 @@ namespace NbtStudio.UI
             return attempts;
         }
 
-        public IFailable<NbtTag> SnbtFromClipboard()
+        public IFailable<NbtTag> ParseSnbt(string snbt)
         {
-            var text = Clipboard.GetText();
-            var attempt1 = SnbtParser.TryParse(text, named: false);
+            var attempt1 = SnbtParser.TryParse(snbt, named: false);
             if (!attempt1.Failed)
                 return attempt1;
             else
             {
-                var attempt2 = SnbtParser.TryParse(text, named: true);
+                var attempt2 = SnbtParser.TryParse(snbt, named: true);
                 if (!attempt2.Failed)
                     return attempt2;
                 else
@@ -259,9 +276,19 @@ namespace NbtStudio.UI
             }
         }
 
+        public IEnumerable<IFailable<IFile>> ParseSnbtFromClipboard()
+        {
+            var text = Clipboard.GetText();
+            var tag = ParseSnbt(text);
+            yield return new Failable<IFile>(() =>
+            {
+                return new NbtFile(tag.Result);
+            }, "Loading SNBT");
+        }
+
         public void Edit()
         {
-            Edit(NbtTree.SelectedModelNodes.ToArray());
+            Edit(View.SelectedModelNodes.ToArray());
         }
 
         public void Edit(params Node[] nodes)
@@ -271,7 +298,7 @@ namespace NbtStudio.UI
 
         public void Rename()
         {
-            Rename(NbtTree.SelectedModelNodes.ToArray());
+            Rename(View.SelectedModelNodes.ToArray());
         }
 
         public void Rename(params Node[] nodes)
@@ -282,30 +309,30 @@ namespace NbtStudio.UI
         public void EditOrRename(bool edit, params Node[] nodes)
         {
             var purpose = edit ? EditPurpose.EditValue : EditPurpose.Rename;
-            Action<IEnumerable<NbtTag>> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(IconSource, x) : x => BulkEditWindow.BulkRename(IconSource, x);
+            Action<IEnumerable<NbtTag>> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(Icons, x) : x => BulkEditWindow.BulkRename(Icons, x);
             var action = new EditorAction()
             {
                 Nodes = nodes
             };
             // hex editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
-                x => ByteProviders.HasProvider(x.GetReadableNbt()),
-                x => x.ModifyNbt(tag => EditHexWindow.ModifyTag(IconSource, tag, purpose))
+                x => ByteProviders.HasProvider(x.Tag),
+                x => EditHexWindow.ModifyTag(Icons, x.Tag, purpose)
             ));
             // tag editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
                 x => true,
-                x => x.ModifyNbt(tag => EditTagWindow.ModifyTag(IconSource, tag, purpose))
+                x => EditTagWindow.ModifyTag(Icons, x.Tag, purpose)
             ));
             // bulk tag editor
             action.AddEditor(new AdHocMultipleEditor<NbtTagNode>(
                x => true,
-               x => Node.ModifyManyNbt(x, bulk_editor)
+               x => bulk_editor(x.Select(x => x.Tag))
             ));
             // chunk editor
             action.AddEditor(new AdHocSingleEditor<ChunkNode>(
                 x => true,
-                x => x.ModifyObject(chunk => EditChunkWindow.MoveChunk(IconSource, chunk.Chunk))
+                x => EditChunkWindow.MoveChunk(Icons, x.Chunk)
             ));
             // TO DO: file renamer
             action.Edit();

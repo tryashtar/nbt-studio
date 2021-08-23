@@ -17,12 +17,6 @@ namespace NbtStudio
             WrappedObject = wrapped;
         }
 
-        public void ModifyObject(Action<WrappedType> action)
-        {
-            action(WrappedObject);
-            MarkDirty();
-        }
-
         protected abstract Node MakeTypedChild(ChildType obj);
         protected abstract IEnumerable<ChildType> GetTypedChildren();
 

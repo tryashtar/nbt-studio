@@ -364,9 +364,9 @@ namespace NbtStudio
 
         public static void SetCompoundEqualTo(this NbtCompound destination, NbtCompound source)
         {
-            var add_children = source.Where(x => !PsuedoContains(destination, x));
-            var remove_children = destination.Where(x => !PsuedoContains(source, x));
-            var update_children = destination.Except(remove_children);
+            var add_children = source.Tags.Where(x => !PsuedoContains(destination, x));
+            var remove_children = destination.Tags.Where(x => !PsuedoContains(source, x));
+            var update_children = destination.Tags.Except(remove_children);
             foreach (var child in remove_children)
             {
                 destination.Remove(child);
@@ -392,7 +392,7 @@ namespace NbtStudio
             }
             int needs_updating = destination.Count;
             if (source.Count > destination.Count)
-                destination.AddRange(source.Skip(destination.Count).Select(x => (NbtTag)x.Clone()));
+                destination.AddRange(source.Tags.Skip(destination.Count).Select(x => (NbtTag)x.Clone()));
             for (int i = 0; i < needs_updating; i++)
             {
                 destination[i].SetEqualTo(source[i]);
@@ -448,30 +448,6 @@ namespace NbtStudio
             throw new ArgumentException($"Can't get automatic name for tags inside a {parent.TagType}");
         }
 
-
-        public static bool CanAddAll(IEnumerable<NbtTag> tags, NbtContainerTag destination)
-        {
-            // check if you're trying to add items of different types to a list
-            if (destination is NbtList list && tags.Select(x => x.TagType).Distinct().Skip(1).Any())
-                return false;
-            // check if you're trying to add an item to its own descendent
-            var ancestors = Ancestors(destination);
-            if (tags.Intersect(ancestors).Any())
-                return false;
-            return tags.All(x => destination.CanAdd(x.TagType));
-        }
-
-        public static List<NbtTag> Ancestors(NbtTag tag)
-        {
-            var ancestors = new List<NbtTag>();
-            while (tag is not null)
-            {
-                ancestors.Add(tag);
-                tag = tag.Parent;
-            }
-            return ancestors;
-        }
-
         private class FileExtension
         {
             public readonly string Extension;
@@ -485,7 +461,7 @@ namespace NbtStudio
                 Type = type;
             }
         }
-        private static readonly List<FileExtension> NbtExtensions = new List<FileExtension>
+        private static readonly List<FileExtension> NbtExtensions = new()
         {
             { new FileExtension("nbt", "NBT files", NbtFileType.BinaryNbt) },
             { new FileExtension("snbt", "SNBT files", NbtFileType.Snbt) },

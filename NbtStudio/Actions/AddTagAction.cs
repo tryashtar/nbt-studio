@@ -22,15 +22,12 @@ namespace NbtStudio
             bool has_original = true;
             foreach (var node in SelectedNodes)
             {
-                node.ModifyNbt(x =>
+                if (node.GetNbtTag() is NbtContainerTag container)
                 {
-                    if (x is NbtContainerTag container)
-                    {
-                        var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
-                        adding.AddTo(container);
-                        has_original = false;
-                    }
-                });
+                    var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
+                    adding.AddTo(container);
+                    has_original = false;
+                }
             }
             return tag.Result;
         }

@@ -85,30 +85,6 @@ namespace NbtStudio
             return MakeChild(obj);
         }
 
-        protected virtual NbtTag GetNbtTag() => null;
-        public void ModifyNbt(Action<NbtTag> action)
-        {
-            var nbt = GetNbtTag();
-            if (nbt != null)
-            {
-                action(nbt);
-                MarkDirty();
-            }
-        }
-        
-        public static void ModifyManyNbt(IEnumerable<Node> nodes, Action<IEnumerable<NbtTag>> action)
-        {
-            var tags = nodes.Select(x => x.GetNbtTag()).Where(x => x != null);
-            action(tags);
-            foreach (var node in nodes)
-            {
-                node.MarkDirty();
-            }
-        }
-
-        public ReadOnlyNbtTag GetReadableNbt()
-        {
-            return GetNbtTag()?.AsReadOnly();
-        }
+        public virtual NbtTag GetNbtTag() => null;
     }
 }

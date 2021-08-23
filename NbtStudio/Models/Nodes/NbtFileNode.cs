@@ -11,12 +11,16 @@ namespace NbtStudio
 {
     public class NbtFileNode : Node<NbtFile, NbtTag>
     {
-        public NbtFileNode(Node parent, NbtFile wrapped) : base(parent, wrapped) { }
+        public NbtFileNode(Node parent, NbtFile wrapped) : base(parent, wrapped)
+        {
+            if (WrappedObject.RootTag is NbtContainerTag container)
+                container.ChildrenChanged += tag => MarkDirty();
+        }
 
         protected override IEnumerable<NbtTag> GetTypedChildren()
         {
             if (WrappedObject.RootTag is NbtContainerTag container)
-                return container;
+                return container.Tags;
             return null;
         }
 
@@ -25,7 +29,7 @@ namespace NbtStudio
             return new NbtTagNode(this, obj);
         }
 
-        protected override NbtTag GetNbtTag() => WrappedObject.RootTag;
+        public override NbtTag GetNbtTag() => WrappedObject.RootTag;
 
         public override IconType GetIcon() => IconType.File;
         public override string PreviewName() => System.IO.Path.GetFileName(WrappedObject.Path);
