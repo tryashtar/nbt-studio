@@ -27,13 +27,13 @@ namespace NbtStudio
 
         public NbtTreeModel()
         {
-            UndoHistory = new UndoHistory(GetDescription);
+            //UndoHistory = new UndoHistory(GetDescription);
         }
 
         public bool HasUnsavedChanges => GetSaveables().Any(x => x.HasUnsavedChanges);
         public IEnumerable<ISaveable> GetSaveables()
         {
-
+            yield break;
         }
 
         public void Replace(params IHavePath[] paths)

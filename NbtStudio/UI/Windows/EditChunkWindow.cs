@@ -30,9 +30,10 @@ namespace NbtStudio.UI
 
         public static Chunk CreateChunk(IconSource source, RegionFile parent, NbtCompound data = null)
         {
-            var chunk = new Chunk(data);
-            var window = new EditChunkWindow(source, chunk, ChunkEditPurpose.Create);
-            return window.ShowDialog() == DialogResult.OK ? chunk : null;
+            return null;
+            //var chunk = new Chunk(data);
+            //var window = new EditChunkWindow(source, chunk, ChunkEditPurpose.Create);
+            //return window.ShowDialog() == DialogResult.OK ? chunk : null;
         }
 
         public static bool MoveChunk(IconSource source, ChunkEntry existing)

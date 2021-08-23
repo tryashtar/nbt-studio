@@ -80,7 +80,7 @@ namespace NbtStudio.UI
         {
             int xval = XBox.GetCoord();
             int zval = ZBox.GetCoord();
-            Chunk.Move(xval, zval);
+            //Chunk.Move(xval, zval);
         }
 
         private void SetColor(CoordCheckResult result)

@@ -24,7 +24,7 @@ namespace NbtStudio
 
         protected override IEnumerable<NbtTag> GetTypedChildren()
         {
-            return GetChunk().Data;
+            return GetChunk().Data.Tags;
         }
 
         public override bool HasChildren => !WrappedObject.IsLoaded || base.HasChildren;

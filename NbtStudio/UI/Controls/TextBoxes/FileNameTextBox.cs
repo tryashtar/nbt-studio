@@ -94,7 +94,7 @@ namespace NbtStudio.UI
             var name = GetName();
             if (name == Path.GetFileName(Item.Path))
                 return;
-            Item.Move(GetDestination(name));
+            //Item.Move(GetDestination(name));
         }
 
         private string GetDestination(string name)

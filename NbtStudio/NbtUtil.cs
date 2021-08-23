@@ -404,28 +404,28 @@ namespace NbtStudio
         public static void TransformInsert(NbtTag tag, NbtContainerTag destination, int index) => TransformInsert(new[] { tag }, destination, index);
         public static void TransformInsert(IEnumerable<NbtTag> tags, NbtContainerTag destination, int index)
         {
-            var adding = tags.ToList();
-            int original_index = index;
-            foreach (var tag in tags)
-            {
-                if (!destination.CanAdd(tag.TagType))
-                {
-                    adding.Remove(tag);
-                    continue;
-                }
-                if (tag.IsInside(destination) && original_index > tag.GetIndex())
-                    index--;
-            }
-            foreach (var tag in adding)
-            {
-                tag.Remove();
-            }
-            foreach (var tag in adding)
-            {
-                tag.Name = GetAutomaticName(tag, destination);
-                tag.InsertInto(destination, index);
-                index++;
-            }
+            //var adding = tags.ToList();
+            //int original_index = index;
+            //foreach (var tag in tags)
+            //{
+            //    if (!destination.CanAdd(tag.TagType))
+            //    {
+            //        adding.Remove(tag);
+            //        continue;
+            //    }
+            //    if (tag.IsInside(destination) && original_index > tag.GetIndex())
+            //        index--;
+            //}
+            //foreach (var tag in adding)
+            //{
+            //    tag.Remove();
+            //}
+            //foreach (var tag in adding)
+            //{
+            //    tag.Name = GetAutomaticName(tag, destination);
+            //    tag.InsertInto(destination, index);
+            //    index++;
+            //}
         }
 
         public static string GetAutomaticName(NbtTag tag, NbtContainerTag parent)

@@ -191,55 +191,56 @@ namespace NbtStudio.UI
 
         private ContextMenuStrip CreateContextMenu(TreeNodeAdvMouseEventArgs e)
         {
-            var menu = new ContextMenuStrip();
-            var obj = NbtTree.ModelNodeFromClick(e);
-            var root_items = new List<ToolStripItem>();
-            var node_items = new List<ToolStripItem>();
-            var file_items = new List<ToolStripItem>();
-            var nbt_items = new List<ToolStripItem>();
-            if (App.Tree.RootNodes.Contains(obj))
-                root_items.Add(new ToolStripMenuItem("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click));
-            if (e.Node.CanExpand)
-            {
-                if (e.Node.IsExpanded)
-                    node_items.Add(new ToolStripMenuItem("&Collapse", null, Collapse_Click));
-                else
-                    node_items.Add(new ToolStripMenuItem("&Expand All", null, ExpandAll_Click));
-                var children = NbtTree.AllChildren(e.Node);
-                if (children.All(x => x.IsSelected))
-                    node_items.Add(new ToolStripMenuItem("Dese&lect all Children", null, DeselectChildren_Click));
-                else
-                    node_items.Add(new ToolStripMenuItem("Se&lect all Children", null, SelectChildren_Click));
-            }
-            var saveable = obj.Get<ISaveable>();
-            if (saveable is not null && saveable.CanSave)
-                file_items.Add(new ToolStripMenuItem("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click));
-            if (obj.Get<IExportable>() is not null)
-                file_items.Add(new ToolStripMenuItem("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click));
-            var refresh = obj.Get<IRefreshable>();
-            if (refresh is not null && refresh.CanRefresh)
-                file_items.Add(new ToolStripMenuItem("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click));
-            var path = obj.Get<IHavePath>();
-            if (path is not null && path.Path is not null)
-                file_items.Add(new ToolStripMenuItem("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click));
-            var container = obj.GetNbtTag() as NbtContainerTag;
-            if (container is not null)
-            {
-                var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
-                bool single = ListUtils.ExactlyOne(addable);
-                var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
-                var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag_Click(x))).ToArray();
-                if (single)
-                    nbt_items.AddRange(items);
-                else
-                {
-                    var add = new ToolStripMenuItem("Add...");
-                    add.DropDownItems.AddRange(items);
-                    nbt_items.Add(add);
-                }
-            }
-            AddMenuSections(menu.Items, root_items, node_items, file_items, nbt_items);
-            return menu;
+            return null;
+            //var menu = new ContextMenuStrip();
+            //var obj = NbtTree.ModelNodeFromClick(e);
+            //var root_items = new List<ToolStripItem>();
+            //var node_items = new List<ToolStripItem>();
+            //var file_items = new List<ToolStripItem>();
+            //var nbt_items = new List<ToolStripItem>();
+            //if (App.Tree.RootNodes.Contains(obj))
+            //    root_items.Add(new ToolStripMenuItem("&Discard", IconSource.GetImage(IconType.Delete).Image, Discard_Click));
+            //if (e.Node.CanExpand)
+            //{
+            //    if (e.Node.IsExpanded)
+            //        node_items.Add(new ToolStripMenuItem("&Collapse", null, Collapse_Click));
+            //    else
+            //        node_items.Add(new ToolStripMenuItem("&Expand All", null, ExpandAll_Click));
+            //    var children = NbtTree.AllChildren(e.Node);
+            //    if (children.All(x => x.IsSelected))
+            //        node_items.Add(new ToolStripMenuItem("Dese&lect all Children", null, DeselectChildren_Click));
+            //    else
+            //        node_items.Add(new ToolStripMenuItem("Se&lect all Children", null, SelectChildren_Click));
+            //}
+            //var saveable = obj.Get<ISaveable>();
+            //if (saveable is not null && saveable.CanSave)
+            //    file_items.Add(new ToolStripMenuItem("&Save File", IconSource.GetImage(IconType.Save).Image, Save_Click));
+            //if (obj.Get<IExportable>() is not null)
+            //    file_items.Add(new ToolStripMenuItem("Save File &As", IconSource.GetImage(IconType.Save).Image, SaveAs_Click));
+            //var refresh = obj.Get<IRefreshable>();
+            //if (refresh is not null && refresh.CanRefresh)
+            //    file_items.Add(new ToolStripMenuItem("&Refresh", IconSource.GetImage(IconType.Refresh).Image, Refresh_Click));
+            //var path = obj.Get<IHavePath>();
+            //if (path is not null && path.Path is not null)
+            //    file_items.Add(new ToolStripMenuItem("&Open in Explorer", IconSource.GetImage(IconType.OpenFile).Image, OpenInExplorer_Click));
+            //var container = obj.GetNbtTag() as NbtContainerTag;
+            //if (container is not null)
+            //{
+            //    var addable = NbtUtil.NormalTagTypes().Where(x => container.CanAdd(x));
+            //    bool single = ListUtils.ExactlyOne(addable);
+            //    var display = single ? (Func<NbtTagType, string>)(x => $"Add {NbtUtil.TagTypeName(x)} Tag") : (x => $"{NbtUtil.TagTypeName(x)} Tag");
+            //    var items = addable.Select(x => new ToolStripMenuItem(display(x), NbtUtil.TagTypeImage(IconSource, x).Image, (s, ea) => AddTag_Click(x))).ToArray();
+            //    if (single)
+            //        nbt_items.AddRange(items);
+            //    else
+            //    {
+            //        var add = new ToolStripMenuItem("Add...");
+            //        add.DropDownItems.AddRange(items);
+            //        nbt_items.Add(add);
+            //    }
+            //}
+            //AddMenuSections(menu.Items, root_items, node_items, file_items, nbt_items);
+            //return menu;
         }
 
         private void AddMenuSections(ToolStripItemCollection collection, params IEnumerable<ToolStripItem>[] sources)
@@ -255,8 +256,8 @@ namespace NbtStudio.UI
 
         private void Discard_Click(object sender, EventArgs e)
         {
-            var selected_roots = NbtTree.SelectedModelNodes.Where(x => x.Parent is ModelRootNode);
-            Discard(selected_roots);
+            // var selected_roots = NbtTree.SelectedModelNodes.Where(x => x.Parent is ModelRootNode);
+            // Discard(selected_roots);
         }
 
         private void Collapse_Click(object sender, EventArgs e)
@@ -337,32 +338,33 @@ namespace NbtStudio.UI
 
             DropDownUndoHistory.Enabled = undo_history.Any();
             DropDownRedoHistory.Enabled = redo_history.Any();
-            ActionClearUndoHistory.Enabled = undo_history.Any() || redo_history.Any();
+            //ActionClearUndoHistory.Enabled = undo_history.Any() || redo_history.Any();
         }
 
         private void MenuFile_DropDownOpening(object sender, EventArgs e)
         {
-            ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
+            //ActionNewClipboard.Enabled = Clipboard.ContainsFileDropList() || Clipboard.ContainsText();
         }
 
         private ToolStripMenuItem RecentEntry(string path)
         {
-            bool directory = Directory.Exists(path);
-            Image image;
-            EventHandler click;
-            if (directory)
-            {
-                image = IconSource.GetImage(IconType.Folder).Image;
-                click = (s, e) => OpenFolder(path);
-            }
-            else
-            {
-                if (!File.Exists(path))
-                    return null;
-                image = IconSource.GetImage(IconType.File).Image;
-                click = (s, e) => OpenFiles(new[] { path });
-            }
-            return new ToolStripMenuItem(path, image, click);
+            return null;
+            //bool directory = Directory.Exists(path);
+            //Image image;
+            //EventHandler click;
+            //if (directory)
+            //{
+            //    image = IconSource.GetImage(IconType.Folder).Image;
+            //    click = (s, e) => OpenFolder(path);
+            //}
+            //else
+            //{
+            //    if (!File.Exists(path))
+            //        return null;
+            //    image = IconSource.GetImage(IconType.File).Image;
+            //    click = (s, e) => OpenFiles(new[] { path });
+            //}
+            //return new ToolStripMenuItem(path, image, click);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

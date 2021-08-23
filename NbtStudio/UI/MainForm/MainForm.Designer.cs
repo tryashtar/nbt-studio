@@ -108,7 +108,6 @@
             this.NbtTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.NbtTree_ItemDrag);
             this.NbtTree.NodeMouseClick += new System.EventHandler<Aga.Controls.Tree.TreeNodeAdvMouseEventArgs>(this.NbtTree_NodeMouseClick);
             this.NbtTree.NodeMouseDoubleClick += new System.EventHandler<Aga.Controls.Tree.TreeNodeAdvMouseEventArgs>(this.NbtTree_NodeMouseDoubleClick);
-            this.NbtTree.SelectionChanged += new System.EventHandler(this.NbtTree_SelectionChanged);
             this.NbtTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragDrop);
             this.NbtTree.DragOver += new System.Windows.Forms.DragEventHandler(this.NbtTree_DragOver);
             // 
@@ -126,7 +125,6 @@
             this.Text = "NBT Studio";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();
             this.ResumeLayout(false);
