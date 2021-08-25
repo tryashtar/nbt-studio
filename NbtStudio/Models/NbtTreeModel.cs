@@ -38,13 +38,14 @@ namespace NbtStudio
 
         public void Replace(params IHavePath[] paths)
         {
+            NodesRemoved?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, Roots.Count).ToArray(), Roots.ToArray()));
             Roots.Clear();
             Import(paths);
         }
 
         public void Import(params IHavePath[] paths)
         {
-            Roots.AddRange(paths.Select(MakeNode));
+            ImportNodes(paths.Select(MakeNode).ToArray());
         }
 
         public void ImportNodes(params Node[] nodes)
@@ -52,6 +53,7 @@ namespace NbtStudio
             if (nodes.Any(x => x.Parent is not null))
                 throw new InvalidOperationException($"One or more specified nodes already have a parent.");
             Roots.AddRange(nodes);
+            NodesInserted?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, nodes.Length).ToArray(), nodes));
         }
 
         private Node MakeNode(IHavePath item)

@@ -308,7 +308,7 @@ namespace NbtStudio.UI
                 var button = DualMenuItem.SingleButton(
                     hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
                     icon: NbtUtil.TagIconType(type));
-                //button.Click += (s, e) => AddTag(type);
+                button.Click += (s, e) => Actions.AddTag(type);
                 buttons.Add(button);
                 ButtonsCollection.Add(button);
             }

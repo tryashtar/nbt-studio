@@ -146,6 +146,26 @@ namespace NbtStudio.UI
             };
         }
 
+        private TagCreator AddTagWindow(NbtTagType type)
+        {
+            Func<NbtContainerTag, NbtTag> simple_method;
+            if (NbtUtil.IsArrayType(type))
+                simple_method = destination => EditHexWindow.CreateTag(GetIcons(), type, destination);
+            else
+                simple_method = destination => EditTagWindow.CreateTag(GetIcons(), type, destination);
+            return destination => new Failable<NbtTag>(() => simple_method(destination), "Creating tag");
+        }
+
+        public NbtTag AddTag(NbtTagType type)
+        {
+            return new AddTagAction()
+            {
+                TagSource = AddTagWindow(type),
+                ErrorHandler = AbstractAction.Throw(),
+                SelectedNodes = GetView().SelectedModelNodes
+            }.AddTag();
+        }
+
         public IEnumerable<IHavePath> New()
         {
             return new OpenFileAction(new NbtFile())
@@ -280,10 +300,7 @@ namespace NbtStudio.UI
         {
             var text = Clipboard.GetText();
             var tag = ParseSnbt(text);
-            yield return new Failable<IFile>(() =>
-            {
-                return new NbtFile(tag.Result);
-            }, "Loading SNBT");
+            yield return tag.Then(x => (IFile)new NbtFile(x));
         }
 
         public void Edit()

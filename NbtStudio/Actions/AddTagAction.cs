@@ -7,27 +7,29 @@ namespace NbtStudio
 {
     public class AddTagAction
     {
-        public TagGetter TagSource;
+        public TagCreator TagSource;
         public ErrorHandler ErrorHandler;
         public IEnumerable<Node> SelectedNodes;
 
         public NbtTag AddTag()
         {
-            var tag = TagSource();
+            var containers = SelectedNodes.Select(x => x.GetNbtTag()).Where(x => x is not null).OfType<NbtContainerTag>();
+            if (!containers.Any())
+                return null;
+            var tag = TagSource(containers.First());
             if (tag.Failed)
             {
                 ErrorHandler(tag);
                 return null;
             }
+            if (tag.Result == null)
+                return null;
             bool has_original = true;
-            foreach (var node in SelectedNodes)
+            foreach (var container in containers)
             {
-                if (node.GetNbtTag() is NbtContainerTag container)
-                {
-                    var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
-                    adding.AddTo(container);
-                    has_original = false;
-                }
+                var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
+                adding.AddTo(container);
+                has_original = false;
             }
             return tag.Result;
         }

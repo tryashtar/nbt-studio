@@ -15,6 +15,7 @@ namespace NbtStudio
     public delegate bool DeleteFileWarningHandler(IEnumerable<IHavePath> files);
     public delegate NbtTreeModel TreeGetter();
     public delegate IFailable<NbtTag> TagGetter();
+    public delegate IFailable<NbtTag> TagCreator(NbtContainerTag pending_destination);
     public delegate IEnumerable<IFailable<IHavePath>> FilesGetter();
     public delegate LoadFileAttempts<IHavePath> PathsGetter();
     public delegate void PathsErrorHandler(LoadFileAttempts<IHavePath> attempts);
