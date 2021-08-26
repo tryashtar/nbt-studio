@@ -42,14 +42,29 @@ namespace NbtStudio
         // start off true since child nodes aren't ready yet
         private bool IsDirty = true;
 
+        public delegate void NodeStructureChangedEvent(ChildrenChangedReport report);
+        public event NodeStructureChangedEvent SomethingChanged;
+        protected void CascadeChanges(ChildrenChangedReport report)
+        {
+            Node node = this;
+            while (node != null)
+            {
+                node.SomethingChanged?.Invoke(report);
+                node = node.Parent;
+            }
+        }
+
         public (string name, string value) Preview()
         {
             return (PreviewName(), PreviewValue());
         }
 
+        // to do: ehh...
+        public static readonly HashSet<Node> DirtyNodes = new();
         protected void MarkDirty()
         {
             IsDirty = true;
+            DirtyNodes.Add(this);
         }
 
         protected abstract IEnumerable<object> GetChildren();
@@ -59,15 +74,16 @@ namespace NbtStudio
         public abstract string PreviewValue();
         public abstract IconType GetIcon();
 
-        private void RefreshChildren()
+        public ChildrenChangedReport RefreshChildren()
         {
             // make sure to reuse existing nodes
             var new_nodes = GetChildren().Select(x => KeyValuePair.Create(x, GetOrCreateChild(x))).ToList();
+            var report = new ChildrenChangedReport(this, ChildNodes, new_nodes);
             // clear the parent, might not be necessary but could help the GC
-            var removing_nodes = ChildNodes.Values.Except(new_nodes.Select(x => x.Value));
-            foreach (var item in removing_nodes)
+            foreach (var item in report.RemovedChildren)
             {
-                item.Parent = null;
+                item.Value.Parent = null;
+                DirtyNodes.Remove(item.Value);
             }
             ChildNodes.Clear();
             DescendantsCount = 0;
@@ -77,6 +93,9 @@ namespace NbtStudio
                 ChildNodes.Add(node);
             }
             IsDirty = false;
+            DirtyNodes.Remove(this);
+            CascadeChanges(report);
+            return report;
         }
 
         private Node GetOrCreateChild(object obj)

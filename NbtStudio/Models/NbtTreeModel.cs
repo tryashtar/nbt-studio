@@ -39,6 +39,7 @@ namespace NbtStudio
         public void Replace(params IHavePath[] paths)
         {
             NodesRemoved?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, Roots.Count).ToArray(), Roots.ToArray()));
+            UnsubscribeNodeEvents(Roots);
             Roots.Clear();
             Import(paths);
         }
@@ -53,7 +54,43 @@ namespace NbtStudio
             if (nodes.Any(x => x.Parent is not null))
                 throw new InvalidOperationException($"One or more specified nodes already have a parent.");
             Roots.AddRange(nodes);
+            SubscribeNodeEvents(nodes);
             NodesInserted?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, nodes.Length).ToArray(), nodes));
+        }
+
+        private void SubscribeNodeEvents(IEnumerable<Node> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                node.SomethingChanged += Node_SomethingChanged;
+            }
+        }
+
+        private void UnsubscribeNodeEvents(IEnumerable<Node> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                node.SomethingChanged -= Node_SomethingChanged;
+            }
+        }
+
+        // to do: ehh...
+        public void Refresh()
+        {
+            foreach (var node in Node.DirtyNodes)
+            {
+                node.RefreshChildren();
+            }
+        }
+
+        private void Node_SomethingChanged(ChildrenChangedReport report)
+        {
+            var path = report.Node.Path;
+            StructureChanged?.Invoke(this, new TreePathEventArgs(path));
+            //NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+            //NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
+            if (report.Node.Parent != null)
+                NodesChanged?.Invoke(this, new TreeModelEventArgs(report.Node.Parent.Path, new object[] { report.Node }));
         }
 
         private Node MakeNode(IHavePath item)
@@ -96,27 +133,6 @@ namespace NbtStudio
                     index++;
                 return (parent, index);
             }
-        }
-
-        public void NotifyNodesAdded(TreePath path, Node[] nodes, int[] indices)
-        {
-            NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-        }
-
-        public void NotifyNodesRemoved(TreePath path, Node[] nodes, int[] indices)
-        {
-            NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-        }
-
-        public void NotifyNodeChanged(Node node)
-        {
-            var path = node.Parent?.Path ?? new TreePath();
-            NodesChanged?.Invoke(this, new TreeModelEventArgs(path, new object[] { node }));
-        }
-
-        public void NotifyNodesReordered(TreePath path)
-        {
-            StructureChanged?.Invoke(this, new TreePathEventArgs(path));
         }
 
         IEnumerable ITreeModel.GetChildren(TreePath treePath) => GetChildren(treePath);

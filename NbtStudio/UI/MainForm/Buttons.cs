@@ -308,7 +308,11 @@ namespace NbtStudio.UI
                 var button = DualMenuItem.SingleButton(
                     hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
                     icon: NbtUtil.TagIconType(type));
-                button.Click += (s, e) => Actions.AddTag(type);
+                button.Click += (s, e) =>
+                {
+                    Actions.AddTag(type);
+                    App.Tree.Refresh();
+                };
                 buttons.Add(button);
                 ButtonsCollection.Add(button);
             }
@@ -335,7 +339,11 @@ namespace NbtStudio.UI
         {
             var button = new DualMenuItem(text, hover, icon, shortcut ?? Keys.None);
             if (action != null)
-                button.Click += (s, e) => action();
+                button.Click += (s, e) =>
+                {
+                    action();
+                    App.Tree.Refresh();
+                };
             if (strip != null)
                 button.AddToToolStrip(strip);
             if (menu != null)
