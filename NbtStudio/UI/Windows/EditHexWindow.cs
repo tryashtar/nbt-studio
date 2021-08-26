@@ -61,16 +61,10 @@ namespace NbtStudio.UI
                 HexBox.Select();
         }
 
-        public static NbtTag CreateTag(IconSource source, NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
+        public static NbtTag CreateTag(IconSource source, NbtTagType type, NbtContainerTag parent)
         {
             bool has_name = parent is NbtCompound;
             var tag = NbtUtil.CreateTag(type);
-
-            if (bypass_window)
-            {
-                tag.Name = NbtUtil.GetAutomaticName(tag, parent);
-                return tag;
-            }
             var window = new EditHexWindow(source, tag, parent, has_name, EditPurpose.Create);
             return window.ShowDialog() == DialogResult.OK ? tag : null;
         }

@@ -149,10 +149,22 @@ namespace NbtStudio.UI
         private TagCreator AddTagWindow(NbtTagType type)
         {
             Func<NbtContainerTag, NbtTag> simple_method;
-            if (NbtUtil.IsArrayType(type))
-                simple_method = destination => EditHexWindow.CreateTag(GetIcons(), type, destination);
+            if (Control.ModifierKeys == Keys.Shift)
+            {
+                simple_method = destination =>
+                {
+                    var tag = NbtUtil.CreateTag(type);
+                    tag.Name = NbtUtil.GetAutomaticName(tag, destination);
+                    return tag;
+                };
+            }
             else
-                simple_method = destination => EditTagWindow.CreateTag(GetIcons(), type, destination);
+            {
+                if (NbtUtil.IsArrayType(type))
+                    simple_method = destination => EditHexWindow.CreateTag(GetIcons(), type, destination);
+                else
+                    simple_method = destination => EditTagWindow.CreateTag(GetIcons(), type, destination);
+            }
             return destination => new Failable<NbtTag>(() => simple_method(destination), "Creating tag");
         }
 

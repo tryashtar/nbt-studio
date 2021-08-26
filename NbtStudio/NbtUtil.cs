@@ -37,48 +37,42 @@ namespace NbtStudio
         // excludes lists, compounds, and arrays
         public static bool IsValueType(NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.Byte:
-                case NbtTagType.Short:
-                case NbtTagType.Int:
-                case NbtTagType.Long:
-                case NbtTagType.Float:
-                case NbtTagType.Double:
-                case NbtTagType.String:
-                    return true;
-                default:
-                    return false;
-            }
+                NbtTagType.Byte or
+                NbtTagType.Short or
+                NbtTagType.Int or
+                NbtTagType.Long or
+                NbtTagType.Float or
+                NbtTagType.Double or
+                NbtTagType.String => true,
+                _ => false,
+            };
         }
 
         public static bool IsNumericType(NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.Byte:
-                case NbtTagType.Short:
-                case NbtTagType.Int:
-                case NbtTagType.Long:
-                case NbtTagType.Float:
-                case NbtTagType.Double:
-                    return true;
-                default:
-                    return false;
-            }
+                NbtTagType.Byte or
+                NbtTagType.Short or
+                NbtTagType.Int or
+                NbtTagType.Long or
+                NbtTagType.Float or
+                NbtTagType.Double => true,
+                _ => false,
+            };
         }
 
         public static bool IsArrayType(NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.ByteArray:
-                case NbtTagType.IntArray:
-                case NbtTagType.LongArray:
-                    return true;
-                default:
-                    return false;
-            }
+                NbtTagType.ByteArray or
+                NbtTagType.IntArray or
+                NbtTagType.LongArray => true,
+                _ => false,
+            };
         }
 
         public static object GetValue(NbtTag tag)
@@ -106,7 +100,7 @@ namespace NbtStudio
             else if (tag is NbtCompound tag_compound)
                 return tag_compound.Tags;
             else if (tag is NbtList tag_list)
-                return tag_list;
+                return tag_list.Tags;
             throw new ArgumentException($"Can't get value from {tag.TagType}");
         }
 
@@ -184,58 +178,37 @@ namespace NbtStudio
 
         public static object ParseValue(string value, NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.Byte:
-                    return (byte)SnbtParser.ParseByte(value);
-                case NbtTagType.Short:
-                    return short.Parse(value);
-                case NbtTagType.Int:
-                    return int.Parse(value);
-                case NbtTagType.Long:
-                    return long.Parse(value);
-                case NbtTagType.Float:
-                    return DataUtils.ParseFloat(value);
-                case NbtTagType.Double:
-                    return DataUtils.ParseDouble(value);
-                case NbtTagType.String:
-                    return value;
-                default:
-                    return null;
-            }
+                NbtTagType.Byte => (byte)SnbtParser.ParseByte(value),
+                NbtTagType.Short => short.Parse(value),
+                NbtTagType.Int => int.Parse(value),
+                NbtTagType.Long => long.Parse(value),
+                NbtTagType.Float => DataUtils.ParseFloat(value),
+                NbtTagType.Double => DataUtils.ParseDouble(value),
+                NbtTagType.String => value,
+                _ => null,
+            };
         }
 
         public static NbtTag CreateTag(NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.Byte:
-                    return new NbtByte();
-                case NbtTagType.Short:
-                    return new NbtShort();
-                case NbtTagType.Int:
-                    return new NbtInt();
-                case NbtTagType.Long:
-                    return new NbtLong();
-                case NbtTagType.Float:
-                    return new NbtFloat();
-                case NbtTagType.Double:
-                    return new NbtDouble();
-                case NbtTagType.String:
-                    return new NbtString();
-                case NbtTagType.ByteArray:
-                    return new NbtByteArray();
-                case NbtTagType.IntArray:
-                    return new NbtIntArray();
-                case NbtTagType.LongArray:
-                    return new NbtLongArray();
-                case NbtTagType.Compound:
-                    return new NbtCompound();
-                case NbtTagType.List:
-                    return new NbtList();
-                default:
-                    throw new ArgumentException($"Can't create a tag from {type}");
-            }
+                NbtTagType.Byte => new NbtByte(),
+                NbtTagType.Short => new NbtShort(),
+                NbtTagType.Int => new NbtInt(),
+                NbtTagType.Long => new NbtLong(),
+                NbtTagType.Float => new NbtFloat(),
+                NbtTagType.Double => new NbtDouble(),
+                NbtTagType.String => new NbtString(),
+                NbtTagType.ByteArray => new NbtByteArray(),
+                NbtTagType.IntArray => new NbtIntArray(),
+                NbtTagType.LongArray => new NbtLongArray(),
+                NbtTagType.Compound => new NbtCompound(),
+                NbtTagType.List => new NbtList(),
+                _ => throw new ArgumentException($"Can't create a tag from {type}"),
+            };
         }
 
         public static (string min, string max) MinMaxFor(NbtTagType type)

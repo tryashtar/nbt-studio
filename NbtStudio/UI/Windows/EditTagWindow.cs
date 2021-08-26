@@ -71,19 +71,14 @@ namespace NbtStudio.UI
             }
         }
 
-        public static NbtTag CreateTag(IconSource source, NbtTagType type, NbtContainerTag parent, bool bypass_window = false)
+        public static NbtTag CreateTag(IconSource source, NbtTagType type, NbtContainerTag parent)
         {
             bool has_name = parent is NbtCompound;
             bool has_value = NbtUtil.IsValueType(type);
 
             var tag = NbtUtil.CreateTag(type);
 
-            if (bypass_window)
-            {
-                tag.Name = NbtUtil.GetAutomaticName(tag, parent);
-                return tag;
-            }
-            else if (has_name || has_value)
+            if (has_name || has_value)
             {
                 var window = new EditTagWindow(source, tag, parent, has_name, has_value, EditPurpose.Create);
                 return window.ShowDialog() == DialogResult.OK ? tag : null;
