@@ -10,7 +10,7 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
-    public class RegionFileNode : Node<RegionFile, ChunkEntry>
+    public class RegionFileNode : FileNode<RegionFile, ChunkEntry>
     {
         public RegionFileNode(RegionFile file) : base(file) { }
 
@@ -25,7 +25,6 @@ namespace NbtStudio
         }
 
         public override IconType GetIcon() => IconType.Region;
-        public override string PreviewName() => System.IO.Path.GetFileName(WrappedObject.Path);
         public override string PreviewValue() => $"[{StringUtils.Pluralize(WrappedObject.ChunkCount, "chunk")}]";
     }
 }

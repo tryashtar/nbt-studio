@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace NbtStudio
 {
-    public class NbtFileNode : Node<NbtFile, NbtTag>
+    public class NbtFileNode : FileNode<NbtFile, NbtTag>
     {
         public NbtFileNode(NbtFile wrapped) : base(wrapped)
         {
@@ -32,7 +32,6 @@ namespace NbtStudio
         public override NbtTag GetNbtTag() => WrappedObject.RootTag;
 
         public override IconType GetIcon() => IconType.File;
-        public override string PreviewName() => System.IO.Path.GetFileName(WrappedObject.Path);
         public override string PreviewValue() => NbtUtil.PreviewNbtValue(WrappedObject.RootTag);
     }
 }

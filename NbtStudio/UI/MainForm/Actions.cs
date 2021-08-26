@@ -177,7 +177,7 @@ namespace NbtStudio.UI
 
         public IEnumerable<IHavePath> NewRegion()
         {
-            return new OpenFileAction(RegionFile.Empty())
+            return new OpenFileAction(new RegionFile())
             {
                 TreeGetter = () => App.Tree,
                 UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
@@ -257,7 +257,7 @@ namespace NbtStudio.UI
 
         public IEnumerable<IHavePath> ImportNewRegion()
         {
-            return new OpenFileAction(RegionFile.Empty())
+            return new OpenFileAction(new RegionFile())
             {
                 TreeGetter = () => App.Tree
             }.Import();

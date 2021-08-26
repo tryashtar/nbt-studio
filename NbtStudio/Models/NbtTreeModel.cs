@@ -53,9 +53,10 @@ namespace NbtStudio
         {
             if (nodes.Any(x => x.Parent is not null))
                 throw new InvalidOperationException($"One or more specified nodes already have a parent.");
+            int roots_length = Roots.Count;
             Roots.AddRange(nodes);
             SubscribeNodeEvents(nodes);
-            NodesInserted?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, nodes.Length).ToArray(), nodes));
+            NodesInserted?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(roots_length, nodes.Length).ToArray(), nodes));
         }
 
         private void SubscribeNodeEvents(IEnumerable<Node> nodes)

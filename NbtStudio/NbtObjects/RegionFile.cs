@@ -31,7 +31,9 @@ namespace NbtStudio
         public event Action OnSaved;
         private ChunkEntry[,] ChunkEntries;
         public string Path { get; private set; }
-        public bool HasUnsavedChanges { get; private set; } = false;
+        private bool UnsavedStructureChanges = false;
+        private bool UnsavedChunkChanges = false;
+        public bool HasUnsavedChanges => UnsavedStructureChanges || UnsavedChunkChanges;
         public RegionFile(string path)
         {
             Path = path;
@@ -44,7 +46,7 @@ namespace NbtStudio
             using var stream = GetStream();
             var locations = IOUtils.ReadBytes(stream, 4096);
             // reading timestamps isn't important
-            // var timestamps = IOUtils.ReadBytes(stream, 4096);
+            //var timestamps = IOUtils.ReadBytes(stream, 4096);
             ChunkCount = 0;
             for (int z = 0; z < ChunkEntries.GetLength(1); z++)
             {
@@ -67,18 +69,15 @@ namespace NbtStudio
             }
             if (ChunkCount == 0)
                 throw new FormatException($"Region doesn't contain any chunks");
+            UnsavedStructureChanges = false;
         }
 
-        private RegionFile()
+        public RegionFile()
         {
             ChunkEntries = new ChunkEntry[ChunkXDimension, ChunkZDimension];
             Path = null;
             ChunkCount = 0;
-        }
-
-        public static RegionFile Empty()
-        {
-            return new RegionFile();
+            UnsavedStructureChanges = true;
         }
 
         public static Failable<RegionFile> TryCreate(string path)
@@ -91,7 +90,7 @@ namespace NbtStudio
             return File.OpenRead(Path);
         }
 
-        public IEnumerable<ChunkEntry> AllChunks => ChunkEntries.Cast<ChunkEntry>();
+        public IEnumerable<ChunkEntry> AllChunks => ChunkEntries.Cast<ChunkEntry>().Where(x => x is not null);
 
         public ChunkEntry GetChunk(int x, int z)
         {
@@ -108,23 +107,6 @@ namespace NbtStudio
                         yield return (x, z);
                 }
             }
-        }
-
-        public void RemoveChunk(int x, int z)
-        {
-            if (ChunkEntries[x, z] is not null)
-            {
-                ChunkEntries[x, z] = null;
-                ChunkCount--;
-            }
-        }
-
-        public void AddChunk(Chunk chunk, int x, int z)
-        {
-            if (ChunkEntries[x, z] is not null)
-                throw new InvalidOperationException($"There is already a chunk at coordinates {x}, {z}");
-            ChunkEntries[x, z] = new ChunkEntry(this, x, z, chunk);
-            ChunkCount++;
         }
 
         private static int ChunkDataLocation(int x, int z)
@@ -173,6 +155,7 @@ namespace NbtStudio
                     action(writer);
                 }
             }
+            UnsavedStructureChanges = false;
             OnSaved?.Invoke();
         }
 
