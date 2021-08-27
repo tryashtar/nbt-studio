@@ -8,13 +8,16 @@ namespace NbtStudio.UI
 {
     public partial class EditTagWindow : Form
     {
+        public readonly NbtTag AffectedTag;
         private readonly bool SettingName;
         private readonly bool SettingValue;
+        public ICommand CommandResult;
 
         private EditTagWindow(IconSource source, NbtTag tag, NbtContainerTag parent, bool set_name, bool set_value, EditPurpose purpose)
         {
             InitializeComponent();
 
+            AffectedTag = tag;
             NameBox.SetTags(tag, parent);
             ValueBox.SetTags(tag, parent, fill_current_value: purpose != EditPurpose.Create);
 
@@ -81,13 +84,18 @@ namespace NbtStudio.UI
             if (has_name || has_value)
             {
                 var window = new EditTagWindow(source, tag, parent, has_name, has_value, EditPurpose.Create);
-                return window.ShowDialog() == DialogResult.OK ? tag : null;
+                if (window.ShowDialog() == DialogResult.OK)
+                {
+                    window.CommandResult?.Execute();
+                    return tag;
+                }
+                return null;
             }
             else
                 return tag; // no customization required, example: adding a compound to a list
         }
 
-        public static bool ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
+        public static ICommand ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
@@ -98,22 +106,25 @@ namespace NbtStudio.UI
             if (has_name || has_value)
             {
                 var window = new EditTagWindow(source, existing, parent, has_name, has_value, purpose);
-                return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
+                if (window.ShowDialog() == DialogResult.OK)
+                    return window.CommandResult;
             }
-            return false;
+            return null;
         }
 
         private void Confirm()
         {
-            if (TryModify())
+            if (TryModify(out ICommand result))
             {
                 DialogResult = DialogResult.OK;
+                CommandResult = result;
                 Close();
             }
         }
 
-        private bool TryModify()
+        private bool TryModify(out ICommand command)
         {
+            command = null;
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
             if (SettingName && !NameBox.CheckName())
                 return false;
@@ -121,10 +132,12 @@ namespace NbtStudio.UI
             if (SettingValue && !ValueBox.CheckValue(out value))
                 return false;
 
+            var commands = new ICommand[2];
             if (SettingName)
-                NameBox.ApplyName();
+                commands[0] = NameBox.ApplyName();
             if (SettingValue)
-                ValueBox.ApplyValue(value);
+                commands[1] = ValueBox.ApplyValue(value);
+            command = CommandExtensions.MergeNullable($"Edit {CommandExtensions.Describe(AffectedTag)}", false, commands);
             return true;
         }
 

@@ -168,13 +168,24 @@ namespace NbtStudio.UI
             return destination => new Failable<NbtTag>(() => simple_method(destination), "Creating tag");
         }
 
+        public void Undo()
+        {
+            App.UndoHistory.Undo();
+        }
+
+        public void Redo()
+        {
+            App.UndoHistory.Redo();
+        }
+
         public NbtTag AddTag(NbtTagType type)
         {
             return new AddTagAction()
             {
                 TagSource = AddTagWindow(type),
                 ErrorHandler = AbstractAction.Throw(),
-                SelectedNodes = GetView().SelectedModelNodes
+                SelectedNodes = GetView().SelectedModelNodes,
+                UndoHistory = App.UndoHistory
             }.AddTag();
         }
 
@@ -338,10 +349,11 @@ namespace NbtStudio.UI
         public void EditOrRename(bool edit, params Node[] nodes)
         {
             var purpose = edit ? EditPurpose.EditValue : EditPurpose.Rename;
-            Action<IEnumerable<NbtTag>> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(Icons, x) : x => BulkEditWindow.BulkRename(Icons, x);
+            Func<IEnumerable<NbtTag>, ICommand> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(Icons, x) : x => BulkEditWindow.BulkRename(Icons, x);
             var action = new EditorAction()
             {
-                Nodes = nodes
+                Nodes = nodes,
+                UndoHistory = App.UndoHistory
             };
             // hex editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(

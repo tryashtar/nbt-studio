@@ -10,6 +10,7 @@ namespace NbtStudio
         public TagCreator TagSource;
         public ErrorHandler ErrorHandler;
         public IEnumerable<Node> SelectedNodes;
+        public UndoHistory UndoHistory;
 
         public NbtTag AddTag()
         {
@@ -28,7 +29,7 @@ namespace NbtStudio
             foreach (var container in containers)
             {
                 var adding = has_original ? tag.Result : (NbtTag)tag.Result.Clone();
-                adding.AddTo(container);
+                UndoHistory.PerformAction(new MoveCommand(adding, container));
                 has_original = false;
             }
             return tag.Result;

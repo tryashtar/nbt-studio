@@ -10,24 +10,22 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
-    public class ChangeValueCommand : ICommand
+    public class ResetValueCommand : ICommand
     {
         public readonly NbtTag Tag;
         private object OriginalValue;
-        public readonly object Value;
 
-        public string Description => $"Change value of {CommandExtensions.Describe(Tag)} from {OriginalValue} to {Value}";
+        public string Description => $"Reset value of {CommandExtensions.Describe(Tag)}";
 
-        public ChangeValueCommand(NbtTag tag, object value)
+        public ResetValueCommand(NbtTag tag)
         {
             Tag = tag;
-            Value = value;
         }
 
         public void Execute()
         {
             OriginalValue = NbtUtil.GetValue(Tag);
-            NbtUtil.SetValue(Tag, Value);
+            NbtUtil.ResetValue(Tag);
         }
 
         public void Undo()

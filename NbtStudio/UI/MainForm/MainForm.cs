@@ -20,7 +20,7 @@ namespace NbtStudio.UI
         private IconSource IconSource;
         private readonly Studio App;
         private readonly Updater UpdateChecker = new();
-        private UndoHistory UndoHistory => App.Tree.UndoHistory;
+        private UndoHistory UndoHistory => App.UndoHistory;
 
         public readonly MainFormActions Actions;
 

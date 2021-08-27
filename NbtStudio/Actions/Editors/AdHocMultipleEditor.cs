@@ -14,7 +14,7 @@ namespace NbtStudio
     public class AdHocMultipleEditor<T> : TypedEditor<T> where T : Node
     {
         public delegate bool EditCheck(IEnumerable<T> nodes);
-        public delegate void EditDo(IEnumerable<T> nodes);
+        public delegate ICommand EditDo(IEnumerable<T> nodes);
 
         private readonly EditCheck Check;
         private readonly EditDo Do;
@@ -30,9 +30,9 @@ namespace NbtStudio
             return Check(nodes);
         }
 
-        public override void Edit(IEnumerable<T> nodes)
+        public override ICommand Edit(IEnumerable<T> nodes)
         {
-            Do(nodes);
+            return Do(nodes);
         }
     }
 }

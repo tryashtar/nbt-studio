@@ -93,13 +93,14 @@ namespace NbtStudio.UI
             return valid;
         }
 
-        public void ApplyName()
+        public ICommand ApplyName()
         {
             var name = GetName();
             if (name == "")
                 name = null;
             if (NbtTag.Name != name)
-                NbtTag.Name = name;
+                return new RenameCommand(NbtTag, name);
+            return null;
         }
 
         public enum NameCheckResult

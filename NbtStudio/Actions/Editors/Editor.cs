@@ -13,6 +13,6 @@ namespace NbtStudio
     public abstract class Editor
     {
         public abstract bool CanEdit(IEnumerable<Node> nodes);
-        public abstract void Edit(IEnumerable<Node> nodes);
+        public abstract ICommand Edit(IEnumerable<Node> nodes);
     }
 }

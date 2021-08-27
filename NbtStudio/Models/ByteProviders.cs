@@ -60,6 +60,7 @@ namespace NbtStudio
         IEnumerable<byte> CurrentBytes { get; }
         void WriteBytes(long initial_index, IEnumerable<byte> bytes);
         void SetBytes(IEnumerable<byte> bytes);
+        ICommand Apply();
     }
 
     // base implementation that handles all kinds of tags
@@ -79,7 +80,7 @@ namespace NbtStudio
         public event EventHandler Changed;
 
         protected abstract IEnumerable<byte> GetBytesFromTag();
-        protected abstract void SetBytesToTag(List<byte> bytes);
+        protected abstract ICommand SetBytesToTag(List<byte> bytes);
         public abstract int BytesPerValue { get; }
 
         protected void OnLengthChanged()
@@ -96,8 +97,16 @@ namespace NbtStudio
         public long Length => Bytes.Count;
         public void ApplyChanges()
         {
-            SetBytesToTag(Bytes);
+            Apply().Execute();
+#if DEBUG
+            Console.WriteLine("ApplyChanges() called, that is probably bad!");
+#endif            
+        }
+
+        public ICommand Apply()
+        {
             HasChanged = false;
+            return SetBytesToTag(Bytes);
         }
 
         public void DeleteBytes(long index, long length)
@@ -166,9 +175,9 @@ namespace NbtStudio
             return Tag.Value;
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
-            Tag.Value = bytes.ToArray();
+            return new ChangeValueCommand(Tag, bytes.ToArray());
         }
     }
 
@@ -183,9 +192,9 @@ namespace NbtStudio
             return DataUtils.ToByteArray(Tag.Value);
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
-            Tag.Value = DataUtils.ToIntArray(bytes.ToArray());
+            return new ChangeValueCommand(Tag, DataUtils.ToIntArray(bytes.ToArray()));
         }
     }
 
@@ -200,9 +209,9 @@ namespace NbtStudio
             return DataUtils.ToByteArray(Tag.Value);
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
-            Tag.Value = DataUtils.ToLongArray(bytes.ToArray());
+            return new ChangeValueCommand(Tag, DataUtils.ToLongArray(bytes.ToArray()));
         }
     }
 
@@ -222,10 +231,12 @@ namespace NbtStudio
             return Tag.Tags.Cast<NbtByte>().Select(x => x.Value);
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
-            Tag.Clear();
-            Tag.AddRange(bytes.Select(x => new NbtByte(x)));
+            return new MergedCommand($"Replace byte tags of {CommandExtensions.Describe(Tag)}",
+                new ClearCommand(Tag),
+                new AddRangeCommand(Tag, bytes.Select(x => new NbtByte(x)))
+            );
         }
     }
 
@@ -240,11 +251,13 @@ namespace NbtStudio
             return DataUtils.ToByteArray(shorts.ToArray());
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
             var shorts = DataUtils.ToShortArray(bytes.ToArray());
-            Tag.Clear();
-            Tag.AddRange(shorts.Select(x => new NbtShort(x)));
+            return new MergedCommand($"Replace short tags of {CommandExtensions.Describe(Tag)}",
+                new ClearCommand(Tag),
+                new AddRangeCommand(Tag, shorts.Select(x => new NbtShort(x)))
+            );
         }
     }
 
@@ -259,11 +272,13 @@ namespace NbtStudio
             return DataUtils.ToByteArray(ints.ToArray());
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
             var ints = DataUtils.ToIntArray(bytes.ToArray());
-            Tag.Clear();
-            Tag.AddRange(ints.Select(x => new NbtInt(x)));
+            return new MergedCommand($"Replace int tags of {CommandExtensions.Describe(Tag)}",
+                new ClearCommand(Tag),
+                new AddRangeCommand(Tag, ints.Select(x => new NbtInt(x)))
+            );
         }
     }
 
@@ -278,11 +293,13 @@ namespace NbtStudio
             return DataUtils.ToByteArray(longs.ToArray());
         }
 
-        protected override void SetBytesToTag(List<byte> bytes)
+        protected override ICommand SetBytesToTag(List<byte> bytes)
         {
             var longs = DataUtils.ToLongArray(bytes.ToArray());
-            Tag.Clear();
-            Tag.AddRange(longs.Select(x => new NbtLong(x)));
+            return new MergedCommand($"Replace long tags of {CommandExtensions.Describe(Tag)}",
+                new ClearCommand(Tag),
+                new AddRangeCommand(Tag, longs.Select(x => new NbtLong(x)))
+            );
         }
     }
 }

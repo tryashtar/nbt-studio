@@ -15,6 +15,7 @@ namespace NbtStudio.UI
         private readonly List<NbtTag> ChangedTags = new();
         private int ChangingCount = 0;
         private readonly ColumnConsistinator Consistinator;
+        public ICommand CommandResult;
 
         private BulkEditWindow(IconSource source, List<NbtTag> tags, BulkEditPurpose purpose)
         {
@@ -23,7 +24,7 @@ namespace NbtStudio.UI
             Purpose = purpose;
             ActionList.Items.AddRange(tags.Select(x => CreateListItem(x, TagPreview(x))).ToArray());
             SetSize();
-            Consistinator = new(this, ActionList);
+            Consistinator = new(this, ActionList); // to do: this is a bit gross, VS thinks the member is unused...
             this.Height += 200;
 
             if (purpose == BulkEditPurpose.Rename)
@@ -55,43 +56,44 @@ namespace NbtStudio.UI
                 return NbtUtil.PreviewNbtValue(tag);
         }
 
-        // returns changed tags
-        public static IEnumerable<NbtTag> BulkRename(IconSource source, IEnumerable<NbtTag> tags)
+        public static ICommand BulkRename(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => x.Parent is NbtCompound).ToList();
             if (list.Any())
             {
                 var window = new BulkEditWindow(source, list, BulkEditPurpose.Rename);
-                window.ShowDialog();
-                return window.ChangedTags;
+                if (window.ShowDialog() == DialogResult.OK)
+                    return window.CommandResult;
             }
-            return Enumerable.Empty<NbtTag>();
+            return null;
         }
 
-        // returns changed tags
-        public static IEnumerable<NbtTag> BulkEdit(IconSource source, IEnumerable<NbtTag> tags)
+        public static ICommand BulkEdit(IconSource source, IEnumerable<NbtTag> tags)
         {
             var list = tags.Where(x => NbtUtil.IsValueType(x.TagType)).ToList();
             if (list.Any())
             {
                 var window = new BulkEditWindow(source, list, BulkEditPurpose.EditValue);
-                window.ShowDialog();
-                return window.ChangedTags;
+                if (window.ShowDialog() == DialogResult.OK)
+                    return window.CommandResult;
             }
-            return Enumerable.Empty<NbtTag>();
+            return null;
         }
 
         private void Confirm()
         {
-            if (TryModify())
+            if (TryModify(out ICommand result))
             {
                 DialogResult = DialogResult.OK;
+                CommandResult = result;
                 Close();
             }
         }
 
-        private bool TryModify()
+        private bool TryModify(out ICommand command)
         {
+            command = null;
+            var commands = new List<ICommand>();
             if (!FindBox.CheckRegex(out _)) return false;
             var transformer = GetTransformer();
             foreach (ListViewItem item in ActionList.Items)
@@ -106,12 +108,15 @@ namespace NbtStudio.UI
                 if (IsValidFor(tag, transformed, out var result))
                 {
                     if (Purpose == BulkEditPurpose.Rename)
-                        tag.Name = transformed;
+                        commands.Add(new RenameCommand(tag, transformed));
                     else
-                        NbtUtil.SetValue(tag, result);
+                        commands.Add(new ChangeValueCommand(tag, result));
                     ChangedTags.Add(tag);
                 }
             }
+            string tags = StringUtils.Pluralize(ChangedTags.Count, "tag");
+            string description = Purpose == BulkEditPurpose.Rename ? $"Rename {tags}" : $"Edit {tags}";
+            command = CommandExtensions.Merge(description, false, commands.ToArray());
             return true;
         }
 

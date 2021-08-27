@@ -11,6 +11,7 @@ namespace NbtStudio.UI
     {
         private readonly ChunkEntry WorkingChunk;
         private readonly ChunkCoordsEditControls Manager;
+        public ICommand CommandResult;
 
         private EditChunkWindow(IconSource source, ChunkEntry chunk, ChunkEditPurpose purpose)
         {
@@ -36,26 +37,30 @@ namespace NbtStudio.UI
             //return window.ShowDialog() == DialogResult.OK ? chunk : null;
         }
 
-        public static bool MoveChunk(IconSource source, ChunkEntry existing)
+        public static ICommand MoveChunk(IconSource source, ChunkEntry existing)
         {
             var window = new EditChunkWindow(source, existing, ChunkEditPurpose.Move);
-            return window.ShowDialog() == DialogResult.OK; // window moves the chunk by itself
+            if (window.ShowDialog() == DialogResult.OK)
+                return window.CommandResult;
+            return null;
         }
 
         private void Confirm()
         {
-            if (TryModify())
+            if (TryModify(out ICommand result))
             {
                 DialogResult = DialogResult.OK;
+                CommandResult = result;
                 Close();
             }
         }
 
-        private bool TryModify()
+        private bool TryModify(out ICommand command)
         {
+            command = null;
             if (!Manager.CheckCoords())
                 return false;
-            Manager.ApplyCoords();
+            command = Manager.ApplyCoords();
             return true;
         }
 

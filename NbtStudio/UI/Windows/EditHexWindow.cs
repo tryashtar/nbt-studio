@@ -15,6 +15,7 @@ namespace NbtStudio.UI
         private readonly NbtContainerTag TagParent;
         private readonly bool SettingName;
         private readonly IByteTransformer Provider;
+        public ICommand CommandResult;
 
         private EditHexWindow(IconSource source, NbtTag tag, NbtContainerTag parent, bool set_name, EditPurpose purpose)
         {
@@ -66,10 +67,15 @@ namespace NbtStudio.UI
             bool has_name = parent is NbtCompound;
             var tag = NbtUtil.CreateTag(type);
             var window = new EditHexWindow(source, tag, parent, has_name, EditPurpose.Create);
-            return window.ShowDialog() == DialogResult.OK ? tag : null;
+            if (window.ShowDialog() == DialogResult.OK)
+            {
+                window.CommandResult?.Execute();
+                return tag;
+            }
+            return null;
         }
 
-        public static bool ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
+        public static ICommand ModifyTag(IconSource source, NbtTag existing, EditPurpose purpose)
         {
             if (purpose == EditPurpose.Create)
                 throw new ArgumentException("Use CreateTag to create tags");
@@ -77,28 +83,33 @@ namespace NbtStudio.UI
             bool has_name = parent is NbtCompound;
 
             var window = new EditHexWindow(source, existing, parent, has_name, purpose);
-            return window.ShowDialog() == DialogResult.OK; // window modifies the tag by itself
+            if (window.ShowDialog() == DialogResult.OK)
+                return window.CommandResult;
+            return null;
         }
 
         private void Confirm()
         {
-            if (TryModify())
+            if (TryModify(out ICommand result))
             {
                 DialogResult = DialogResult.OK;
+                CommandResult = result;
                 Close();
             }
         }
 
-        private bool TryModify()
+        private bool TryModify(out ICommand command)
         {
+            command = null;
             // check conditions first, tag must not be modified at ALL until we can be sure it's safe
             if (SettingName && !NameBox.CheckName())
                 return false;
 
+            var commands = new ICommand[2];
             if (SettingName)
-                NameBox.ApplyName();
-
-            HexBox.ByteProvider.ApplyChanges();
+                commands[0] = NameBox.ApplyName();
+            commands[1] = Provider.Apply();
+            command = CommandExtensions.MergeNullable($"Edit {CommandExtensions.Describe(WorkingTag)}", false, commands);
             return true;
         }
 

@@ -23,12 +23,6 @@ namespace NbtStudio
 
         private readonly List<Node> Roots = new();
         public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
-        public readonly UndoHistory UndoHistory;
-
-        public NbtTreeModel()
-        {
-            //UndoHistory = new UndoHistory(GetDescription);
-        }
 
         public bool HasUnsavedChanges => GetSaveables().Any(x => x.HasUnsavedChanges);
         public IEnumerable<ISaveable> GetSaveables()

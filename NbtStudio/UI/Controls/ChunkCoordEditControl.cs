@@ -76,11 +76,12 @@ namespace NbtStudio.UI
             return valid;
         }
 
-        public void ApplyCoords()
+        public ICommand ApplyCoords()
         {
             int xval = XBox.GetCoord();
             int zval = ZBox.GetCoord();
             //Chunk.Move(xval, zval);
+            throw new NotImplementedException();
         }
 
         private void SetColor(CoordCheckResult result)

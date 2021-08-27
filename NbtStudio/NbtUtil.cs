@@ -213,23 +213,16 @@ namespace NbtStudio
 
         public static (string min, string max) MinMaxFor(NbtTagType type)
         {
-            switch (type)
+            return type switch
             {
-                case NbtTagType.Byte:
-                    return (sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
-                case NbtTagType.Short:
-                    return (short.MinValue.ToString(), short.MaxValue.ToString());
-                case NbtTagType.Int:
-                    return (int.MinValue.ToString(), int.MaxValue.ToString());
-                case NbtTagType.Long:
-                    return (long.MinValue.ToString(), long.MaxValue.ToString());
-                case NbtTagType.Float:
-                    return (float.MinValue.ToString(), float.MaxValue.ToString());
-                case NbtTagType.Double:
-                    return (double.MinValue.ToString(), double.MaxValue.ToString());
-                default:
-                    throw new ArgumentException($"{type} isn't numeric, has no min and max");
-            }
+                NbtTagType.Byte => (sbyte.MinValue.ToString(), sbyte.MaxValue.ToString()),
+                NbtTagType.Short => (short.MinValue.ToString(), short.MaxValue.ToString()),
+                NbtTagType.Int => (int.MinValue.ToString(), int.MaxValue.ToString()),
+                NbtTagType.Long => (long.MinValue.ToString(), long.MaxValue.ToString()),
+                NbtTagType.Float => (float.MinValue.ToString(), float.MaxValue.ToString()),
+                NbtTagType.Double => (double.MinValue.ToString(), double.MaxValue.ToString()),
+                _ => throw new ArgumentException($"{type} isn't numeric, has no min and max"),
+            };
         }
 
         public static string PreviewNbtValue(NbtTag tag)
@@ -500,31 +493,22 @@ namespace NbtStudio
 
         public static IconType TagIconType(NbtTagType type)
         {
-            if (type == NbtTagType.Byte)
-                return IconType.ByteTag;
-            if (type == NbtTagType.Short)
-                return IconType.ShortTag;
-            if (type == NbtTagType.Int)
-                return IconType.IntTag;
-            if (type == NbtTagType.Long)
-                return IconType.LongTag;
-            if (type == NbtTagType.Float)
-                return IconType.FloatTag;
-            if (type == NbtTagType.Double)
-                return IconType.DoubleTag;
-            if (type == NbtTagType.String)
-                return IconType.StringTag;
-            if (type == NbtTagType.ByteArray)
-                return IconType.ByteArrayTag;
-            if (type == NbtTagType.IntArray)
-                return IconType.IntArrayTag;
-            if (type == NbtTagType.LongArray)
-                return IconType.LongArrayTag;
-            if (type == NbtTagType.Compound)
-                return IconType.CompoundTag;
-            if (type == NbtTagType.List)
-                return IconType.ListTag;
-            throw new ArgumentException($"No icon for {type}");
+            return type switch
+            {
+                NbtTagType.Byte => IconType.ByteTag,
+                NbtTagType.Short => IconType.ShortTag,
+                NbtTagType.Int => IconType.IntTag,
+                NbtTagType.Long => IconType.LongTag,
+                NbtTagType.Float => IconType.FloatTag,
+                NbtTagType.Double => IconType.DoubleTag,
+                NbtTagType.String => IconType.StringTag,
+                NbtTagType.ByteArray => IconType.ByteArrayTag,
+                NbtTagType.IntArray => IconType.IntArrayTag,
+                NbtTagType.LongArray => IconType.LongArrayTag,
+                NbtTagType.Compound => IconType.CompoundTag,
+                NbtTagType.List => IconType.ListTag,
+                _ => throw new ArgumentException($"No icon for {type}")
+            };
         }
 
         public static ImageIcon TagTypeImage(IconSource source, NbtTagType type)

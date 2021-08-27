@@ -64,7 +64,8 @@ namespace NbtStudio.UI
 
         private SizeF DrawOrMeasure(TreeNodeAdv node, DrawContext context, bool draw)
         {
-            var (name, value) = ((Node)node.Tag).Preview();
+            var name = ((Node)node.Tag).PreviewName();
+            var value = ((Node)node.Tag).PreviewValue();
             var boldfont = new Font(context.Font, FontStyle.Bold);
             context.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             context.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
@@ -75,15 +76,16 @@ namespace NbtStudio.UI
                 TextFormatFlags.VerticalCenter |
                 TextFormatFlags.NoPrefix;
 
-            if (name is not null)
+            if (!String.IsNullOrEmpty(name))
             {
+                name += ":";
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, name, boldfont, rectangle, Parent.ForeColor, format);
                 var name_size = TextRenderer.MeasureText(context.Graphics, name, boldfont, rectangle.Size, format);
                 size = AppendSizes(size, name_size);
                 rectangle.X += (int)name_size.Width;
             }
-            if (value is not null)
+            if (!String.IsNullOrEmpty(value))
             {
                 if (draw)
                     TextRenderer.DrawText(context.Graphics, value, context.Font, rectangle, Parent.ForeColor, format);

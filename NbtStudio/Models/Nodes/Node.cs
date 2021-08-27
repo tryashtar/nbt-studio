@@ -54,11 +54,6 @@ namespace NbtStudio
             }
         }
 
-        public (string name, string value) Preview()
-        {
-            return (PreviewName(), PreviewValue());
-        }
-
         // to do: ehh...
         public static readonly HashSet<Node> DirtyNodes = new();
         protected void MarkDirty()

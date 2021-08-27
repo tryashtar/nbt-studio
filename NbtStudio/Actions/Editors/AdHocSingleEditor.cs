@@ -14,7 +14,7 @@ namespace NbtStudio
     public class AdHocSingleEditor<T> : SingleEditor<T> where T : Node
     {
         public delegate bool EditCheck(T node);
-        public delegate void EditDo(T node);
+        public delegate ICommand EditDo(T node);
 
         private readonly EditCheck Check;
         private readonly EditDo Do;
@@ -30,9 +30,9 @@ namespace NbtStudio
             return Check(node);
         }
 
-        public override void Edit(T node)
+        public override ICommand Edit(T node)
         {
-            Do(node);
+            return Do(node);
         }
     }
 }

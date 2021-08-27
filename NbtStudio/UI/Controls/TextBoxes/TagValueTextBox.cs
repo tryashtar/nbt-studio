@@ -106,15 +106,16 @@ namespace NbtStudio.UI
             ApplyValue(value);
         }
 
-        public void ApplyValue(object value)
+        public ICommand ApplyValue(object value)
         {
             if (value is null)
-                NbtUtil.ResetValue(NbtTag);
+                return new ResetValueCommand(NbtTag);
             else
             {
                 var current = NbtUtil.GetValue(NbtTag);
                 if (!current.Equals(value))
-                    NbtUtil.SetValue(NbtTag, value);
+                    return new ChangeValueCommand(NbtTag, value);
+                return null;
             }
         }
 

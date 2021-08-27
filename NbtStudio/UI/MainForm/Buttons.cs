@@ -138,7 +138,7 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                //action: Undo,
+                action: Actions.Undo,
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
@@ -147,7 +147,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Redo,
+                action: Actions.Redo,
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
@@ -186,7 +186,7 @@ namespace NbtStudio.UI
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                //action: Rename,
+                action: Actions.Rename,
                 text: "Re&name",
                 hover: "Rename",
                 icon: IconType.Rename,
