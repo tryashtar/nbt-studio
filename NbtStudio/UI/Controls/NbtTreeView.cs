@@ -63,6 +63,18 @@ namespace NbtStudio.UI
         {
             base.OnNodesInserted(parent, e);
             parent.Expand();
+            if (e.Path.IsEmpty())
+            {
+                var node = Root;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (node.Children.Count == 1)
+                    {
+                        node = node.Children[0];
+                        node.Expand();
+                    }
+                }
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -78,20 +90,6 @@ namespace NbtStudio.UI
                 var rectangle = new Rectangle(DisplayRectangle.Width - size.Width - x_buffer, DisplayRectangle.Height - size.Height - y_buffer, size.Width + 3, size.Height + 3);
                 e.Graphics.FillRectangle(new SolidBrush(this.BackColor), rectangle);
                 e.Graphics.DrawString(text, this.Font, Brushes.Gray, rectangle, format);
-            }
-        }
-
-        protected override void OnModelChanged()
-        {
-            base.OnModelChanged();
-            var node = Root;
-            for (int i = 0; i < 3; i++)
-            {
-                if (node.Children.Count == 1)
-                {
-                    node = node.Children[0];
-                    node.Expand();
-                }
             }
         }
 

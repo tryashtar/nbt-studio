@@ -178,15 +178,23 @@ namespace NbtStudio.UI
             App.UndoHistory.Redo();
         }
 
-        public NbtTag AddTag(NbtTagType type)
+        public EditorAction AddTag(NbtTagType type)
         {
-            return new AddTagAction()
+            var action = new EditorAction()
             {
-                TagSource = AddTagWindow(type),
-                ErrorHandler = AbstractAction.Throw(),
-                SelectedNodes = GetView().SelectedModelNodes,
-                UndoHistory = App.UndoHistory
-            }.AddTag();
+                NodeSource = () => GetView().SelectedModelNodes,
+                UndoHistorySource = () => App.UndoHistory
+            };
+            action.AddEditor(new AdHocMultipleEditor<Node>(
+               x => x.All(x => x.GetNbtTag() is not null),
+               x => new AddTagAction()
+               {
+                   TagSource = AddTagWindow(type),
+                   ErrorHandler = AbstractAction.Throw(),
+                   SelectedNodes = GetView().SelectedModelNodes,
+                   UndoHistory = App.UndoHistory
+               }.AddTag()
+            ));
         }
 
         public IEnumerable<IHavePath> New()
@@ -237,24 +245,34 @@ namespace NbtStudio.UI
             return OpenOrImport(true, DefaultBrowseFolder(), "Open a new folder anyway?");
         }
 
-        public IEnumerable<IHavePath> NewPaste()
+        public IEnumerable<IHavePath> OpenOrImportPaste(bool open)
         {
             if (Clipboard.ContainsFileDropList())
-            {
-                return OpenOrImport(true, FilesFromClipboard, "Create a new file anyway?");
-            }
+                return OpenOrImport(open, FilesFromClipboard, "Create a new file anyway?");
             else if (Clipboard.ContainsText())
             {
-                return new OpenFileAction()
+
+                var action = new OpenFileAction()
                 {
                     TreeGetter = () => App.Tree,
                     UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
                     FilesGetter = ParseSnbtFromClipboard,
                     ErrorHandler = ShowError("Clipboard error", "Failed to parse SNBT from clipboard.")
-                }.Open();
+                };
+                return open ? action.Open() : action.Import();
             }
             else
                 return null;
+        }
+
+        public IEnumerable<IHavePath> NewPaste()
+        {
+            return OpenOrImportPaste(true);
+        }
+
+        public IEnumerable<IHavePath> ImportPaste()
+        {
+            return OpenOrImportPaste(false);
         }
 
         public IEnumerable<IHavePath> OpenOrImport(bool open, PathsGetter getter, string confirm_message = "Open a new file anyway?")
@@ -266,8 +284,12 @@ namespace NbtStudio.UI
             };
             action.PathsGetter = getter;
             if (open)
+            {
                 action.UnsavedWarningCheck = ConfirmIfUnsaved(confirm_message);
-            return action.Open();
+                return action.Open();
+            }
+            else
+                return action.Import();
         }
 
         public IEnumerable<IHavePath> ImportNew()
@@ -326,34 +348,34 @@ namespace NbtStudio.UI
             yield return tag.Then(x => (IFile)new NbtFile(x));
         }
 
-        public void Edit()
+        public EditorAction Edit()
         {
-            Edit(View.SelectedModelNodes.ToArray());
+            return Edit(View.SelectedModelNodes.ToArray());
         }
 
-        public void Edit(params Node[] nodes)
+        public EditorAction Edit(params Node[] nodes)
         {
-            EditOrRename(true, nodes);
+            return EditOrRename(true, nodes);
         }
 
-        public void Rename()
+        public EditorAction Rename()
         {
-            Rename(View.SelectedModelNodes.ToArray());
+            return Rename(View.SelectedModelNodes.ToArray());
         }
 
-        public void Rename(params Node[] nodes)
+        public EditorAction Rename(params Node[] nodes)
         {
-            EditOrRename(false, nodes);
+            return EditOrRename(false, nodes);
         }
 
-        public void EditOrRename(bool edit, params Node[] nodes)
+        public EditorAction EditOrRename(bool edit, params Node[] nodes)
         {
             var purpose = edit ? EditPurpose.EditValue : EditPurpose.Rename;
             Func<IEnumerable<NbtTag>, ICommand> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(Icons, x) : x => BulkEditWindow.BulkRename(Icons, x);
             var action = new EditorAction()
             {
-                Nodes = nodes,
-                UndoHistory = App.UndoHistory
+                NodeSource = () => nodes,
+                UndoHistorySource = () => App.UndoHistory
             };
             // hex editor
             action.AddEditor(new AdHocSingleEditor<NbtTagNode>(
@@ -376,7 +398,7 @@ namespace NbtStudio.UI
                 x => EditChunkWindow.MoveChunk(Icons, x.Chunk)
             ));
             // TO DO: file renamer
-            action.Edit();
+            return action;
         }
     }
 }

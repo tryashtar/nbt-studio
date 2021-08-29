@@ -23,7 +23,7 @@ namespace NbtStudio.UI
             bool has_files() => App.Tree.GetSaveables().Any();
 
             AddButton(
-                action: () => Actions.New(),
+                no_context_action: () => Actions.New(),
                 text: "&New",
                 hover: "New File",
                 icon: IconType.NewFile,
@@ -32,14 +32,14 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: () => Actions.NewPaste(),
+                no_context_action: () => Actions.NewPaste(),
                 text: "New from &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.V,
                 menu: MenuFile
             );
             AddButton(
-                action: () => Actions.NewRegion(),
+                no_context_action: () => Actions.NewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 shortcut: Keys.Control | Keys.Alt | Keys.R,
@@ -47,7 +47,7 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                action: () => Actions.OpenFile(),
+                no_context_action: () => Actions.OpenFile(),
                 text: "&Open File",
                 hover: "Open File",
                 icon: IconType.OpenFile,
@@ -56,7 +56,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: () => Actions.OpenFolder(),
+                no_context_action: () => Actions.OpenFolder(),
                 text: "Open &Folder",
                 hover: "Open Folder",
                 icon: IconType.OpenFolder,
@@ -69,34 +69,34 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                action: () => Actions.ImportFile(),
+                no_context_action: () => Actions.ImportFile(),
                 text: "&File",
                 icon: IconType.OpenFile,
                 shortcut: Keys.Control | Keys.I,
                 parent: import
             );
             AddButton(
-                action: () => Actions.ImportFolder(),
+                no_context_action: () => Actions.ImportFolder(),
                 text: "F&older",
                 icon: IconType.OpenFolder,
                 shortcut: Keys.Control | Keys.Shift | Keys.I,
                 parent: import
             );
             AddButton(
-                action: () => Actions.ImportNew(),
+                no_context_action: () => Actions.ImportNew(),
                 text: "&New File",
                 icon: IconType.NewFile,
                 shortcut: Keys.Control | Keys.Alt | Keys.N,
                 parent: import
             );
             AddButton(
-                action: () => Actions.ImportNewRegion(),
+                no_context_action: () => Actions.ImportNewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 parent: import
             );
             AddButton(
-                //action: () => ImportClipboard(),
+                no_context_action: () => Actions.ImportPaste(),
                 text: "From &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.I,
@@ -138,7 +138,7 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                action: Actions.Undo,
+                no_context_action: Actions.Undo,
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
@@ -147,7 +147,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                action: Actions.Redo,
+                no_context_action: Actions.Redo,
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
@@ -186,7 +186,7 @@ namespace NbtStudio.UI
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                action: Actions.Rename,
+                action: Actions.Rename(),
                 text: "Re&name",
                 hover: "Rename",
                 icon: IconType.Rename,
@@ -195,7 +195,7 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                action: Actions.Edit,
+                action: Actions.Edit(),
                 text: "&Edit Value",
                 hover: "Edit",
                 icon: IconType.Edit,
@@ -244,11 +244,7 @@ namespace NbtStudio.UI
                 text: "Clear Undo History",
                 menu: MenuEdit
             );
-            var tag_buttons = MakeCreateTagButtons();
-            foreach (var button in tag_buttons)
-            {
-                button.AddToToolStrip(Tools);
-            }
+            MakeCreateTagButtons();
             AddButton(
                 //action: AddSnbt,
                 hover: "Add as SNBT",
@@ -263,7 +259,7 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                action: Find,
+                no_context_action: Find,
                 text: "&Find",
                 hover: "Find",
                 icon: IconType.Search,
@@ -272,14 +268,14 @@ namespace NbtStudio.UI
                 menu: MenuSearch
             );
             AddButton(
-                action: About,
+                no_context_action: About,
                 text: "&About",
                 icon: IconType.NbtStudio,
                 shortcut: Keys.F1,
                 menu: MenuHelp
             );
             AddButton(
-                action: ChangeIcons,
+                no_context_action: ChangeIcons,
                 text: "&Change Icons",
                 icon: IconType.Refresh,
                 shortcut: Keys.Control | Keys.I,
@@ -287,36 +283,30 @@ namespace NbtStudio.UI
             );
             MenuHelp.DropDownItems.Add(new ToolStripSeparator());
             UpdateButton = AddButton(
-                action: Update,
+                no_context_action: Update,
                 text: "&Update",
                 strip: MenuStrip
             );
             UpdateButton.Visible = false;
             AddButton(
-                action: CheckForUpdates,
+                no_context_action: CheckForUpdates,
                 text: "Check for &Updates",
                 shortcut: Keys.Control | Keys.U,
                 menu: MenuHelp
             );
         }
 
-        private List<DualMenuItem> MakeCreateTagButtons()
+        private void MakeCreateTagButtons()
         {
-            var buttons = new List<DualMenuItem>();
             foreach (var type in NbtUtil.NormalTagTypes())
             {
-                var button = DualMenuItem.SingleButton(
+                AddButton(
                     hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
-                    icon: NbtUtil.TagIconType(type));
-                button.Click += (s, e) =>
-                {
-                    Actions.AddTag(type);
-                    App.Tree.Refresh();
-                };
-                buttons.Add(button);
-                ButtonsCollection.Add(button);
+                    icon: NbtUtil.TagIconType(type),
+                    strip: Tools,
+                    action: Actions.AddTag(type)
+                );
             }
-            return buttons;
         }
 
         private readonly Dictionary<EnableTrigger, Action> EnableTriggers = new()
@@ -325,7 +315,8 @@ namespace NbtStudio.UI
             { EnableTrigger.TreeChanged, () => { } }
         };
         private DualMenuItem AddButton(
-            Action action = null,
+            EditorAction action = null,
+            Action no_context_action = null,
             string text = null,
             string hover = null,
             IconType? icon = null,
@@ -339,11 +330,21 @@ namespace NbtStudio.UI
         {
             var button = new DualMenuItem(text, hover, icon, shortcut ?? Keys.None);
             if (action != null)
+            {
                 button.Click += (s, e) =>
                 {
-                    action();
+                    action.Edit();
                     App.Tree.Refresh();
                 };
+            }
+            if (no_context_action != null)
+            {
+                button.Click += (s, e) =>
+                {
+                    no_context_action();
+                    App.Tree.Refresh();
+                };
+            }
             if (strip != null)
                 button.AddToToolStrip(strip);
             if (menu != null)

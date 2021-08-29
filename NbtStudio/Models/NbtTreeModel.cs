@@ -80,12 +80,18 @@ namespace NbtStudio
 
         private void Node_SomethingChanged(ChildrenChangedReport report)
         {
-            var path = report.Node.Path;
-            StructureChanged?.Invoke(this, new TreePathEventArgs(path));
-            //NodesInserted?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-            //NodesRemoved?.Invoke(this, new TreeModelEventArgs(path, indices, nodes));
-            if (report.Node.Parent != null)
-                NodesChanged?.Invoke(this, new TreeModelEventArgs(report.Node.Parent.Path, new object[] { report.Node }));
+            var removed = report.RemovedArgs();
+            if (removed is not null)
+                NodesRemoved?.Invoke(this, removed);
+            var added = report.InsertedArgs();
+            if (added is not null)
+                NodesInserted?.Invoke(this, added);
+            var structure = report.StructureChangedArgs();
+            if (structure is not null)
+                StructureChanged?.Invoke(this, structure);
+            var changed = report.ChangedArgs();
+            if (changed is not null)
+                NodesChanged?.Invoke(this, changed);
         }
 
         private Node MakeNode(IHavePath item)
