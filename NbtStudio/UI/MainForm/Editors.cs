@@ -194,7 +194,7 @@ namespace NbtStudio.UI
 
         public ContextFreeEditor New()
         {
-            return new OpenFileEditor(new NbtFile())
+            return new OpenFileEditor(() => new NbtFile())
             {
                 TreeGetter = () => App.Tree,
                 UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
@@ -203,7 +203,7 @@ namespace NbtStudio.UI
 
         public ContextFreeEditor NewRegion()
         {
-            return new OpenFileEditor(new RegionFile())
+            return new OpenFileEditor(() => new RegionFile())
             {
                 TreeGetter = () => App.Tree,
                 UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
@@ -288,7 +288,7 @@ namespace NbtStudio.UI
 
         public ContextFreeEditor ImportNew()
         {
-            return new OpenFileEditor(new NbtFile())
+            return new OpenFileEditor(() => new NbtFile())
             {
                 TreeGetter = () => App.Tree
             };
@@ -296,7 +296,7 @@ namespace NbtStudio.UI
 
         public ContextFreeEditor ImportNewRegion()
         {
-            return new OpenFileEditor(new RegionFile())
+            return new OpenFileEditor(() => new RegionFile())
             {
                 TreeGetter = () => App.Tree
             };

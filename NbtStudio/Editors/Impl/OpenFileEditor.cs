@@ -19,9 +19,9 @@ namespace NbtStudio
 
         public OpenFileEditor() { }
 
-        public OpenFileEditor(IHavePath literal)
+        public OpenFileEditor(Func<IHavePath> literal)
         {
-            FilesGetter = () => new[] { FailableFactory.Success(literal, null) };
+            FilesGetter = () => new[] { FailableFactory.Success(literal(), null) };
         }
 
         public override bool CanEdit()

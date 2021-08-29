@@ -32,9 +32,12 @@ namespace NbtStudio
 
         public void Replace(params IHavePath[] paths)
         {
-            NodesRemoved?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, Roots.Count).ToArray(), Roots.ToArray()));
-            UnsubscribeNodeEvents(Roots);
-            Roots.Clear();
+            if (Roots.Count > 0)
+            {
+                NodesRemoved?.Invoke(this, new TreeModelEventArgs(TreePath.Empty, Enumerable.Range(0, Roots.Count).ToArray(), Roots.ToArray()));
+                UnsubscribeNodeEvents(Roots);
+                Roots.Clear();
+            }
             Import(paths);
         }
 

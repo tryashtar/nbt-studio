@@ -24,8 +24,8 @@ namespace NbtStudio
             Path = node.Path;
             OldChildren = new(old_children);
             CurrentChildren = new(current_children);
-            RemovedChildren = new(OldChildren.Where(x => !CurrentChildren.ContainsKey(x)));
-            AddedChildren = new(CurrentChildren.Where(x => !OldChildren.ContainsKey(x)));
+            RemovedChildren = new(OldChildren.Where(x => !CurrentChildren.ContainsKey(x.Key)));
+            AddedChildren = new(CurrentChildren.Where(x => !OldChildren.ContainsKey(x.Key)));
         }
 
         public TreeModelEventArgs InsertedArgs()
