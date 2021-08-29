@@ -4,19 +4,22 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
-    public class OpenPathsAction
+    public class OpenPathsEditor : ContextFreeEditor
     {
         public UnsavedWarningHandler UnsavedWarningCheck;
         public TreeGetter TreeGetter;
         public PathsGetter PathsGetter;
         public PathsErrorHandler ErrorHandler;
+        public OpenMode Mode;
 
-        public IEnumerable<IHavePath> Open() => OpenOrImportPaths(true);
-        public IEnumerable<IHavePath> Import() => OpenOrImportPaths(false);
-
-        private IEnumerable<IHavePath> OpenOrImportPaths(bool open)
+        public override bool CanEdit()
         {
-            if (open && !UnsavedWarningCheck())
+            return true;
+        }
+
+        public override ICommand Edit()
+        {
+            if (Mode == OpenMode.Open && !UnsavedWarningCheck())
                 return null;
             IHavePath[] loadable;
             var files = PathsGetter();
@@ -30,11 +33,10 @@ namespace NbtStudio
             if (loadable.Any())
             {
                 Properties.Settings.Default.RecentFiles.AddMany(files.SucceededPaths);
-                if (open)
+                if (Mode == OpenMode.Open)
                     TreeGetter().Replace(loadable);
                 else
                     TreeGetter().Import(loadable);
-                return loadable;
             }
             return null;
         }

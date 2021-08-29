@@ -1,10 +1,5 @@
-﻿using fNbt;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
 
@@ -18,12 +13,32 @@ namespace NbtStudio.UI
         private DualMenuItem DropDownUndoHistory;
         private DualMenuItem DropDownRedoHistory;
 
+        private readonly FormNodeSource OpenFilesSource;
+        private readonly FormNodeSource SelectedNodesSource;
+
+        private class FormNodeSource : NodeSource
+        {
+            public readonly Func<IEnumerable<Node>> NodeGetter;
+            public FormNodeSource(Func<IEnumerable<Node>> getter)
+            {
+                NodeGetter = getter;
+            }
+
+            public override IEnumerable<Node> GetNodes()
+            {
+                return NodeGetter();
+            }
+
+            public void NoticeChanges()
+            {
+                InvokeChanged();
+            }
+        }
+
         private void AddActionButtons()
         {
-            bool has_files() => App.Tree.GetSaveables().Any();
-
             AddButton(
-                no_context_action: () => Actions.New(),
+                no_context_editor: Editors.New(),
                 text: "&New",
                 hover: "New File",
                 icon: IconType.NewFile,
@@ -32,14 +47,14 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                no_context_action: () => Actions.NewPaste(),
+                no_context_editor: Editors.NewPaste(),
                 text: "New from &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.V,
                 menu: MenuFile
             );
             AddButton(
-                no_context_action: () => Actions.NewRegion(),
+                no_context_editor: Editors.NewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 shortcut: Keys.Control | Keys.Alt | Keys.R,
@@ -47,7 +62,7 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                no_context_action: () => Actions.OpenFile(),
+                no_context_editor: Editors.OpenFile(),
                 text: "&Open File",
                 hover: "Open File",
                 icon: IconType.OpenFile,
@@ -56,7 +71,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                no_context_action: () => Actions.OpenFolder(),
+                no_context_editor: Editors.OpenFolder(),
                 text: "Open &Folder",
                 hover: "Open Folder",
                 icon: IconType.OpenFolder,
@@ -69,34 +84,34 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                no_context_action: () => Actions.ImportFile(),
+                no_context_editor: Editors.ImportFile(),
                 text: "&File",
                 icon: IconType.OpenFile,
                 shortcut: Keys.Control | Keys.I,
                 parent: import
             );
             AddButton(
-                no_context_action: () => Actions.ImportFolder(),
+                no_context_editor: Editors.ImportFolder(),
                 text: "F&older",
                 icon: IconType.OpenFolder,
                 shortcut: Keys.Control | Keys.Shift | Keys.I,
                 parent: import
             );
             AddButton(
-                no_context_action: () => Actions.ImportNew(),
+                no_context_editor: Editors.ImportNew(),
                 text: "&New File",
                 icon: IconType.NewFile,
                 shortcut: Keys.Control | Keys.Alt | Keys.N,
                 parent: import
             );
             AddButton(
-                no_context_action: () => Actions.ImportNewRegion(),
+                no_context_editor: Editors.ImportNewRegion(),
                 text: "New &Region File",
                 icon: IconType.Region,
                 parent: import
             );
             AddButton(
-                no_context_action: () => Actions.ImportPaste(),
+                no_context_editor: Editors.ImportPaste(),
                 text: "From &Clipboard",
                 icon: IconType.Paste,
                 shortcut: Keys.Control | Keys.Alt | Keys.I,
@@ -104,23 +119,21 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                //action: Save,
+                //editor: Editors.Save(),
+                source: OpenFilesSource,
                 text: "&Save",
                 hover: "Save",
                 icon: IconType.Save,
                 shortcut: Keys.Control | Keys.S,
-                enabled_when: has_files,
-                enable_trigger: EnableTrigger.TreeChanged,
                 strip: Tools,
                 menu: MenuFile
             );
             AddButton(
-                //action: SaveAs,
+                //editor: Editors.SaveAs(),
+                source: OpenFilesSource,
                 text: "Save &As",
                 icon: IconType.Save,
                 shortcut: Keys.Control | Keys.Shift | Keys.S,
-                enabled_when: has_files,
-                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuFile
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
@@ -129,35 +142,31 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                //action: RefreshFiles,
+                //editor: Editors.Refresh(),
+                source: OpenFilesSource,
                 hover: "Refresh",
                 icon: IconType.Refresh,
-                enabled_when: has_files,
-                enable_trigger: EnableTrigger.TreeChanged,
                 strip: Tools
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                no_context_action: Actions.Undo,
+                //no_context_editor: Editors.Undo(),
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
-                enabled_when: () => UndoHistory.CanUndo,
-                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuEdit
             );
             AddButton(
-                no_context_action: Actions.Redo,
+                //no_context_editor: Editors.Redo(),
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
-                enabled_when: () => UndoHistory.CanRedo,
-                enable_trigger: EnableTrigger.TreeChanged,
                 menu: MenuEdit
             );
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                //action: Cut,
+                //editor: Editors.Cut(),
+                source: SelectedNodesSource,
                 text: "Cu&t",
                 hover: "Cut",
                 icon: IconType.Cut,
@@ -166,7 +175,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Copy,
+                //editor: Editors.Copy(),
+                source: SelectedNodesSource,
                 text: "&Copy",
                 hover: "Copy",
                 icon: IconType.Copy,
@@ -175,7 +185,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Paste,
+                //editor: Editors.Paste(),
+                source: SelectedNodesSource,
                 text: "&Paste",
                 hover: "Paste",
                 icon: IconType.Paste,
@@ -186,7 +197,8 @@ namespace NbtStudio.UI
             MenuEdit.DropDownItems.Add(new ToolStripSeparator());
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                action: Actions.Rename(),
+                editor: Editors.Rename(),
+                source: SelectedNodesSource,
                 text: "Re&name",
                 hover: "Rename",
                 icon: IconType.Rename,
@@ -195,7 +207,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                action: Actions.Edit(),
+                editor: Editors.Edit(),
+                source: SelectedNodesSource,
                 text: "&Edit Value",
                 hover: "Edit",
                 icon: IconType.Edit,
@@ -204,7 +217,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: EditSnbt,
+                //editor: Editors.EditSnbt(),
+                source: SelectedNodesSource,
                 text: "Edit as &SNBT",
                 hover: "Edit as SNBT",
                 icon: IconType.EditSnbt,
@@ -213,7 +227,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Delete,
+                //editor: Editors.Delete(),
+                source: SelectedNodesSource,
                 text: "&Delete",
                 hover: "Delete",
                 icon: IconType.Delete,
@@ -222,7 +237,8 @@ namespace NbtStudio.UI
                 menu: MenuEdit
             );
             AddButton(
-                //action: Sort,
+                //editor: Editors.Sort(),
+                source: SelectedNodesSource,
                 hover: "Sort",
                 icon: IconType.Sort,
                 strip: Tools
@@ -259,7 +275,7 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                no_context_action: Find,
+                simple_action: Find,
                 text: "&Find",
                 hover: "Find",
                 icon: IconType.Search,
@@ -268,14 +284,14 @@ namespace NbtStudio.UI
                 menu: MenuSearch
             );
             AddButton(
-                no_context_action: About,
+                simple_action: About,
                 text: "&About",
                 icon: IconType.NbtStudio,
                 shortcut: Keys.F1,
                 menu: MenuHelp
             );
             AddButton(
-                no_context_action: ChangeIcons,
+                simple_action: ChangeIcons,
                 text: "&Change Icons",
                 icon: IconType.Refresh,
                 shortcut: Keys.Control | Keys.I,
@@ -283,13 +299,13 @@ namespace NbtStudio.UI
             );
             MenuHelp.DropDownItems.Add(new ToolStripSeparator());
             UpdateButton = AddButton(
-                no_context_action: Update,
+                simple_action: Update,
                 text: "&Update",
                 strip: MenuStrip
             );
             UpdateButton.Visible = false;
             AddButton(
-                no_context_action: CheckForUpdates,
+                simple_action: CheckForUpdates,
                 text: "Check for &Updates",
                 shortcut: Keys.Control | Keys.U,
                 menu: MenuHelp
@@ -304,44 +320,56 @@ namespace NbtStudio.UI
                     hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
                     icon: NbtUtil.TagIconType(type),
                     strip: Tools,
-                    action: Actions.AddTag(type)
+                    editor: Editors.AddTag(type),
+                    source: SelectedNodesSource
                 );
             }
         }
 
-        private readonly Dictionary<EnableTrigger, Action> EnableTriggers = new()
-        {
-            { EnableTrigger.SelectionChanged, () => { } },
-            { EnableTrigger.TreeChanged, () => { } }
-        };
         private DualMenuItem AddButton(
-            EditorAction action = null,
-            Action no_context_action = null,
+            Editor editor = null,
+            ContextFreeEditor no_context_editor = null,
+            Action simple_action = null,
+            NodeSource source = null,
             string text = null,
             string hover = null,
             IconType? icon = null,
             Keys? shortcut = null,
             ToolStrip strip = null,
             ToolStripMenuItem menu = null,
-            DualMenuItem parent = null,
-            Func<bool> enabled_when = null,
-            EnableTrigger? enable_trigger = null
+            DualMenuItem parent = null
             )
         {
             var button = new DualMenuItem(text, hover, icon, shortcut ?? Keys.None);
-            if (action != null)
+            if (editor is not null)
             {
+                void enabler() => button.Enabled = editor.CanEdit(source.GetNodes());
+                enabler();
+                source.Changed += (s, e) => enabler();
                 button.Click += (s, e) =>
                 {
-                    action.Edit();
+                    var nodes = source.GetNodes();
+                    var command = editor.Edit(nodes);
+                    if (command is not null)
+                        App.UndoHistory.PerformAction(command);
                     App.Tree.Refresh();
                 };
             }
-            if (no_context_action != null)
+            if (no_context_editor is not null)
             {
                 button.Click += (s, e) =>
                 {
-                    no_context_action();
+                    var command = no_context_editor.Edit();
+                    if (command is not null)
+                        App.UndoHistory.PerformAction(command);
+                    App.Tree.Refresh();
+                };
+            }
+            if (simple_action is not null)
+            {
+                button.Click += (s, e) =>
+                {
+                    simple_action();
                     App.Tree.Refresh();
                 };
             }
@@ -351,18 +379,8 @@ namespace NbtStudio.UI
                 button.AddToMenuItem(menu);
             if (parent != null)
                 button.AddToDual(parent);
-            if (enable_trigger.HasValue && enabled_when != null)
-            {
-                EnableTriggers[enable_trigger.Value] += () => button.Enabled = enabled_when();
-            }
             ButtonsCollection.Add(button);
             return button;
-        }
-
-        private enum EnableTrigger
-        {
-            TreeChanged,
-            SelectionChanged
         }
 
         private FindWindow FindWindow;

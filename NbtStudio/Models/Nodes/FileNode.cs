@@ -30,5 +30,7 @@ namespace NbtStudio
             }
             return name;
         }
+
+        public override IFile GetFile() => WrappedObject;
     }
 }

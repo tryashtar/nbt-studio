@@ -22,19 +22,26 @@ namespace NbtStudio.UI
         private readonly Updater UpdateChecker = new();
         private UndoHistory UndoHistory => App.UndoHistory;
 
-        public readonly MainFormActions Actions;
+        public readonly MainFormEditors Editors;
 
         public MainForm(Studio application)
         {
             App = application;
-            Actions = new(() => App, () => this, () => NbtTree, () => IconSource);
+            Editors = new(() => App, () => this, () => NbtTree, () => IconSource);
 
             // add controls
             InitializeComponent();
-            AddActionButtons();
 
             NbtTree.Font = new Font(NbtTree.Font.FontFamily, Properties.Settings.Default.TreeZoom);
             NbtTree.Model = App.Tree;
+
+            OpenFilesSource = new FormNodeSource(() => App.Tree.GetFiles());
+            SelectedNodesSource = new FormNodeSource(() => NbtTree.SelectedModelNodes);
+            App.Tree.NodesInserted += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            App.Tree.NodesRemoved += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            NbtTree.SelectionChanged += (s,e) => SelectedNodesSource.NoticeChanges();
+
+            AddActionButtons();
 
             IconSetWindow.TryImportSources(Properties.Settings.Default.CustomIconSets, this);
             SetIconSource(IconSourceRegistry.FromID(Properties.Settings.Default.IconSet));
@@ -104,14 +111,14 @@ namespace NbtStudio.UI
         {
             var files = Properties.Settings.Default.RecentFiles;
             if (files.Count >= 1)
-                Actions.OpenFiles(files.GetFirst());
+                Editors.OpenFiles(files.GetFirst());
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var node = NbtTree.ModelNodeFromClick(e);
             if (!e.Node.CanExpand)
-                Actions.Edit(node);
+                Editors.Edit(node);
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -142,9 +149,9 @@ namespace NbtStudio.UI
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (e.Effect == DragDropEffects.Move)
-                    Actions.OpenFiles(files);
+                    Editors.OpenFiles(files);
                 else if (e.Effect == DragDropEffects.Copy)
-                    Actions.ImportFiles(files);
+                    Editors.ImportFiles(files);
             }
             else
             {
@@ -371,7 +378,7 @@ namespace NbtStudio.UI
         {
             if (keyData == Keys.Enter)
             {
-                Actions.Edit();
+                Editors.Edit();
                 return true;
             }
             if (keyData == (Keys.Control | Keys.Shift | Keys.T))

@@ -24,10 +24,10 @@ namespace NbtStudio
         private readonly List<Node> Roots = new();
         public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
 
-        public bool HasUnsavedChanges => GetSaveables().Any(x => x.HasUnsavedChanges);
-        public IEnumerable<ISaveable> GetSaveables()
+        public bool HasUnsavedChanges => GetFiles().Any(x => x.GetFile().HasUnsavedChanges);
+        public IEnumerable<Node> GetFiles()
         {
-            yield break;
+            return BreadthFirstSearch(x => x is FolderNode || x.GetFile() is not null);
         }
 
         public void Replace(params IHavePath[] paths)

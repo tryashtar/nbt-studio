@@ -19,17 +19,4 @@ namespace NbtStudio
     public delegate IEnumerable<IFailable<IHavePath>> FilesGetter();
     public delegate LoadFileAttempts<IHavePath> PathsGetter();
     public delegate void PathsErrorHandler(LoadFileAttempts<IHavePath> attempts);
-
-    public abstract class AbstractAction
-    {
-        public static ErrorHandler Throw()
-        {
-            return x => throw x.Exception;
-        }
-
-        public static PathsErrorHandler ThrowPaths()
-        {
-            return x => throw x.Failable.Exception;
-        }
-    }
 }

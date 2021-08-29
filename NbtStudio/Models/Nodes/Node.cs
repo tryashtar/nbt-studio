@@ -103,5 +103,6 @@ namespace NbtStudio
         }
 
         public virtual NbtTag GetNbtTag() => null;
+        public virtual IFile GetFile() => null;
     }
 }

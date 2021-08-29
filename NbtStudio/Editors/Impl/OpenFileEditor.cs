@@ -9,26 +9,29 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
-    public class OpenFileAction
+    public class OpenFileEditor : ContextFreeEditor
     {
         public UnsavedWarningHandler UnsavedWarningCheck;
         public TreeGetter TreeGetter;
         public FilesGetter FilesGetter;
         public ErrorHandler ErrorHandler;
+        public OpenMode Mode;
 
-        public OpenFileAction() { }
+        public OpenFileEditor() { }
 
-        public OpenFileAction(IHavePath literal)
+        public OpenFileEditor(IHavePath literal)
         {
             FilesGetter = () => new[] { FailableFactory.Success(literal, null) };
         }
 
-        public IEnumerable<IHavePath> Open() => OpenOrImportFiles(true);
-        public IEnumerable<IHavePath> Import() => OpenOrImportFiles(false);
-
-        private IEnumerable<IHavePath> OpenOrImportFiles(bool open)
+        public override bool CanEdit()
         {
-            if (open && !UnsavedWarningCheck())
+            return true;
+        }
+
+        public override ICommand Edit()
+        {
+            if (Mode == OpenMode.Open && !UnsavedWarningCheck())
                 return null;
             IHavePath[] loadable;
             var files = FilesGetter();
@@ -41,13 +44,18 @@ namespace NbtStudio
                 ErrorHandler(FailableFactory.Aggregate(bad));
             if (loadable.Any())
             {
-                if (open)
+                if (Mode == OpenMode.Open)
                     TreeGetter().Replace(loadable);
                 else
                     TreeGetter().Import(loadable);
-                return loadable;
             }
             return null;
         }
+    }
+
+    public enum OpenMode
+    {
+        Open,
+        Import
     }
 }
