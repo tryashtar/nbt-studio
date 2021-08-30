@@ -15,10 +15,13 @@ namespace NbtStudio
 
         public ChunkEntry Chunk => WrappedObject;
 
+        private bool SetupEvents = false;
         private Chunk GetChunk()
         {
             if (!WrappedObject.IsLoaded)
                 WrappedObject.Load();
+            if (!SetupEvents)
+                WrappedObject.Chunk.Data.ChildrenChanged += tag => MarkDirty();
             return WrappedObject.Chunk;
         }
 

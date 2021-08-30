@@ -150,14 +150,14 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                //no_context_editor: Editors.Undo(),
+                simple_action: () => App.UndoHistory.Undo(),
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
                 menu: MenuEdit
             );
             AddButton(
-                //no_context_editor: Editors.Redo(),
+                simple_action: () => App.UndoHistory.Redo(),
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
