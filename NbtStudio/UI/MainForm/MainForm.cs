@@ -111,14 +111,14 @@ namespace NbtStudio.UI
         {
             var files = Properties.Settings.Default.RecentFiles;
             if (files.Count >= 1)
-                Editors.OpenFiles(files.GetFirst());
+                RunEditor(Editors.OpenFiles(files.GetFirst()));
         }
 
         private void NbtTree_NodeMouseDoubleClick(object sender, TreeNodeAdvMouseEventArgs e)
         {
             var node = NbtTree.ModelNodeFromClick(e);
             if (!e.Node.CanExpand)
-                Editors.Edit(node);
+                RunEditor(Editors.Edit(), new[] { node });
         }
 
         private void NbtTree_ItemDrag(object sender, ItemDragEventArgs e)
@@ -149,9 +149,9 @@ namespace NbtStudio.UI
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (e.Effect == DragDropEffects.Move)
-                    Editors.OpenFiles(files);
+                    RunEditor(Editors.OpenFiles(files));
                 else if (e.Effect == DragDropEffects.Copy)
-                    Editors.ImportFiles(files);
+                    RunEditor(Editors.ImportFiles(files));
             }
             else
             {
@@ -378,7 +378,7 @@ namespace NbtStudio.UI
         {
             if (keyData == Keys.Enter)
             {
-                Editors.Edit();
+                RunEditor(Editors.Edit(), NbtTree.SelectedModelNodes);
                 return true;
             }
             if (keyData == (Keys.Control | Keys.Shift | Keys.T))

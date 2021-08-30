@@ -197,7 +197,8 @@ namespace NbtStudio.UI
             return new OpenFileEditor(() => new NbtFile())
             {
                 TreeGetter = () => App.Tree,
-                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
+                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
+                Mode = OpenMode.Open
             };
         }
 
@@ -206,7 +207,8 @@ namespace NbtStudio.UI
             return new OpenFileEditor(() => new RegionFile())
             {
                 TreeGetter = () => App.Tree,
-                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?")
+                UnsavedWarningCheck = ConfirmIfUnsaved("Create a new file anyway?"),
+                Mode = OpenMode.Open
             };
         }
 
@@ -290,7 +292,8 @@ namespace NbtStudio.UI
         {
             return new OpenFileEditor(() => new NbtFile())
             {
-                TreeGetter = () => App.Tree
+                TreeGetter = () => App.Tree,
+                Mode = OpenMode.Import
             };
         }
 
@@ -298,7 +301,8 @@ namespace NbtStudio.UI
         {
             return new OpenFileEditor(() => new RegionFile())
             {
-                TreeGetter = () => App.Tree
+                TreeGetter = () => App.Tree,
+                Mode = OpenMode.Import
             };
         }
 
@@ -344,25 +348,15 @@ namespace NbtStudio.UI
 
         public Editor Edit()
         {
-            return Edit(View.SelectedModelNodes.ToArray());
-        }
-
-        public Editor Edit(params Node[] nodes)
-        {
-            return EditOrRename(true, nodes);
+            return EditOrRename(true);
         }
 
         public Editor Rename()
         {
-            return Rename(View.SelectedModelNodes.ToArray());
+            return EditOrRename(false);
         }
 
-        public Editor Rename(params Node[] nodes)
-        {
-            return EditOrRename(false, nodes);
-        }
-
-        public Editor EditOrRename(bool edit, params Node[] nodes)
+        public Editor EditOrRename(bool edit)
         {
             var purpose = edit ? EditPurpose.EditValue : EditPurpose.Rename;
             Func<IEnumerable<NbtTag>, ICommand> bulk_editor = edit ? x => BulkEditWindow.BulkEdit(Icons, x) : x => BulkEditWindow.BulkRename(Icons, x);
@@ -393,6 +387,81 @@ namespace NbtStudio.UI
             ));
             // TO DO: file renamer
             return editor;
+        }
+
+        public Editor Save()
+        {
+            return new AdHocEditor<IFile>(
+                x => x.GetFile(),
+                x => x.Any(),
+                x =>
+                {
+                    foreach (var file in x)
+                    {
+                        if (file.CanSave)
+                            file.Save();
+                        else if (!SaveAs(file))
+                            break;
+                    }
+                    return null;
+                }
+            );
+        }
+
+        public Editor SaveAs()
+        {
+            return new AdHocEditor<IFile>(
+                x => x.GetFile(),
+                x => x.Any(),
+                x =>
+                {
+                    foreach (var file in x)
+                    {
+                        if (!SaveAs(file))
+                            break;
+                    }
+                    return null;
+                }
+            );
+        }
+
+        private bool SaveAs(IExportable file)
+        {
+            string path = null;
+            if (file is IHavePath has_path)
+                path = has_path.Path;
+            using var dialog = new SaveFileDialog
+            {
+                Title = path is null ? "Save NBT file" : $"Save {Path.GetFileName(path)} as...",
+                RestoreDirectory = true,
+                FileName = path,
+                Filter = NbtUtil.SaveFilter(path, NbtUtil.GetFileType(file))
+            };
+            if (path is not null)
+            {
+                dialog.InitialDirectory = Path.GetDirectoryName(path);
+                dialog.FileName = Path.GetFileName(path);
+            }
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (file is NbtFile nbtfile)
+                {
+                    var export = new ExportWindow(GetIcons(), nbtfile.ExportSettings, dialog.FileName);
+                    if (export.ShowDialog() == DialogResult.OK)
+                    {
+                        nbtfile.SaveAs(dialog.FileName, export.GetSettings());
+                        Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                        return true;
+                    }
+                }
+                else
+                {
+                    file.SaveAs(dialog.FileName);
+                    Properties.Settings.Default.RecentFiles.Add(dialog.FileName);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

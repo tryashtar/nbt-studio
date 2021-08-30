@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NbtStudio
 {
@@ -33,7 +34,7 @@ namespace NbtStudio
 
         protected override bool CanEdit(IEnumerable<T> items)
         {
-            return CanEditFunction(items);
+            return items.Any() && CanEditFunction(items);
         }
     }
 
@@ -62,7 +63,7 @@ namespace NbtStudio
 
         protected override bool CanEdit(T item)
         {
-            return CanEditFunction(item);
+            return item is not null && CanEditFunction(item);
         }
     }
 }

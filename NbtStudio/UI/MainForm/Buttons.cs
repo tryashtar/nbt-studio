@@ -119,7 +119,7 @@ namespace NbtStudio.UI
             );
             MenuFile.DropDownItems.Add(new ToolStripSeparator());
             AddButton(
-                //editor: Editors.Save(),
+                editor: Editors.Save(),
                 source: OpenFilesSource,
                 text: "&Save",
                 hover: "Save",
@@ -129,7 +129,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                //editor: Editors.SaveAs(),
+                editor: Editors.SaveAs(),
                 source: OpenFilesSource,
                 text: "Save &As",
                 icon: IconType.Save,
@@ -326,6 +326,22 @@ namespace NbtStudio.UI
             }
         }
 
+        public void RunEditor(Editor editor, IEnumerable<Node> nodes)
+        {
+            var command = editor.Edit(nodes);
+            if (command is not null)
+                App.UndoHistory.PerformAction(command);
+            App.Tree.Refresh();
+        }
+
+        public void RunEditor(ContextFreeEditor editor)
+        {
+            var command = editor.Edit();
+            if (command is not null)
+                App.UndoHistory.PerformAction(command);
+            App.Tree.Refresh();
+        }
+
         private DualMenuItem AddButton(
             Editor editor = null,
             ContextFreeEditor no_context_editor = null,
@@ -346,24 +362,11 @@ namespace NbtStudio.UI
                 void enabler() => button.Enabled = editor.CanEdit(source.GetNodes());
                 enabler();
                 source.Changed += (s, e) => enabler();
-                button.Click += (s, e) =>
-                {
-                    var nodes = source.GetNodes();
-                    var command = editor.Edit(nodes);
-                    if (command is not null)
-                        App.UndoHistory.PerformAction(command);
-                    App.Tree.Refresh();
-                };
+                button.Click += (s, e) => RunEditor(editor, source.GetNodes());
             }
             if (no_context_editor is not null)
             {
-                button.Click += (s, e) =>
-                {
-                    var command = no_context_editor.Edit();
-                    if (command is not null)
-                        App.UndoHistory.PerformAction(command);
-                    App.Tree.Refresh();
-                };
+                button.Click += (s, e) => RunEditor(no_context_editor);
             }
             if (simple_action is not null)
             {

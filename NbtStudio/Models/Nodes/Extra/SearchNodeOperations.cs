@@ -14,7 +14,7 @@ namespace NbtStudio
     {
         public static Node SearchFrom(NbtTreeModel model, Node start, Predicate<Node> predicate, SearchDirection direction, bool wrap, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
-            var very_first = direction == SearchDirection.Forward ? model.RootNodes[0] : model.RootNodes[^1];
+            var very_first = direction == SearchDirection.Forward ? model.RootNodes[0] : FinalNode(model.RootNodes[^1]);
             Func<Node, Node> next_function = direction == SearchDirection.Forward ? NextNode : PreviousNode;
             start = start is null ? very_first : next_function(start);
             return SearchFromNext(model, start, predicate, next_function, new TreeSearchReport(), wrap ? very_first : null, progress, token);
@@ -32,7 +32,6 @@ namespace NbtStudio
             var node = model.RootNodes[0];
             while (node is not null)
             {
-                node = NextNode(node);
                 if (node is not null && predicate(node))
                     yield return node;
                 report.NodesSearched++;
@@ -42,6 +41,7 @@ namespace NbtStudio
                     progress.Report(report);
                     token.ThrowIfCancellationRequested();
                 }
+                node = NextNode(node);
             }
         }
 

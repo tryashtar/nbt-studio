@@ -81,6 +81,7 @@ namespace NbtStudio
                 file.LoadFromStream(stream, NbtCompression.AutoDetect);
                 LocalCompression = file.FileCompression;
                 LoadedChunk = new Chunk(file.GetRootTag<NbtCompound>());
+                Status = ChunkStatus.Loaded;
             }
             catch
             {
