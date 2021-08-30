@@ -36,7 +36,7 @@ namespace NbtStudio
         private void Form_Load(object sender, EventArgs e)
         {
             if (CommandLineArguments.Length > 0)
-                Form.Editors.OpenFiles(CommandLineArguments);
+                Form.RunEditor(Form.Editors.OpenFiles(CommandLineArguments));
         }
     }
 }
