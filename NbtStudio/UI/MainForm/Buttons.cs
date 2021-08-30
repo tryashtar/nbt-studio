@@ -332,6 +332,7 @@ namespace NbtStudio.UI
             if (command is not null)
                 App.UndoHistory.PerformAction(command);
             App.Tree.Refresh();
+            NbtTree.Refresh();
         }
 
         public void RunEditor(ContextFreeEditor editor)
@@ -340,6 +341,7 @@ namespace NbtStudio.UI
             if (command is not null)
                 App.UndoHistory.PerformAction(command);
             App.Tree.Refresh();
+            NbtTree.Refresh();
         }
 
         private DualMenuItem AddButton(
@@ -374,6 +376,7 @@ namespace NbtStudio.UI
                 {
                     simple_action();
                     App.Tree.Refresh();
+                    NbtTree.Refresh();
                 };
             }
             if (strip != null)
