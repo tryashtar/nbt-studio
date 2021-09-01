@@ -45,17 +45,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj">
-    </ProjectReference>
-    <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
-    </ProjectReference>
-    <ProjectReference Include="..\utils\fNbt\fNbt\fNbt.csproj" />
-    <ProjectReference Include="..\utils\Forms\TryashtarUtils.Forms.csproj" />
-    <ProjectReference Include="..\utils\Nbt\TryashtarUtils.Nbt.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.1" />
+    <ProjectReference Include="..\..\fNbt\fNbt\fNbt.csproj" />
+    <ProjectReference Include="..\..\HexBox\Be.Windows.Forms.HexBox.csproj" />
+    <ProjectReference Include="..\..\TreeViewAdv\Aga.Controls.csproj" />
+    <ProjectReference Include="..\..\TryashtarUtils\Forms\TryashtarUtils.Forms.csproj" />
+    <ProjectReference Include="..\..\TryashtarUtils\Nbt\TryashtarUtils.Nbt.csproj" />
+    <ProjectReference Include="..\..\TryashtarUtils\Utility\TryashtarUtils.Utility.csproj" />
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
