@@ -27,7 +27,7 @@ NBT Studio is designed around the easy transfer and conversion between textual S
 NBT Studio adds an assortment of convenience features to make navigating and editing NBT data easier.
 
 * <img src="NbtStudio/Resources/amber/tag_byte.png" width=16> The tag creation and edit menus have fields for both tag name and value, so you don't have to do it in two steps
-* <img src="NbtStudio/Resources/amber/tag_int.png" width=16> Hold <kbd>Shift</kbd> while adding a tag to skip the menu and select its name automatically
+* <img src="NbtStudio/Resources/amber/tag_int.png" width=16> Hold <kbd>Shift</kbd> while adding a tag to skip the menu and choose its name automatically
 * <img src="NbtStudio/Resources/amber/tag_list.png" width=16> NBT lists of type `byte`, `short`, `int`, or `long` can be edited as hex just like arrays
 * <img src="NbtStudio/Resources/amber/action_cut.png" width=16> Tags can be selected, dragged, and dropped to move them to a different parent
 * <img src="NbtStudio/Resources/amber/action_undo.png" width=16> Undo and redo functionality with <kbd>Ctrl</kbd> <kbd>Z</kbd> and <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd>
@@ -38,6 +38,9 @@ NBT Studio adds an assortment of convenience features to make navigating and edi
 * <img src="NbtStudio/Resources/amber/action_save.png" width=16> Right-click on a file to see options to save it, or open it in File Explorer
 * <img src="NbtStudio/Resources/amber/tag_compound.png" width=16> Right-click on a container tag to see options to add a child tag
 * <img src="NbtStudio/Resources/amber/file_file.png" width=16> Files display an asterisk (`*`) to indicate there are unsaved changes
+
+## Building This
+Unfortunately, it's rather difficult to clone and build this project now, since it uses like 6 different libraries that I intentionally separated so I could reuse them as shared code across multiple projects. If anyone has a better suggestion for how to do that (besides git submodules, which I couldn't stand), please let me know! :)
 
 # Credits
 This application was written from scratch by myself, tryashtar. However, it would never have existed without these amazing projects that came before me:
