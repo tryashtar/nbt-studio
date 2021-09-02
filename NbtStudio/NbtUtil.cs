@@ -237,19 +237,19 @@ namespace NbtStudio
             }
             else if (tag is NbtByteArray byte_array)
             {
-                if (byte_array.Value.Length < 20 && byte_array.Value.Length > 0)
+                if (byte_array.Value.Length is < 20 and > 0)
                     return $"[{String.Join(", ", byte_array.Value)}]";
                 return $"[{StringUtils.Pluralize(byte_array.Value.Length, "byte")}]";
             }
             else if (tag is NbtIntArray int_array)
             {
-                if (int_array.Value.Length < 20 && int_array.Value.Length > 0)
+                if (int_array.Value.Length is < 20 and > 0)
                     return $"[{String.Join(", ", int_array.Value)}]";
                 return $"[{StringUtils.Pluralize(int_array.Value.Length, "int")}]";
             }
             else if (tag is NbtLongArray long_array)
             {
-                if (long_array.Value.Length < 20 && long_array.Value.Length > 0)
+                if (long_array.Value.Length is < 20 and > 0)
                     return $"[{String.Join(", ", long_array.Value)}]";
                 return $"[{StringUtils.Pluralize(long_array.Value.Length, "long")}]";
             }

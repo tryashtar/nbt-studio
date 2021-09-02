@@ -140,5 +140,17 @@ namespace NbtStudio.Properties {
                 this["TagWordWrap"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NbtPath {
+            get {
+                return ((string)(this["NbtPath"]));
+            }
+            set {
+                this["NbtPath"] = value;
+            }
+        }
     }
 }

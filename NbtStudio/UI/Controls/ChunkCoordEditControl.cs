@@ -86,7 +86,7 @@ namespace NbtStudio.UI
 
         private void SetColor(CoordCheckResult result)
         {
-            var bad_color = Color.FromArgb(255, 230, 230);
+            var bad_color = ConvenienceTextBox.ErrorColor;
             switch (result)
             {
                 case CoordCheckResult.InvalidXOutOfBounds:

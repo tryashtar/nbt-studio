@@ -45,7 +45,7 @@ namespace NbtStudio.UI
             if (exception is null)
                 RestoreBackColor();
             else
-                SetBackColor(Color.FromArgb(255, 230, 230));
+                SetBackColor(ConvenienceTextBox.ErrorColor);
         }
 
         private void ShowTooltip(Exception exception)

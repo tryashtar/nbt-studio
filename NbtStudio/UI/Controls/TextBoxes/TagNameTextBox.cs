@@ -29,10 +29,8 @@ namespace NbtStudio.UI
             {
                 case NameCheckResult.InvalidMissingName:
                 case NameCheckResult.InvalidHasName:
-                    SetBackColor(Color.FromArgb(255, 230, 230));
-                    break;
                 case NameCheckResult.InvalidDuplicateName:
-                    SetBackColor(Color.FromArgb(255, 230, 230));
+                    SetBackColor(ConvenienceTextBox.ErrorColor);
                     break;
                 case NameCheckResult.Valid:
                     RestoreBackColor();

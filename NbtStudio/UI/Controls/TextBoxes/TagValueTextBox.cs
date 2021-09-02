@@ -31,7 +31,7 @@ namespace NbtStudio.UI
                 case ValueCheckResult.InvalidFormat:
                 case ValueCheckResult.InvalidOutOfRange:
                 case ValueCheckResult.InvalidUnknown:
-                    SetBackColor(Color.FromArgb(255, 230, 230));
+                    SetBackColor(ConvenienceTextBox.ErrorColor);
                     break;
                 case ValueCheckResult.Valid:
                     RestoreBackColor();

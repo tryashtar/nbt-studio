@@ -132,7 +132,7 @@ namespace NbtStudio.UI
             ProgressBar.Value--; // fix animation
         }
 
-        private void FastEnsureVisible(TreeNodeAdv node)
+        public static void FastEnsureVisible(TreeNodeAdv node)
         {
             while (node is not null)
             {

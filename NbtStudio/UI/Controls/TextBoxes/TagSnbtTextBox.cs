@@ -31,13 +31,8 @@ namespace NbtStudio.UI
         {
             if (result.IsValid)
                 RestoreBackColor();
-            else
-            {
-                if (result is SnbtInvalidFormat)
-                    SetBackColor(Color.FromArgb(255, 230, 230));
-                else if (result is SnbtInvalidWrongType)
-                    SetBackColor(Color.FromArgb(255, 230, 230));
-            }
+            else if (result is SnbtInvalidFormat or SnbtInvalidWrongType)
+                SetBackColor(ConvenienceTextBox.ErrorColor);
         }
 
         private void ShowTooltip(ISnbtCheckResult result)

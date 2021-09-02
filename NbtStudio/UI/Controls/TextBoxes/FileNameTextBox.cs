@@ -32,7 +32,7 @@ namespace NbtStudio.UI
                 case NameCheckResult.InvalidWhitespace:
                 case NameCheckResult.InvalidCharacters:
                 case NameCheckResult.InvalidAlreadyTaken:
-                    SetBackColor(Color.FromArgb(255, 230, 230));
+                    SetBackColor(ConvenienceTextBox.ErrorColor);
                     break;
                 case NameCheckResult.Valid:
                     RestoreBackColor();

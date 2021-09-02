@@ -68,7 +68,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Update="UI\Controls\TextBoxes\NbtPathTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="UI\MainForm\Actions.cs" />
+    <Compile Update="UI\Windows\NbtPathWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Update="Properties\Settings.settings">

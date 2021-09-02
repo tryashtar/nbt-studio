@@ -284,6 +284,13 @@ namespace NbtStudio.UI
                 menu: MenuSearch
             );
             AddButton(
+                simple_action: SelectNbtPath,
+                text: "&Select NBT by Path",
+                icon: IconType.Search,
+                shortcut: Keys.Control | Keys.Alt | Keys.F,
+                menu: MenuSearch
+            );
+            AddButton(
                 simple_action: About,
                 text: "&About",
                 icon: IconType.NbtStudio,
@@ -397,6 +404,16 @@ namespace NbtStudio.UI
             if (!FindWindow.Visible)
                 FindWindow.Show(this);
             FindWindow.Focus();
+        }
+
+        private NbtPathWindow NbtPathWindow;
+        private void SelectNbtPath()
+        {
+            if (NbtPathWindow is null || NbtPathWindow.IsDisposed)
+                NbtPathWindow = new NbtPathWindow(IconSource, NbtTree);
+            if (!NbtPathWindow.Visible)
+                NbtPathWindow.Show(this);
+            NbtPathWindow.Focus();
         }
 
         private AboutWindow AboutWindow;

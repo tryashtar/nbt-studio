@@ -71,6 +71,7 @@ namespace NbtStudio.UI
     public class ConvenienceTextBox : TextBox
     {
         private readonly ConvenienceManager Convenience;
+        public static readonly Color ErrorColor = Color.FromArgb(255, 230, 230);
         public ConvenienceTextBox()
         {
             Convenience = new ConvenienceManager(this);
