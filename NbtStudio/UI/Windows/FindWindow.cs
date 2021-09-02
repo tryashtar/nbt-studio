@@ -102,25 +102,25 @@ namespace NbtStudio.UI
                 }
                 else
                 {
-                    if (x.Result.CountGreaterThan(1))
+                    var items = x.Result.ToList();
+                    if (items.Count > 1)
                     {
                         FoundResultsLabel.Text = $"Found {x.Result.Count()} matching results";
                         FoundResultsLabel.Visible = true;
                     }
                     SearchingView.ClearSelection();
-                    LastFound = x.Result.Last();
-                    foreach (var item in x.Result)
+                    LastFound = items[^1];
+                    for (int i = 0; i < items.Count; i++)
                     {
-                        var node = SearchingView.FindNode(item.Path, true);
+                        var node = SearchingView.FindNode(items[i].Path, true);
                         if (node is not null)
                         {
                             FastEnsureVisible(node);
                             node.IsSelected = true;
+                            if (i == items.Count - 1)
+                                SearchingView.ScrollTo(node);
                         }
                     }
-                    var scroll = SearchingView.FindNode(LastFound.Path, true);
-                    if (scroll is not null)
-                        SearchingView.ScrollTo(scroll);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }

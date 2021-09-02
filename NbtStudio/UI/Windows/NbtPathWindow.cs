@@ -60,20 +60,22 @@ namespace NbtStudio.UI
                 FoundResultsLabel.Text = "Select a tag to begin";
                 return;
             }
-            var selected = selected_nodes.SelectMany(node_path.Traverse);
-            if (!selected.Any())
+            var selected = selected_nodes.SelectMany(node_path.Traverse).ToList();
+            if (selected.Count == 0)
             {
                 FoundResultsLabel.Text = "No tags match that path";
                 return;
             }
             View.ClearSelection();
-            foreach (var found in selected)
+            for (int i = 0; i < selected.Count; i++)
             {
-                var node = View.FindNode(found.Path, true);
+                var node = View.FindNode(selected[i].Path, true);
                 if (node is not null)
                 {
                     FindWindow.FastEnsureVisible(node);
                     node.IsSelected = true;
+                    if (i == 0)
+                        View.ScrollTo(node);
                 }
             }
             FoundResultsLabel.Text = $"Found {StringUtils.Pluralize(selected.Count(), "matching tag")}";

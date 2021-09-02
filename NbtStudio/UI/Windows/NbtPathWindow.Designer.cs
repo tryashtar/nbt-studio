@@ -62,7 +62,7 @@
             this.FoundResultsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.FoundResultsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.FoundResultsLabel.ForeColor = System.Drawing.Color.Gray;
-            this.FoundResultsLabel.Location = new System.Drawing.Point(39, 62);
+            this.FoundResultsLabel.Location = new System.Drawing.Point(39, 67);
             this.FoundResultsLabel.Margin = new System.Windows.Forms.Padding(12, 12, 6, 0);
             this.FoundResultsLabel.Name = "FoundResultsLabel";
             this.FoundResultsLabel.Size = new System.Drawing.Size(182, 20);
