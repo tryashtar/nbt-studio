@@ -123,7 +123,7 @@ namespace NbtStudio.UI
                 source: OpenFilesSource,
                 text: "&Save",
                 hover: "Save",
-                icon: IconType.Save,
+                context_icon: x => x.CountGreaterThan(1) ? IconType.SaveAll : IconType.Save,
                 shortcut: Keys.Control | Keys.S,
                 strip: Tools,
                 menu: MenuFile
@@ -132,7 +132,7 @@ namespace NbtStudio.UI
                 editor: Editors.SaveAs(),
                 source: OpenFilesSource,
                 text: "Save &As",
-                icon: IconType.Save,
+                context_icon: x => x.CountGreaterThan(1) ? IconType.SaveAll : IconType.Save,
                 shortcut: Keys.Control | Keys.Shift | Keys.S,
                 menu: MenuFile
             );
@@ -365,6 +365,7 @@ namespace NbtStudio.UI
             string text = null,
             string hover = null,
             IconType? icon = null,
+            Func<IEnumerable<Node>, IconType?> context_icon = null,
             Keys? shortcut = null,
             ToolStrip strip = null,
             ToolStripMenuItem menu = null,
@@ -372,6 +373,12 @@ namespace NbtStudio.UI
             )
         {
             var button = new DualMenuItem(text, hover, icon, shortcut ?? Keys.None);
+            if (context_icon is not null)
+            {
+                void changer() => button.IconType = context_icon(source.GetNodes());
+                changer();
+                source.Changed += (s, e) => changer();
+            }
             if (editor is not null)
             {
                 void enabler() => button.Enabled = editor.CanEdit(source.GetNodes());

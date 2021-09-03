@@ -6,16 +6,15 @@ namespace NbtStudio
 {
     public delegate T ExtractDelegate<T>(Node node);
     public delegate ICommand EditDelegate<T>(IEnumerable<T> items);
-    public delegate bool CanEditDelegate<T>(IEnumerable<T> items);
     public delegate ICommand EditSingleDelegate<T>(T item);
     public delegate bool CanEditSingleDelegate<T>(T item);
     public class AdHocEditor<T> : TypedEditor<T>
     {
         public readonly ExtractDelegate<T> ExtractFunction;
         public readonly EditDelegate<T> EditFunction;
-        public readonly CanEditDelegate<T> CanEditFunction;
+        public readonly CanEditSingleDelegate<T> CanEditFunction;
 
-        public AdHocEditor(ExtractDelegate<T> extract, CanEditDelegate<T> can, EditDelegate<T> edit)
+        public AdHocEditor(ExtractDelegate<T> extract, CanEditSingleDelegate<T> can, EditDelegate<T> edit)
         {
             ExtractFunction = extract;
             CanEditFunction = can;
@@ -32,9 +31,9 @@ namespace NbtStudio
             return EditFunction(items);
         }
 
-        protected override bool CanEdit(IEnumerable<T> items)
+        protected override bool CanEdit(T item)
         {
-            return items.Any() && CanEditFunction(items);
+            return CanEditFunction(item);
         }
     }
 
@@ -63,7 +62,7 @@ namespace NbtStudio
 
         protected override bool CanEdit(T item)
         {
-            return item is not null && CanEditFunction(item);
+            return CanEditFunction(item);
         }
     }
 }

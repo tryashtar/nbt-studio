@@ -14,7 +14,7 @@ namespace NbtStudio
     {
         protected sealed override bool CanEdit(IEnumerable<T> items)
         {
-            return ListUtils.ExactlyOne(items) && CanEdit(items.Single());
+            return ListUtils.ExactlyOne(items);
         }
 
         protected override ICommand Edit(IEnumerable<T> items)
@@ -22,7 +22,6 @@ namespace NbtStudio
             return Edit(items.Single());
         }
 
-        protected abstract bool CanEdit(T item);
         protected abstract ICommand Edit(T item);
     }
 }

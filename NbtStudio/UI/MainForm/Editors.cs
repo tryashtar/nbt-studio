@@ -1,4 +1,4 @@
-﻿using fNbt;
+using fNbt;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -393,7 +393,7 @@ namespace NbtStudio.UI
         {
             return new AdHocEditor<IFile>(
                 x => x.GetFile(),
-                x => x.Any(),
+                x => true,
                 x =>
                 {
                     foreach (var file in x)
@@ -412,7 +412,7 @@ namespace NbtStudio.UI
         {
             return new AdHocEditor<IFile>(
                 x => x.GetFile(),
-                x => x.Any(),
+                x => true,
                 x =>
                 {
                     foreach (var file in x)
