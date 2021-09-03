@@ -98,9 +98,7 @@ namespace NbtStudio
         public void ApplyChanges()
         {
             Apply().Execute();
-#if DEBUG
-            Console.WriteLine("ApplyChanges() called, that is probably bad!");
-#endif            
+            DebugLog.WriteLine("ApplyChanges() called, that is probably bad!");
         }
 
         public ICommand Apply()

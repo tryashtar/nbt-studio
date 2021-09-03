@@ -72,7 +72,7 @@ namespace NbtStudio.UI
                         "Failed to check for updates.", x,
                         "Would you like to go to the update page?\n" +
                         Updater.GitHubUrl(),
-                        ExceptionWindowButtons.OKCancel
+                        InfoWindowButtons.OKCancel
                     );
                     window.ShowDialog(this);
                     if (window.DialogResult == DialogResult.OK)

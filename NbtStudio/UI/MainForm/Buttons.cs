@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
@@ -304,6 +304,12 @@ namespace NbtStudio.UI
                 shortcut: Keys.Control | Keys.I,
                 menu: MenuHelp
             );
+            AddButton(
+                simple_action: ViewLog,
+                text: "View &Log",
+                icon: IconType.NewFile,
+                menu: MenuHelp
+            );
             MenuHelp.DropDownItems.Add(new ToolStripSeparator());
             UpdateButton = AddButton(
                 simple_action: Update,
@@ -453,6 +459,22 @@ namespace NbtStudio.UI
             if (!UpdateWindow.Visible)
                 UpdateWindow.Show(this);
             UpdateWindow.Focus();
+        }
+
+        private InfoWindow LogWindow;
+        private void ViewLog()
+        {
+            if (LogWindow is null || LogWindow.IsDisposed)
+            {
+                var log = DebugLog.Get();
+                LogWindow = new InfoWindow("Log",
+                    $"Found {StringUtils.Pluralize(log.Count, "log entry", "log entries")}",
+                    String.Join(Environment.NewLine, log)
+                );
+            }
+            if (!LogWindow.Visible)
+                LogWindow.Show(this);
+            LogWindow.Focus();
         }
     }
 }

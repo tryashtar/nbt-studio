@@ -54,10 +54,8 @@ namespace NbtStudio
 
         public void Load()
         {
-#if DEBUG
             if (IsLoaded)
-                Debug.WriteLine($"Loading chunk entry ({X},{Z}) that's already loaded");
-#endif
+                DebugLog.WriteLine($"Loading chunk entry ({X},{Z}) that's already loaded");
             using var stream = Region.GetStream();
             stream.Seek(Offset + 4, SeekOrigin.Begin);
             int compression = stream.ReadByte();

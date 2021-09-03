@@ -93,9 +93,7 @@ namespace NbtStudio.UI
 
         public Regex ReparseRegex()
         {
-#if DEBUG
-            Console.WriteLine($"Parsing new regex: \"{this.Text}\"");
-#endif
+            DebugLog.WriteLine($"Parsing new regex: \"{this.Text}\"");
             return new Regex(this.Text, RegexOptions.IgnoreCase);
         }
 

@@ -72,6 +72,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="UI\MainForm\Actions.cs" />
+    <Compile Update="UI\Windows\InfoWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="UI\Windows\NbtPathWindow.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,6 +1,6 @@
 ﻿namespace NbtStudio.UI
 {
-    partial class ExceptionWindow
+    partial class InfoWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -142,7 +142,7 @@
             this.ExtraInfoLabel.Size = new System.Drawing.Size(25, 29);
             this.ExtraInfoLabel.TabIndex = 2;
             // 
-            // ExceptionWindow
+            // InfoWindow
             // 
             this.AcceptButton = this.ButtonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -160,10 +160,10 @@
             this.MaximumSize = new System.Drawing.Size(581, 802);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(114, 156);
-            this.Name = "ExceptionWindow";
+            this.Name = "InfoWindow";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Load += new System.EventHandler(this.ExceptionWindow_Load);
+            this.Load += new System.EventHandler(this.InfoWindow_Load);
             this.ButtonsPanel.ResumeLayout(false);
             this.MessagePanel.ResumeLayout(false);
             this.MessagePanel.PerformLayout();
