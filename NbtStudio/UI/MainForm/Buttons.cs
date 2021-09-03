@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
@@ -142,7 +142,7 @@ namespace NbtStudio.UI
                 menu: MenuFile
             );
             AddButton(
-                //editor: Editors.Refresh(),
+                editor: Editors.RefreshFiles(),
                 source: OpenFilesSource,
                 hover: "Refresh",
                 icon: IconType.Refresh,

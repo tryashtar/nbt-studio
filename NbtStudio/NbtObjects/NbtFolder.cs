@@ -9,7 +9,7 @@ using TryashtarUtils.Utility;
 
 namespace NbtStudio
 {
-    public class NbtFolder : IHavePath, IRefreshable, IDisposable
+    public class NbtFolder : IHavePath, IDisposable
     {
         public string Path { get; private set; }
         public readonly bool Recursive;
@@ -24,8 +24,6 @@ namespace NbtStudio
         private readonly Dictionary<string, NbtFolder> SubfolderDict = new();
         private readonly Dictionary<string, IFile> FileDict = new();
         private readonly Dictionary<string, IFailable<IFile>> FailedFileDict = new();
-        public bool CanRefresh => true;
-        public void Refresh() => Scan();
 
         public NbtFolder(string path, bool recursive)
         {

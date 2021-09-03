@@ -187,11 +187,15 @@ namespace NbtStudio
             Save();
         }
 
-        public void Refresh()
+        public ICommand Refresh()
         {
             var current = TryCreateFromExportSettings(Path, ExportSettings).Result.RootTag;
-            RootTag.SetEqualTo(current);
-            HasUnsavedChanges = false;
+            var command = new SetTagEqualCommand(RootTag, current);
+            var extra = new ExtraOperationCommand(command,
+                () => HasUnsavedChanges = false,
+                () => HasUnsavedChanges = true
+            );
+            return extra;
         }
     }
 }

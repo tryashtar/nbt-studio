@@ -27,7 +27,7 @@ namespace NbtStudio
     public interface IRefreshable
     {
         bool CanRefresh { get; }
-        void Refresh();
+        ICommand Refresh();
     }
 
     public interface IFile : IHavePath, ISaveable, IExportable, IRefreshable

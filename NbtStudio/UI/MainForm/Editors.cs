@@ -1,4 +1,4 @@
-using fNbt;
+﻿using fNbt;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -404,6 +404,23 @@ namespace NbtStudio.UI
                             break;
                     }
                     return null;
+                }
+            );
+        }
+
+        public Editor RefreshFiles()
+        {
+            return new AdHocEditor<IFile>(
+                x => x.GetFile(),
+                x => x.CanRefresh,
+                x =>
+                {
+                    var commands = new List<ICommand>();
+                    foreach (var file in x)
+                    {
+                        commands.Add(file.Refresh());
+                    }
+                    return CommandExtensions.Merge($"Refresh {StringUtils.Pluralize(x.Count(), "file")}", false, commands.ToArray());
                 }
             );
         }

@@ -203,9 +203,9 @@ namespace NbtStudio
             Save();
         }
 
-        public void Refresh()
+        public ICommand Refresh()
         {
-            Load();
+            throw new NotImplementedException();
         }
     }
 
