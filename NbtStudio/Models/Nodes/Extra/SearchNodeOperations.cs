@@ -14,6 +14,8 @@ namespace NbtStudio
     {
         public static Node SearchFrom(IList<Node> nodes, Node start, Predicate<Node> predicate, SearchDirection direction, bool wrap, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
+            if (nodes.Count == 0)
+                return null;
             var very_first = direction == SearchDirection.Forward ? nodes[0] : FinalNode(nodes[^1]);
             Func<Node, Node> next_function = direction == SearchDirection.Forward ? x => NextNode(nodes, x) : x => PreviousNode(nodes, x);
             start = start is null ? very_first : next_function(start);
@@ -27,6 +29,8 @@ namespace NbtStudio
 
         public static IEnumerable<Node> SearchAll(IList<Node> nodes, Predicate<Node> predicate, IProgress<TreeSearchReport> progress, CancellationToken token)
         {
+            if (nodes.Count == 0)
+                yield break;
             var report = new TreeSearchReport();
             report.TotalNodes = TotalNodes(nodes);
             var node = nodes[0];

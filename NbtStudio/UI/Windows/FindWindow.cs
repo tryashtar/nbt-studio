@@ -59,7 +59,7 @@ namespace NbtStudio.UI
         private Node DoSearch(SearchDirection direction, IProgress<TreeSearchReport> progress)
         {
             if (!ValidateRegex()) return null;
-            var start = (SearchingView.SelectedNode?.Tag as Node) ?? LastFound;
+            var start = (SearchingView.SelectedModelNode) ?? LastFound;
             var predicate = GetPredicate();
             var find = SearchNodeOperations.SearchFrom(SearchingModel.RootNodes, start, predicate, direction, true, progress, CancelSource.Token);
             if (find is null)

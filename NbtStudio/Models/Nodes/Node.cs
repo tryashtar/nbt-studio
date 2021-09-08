@@ -89,7 +89,6 @@ namespace NbtStudio
             }
             IsDirty = false;
             DirtyNodes.Remove(this);
-            CascadeChanges(report);
             return report;
         }
 

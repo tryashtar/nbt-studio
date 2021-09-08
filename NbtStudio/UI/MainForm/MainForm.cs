@@ -183,8 +183,8 @@ namespace NbtStudio.UI
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
 #if !DEBUG
-            if (!ConfirmIfUnsaved("Exit anyway?"))
-                e.Cancel = true;
+            //if (!ConfirmIfUnsaved("Exit anyway?"))
+            //    e.Cancel = true;
 #endif
         }
 

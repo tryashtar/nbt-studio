@@ -77,7 +77,7 @@ namespace NbtStudio
         {
             foreach (var node in Node.DirtyNodes)
             {
-                node.RefreshChildren();
+                Node_SomethingChanged(node.RefreshChildren());
             }
         }
 
