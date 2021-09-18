@@ -14,8 +14,6 @@ namespace NbtStudio
     {
         public NbtTagNode(NbtTag wrapped) : base(wrapped)
         {
-            if (WrappedObject is NbtContainerTag container)
-                container.ChildrenChanged += tag => MarkDirty();
         }
 
         public NbtTag Tag => WrappedObject;

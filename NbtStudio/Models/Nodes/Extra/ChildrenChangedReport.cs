@@ -18,6 +18,7 @@ namespace NbtStudio
         public readonly OrderedDictionary<object, Node> CurrentChildren;
         public readonly OrderedDictionary<object, Node> RemovedChildren;
         public readonly OrderedDictionary<object, Node> AddedChildren;
+        public bool AnyChanges => RemovedChildren.Count > 0 || AddedChildren.Count > 0;
         public ChildrenChangedReport(Node node, IEnumerable<KeyValuePair<object, Node>> old_children, IEnumerable<KeyValuePair<object, Node>> current_children)
         {
             Node = node;
@@ -26,34 +27,6 @@ namespace NbtStudio
             CurrentChildren = new(current_children);
             RemovedChildren = new(OldChildren.Where(x => !CurrentChildren.ContainsKey(x.Key)));
             AddedChildren = new(CurrentChildren.Where(x => !OldChildren.ContainsKey(x.Key)));
-        }
-
-        public TreeModelEventArgs InsertedArgs()
-        {
-            if (AddedChildren.Count == 0)
-                return null;
-            var indices = AddedChildren.Select(x => CurrentChildren.IndexOf(x.Key)).ToArray();
-            return new TreeModelEventArgs(Path, indices, AddedChildren.Values.ToArray());
-        }
-
-        public TreeModelEventArgs RemovedArgs()
-        {
-            if (RemovedChildren.Count == 0)
-                return null;
-            var indices = RemovedChildren.Select(x => OldChildren.IndexOf(x.Key)).ToArray();
-            return new TreeModelEventArgs(Path, indices, RemovedChildren.Values.ToArray());
-        }
-
-        public TreeModelEventArgs StructureChangedArgs()
-        {
-            return null;
-        }
-
-        public TreeModelEventArgs ChangedArgs()
-        {
-            if (Node.Parent is null)
-                return null;
-            return new TreeModelEventArgs(Node.Parent.Path, new object[] { Node });
         }
     }
 }

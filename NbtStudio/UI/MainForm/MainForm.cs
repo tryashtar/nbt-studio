@@ -37,8 +37,9 @@ namespace NbtStudio.UI
 
             OpenFilesSource = new FormNodeSource(() => App.Tree.GetFiles());
             SelectedNodesSource = new FormNodeSource(() => NbtTree.SelectedModelNodes);
-            App.Tree.NodesInserted += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
-            App.Tree.NodesRemoved += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            // TO DO: bring this back
+            //App.Tree.NodesInserted += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            //App.Tree.NodesRemoved += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
             NbtTree.SelectionChanged += (s,e) => SelectedNodesSource.NoticeChanges();
 
             AddActionButtons();

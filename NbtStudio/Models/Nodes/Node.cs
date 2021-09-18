@@ -31,36 +31,13 @@ namespace NbtStudio
         {
             get
             {
-                if (IsDirty)
-                    RefreshChildren();
+                RefreshChildren();
                 return ChildNodes.Values;
             }
         }
         public virtual bool HasChildren => GetChildren().Any();
 
         private readonly OrderedDictionary<object, Node> ChildNodes = new();
-        // start off true since child nodes aren't ready yet
-        private bool IsDirty = true;
-
-        public delegate void NodeStructureChangedEvent(ChildrenChangedReport report);
-        public event NodeStructureChangedEvent SomethingChanged;
-        protected void CascadeChanges(ChildrenChangedReport report)
-        {
-            Node node = this;
-            while (node != null)
-            {
-                node.SomethingChanged?.Invoke(report);
-                node = node.Parent;
-            }
-        }
-
-        // to do: ehh...
-        public static readonly HashSet<Node> DirtyNodes = new();
-        protected void MarkDirty()
-        {
-            IsDirty = true;
-            DirtyNodes.Add(this);
-        }
 
         protected abstract IEnumerable<object> GetChildren();
         protected abstract Node MakeChild(object item);
@@ -69,16 +46,17 @@ namespace NbtStudio
         public abstract string PreviewValue();
         public abstract IconType GetIcon();
 
-        public ChildrenChangedReport RefreshChildren()
+        public void RefreshChildren()
         {
             // make sure to reuse existing nodes
             var new_nodes = GetChildren().Select(x => KeyValuePair.Create(x, GetOrCreateChild(x))).ToList();
             var report = new ChildrenChangedReport(this, ChildNodes, new_nodes);
+            if (!report.AnyChanges)
+                return;
             // clear the parent, might not be necessary but could help the GC
             foreach (var item in report.RemovedChildren)
             {
                 item.Value.Parent = null;
-                DirtyNodes.Remove(item.Value);
             }
             ChildNodes.Clear();
             DescendantsCount = 0;
@@ -87,9 +65,6 @@ namespace NbtStudio
                 DescendantsCount += node.Value.DescendantsCount + 1; // +1 for the node itself
                 ChildNodes.Add(node);
             }
-            IsDirty = false;
-            DirtyNodes.Remove(this);
-            return report;
         }
 
         private Node GetOrCreateChild(object obj)

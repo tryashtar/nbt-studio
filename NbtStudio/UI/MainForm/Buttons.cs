@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using TryashtarUtils.Utility;
 
@@ -344,8 +345,7 @@ namespace NbtStudio.UI
             var command = editor.Edit(nodes);
             if (command is not null)
                 App.UndoHistory.PerformAction(command);
-            App.Tree.Refresh();
-            NbtTree.Refresh();
+            NbtTree.RefreshModelNodes(nodes.Select(x => x.Path));
         }
 
         public void RunEditor(ContextFreeEditor editor)
@@ -353,8 +353,7 @@ namespace NbtStudio.UI
             var command = editor.Edit();
             if (command is not null)
                 App.UndoHistory.PerformAction(command);
-            App.Tree.Refresh();
-            NbtTree.Refresh();
+            NbtTree.RefreshModelNodes(App.Tree.RootNodes.Select(x => x.Path));
         }
 
         private DualMenuItem AddButton(
@@ -392,12 +391,7 @@ namespace NbtStudio.UI
             }
             if (simple_action is not null)
             {
-                button.Click += (s, e) =>
-                {
-                    simple_action();
-                    App.Tree.Refresh();
-                    NbtTree.Refresh();
-                };
+                button.Click += (s, e) => simple_action();
             }
             if (strip != null)
                 button.AddToToolStrip(strip);

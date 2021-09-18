@@ -13,8 +13,6 @@ namespace NbtStudio
     {
         public NbtFileNode(NbtFile wrapped) : base(wrapped)
         {
-            if (WrappedObject.RootTag is NbtContainerTag container)
-                container.ChildrenChanged += tag => MarkDirty();
         }
 
         protected override IEnumerable<NbtTag> GetTypedChildren()
