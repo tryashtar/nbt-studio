@@ -45,13 +45,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj" />
     <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj">
     </ProjectReference>
     <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj">
     </ProjectReference>
-    <ProjectReference Include="..\utils\fNbt\fNbt\fNbt.csproj" />
-    <ProjectReference Include="..\utils\Forms\TryashtarUtils.Forms.csproj" />
-    <ProjectReference Include="..\utils\Nbt\TryashtarUtils.Nbt.csproj" />
+    <ProjectReference Include="..\utils.forms\TryashtarUtils.Forms.csproj" />
+    <ProjectReference Include="..\utils.nbt\TryashtarUtils.Nbt.csproj" />
+    <ProjectReference Include="..\utils.utility\TryashtarUtils.Utility.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
