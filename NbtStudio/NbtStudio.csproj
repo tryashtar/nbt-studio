@@ -47,9 +47,9 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.1" />
-    <ProjectReference Include="..\..\HexBox\Be.Windows.Forms.HexBox.csproj" />
-    <ProjectReference Include="..\..\TreeViewAdv\Aga.Controls.csproj" />
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj" />
+    <ProjectReference Include="..\HexBox\Be.Windows.Forms.HexBox.csproj" />
+    <ProjectReference Include="..\TreeViewAdv\Aga.Controls.csproj" />
     <ProjectReference Include="..\utils.forms\TryashtarUtils.Forms.csproj" />
     <ProjectReference Include="..\utils.nbt\TryashtarUtils.Nbt.csproj" />
     <ProjectReference Include="..\utils.utility\TryashtarUtils.Utility.csproj" />

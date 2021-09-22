@@ -20,7 +20,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\TreeViewAdv\Aga.Controls.csproj" />
     <ProjectReference Include="..\fNbt\fNbt\fNbt.csproj" />
     <ProjectReference Include="..\NbtStudio\NbtStudio.csproj">
     </ProjectReference>

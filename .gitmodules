@@ -10,3 +10,9 @@
 [submodule "utils.utility"]
 	path = utils.utility
 	url = https://github.com/tryashtar/utils.utility
+[submodule "TreeViewAdv"]
+	path = TreeViewAdv
+	url = https://github.com/tryashtar/TreeViewAdv
+[submodule "HexBox"]
+	path = HexBox
+	url = https://github.com/tryashtar/HexBox
