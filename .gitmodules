@@ -4,6 +4,15 @@
 [submodule "HexBox"]
 	path = HexBox
 	url = https://github.com/tryashtar/HexBox
-[submodule "utils"]
-	path = utils
-	url = https://github.com/tryashtar/utils
+[submodule "fNbt"]
+	path = fNbt
+	url = https://github.com/tryashtar/fNbt
+[submodule "utils.utility"]
+	path = utils.utility
+	url = https://github.com/tryashtar/utils.utility
+[submodule "utils.forms"]
+	path = utils.forms
+	url = https://github.com/tryashtar/utils.forms
+[submodule "utils.nbt"]
+	path = utils.nbt
+	url = https://github.com/tryashtar/utils.nbt
