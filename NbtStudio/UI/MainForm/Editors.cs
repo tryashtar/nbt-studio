@@ -17,20 +17,23 @@ namespace NbtStudio.UI
     public class MainFormEditors
     {
         private readonly Getter<Studio> GetApp;
+        private readonly Getter<UndoHistory> GetUndo;
         private readonly Getter<MainForm> GetForm;
         private readonly Getter<NbtTreeView> GetView;
         private readonly Getter<IconSource> GetIcons;
         private Studio App => GetApp();
+        private UndoHistory Undoer => GetUndo();
         private MainForm Form => GetForm();
         private NbtTreeView View => GetView();
         private IconSource Icons => GetIcons();
 
-        public MainFormEditors(Getter<Studio> app, Getter<MainForm> form, Getter<NbtTreeView> view, Getter<IconSource> icons)
+        public MainFormEditors(Getter<Studio> app, Getter<MainForm> form, Getter<NbtTreeView> view, Getter<IconSource> icons, Getter<UndoHistory> undo)
         {
             GetApp = app;
             GetForm = form;
             GetView = view;
             GetIcons = icons;
+            GetUndo = undo;
         }
 
         private UnsavedWarningHandler ConfirmIfUnsaved(string message)
@@ -175,12 +178,12 @@ namespace NbtStudio.UI
 
         public void Undo()
         {
-            App.UndoHistory.Undo();
+            Undoer.Undo();
         }
 
         public void Redo()
         {
-            App.UndoHistory.Redo();
+            Undoer.Redo();
         }
 
         public Editor AddTag(NbtTagType type)

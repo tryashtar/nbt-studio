@@ -13,7 +13,6 @@ namespace NbtStudio
     {
         public MainForm Form { get; private set; }
         public readonly NbtTreeModel Tree = new();
-        public readonly UndoHistory UndoHistory = new();
 
         private readonly string[] CommandLineArguments;
 

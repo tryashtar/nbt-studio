@@ -16,6 +16,7 @@ namespace NbtStudio
     // this is mostly necessary because TreeViewAdv requires it, but it has some extra stuff as well
     public partial class NbtTreeModel : ITreeModel
     {
+        public readonly UndoHistory UndoHistory = new();
         private readonly List<Node> Roots = new();
         public ReadOnlyCollection<Node> RootNodes => Roots.AsReadOnly();
 
@@ -29,6 +30,7 @@ namespace NbtStudio
         {
             Roots.Clear();
             Import(paths);
+            UndoHistory.Clear();
         }
 
         public void Import(params IHavePath[] paths)

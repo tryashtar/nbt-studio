@@ -62,19 +62,23 @@ namespace NbtStudio.UI
         protected override void OnNodesInserted(TreeNodeAdv parent, TreeModelEventArgs e)
         {
             base.OnNodesInserted(parent, e);
-            parent.Expand();
             if (e.Path.IsEmpty())
             {
-                var node = Root;
-                for (int i = 0; i < 3; i++)
+                if (Root.Children.Count == 1)
                 {
-                    if (node.Children.Count == 1)
+                    var node = Root;
+                    for (int i = 0; i < 3; i++)
                     {
-                        node = node.Children[0];
-                        node.Expand();
+                        if (node.Children.Count == 1)
+                        {
+                            node = node.Children[0];
+                            node.Expand();
+                        }
                     }
                 }
             }
+            else
+                parent.Expand();
         }
 
         protected override void OnPaint(PaintEventArgs e)

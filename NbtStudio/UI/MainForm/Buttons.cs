@@ -151,14 +151,14 @@ namespace NbtStudio.UI
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
-                simple_action: () => App.UndoHistory.Undo(),
+                simple_action: () => UndoHistory.Undo(),
                 text: "&Undo",
                 icon: IconType.Undo,
                 shortcut: Keys.Control | Keys.Z,
                 menu: MenuEdit
             );
             AddButton(
-                simple_action: () => App.UndoHistory.Redo(),
+                simple_action: () => UndoHistory.Redo(),
                 text: "&Redo",
                 icon: IconType.Redo,
                 shortcut: Keys.Control | Keys.Shift | Keys.Z,
@@ -344,7 +344,7 @@ namespace NbtStudio.UI
         {
             var command = editor.Edit(nodes);
             if (command is not null)
-                App.UndoHistory.PerformAction(command);
+                UndoHistory.PerformAction(command);
             NbtTree.RefreshModelNodes(nodes.Select(x => x.Path));
         }
 
@@ -352,7 +352,7 @@ namespace NbtStudio.UI
         {
             var command = editor.Edit();
             if (command is not null)
-                App.UndoHistory.PerformAction(command);
+                UndoHistory.PerformAction(command);
             NbtTree.RefreshModelNodes(App.Tree.RootNodes.Select(x => x.Path));
         }
 

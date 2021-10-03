@@ -20,14 +20,14 @@ namespace NbtStudio.UI
         private IconSource IconSource;
         private readonly Studio App;
         private readonly Updater UpdateChecker = new();
-        private UndoHistory UndoHistory => App.UndoHistory;
+        private UndoHistory UndoHistory => App.Tree.UndoHistory;
 
         public readonly MainFormEditors Editors;
 
         public MainForm(Studio application)
         {
             App = application;
-            Editors = new(() => App, () => this, () => NbtTree, () => IconSource);
+            Editors = new(() => App, () => this, () => NbtTree, () => IconSource, () => UndoHistory);
 
             // add controls
             InitializeComponent();
@@ -37,10 +37,9 @@ namespace NbtStudio.UI
 
             OpenFilesSource = new FormNodeSource(() => App.Tree.GetFiles());
             SelectedNodesSource = new FormNodeSource(() => NbtTree.SelectedModelNodes);
-            // TO DO: bring this back
-            //App.Tree.NodesInserted += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
-            //App.Tree.NodesRemoved += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
-            NbtTree.SelectionChanged += (s,e) => SelectedNodesSource.NoticeChanges();
+            NbtTree.NodesInserted += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            NbtTree.NodesRemoved += (s, e) => { OpenFilesSource.NoticeChanges(); SelectedNodesSource.NoticeChanges(); };
+            NbtTree.SelectionChanged += (s, e) => SelectedNodesSource.NoticeChanges();
 
             AddActionButtons();
 
