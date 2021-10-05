@@ -261,18 +261,32 @@ namespace NbtStudio.UI
                 text: "Clear Undo History",
                 menu: MenuEdit
             );
-            MakeCreateTagButtons();
+            foreach (var type in NbtUtil.NormalTagTypes())
+            {
+                AddButton(
+                    hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
+                    icon: NbtUtil.TagIconType(type),
+                    strip: Tools,
+                    editor: Editors.AddTag(type),
+                    context_visibility: x => !EditingChunks(x),
+                    source: SelectedNodesSource
+                );
+            }
             AddButton(
                 //action: AddSnbt,
                 hover: "Add as SNBT",
                 icon: IconType.AddSnbt,
-                strip: Tools
+                strip: Tools,
+                context_visibility: x => !EditingChunks(x),
+                source: SelectedNodesSource
             );
             AddButton(
                 //action: AddChunk,
                 hover: "Add Chunk",
                 icon: IconType.Chunk,
-                strip: Tools
+                strip: Tools,
+                context_visibility: x => EditingChunks(x),
+                source: SelectedNodesSource
             );
             Tools.Items.Add(new ToolStripSeparator());
             AddButton(
@@ -326,18 +340,9 @@ namespace NbtStudio.UI
             );
         }
 
-        private void MakeCreateTagButtons()
+        private bool EditingChunks(IEnumerable<Node> nodes)
         {
-            foreach (var type in NbtUtil.NormalTagTypes())
-            {
-                AddButton(
-                    hover: $"Add {NbtUtil.TagTypeName(type)} Tag",
-                    icon: NbtUtil.TagIconType(type),
-                    strip: Tools,
-                    editor: Editors.AddTag(type),
-                    source: SelectedNodesSource
-                );
-            }
+            return nodes.Any() && nodes.All(x => x is RegionFileNode);
         }
 
         public void RunEditor(Editor editor, IEnumerable<Node> nodes)
@@ -365,6 +370,7 @@ namespace NbtStudio.UI
             string hover = null,
             IconType? icon = null,
             Func<IEnumerable<Node>, IconType?> context_icon = null,
+            Func<IEnumerable<Node>, bool> context_visibility = null,
             Keys? shortcut = null,
             ToolStrip strip = null,
             ToolStripMenuItem menu = null,
@@ -375,6 +381,12 @@ namespace NbtStudio.UI
             if (context_icon is not null)
             {
                 void changer() => button.IconType = context_icon(source.GetNodes());
+                changer();
+                source.Changed += (s, e) => changer();
+            }
+            if (context_visibility is not null)
+            {
+                void changer() => button.Visible = context_visibility(source.GetNodes());
                 changer();
                 source.Changed += (s, e) => changer();
             }
@@ -393,11 +405,11 @@ namespace NbtStudio.UI
             {
                 button.Click += (s, e) => simple_action();
             }
-            if (strip != null)
+            if (strip is not null)
                 button.AddToToolStrip(strip);
-            if (menu != null)
+            if (menu is not null)
                 button.AddToMenuItem(menu);
-            if (parent != null)
+            if (parent is not null)
                 button.AddToDual(parent);
             ButtonsCollection.Add(button);
             return button;
