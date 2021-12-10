@@ -121,11 +121,11 @@ namespace NbtStudio
             else if (tag is NbtString tag_string)
                 tag_string.Value = String.Empty;
             else if (tag is NbtByteArray tag_ba)
-                tag_ba.Value = new byte[0];
+                tag_ba.Value = Array.Empty<byte>();
             else if (tag is NbtIntArray tag_ia)
-                tag_ia.Value = new int[0];
+                tag_ia.Value = Array.Empty<int>();
             else if (tag is NbtLongArray tag_la)
-                tag_la.Value = new long[0];
+                tag_la.Value = Array.Empty<long>();
             else if (tag is NbtCompound tag_compound)
                 tag_compound.Clear();
             else if (tag is NbtList tag_list)

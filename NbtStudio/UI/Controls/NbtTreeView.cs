@@ -101,8 +101,8 @@ namespace NbtStudio.UI
         {
             if (Control.ModifierKeys == Keys.Control)
             {
-                float delta = (e.Delta > 0 ? 2f : -2f);
-                this.Font = new Font(this.Font.FontFamily, Math.Max(3, Math.Min(99, this.Font.Size + delta)));
+                float delta = 2 * Math.Sign(e.Delta);
+                this.Font = new Font(this.Font.FontFamily, Math.Clamp(this.Font.Size + delta, 3, 99));
             }
             else
                 base.OnMouseWheel(e);
