@@ -82,7 +82,7 @@ namespace NbtStudio
                 () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false), // bedrock files
                 () => TryCreateFromNbt(path, NbtCompression.AutoDetect, big_endian: false, bedrock_header: true) // bedrock level.dat files
             };
-            return TryVariousMethods(methods, x => LooksSuspicious(x.RootTag));
+            return TryVariousMethods(methods, x => (x.RootTag is NbtContainerTag c && c.Count == 0) || LooksSuspicious(x.RootTag));
         }
 
         public static IFailable<NbtFile> TryVariousMethods(IEnumerable<Func<IFailable<NbtFile>>> methods, Predicate<NbtFile> suspicious)
