@@ -115,7 +115,10 @@ namespace NbtStudio.UI
                         var node = SearchingView.FindNode(item.Path, true);
                         if (node is not null)
                         {
-                            FastEnsureVisible(node);
+                            if (x.Result.Count() < 4000)
+                            {
+                                FastEnsureVisible(node);
+                            }
                             node.IsSelected = true;
                         }
                     }
