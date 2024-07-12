@@ -1,14 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
+using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
 
 namespace NbtStudio
 {
@@ -16,15 +13,17 @@ namespace NbtStudio
     {
         public static AvailableUpdate CheckForUpdates()
         {
+#pragma warning disable CS0162
 #if DEBUG
             return null;
 #endif
-            var old = AvailableUpdate.TemporaryPath(Application.ExecutablePath);
+
+            string old = AvailableUpdate.TemporaryPath(Application.ExecutablePath);
+#pragma warning restore CS0162
             if (File.Exists(old))
                 File.Delete(old);
             var current = GetCurrentVersion();
-            var client = new WebClient();
-            client.Headers.Add(HttpRequestHeader.UserAgent, "NBT Studio update checker");
+            var client = new HttpClient();
             bool success = false;
             try
             {
@@ -44,7 +43,7 @@ namespace NbtStudio
             }
         }
 
-        private static string MergeChangelogs(WebClient client, IEnumerable<GitHubVersion> versions)
+        private static string MergeChangelogs(HttpClient client, IEnumerable<GitHubVersion> versions)
         {
             var builder = new StringBuilder();
             foreach (var version in versions)
@@ -67,11 +66,11 @@ namespace NbtStudio
             return new Version(Application.ProductVersion);
         }
 
-        public static List<GitHubVersion> GetAllVersions(WebClient client)
+        public static List<GitHubVersion> GetAllVersions(HttpClient client)
         {
             var versions = new List<GitHubVersion>();
             var uri = new Uri("https://api.github.com/repos/tryashtar/nbt-studio/releases");
-            string data = client.DownloadString(uri);
+            string data = client.GetStringAsync(uri).Result;
             var releases = JArray.Parse(data);
             foreach (JObject item in releases)
             {
@@ -102,8 +101,8 @@ namespace NbtStudio
     {
         public readonly GitHubVersion Version;
         public readonly string Changelog;
-        private readonly WebClient Client;
-        public AvailableUpdate(GitHubVersion version, WebClient client, string changelog)
+        private readonly HttpClient Client;
+        public AvailableUpdate(GitHubVersion version, HttpClient client, string changelog)
         {
             Version = version;
             Changelog = changelog;
@@ -230,22 +229,26 @@ namespace NbtStudio
             }
         }
 
-        public string DownloadChangelog(WebClient client)
+        public string DownloadChangelog(HttpClient client)
         {
             if (Changelog is null && ChangelogURL is not null)
             {
                 var uri = new Uri(ChangelogURL);
-                Changelog = client.DownloadString(uri);
+                Changelog = client.GetStringAsync(uri).Result;
             }
             return Changelog;
         }
 
-        public void DownloadAssets(WebClient client, string folder)
+        public void DownloadAssets(HttpClient client, string folder)
         {
             foreach (var (name, url) in Assets)
             {
                 var uri = new Uri(url);
-                client.DownloadFile(uri, Path.Combine(folder, name));
+                client.GetByteArrayAsync(uri).ContinueWith(task =>
+                {
+                    byte[] result = task.Result;
+                    File.WriteAllBytes(Path.Combine(folder, name), result);
+                });
             }
         }
     }

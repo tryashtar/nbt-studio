@@ -1,5 +1,4 @@
 ﻿using fNbt;
-using NbtStudio;
 using System;
 using System.IO;
 using System.Linq;

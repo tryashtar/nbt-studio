@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NbtStudio.UI;
+using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using NbtStudio.UI;
 
 namespace NbtStudio
 {

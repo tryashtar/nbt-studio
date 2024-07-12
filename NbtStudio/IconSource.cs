@@ -5,8 +5,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NbtStudio
 {
@@ -53,15 +51,13 @@ namespace NbtStudio
 
         public static void RegisterCustomSource(string filepath)
         {
-            using (ZipArchive zip = ZipFile.OpenRead(filepath))
-            {
-                var source = new ZippedIconSource(filepath, zip);
-                Register(filepath, source);
-            }
+            using ZipArchive zip = ZipFile.OpenRead(filepath);
+            var source = new ZippedIconSource(filepath, zip);
+            Register(filepath, source);
         }
     }
 
-    public struct ImageIcon
+    public readonly struct ImageIcon
     {
         public readonly Image Image;
         public readonly Icon Icon;
@@ -126,7 +122,7 @@ namespace NbtStudio
 
     public abstract class SimpleIconSource : IconSource
     {
-        private readonly Dictionary<IconType, ImageIcon> Cache = new Dictionary<IconType, ImageIcon>();
+        private readonly Dictionary<IconType, ImageIcon> Cache = new();
 
         public override ImageIcon GetImage(IconType type)
         {
@@ -147,37 +143,33 @@ namespace NbtStudio
 
         protected void Add(IconType type, Image image)
         {
-            using (var stream = ConvertToIcon(image))
-            {
-                var icon = new Icon(stream);
-                Add(type, image, icon);
-            }
+            using var stream = ConvertToIcon(image);
+            var icon = new Icon(stream);
+            Add(type, image, icon);
         }
 
         private static Stream ConvertToIcon(Image input)
         {
-            using (var stream = new MemoryStream())
-            {
-                var output = new MemoryStream();
-                input.Save(stream, ImageFormat.Png);
-                var writer = new BinaryWriter(output);
-                writer.Write((byte)0);
-                writer.Write((byte)0);
-                writer.Write((short)1);
-                writer.Write((short)1);
-                writer.Write((byte)input.Width);
-                writer.Write((byte)input.Height);
-                writer.Write((byte)0);
-                writer.Write((byte)0);
-                writer.Write((short)0);
-                writer.Write((short)32);
-                writer.Write((int)stream.Length);
-                writer.Write((int)(6 + 16));
-                writer.Write(stream.ToArray());
-                writer.Flush();
-                output.Position = 0;
-                return output;
-            }
+            using var stream = new MemoryStream();
+            var output = new MemoryStream();
+            input.Save(stream, ImageFormat.Png);
+            var writer = new BinaryWriter(output);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((short)1);
+            writer.Write((short)1);
+            writer.Write((byte)input.Width);
+            writer.Write((byte)input.Height);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((short)0);
+            writer.Write((short)32);
+            writer.Write((int)stream.Length);
+            writer.Write((int)(6 + 16));
+            writer.Write(stream.ToArray());
+            writer.Flush();
+            output.Position = 0;
+            return output;
         }
     }
 
@@ -382,7 +374,7 @@ namespace NbtStudio
     {
         private readonly string Filepath;
         public override string Name => Path.GetFileNameWithoutExtension(Filepath);
-        private readonly Dictionary<string, IconType> FileNameMap = new Dictionary<string, IconType>
+        private readonly Dictionary<string, IconType> FileNameMap = new()
         {
             { "file", IconType.File },
             { "folder", IconType.Folder },

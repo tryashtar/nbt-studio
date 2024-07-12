@@ -1,12 +1,11 @@
 ﻿using Aga.Controls.Tree;
-using fNbt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using TryashtarUtils.Utility;
 
 namespace NbtStudio.UI

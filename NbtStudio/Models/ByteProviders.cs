@@ -1,11 +1,8 @@
 ﻿using Be.Windows.Forms;
 using fNbt;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TryashtarUtils.Utility;
 
 namespace NbtStudio

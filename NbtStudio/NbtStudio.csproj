@@ -55,7 +55,7 @@
     <ProjectReference Include="..\utils.utility\TryashtarUtils.Utility.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WinCopies.WindowsAPICodePack.Shell" Version="2.1.1" />
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,7 +1,4 @@
-﻿using fNbt;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
 using System.Windows.Forms;
 
 namespace NbtStudio.UI
